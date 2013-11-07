@@ -8,6 +8,7 @@ import org.jsfml.graphics.RenderTexture;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.TextureCreationException;
 
+// TODO: Doesn't respect View
 public class LightMap implements Drawable {
 
 	private final RenderTexture lightMap;
@@ -21,7 +22,6 @@ public class LightMap implements Drawable {
 	public void draw( RenderTarget target ) {
 		lightMap.display();
 		Sprite s = new Sprite(lightMap.getTexture());
-	//	s.setPosition(lightMap.getSize().x/2, lightMap.getSize().y/2);
 		target.draw(s, new RenderStates(BlendMode.ADD));
 	}
 	

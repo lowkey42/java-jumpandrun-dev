@@ -24,8 +24,8 @@ public class Light {
 		this.center = center;
 		this.color = color;
 		this.radius = radius;
-		this.degree = degree;
-		this.centerDegree = centerDegree;
+		this.degree = (float) Math.toRadians(degree);
+		this.centerDegree = (float) Math.toRadians(centerDegree);
 		this.dirty = true;
 	}
 
@@ -70,11 +70,11 @@ public class Light {
 		this.dirty = true;
 	}
 	public void setDegree(float degree) {
-		this.degree = degree;
+		this.degree = (float) Math.toRadians(degree);
 		this.dirty = true;
 	}
 	public void setCenterDegree(float centerDegree) {
-		this.centerDegree = centerDegree;
+		this.centerDegree = (float) Math.toRadians(centerDegree);
 		this.dirty = true;
 	}
 
