@@ -12,7 +12,7 @@ import de.secondsystem.game01.impl.GameState;
  *
  */
 public final class IntroState extends GameState {
-
+	
 	@Override
 	protected void onStart(GameContext ctx) {
 		// TODO
