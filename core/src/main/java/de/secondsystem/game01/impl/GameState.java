@@ -46,7 +46,12 @@ public abstract class GameState implements IState {
 
 		ctx.window.display();
 		
-		return nextState!=null ? nextState : this;
+		if( nextState!=null ) { 
+			IState r = nextState;
+			nextState = null;
+			return r;
+		}
+		return this;
 	}
 
 }
