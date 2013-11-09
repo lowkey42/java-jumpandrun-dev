@@ -12,7 +12,9 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.map.GameMap;
-import de.secondsystem.game01.impl.map.GraphicLayer.GraphicLayerType;
+import de.secondsystem.game01.impl.map.LayerType;
+import de.secondsystem.game01.impl.map.objects.CollisionObject;
+import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 public class MainGameState extends GameState {
 
@@ -20,16 +22,10 @@ public class MainGameState extends GameState {
 	
 	public MainGameState( String mapId ) {
 		// TODO: load
-		map = new GameMap();
-		Texture t1 = new Texture();
-		try {
-			t1.loadFromFile(Paths.get("assets/tiles/test01.png"));
-		} catch (IOException e) {
-			throw new Error(e);
-		}
-		Sprite s1 = new Sprite(t1);
-		s1.setPosition(200, 200);
-		map.addNode(GraphicLayerType.FOREGROUND_0, s1);
+		map = new GameMap("test01");
+
+		map.addNode(LayerType.FOREGROUND_0, new SpriteLayerObject(map.tileset, 0, 200, 200, 0, 1));
+		map.addNode(LayerType.PHYSICS, new CollisionObject(100, 100, 150, 20, 0));
 	}
 	
 	@Override

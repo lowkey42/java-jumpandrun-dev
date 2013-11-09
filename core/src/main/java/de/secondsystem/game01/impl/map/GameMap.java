@@ -6,16 +6,18 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.GraphicLayer.GraphicLayerType;
-
 public class GameMap {
 
-	private GraphicLayer[] graphicLayer = new GraphicLayer[GraphicLayer.LAYER_COUNT];
-		
-	public GameMap() {
-		for( GraphicLayerType l : GraphicLayerType.values() ) {
-			graphicLayer[l.layerIndex] = new GraphicLayer();
+	private Layer[] graphicLayer = new Layer[LayerType.LAYER_COUNT];
+	
+	public final Tileset tileset;
+	
+	public GameMap(String tilesetName) {
+		for( LayerType l : LayerType.values() ) {
+			graphicLayer[l.layerIndex] = new Layer();
 		}
+		
+		tileset = new Tileset(tilesetName);
 	}
 	
 	// objectLayer
@@ -26,8 +28,8 @@ public class GameMap {
 	public void draw(RenderTarget rt) {
 		final ConstView cView = rt.getView();
 		
-		for( GraphicLayerType l : GraphicLayerType.values() ) {
-			GraphicLayer layer = graphicLayer[l.layerIndex];
+		for( LayerType l : LayerType.values() ) {
+			Layer layer = graphicLayer[l.layerIndex];
 			
 			if( layer.show ) {
 				if( l.parallax!=1.f )
@@ -42,22 +44,22 @@ public class GameMap {
 		rt.setView(cView);
 	}
 	
-	public void addNode( GraphicLayerType layer, Sprite sprite ) {
+	public void addNode( LayerType layer, LayerObject sprite ) {
 		graphicLayer[layer.layerIndex].addNode(sprite);
 	}
-	public Sprite findNode( GraphicLayerType layer, Vector2f point ) {
+	public LayerObject findNode( LayerType layer, Vector2f point ) {
 		return graphicLayer[layer.layerIndex].findNode(point);
 	}
-	public void remove( GraphicLayerType layer, Sprite s ) {
+	public void remove( LayerType layer, LayerObject s ) {
 		graphicLayer[layer.layerIndex].remove(s);
 	}
 		
-	public boolean flipShowLayer( GraphicLayerType layer ) {
+	public boolean flipShowLayer( LayerType layer ) {
 		return graphicLayer[layer.layerIndex].show = !graphicLayer[layer.layerIndex].show;
 	}
 	public boolean[] getShownLayer() {
-		boolean[] s = new boolean[GraphicLayer.LAYER_COUNT];
-		for( int i=0; i<GraphicLayer.LAYER_COUNT; ++i )
+		boolean[] s = new boolean[LayerType.LAYER_COUNT];
+		for( int i=0; i<LayerType.LAYER_COUNT; ++i )
 			s[i] = graphicLayer[i].show;
 		
 		return s;

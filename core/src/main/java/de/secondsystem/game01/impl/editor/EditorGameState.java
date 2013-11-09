@@ -26,8 +26,10 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.LayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
-import de.secondsystem.game01.impl.map.GraphicLayer.GraphicLayerType;
+import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 /**
  * 
@@ -59,9 +61,9 @@ public final class EditorGameState extends GameState {
 	private int currentTile = 0;
 	private float currentTileRotation=0;
 	private float currentTileZoom=1.f;
-	private GraphicLayerType currentLayer = GraphicLayerType.FOREGROUND_0;
-	private Sprite selectedSprite;
-	private RectangleShape selectedSpriteMarker;
+	private LayerType currentLayer = LayerType.FOREGROUND_0;
+	private LayerObject selectedObject;
+	private RectangleShape selectedObjectMarker;
 	
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
@@ -89,10 +91,10 @@ public final class EditorGameState extends GameState {
 		mouseTile.setTexture(tileset.tiles.get(currentTile));
 		mouseTile.setOrigin(mouseTile.getTexture().getSize().x/2, mouseTile.getTexture().getSize().y/2);
 		
-		selectedSpriteMarker = new RectangleShape(new Vector2f(1,1));
-		selectedSpriteMarker.setOutlineColor(Color.BLUE);
-		selectedSpriteMarker.setOutlineThickness(4);
-		selectedSpriteMarker.setFillColor(Color.TRANSPARENT);
+		selectedObjectMarker = new RectangleShape(new Vector2f(1,1));
+		selectedObjectMarker.setOutlineColor(Color.BLUE);
+		selectedObjectMarker.setOutlineThickness(4);
+		selectedObjectMarker.setFillColor(Color.TRANSPARENT);
 	}
 
 	@Override
@@ -138,23 +140,20 @@ public final class EditorGameState extends GameState {
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
 		
 		
-		if( selectedSprite!=null ) {
-			selectedSprite.setOrigin(mouseTile.getTexture().getSize().x/2, mouseTile.getTexture().getSize().y/2);
-			
+		if( selectedObject!=null ) {
 			if( Mouse.isButtonPressed(Button.LEFT) ) {
-				selectedSprite.setPosition(rt.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y)));
+				selectedObject.setPosition(rt.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y)));
 			}
 			
-			selectedSprite.setRotation(currentTileRotation);
-			selectedSprite.setScale(currentTileZoom, currentTileZoom);
+			selectedObject.setRotation(currentTileRotation);
+			selectedObject.setScale(currentTileZoom);
 			
-			Vector2i texBounds = selectedSprite.getTexture().getSize();
-			selectedSpriteMarker.setSize( new Vector2f(texBounds.x, texBounds.y) );
-			selectedSpriteMarker.setScale(selectedSprite.getScale());
-			selectedSpriteMarker.setOrigin(selectedSprite.getOrigin());
-			selectedSpriteMarker.setRotation(selectedSprite.getRotation());
-			selectedSpriteMarker.setPosition(selectedSprite.getPosition());
-			rt.draw(selectedSpriteMarker);
+			selectedObjectMarker.setSize( new Vector2f(selectedObject.getHeight(), selectedObject.getWidth()) );
+			selectedObjectMarker.setScale(selectedObject.getScale(), selectedObject.getScale());
+			selectedObjectMarker.setOrigin(selectedObject.getOrigin());
+			selectedObjectMarker.setRotation(selectedObject.getRotation());
+			selectedObjectMarker.setPosition(selectedObject.getPosition());
+			rt.draw(selectedObjectMarker);
 			
 		} else {
 			mouseTile.setOrigin(mouseTile.getTexture().getSize().x/2, mouseTile.getTexture().getSize().y/2);
@@ -184,15 +183,8 @@ public final class EditorGameState extends GameState {
 			case MOUSE_BUTTON_RELEASED:
 				switch( event.asMouseButtonEvent().button ){
 					case LEFT:
-						if( selectedSprite==null ) {
-							Sprite sprite = new Sprite();
-							sprite.setTexture(tileset.tiles.get(currentTile));
-							sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
-							sprite.setPosition(mouseTile.getPosition());
-							sprite.setRotation(currentTileRotation);
-							sprite.setScale(currentTileZoom, currentTileZoom);
-							
-							map.addNode(currentLayer, sprite);
+						if( selectedObject==null ) {
+							map.addNode(currentLayer, new SpriteLayerObject(tileset, currentTile, mouseTile.getPosition().x, mouseTile.getPosition().y, currentTileRotation, currentTileZoom));
 						}
 						return true;
 					
@@ -203,11 +195,11 @@ public final class EditorGameState extends GameState {
 										currentLayer.parallax), 
 								Vector2f.div(ctx.window.getView().getSize(), zoom) );
 						
-						selectedSprite = map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y), view));
+						selectedObject = map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y), view));
 						
-						if( selectedSprite!=null ) {
-							currentTileRotation = selectedSprite.getRotation();
-							currentTileZoom = selectedSprite.getScale().x;
+						if( selectedObject!=null ) {
+							currentTileRotation = selectedObject.getRotation();
+							currentTileZoom = selectedObject.getScale();
 							
 						} else {
 							deselectSprite();
@@ -223,7 +215,7 @@ public final class EditorGameState extends GameState {
 	}
 
 	private void deselectSprite() {
-		selectedSprite = null;
+		selectedObject = null;
 		currentTileRotation = 0.f;
 		currentTileZoom = 1.f;
 	}
@@ -244,8 +236,8 @@ public final class EditorGameState extends GameState {
 	private final boolean processInputKey(KeyEvent event) {
 		switch( event.key ) {
 			case DELETE:
-				if( selectedSprite!=null ) {
-					map.remove(currentLayer, selectedSprite);
+				if( selectedObject!=null ) {
+					map.remove(currentLayer, selectedObject);
 					deselectSprite();
 				}
 				break; 
@@ -269,41 +261,51 @@ public final class EditorGameState extends GameState {
 				
 			case NUM1:
 				if( event.control )
-					map.flipShowLayer(GraphicLayerType.BACKGROUND_2);
+					map.flipShowLayer(LayerType.BACKGROUND_2);
 				else {
-					currentLayer = GraphicLayerType.BACKGROUND_2;
+					currentLayer = LayerType.BACKGROUND_2;
 					deselectSprite();
 				}
 				break;
 			case NUM2:
 				if( event.control )
-					map.flipShowLayer(GraphicLayerType.BACKGROUND_1);
+					map.flipShowLayer(LayerType.BACKGROUND_1);
 				else {
-					currentLayer = GraphicLayerType.BACKGROUND_1;
+					currentLayer = LayerType.BACKGROUND_1;
 					deselectSprite();
 				}
 				break;
 			case NUM3:
 				if( event.control )
-					map.flipShowLayer(GraphicLayerType.BACKGROUND_0);
+					map.flipShowLayer(LayerType.BACKGROUND_0);
 				else {
-					currentLayer = GraphicLayerType.BACKGROUND_0;
+					currentLayer = LayerType.BACKGROUND_0;
 					deselectSprite();
 				}
 				break;
+				
 			case NUM4:
 				if( event.control )
-					map.flipShowLayer(GraphicLayerType.FOREGROUND_0);
+					map.flipShowLayer(LayerType.PHYSICS);
 				else {
-					currentLayer = GraphicLayerType.FOREGROUND_0;
+					currentLayer = LayerType.PHYSICS;
 					deselectSprite();
 				}
 				break;
+				
 			case NUM5:
 				if( event.control )
-					map.flipShowLayer(GraphicLayerType.FOREGROUND_1);
+					map.flipShowLayer(LayerType.FOREGROUND_0);
 				else {
-					currentLayer = GraphicLayerType.FOREGROUND_1;
+					currentLayer = LayerType.FOREGROUND_0;
+					deselectSprite();
+				}
+				break;
+			case NUM6:
+				if( event.control )
+					map.flipShowLayer(LayerType.FOREGROUND_1);
+				else {
+					currentLayer = LayerType.FOREGROUND_1;
 					deselectSprite();
 				}
 				break;
@@ -321,11 +323,12 @@ public final class EditorGameState extends GameState {
 		
 		StringBuilder str = new StringBuilder();
 		
-		for( int i=0; i<s.length; ++i )
-			if( currentLayer.layerIndex==i )
-				str.append("=").append(i+1).append("= ");
+		for( LayerType l : LayerType.values() ) {
+			if( currentLayer==l )
+				str.append("=").append(l.name).append("=   ");
 			else
-				str.append(i+1).append(" ");
+				str.append(l.name).append("   ");
+		}
 		
 		return str.toString();
 	}
