@@ -14,10 +14,10 @@ public class CollisionObject implements LayerObject {
 	public CollisionObject(float x, float y, float height, float width, float rotation) {
 		this.shape = new RectangleShape(new Vector2f(height, width));
 		shape.setPosition(x, y);
-		shape.setFillColor(new Color(160, 160, 160, 160));
+		shape.setFillColor(new Color(160, 160, 160, 255));
 		shape.setOutlineColor(Color.YELLOW);
 		shape.setOutlineThickness(2);
-		shape.setOrigin(height/2, width/2);
+		shape.setOrigin( shape.getSize().x/2, shape.getSize().y/2);
 		shape.setRotation(rotation);
 	}
 	

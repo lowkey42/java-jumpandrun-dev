@@ -25,7 +25,7 @@ public class MainGameState extends GameState {
 		map = new GameMap("test01");
 
 		map.addNode(LayerType.FOREGROUND_0, new SpriteLayerObject(map.tileset, 0, 200, 200, 0, 1));
-		map.addNode(LayerType.PHYSICS, new CollisionObject(100, 100, 150, 20, 0));
+		map.addNode(LayerType.PHYSICS, new CollisionObject(100, 100, 150, 10, 0));
 	}
 	
 	@Override

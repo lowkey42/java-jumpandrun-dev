@@ -14,7 +14,7 @@ public class GameMap {
 	
 	public GameMap(String tilesetName) {
 		for( LayerType l : LayerType.values() ) {
-			graphicLayer[l.layerIndex] = new Layer();
+			graphicLayer[l.layerIndex] = new Layer(l);
 		}
 		
 		tileset = new Tileset(tilesetName);

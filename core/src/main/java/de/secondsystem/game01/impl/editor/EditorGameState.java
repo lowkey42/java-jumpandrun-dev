@@ -325,9 +325,13 @@ public final class EditorGameState extends GameState {
 		
 		for( LayerType l : LayerType.values() ) {
 			if( currentLayer==l )
-				str.append("=").append(l.name).append("=   ");
+				str.append("=").append(l.name).append("=");
 			else
-				str.append(l.name).append("   ");
+				str.append(l.name);
+			
+			str.append( s[l.layerIndex] ? "[X]" : "[ ]" );
+
+			str.append("\t");
 		}
 		
 		return str.toString();

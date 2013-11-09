@@ -4,17 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
-public final class Layer {
+final class Layer {
 	
 	List<LayerObject> objects = new ArrayList<>();
-	boolean show = true;
+	boolean show;
+	
+	public Layer( LayerType type ) {
+		show = type.visible;
+	}
 	
 	public void draw(RenderTarget rt) {
-		for( LayerObject s : objects )
-			s.draw(rt);
+		if( show )
+			for( LayerObject s : objects )
+				s.draw(rt);
 	}
 	public void addNode( LayerObject obj ) {
 		objects.add(obj);
