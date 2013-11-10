@@ -7,25 +7,50 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
 
+/**
+ * TODO: tinting
+ * @author lowkey
+ *
+ */
 public class SpriteLayerObject implements LayerObject {
 
 	private Sprite sprite;
 	
+	private Tileset tileset;
+	private int tileId;
+	
 	public SpriteLayerObject(Sprite sprite) {
 		this.sprite = sprite;
 	}
-	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float scale) {
+	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation) {
+		this(tileset, tileId, x, y, rotation, 0, 0);
+	}
+	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float height, float width) {
+		this.tileset = tileset;
+		this.tileId = tileId;
 		sprite = new Sprite();
 		sprite.setTexture(tileset.tiles.get(tileId));
 		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
 		sprite.setPosition(x, y);
 		sprite.setRotation(rotation);
-		sprite.setScale(scale, scale);
+		setDimensions(height>0?height:sprite.getTexture().getSize().y, width>0?width:sprite.getTexture().getSize().x);
+	}
+	
+	public void setTile(Tileset tileset, int tileId) {
+		this.tileset = tileset;
+		this.tileId = tileId;
+		sprite.setTexture(tileset.tiles.get(tileId));
+		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
 	}
 	
 	@Override
 	public void draw(RenderTarget rt) {
 		rt.draw(sprite);
+	}
+	
+	@Override
+	public void setDimensions(float height, float width) {
+		sprite.setScale(width/sprite.getTexture().getSize().x, height/sprite.getTexture().getSize().y);
 	}
 
 	@Override
@@ -44,23 +69,13 @@ public class SpriteLayerObject implements LayerObject {
 	}
 
 	@Override
-	public void setScale(float scale) {
-		sprite.setScale(scale, scale);
-	}
-
-	@Override
 	public int getHeight() {
-		return sprite.getTexture().getSize().y;
+		return (int) (sprite.getTexture().getSize().y * sprite.getScale().y);
 	}
 
 	@Override
 	public int getWidth() {
-		return sprite.getTexture().getSize().y;
-	}
-
-	@Override
-	public float getScale() {
-		return sprite.getScale().x;
+		return (int) (sprite.getTexture().getSize().x * sprite.getScale().x);
 	}
 
 	@Override
@@ -76,6 +91,10 @@ public class SpriteLayerObject implements LayerObject {
 	@Override
 	public Vector2f getPosition() {
 		return sprite.getPosition();
+	}
+	@Override
+	public LayerObject copy() {
+		return new SpriteLayerObject(tileset, tileId, sprite.getPosition().x, sprite.getPosition().y, sprite.getRotation(), getHeight(), getWidth());
 	}
 
 }

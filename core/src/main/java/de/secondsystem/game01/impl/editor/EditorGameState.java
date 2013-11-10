@@ -10,6 +10,7 @@ import org.jsfml.graphics.Font;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.View;
@@ -29,7 +30,9 @@ import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.impl.map.objects.CollisionObject;
 import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
+import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
 
 /**
  * 
@@ -49,18 +52,22 @@ public final class EditorGameState extends GameState {
 
 	private static final float CAM_MOVE_SPEED = 5.f;
 	
+	private RenderWindow window;
+	
 	private final GameState playGameState;
 	private final GameMap map;
 	private final Tileset tileset;
 	
 	private final Text editorHint;
 	private final Text layerHint;
-	private final Sprite mouseTile;
+	private LayerObject mouseTile;
 	
 	private float x,y, zoom=1.f;
 	private int currentTile = 0;
 	private float currentTileRotation=0;
 	private float currentTileZoom=1.f;
+	private int currentTileHeight=1;
+	private int currentTileWidth=1;
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
 	private LayerObject selectedObject;
 	private RectangleShape selectedObjectMarker;
@@ -86,10 +93,7 @@ public final class EditorGameState extends GameState {
 		layerHint.setPosition(0, 25);
 		layerHint.setColor(Color.WHITE);
 		
-		mouseTile = new Sprite();
-		mouseTile.setColor(new Color(255, 255, 255, 128));
-		mouseTile.setTexture(tileset.tiles.get(currentTile));
-		mouseTile.setOrigin(mouseTile.getTexture().getSize().x/2, mouseTile.getTexture().getSize().y/2);
+		createMouseSprite();
 		
 		selectedObjectMarker = new RectangleShape(new Vector2f(1,1));
 		selectedObjectMarker.setOutlineColor(Color.BLUE);
@@ -99,8 +103,7 @@ public final class EditorGameState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
-		// TODO Auto-generated method stub
-
+		window = ctx.window;
 	}
 
 	@Override
@@ -109,6 +112,30 @@ public final class EditorGameState extends GameState {
 
 	}
 
+	private void createMouseSprite() {
+		if( !(mouseTile instanceof SpriteLayerObject) )
+			mouseTile = new SpriteLayerObject(tileset, currentTile, 0, 0, 0);
+		onSpriteTileChnaged();
+	}
+	private void createMouseCollisionObj() {
+		if( !(mouseTile instanceof CollisionObject) )
+			mouseTile = new CollisionObject(CollisionType.NORMAL, 0, 0, 50, 50, 0);
+		onSpriteTileChnaged();
+	}
+	private void onSpriteTileChnaged() {
+		currentTileRotation = 0.f;
+		currentTileZoom = 1.f;
+		currentTileHeight = mouseTile.getHeight();
+		currentTileWidth = mouseTile.getWidth();
+	}
+	
+	private int getMouseX() {
+		return Mouse.getPosition(window).x;
+	}
+	private int getMouseY() {
+		return Mouse.getPosition(window).y;
+	}
+	
 	@Override
 	protected void onFrame(GameContext ctx) {
 		drawMap(ctx.window);
@@ -142,25 +169,23 @@ public final class EditorGameState extends GameState {
 		
 		if( selectedObject!=null ) {
 			if( Mouse.isButtonPressed(Button.LEFT) ) {
-				selectedObject.setPosition(rt.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y)));
+				selectedObject.setPosition(rt.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY())));
 			}
 			
 			selectedObject.setRotation(currentTileRotation);
-			selectedObject.setScale(currentTileZoom);
+			selectedObject.setDimensions(currentTileHeight*currentTileZoom, currentTileWidth*currentTileZoom);
 			
-			selectedObjectMarker.setSize( new Vector2f(selectedObject.getHeight(), selectedObject.getWidth()) );
-			selectedObjectMarker.setScale(selectedObject.getScale(), selectedObject.getScale());
+			selectedObjectMarker.setSize( new Vector2f(selectedObject.getWidth(), selectedObject.getHeight()) );
 			selectedObjectMarker.setOrigin(selectedObject.getOrigin());
 			selectedObjectMarker.setRotation(selectedObject.getRotation());
 			selectedObjectMarker.setPosition(selectedObject.getPosition());
 			rt.draw(selectedObjectMarker);
 			
 		} else {
-			mouseTile.setOrigin(mouseTile.getTexture().getSize().x/2, mouseTile.getTexture().getSize().y/2);
-			mouseTile.setPosition( rt.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y)) );
+			mouseTile.setPosition( rt.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY())) );
 			mouseTile.setRotation(currentTileRotation);
-			mouseTile.setScale(currentTileZoom, currentTileZoom);
-			rt.draw(mouseTile);
+			mouseTile.setDimensions(currentTileHeight*currentTileZoom, currentTileWidth*currentTileZoom);
+			mouseTile.draw(rt);
 		}
 
 		rt.setView(cView);
@@ -175,16 +200,22 @@ public final class EditorGameState extends GameState {
 				if( event.asMouseWheelEvent().delta==0 )
 					return true;
 				
-				currentTile = Math.abs( (currentTile+ (event.asMouseWheelEvent().delta<0 ? -1 : 1)) % tileset.tiles.size() );
-				mouseTile.setTexture(tileset.tiles.get(currentTile));
-				mouseTile.setOrigin(mouseTile.getTexture().getSize().x/2, mouseTile.getTexture().getSize().y/2);
+				int offset = event.asMouseWheelEvent().delta<0 ? -1 : 1;
+				
+				if( mouseTile instanceof SpriteLayerObject ) {
+					currentTile = Math.abs( (currentTile+offset) % tileset.tiles.size() );
+					((SpriteLayerObject)mouseTile).setTile(tileset, currentTile);
+				} else if( mouseTile instanceof CollisionObject ) {
+					((CollisionObject)mouseTile).setType( offset>0 ? ((CollisionObject)mouseTile).getType().next() : ((CollisionObject)mouseTile).getType().prev() );
+				}
+				
 				return true;
 				
 			case MOUSE_BUTTON_RELEASED:
 				switch( event.asMouseButtonEvent().button ){
 					case LEFT:
 						if( selectedObject==null ) {
-							map.addNode(currentLayer, new SpriteLayerObject(tileset, currentTile, mouseTile.getPosition().x, mouseTile.getPosition().y, currentTileRotation, currentTileZoom));
+							map.addNode(currentLayer, mouseTile.copy());
 						}
 						return true;
 					
@@ -195,11 +226,13 @@ public final class EditorGameState extends GameState {
 										currentLayer.parallax), 
 								Vector2f.div(ctx.window.getView().getSize(), zoom) );
 						
-						selectedObject = map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(Mouse.getPosition().x, Mouse.getPosition().y), view));
+						selectedObject = map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view));
 						
 						if( selectedObject!=null ) {
 							currentTileRotation = selectedObject.getRotation();
-							currentTileZoom = selectedObject.getScale();
+							currentTileZoom = 1.0f;
+							currentTileHeight = selectedObject.getHeight();
+							currentTileWidth = selectedObject.getWidth();
 							
 						} else {
 							deselectSprite();
@@ -216,8 +249,11 @@ public final class EditorGameState extends GameState {
 
 	private void deselectSprite() {
 		selectedObject = null;
-		currentTileRotation = 0.f;
-		currentTileZoom = 1.f;
+		
+		if(currentLayer==LayerType.PHYSICS)
+			createMouseCollisionObj();
+		else
+			createMouseSprite();
 	}
 	
 	private final boolean processInputKeyboard() {
@@ -230,6 +266,15 @@ public final class EditorGameState extends GameState {
 		if( Keyboard.isKeyPressed(Key.D) )
 			x+=CAM_MOVE_SPEED;
 		
+		if( Keyboard.isKeyPressed(Key.LEFT) && currentTileWidth>0 )
+			currentTileWidth--;
+		if( Keyboard.isKeyPressed(Key.RIGHT) )
+			currentTileWidth++;
+		if( Keyboard.isKeyPressed(Key.UP) )
+			currentTileHeight++;
+		if( Keyboard.isKeyPressed(Key.DOWN) && currentTileHeight>0 )
+			currentTileHeight--;
+		
 		return true;
 	}
 	
@@ -241,7 +286,7 @@ public final class EditorGameState extends GameState {
 					deselectSprite();
 				}
 				break; 
-		
+						
 			case ADD:
 				if( event.shift )
 					currentTileRotation+=11.25f;
@@ -286,6 +331,23 @@ public final class EditorGameState extends GameState {
 				
 			case NUM4:
 				if( event.control )
+					map.flipShowLayer(LayerType.FOREGROUND_0);
+				else {
+					currentLayer = LayerType.FOREGROUND_0;
+					deselectSprite();
+				}
+				break;
+			case NUM5:
+				if( event.control )
+					map.flipShowLayer(LayerType.FOREGROUND_1);
+				else {
+					currentLayer = LayerType.FOREGROUND_1;
+					deselectSprite();
+				}
+				break;
+				
+			case P:
+				if( event.control )
 					map.flipShowLayer(LayerType.PHYSICS);
 				else {
 					currentLayer = LayerType.PHYSICS;
@@ -293,19 +355,11 @@ public final class EditorGameState extends GameState {
 				}
 				break;
 				
-			case NUM5:
+			case O:
 				if( event.control )
-					map.flipShowLayer(LayerType.FOREGROUND_0);
+					map.flipShowLayer(LayerType.OBJECTS);
 				else {
-					currentLayer = LayerType.FOREGROUND_0;
-					deselectSprite();
-				}
-				break;
-			case NUM6:
-				if( event.control )
-					map.flipShowLayer(LayerType.FOREGROUND_1);
-				else {
-					currentLayer = LayerType.FOREGROUND_1;
+					currentLayer = LayerType.OBJECTS;
 					deselectSprite();
 				}
 				break;
