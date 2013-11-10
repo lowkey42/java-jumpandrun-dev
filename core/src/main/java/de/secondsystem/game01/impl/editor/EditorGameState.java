@@ -280,6 +280,10 @@ public final class EditorGameState extends GameState {
 	
 	private final boolean processInputKey(KeyEvent event) {
 		switch( event.key ) {
+			case TAB:
+				map.switchWorlds();
+				break;
+				
 			case DELETE:
 				if( selectedObject!=null ) {
 					map.remove(currentLayer, selectedObject);

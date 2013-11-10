@@ -22,10 +22,7 @@ public class MainGameState extends GameState {
 	
 	public MainGameState( String mapId ) {
 		// TODO: load
-		map = new GameMap("test01");
-
-		map.addNode(LayerType.FOREGROUND_0, new SpriteLayerObject(map.tileset, 0, 200, 200, 0));
-		map.addNode(LayerType.PHYSICS, new CollisionObject( CollisionObject.CollisionType.NORMAL, 100, 100, 150, 10, 0));
+		map = new GameMap("test01", "test01");
 	}
 	
 	@Override
@@ -49,6 +46,9 @@ public class MainGameState extends GameState {
 	        } else if( event.type==Event.Type.KEY_RELEASED ) {
 	        	if( event.asKeyEvent().key==Key.F12 ) {
 	        		setNextState(new EditorGameState(this, map));
+	        	}
+	        	if( event.asKeyEvent().key==Key.TAB ) {
+					map.switchWorlds();
 	        	}
 	        }
 	    }

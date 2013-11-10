@@ -8,5 +8,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/core/lib/jsfml-test-Jul31_2013.zip!/javadoc"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/json_simple-1.1.jar" sourcepath="lib/json_simple-1.1-source.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

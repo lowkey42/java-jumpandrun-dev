@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.map;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
@@ -8,16 +9,32 @@ import org.jsfml.system.Vector2f;
 
 public class GameMap {
 
-	private Layer[] graphicLayer = new Layer[LayerType.LAYER_COUNT];
-	
-	public final Tileset tileset;
-	
-	public GameMap(String tilesetName) {
-		for( LayerType l : LayerType.values() ) {
-			graphicLayer[l.layerIndex] = new Layer(l);
-		}
+	public static final class World {
+		final Layer[] graphicLayer = new Layer[LayerType.LAYER_COUNT];
+		Tileset tileset;
+		Color backgroundColor;
 		
-		tileset = new Tileset(tilesetName);
+		World(String tilesetName) {
+			for( LayerType l : LayerType.values() )
+				graphicLayer[l.layerIndex] = new Layer(l);
+			
+			tileset = new Tileset(tilesetName);
+			backgroundColor = Color.BLACK;
+		}
+		void setTileset(String tilesetName) {
+			tileset = new Tileset(tilesetName);
+		}
+	}
+	
+	final World world[] = new World[2];
+	
+	int activeWorld;
+	
+	public GameMap(String tilesetName1, String tilesetName2) {
+		world[0] = new World(tilesetName1);
+		world[1] = new World(tilesetName2);
+		
+		activeWorld = 0;
 	}
 	
 	// objectLayer
@@ -25,11 +42,17 @@ public class GameMap {
 	// triggerLayer
 	// particleLayer
 	
+	public void switchWorlds() {
+		activeWorld = activeWorld==0 ? 1 : 0;
+	}
+	
 	public void draw(RenderTarget rt) {
 		final ConstView cView = rt.getView();
 		
+		rt.clear(world[activeWorld].backgroundColor);
+		
 		for( LayerType l : LayerType.values() ) {
-			Layer layer = graphicLayer[l.layerIndex];
+			Layer layer = world[activeWorld].graphicLayer[l.layerIndex];
 			
 			if( layer.show ) {
 				if( l.parallax!=1.f )
@@ -45,22 +68,22 @@ public class GameMap {
 	}
 	
 	public void addNode( LayerType layer, LayerObject sprite ) {
-		graphicLayer[layer.layerIndex].addNode(sprite);
+		world[activeWorld].graphicLayer[layer.layerIndex].addNode(sprite);
 	}
 	public LayerObject findNode( LayerType layer, Vector2f point ) {
-		return graphicLayer[layer.layerIndex].findNode(point);
+		return world[activeWorld].graphicLayer[layer.layerIndex].findNode(point);
 	}
 	public void remove( LayerType layer, LayerObject s ) {
-		graphicLayer[layer.layerIndex].remove(s);
+		world[activeWorld].graphicLayer[layer.layerIndex].remove(s);
 	}
 		
 	public boolean flipShowLayer( LayerType layer ) {
-		return graphicLayer[layer.layerIndex].show = !graphicLayer[layer.layerIndex].show;
+		return world[activeWorld].graphicLayer[layer.layerIndex].show = !world[activeWorld].graphicLayer[layer.layerIndex].show;
 	}
 	public boolean[] getShownLayer() {
 		boolean[] s = new boolean[LayerType.LAYER_COUNT];
 		for( int i=0; i<LayerType.LAYER_COUNT; ++i )
-			s[i] = graphicLayer[i].show;
+			s[i] = world[activeWorld].graphicLayer[i].show;
 		
 		return s;
 	}
