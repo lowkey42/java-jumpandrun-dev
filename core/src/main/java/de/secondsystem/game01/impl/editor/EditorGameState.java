@@ -27,6 +27,7 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
@@ -55,7 +56,7 @@ public final class EditorGameState extends GameState {
 	private RenderWindow window;
 	
 	private final GameState playGameState;
-	private final GameMap map;
+	private GameMap map;
 	private final Tileset tileset;
 	
 	private final Text editorHint;
@@ -280,6 +281,14 @@ public final class EditorGameState extends GameState {
 	
 	private final boolean processInputKey(KeyEvent event) {
 		switch( event.key ) {
+			case F5:
+				new JsonGameMapSerializer().serialize(Paths.get("assets", "maps", "test01.map"), map);
+				break;
+				
+			case F9:
+				map = new JsonGameMapSerializer().deserialize(Paths.get("assets", "maps", "test01.map"));
+				break;
+		
 			case TAB:
 				map.switchWorlds();
 				break;
@@ -290,7 +299,8 @@ public final class EditorGameState extends GameState {
 					deselectSprite();
 				}
 				break; 
-						
+					
+			case PAGEUP:
 			case ADD:
 				if( event.shift )
 					currentTileRotation+=11.25f;
@@ -299,6 +309,8 @@ public final class EditorGameState extends GameState {
 				else 
 					zoom*=2;
 				break;
+				
+			case PAGEDOWN:
 			case SUBTRACT:
 				if( event.shift )
 					currentTileRotation-=11.25f;

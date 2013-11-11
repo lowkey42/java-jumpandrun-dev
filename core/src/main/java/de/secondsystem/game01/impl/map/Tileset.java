@@ -14,9 +14,13 @@ import org.jsfml.graphics.Texture;
 
 public class Tileset {
 
+	public final String name;
+	
 	public final List<ConstTexture> tiles;
 	
 	public Tileset( String name ) {
+		this.name = name;
+		
 		try {
 			String[] tileFiles = readFile("assets/tilesets/"+name+".txt").split("\\s*,\\s*");
 			

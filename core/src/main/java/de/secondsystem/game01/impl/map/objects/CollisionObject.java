@@ -1,14 +1,18 @@
 package de.secondsystem.game01.impl.map.objects;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.LayerObject;
-import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
 
 public class CollisionObject implements LayerObject {
+
+	public static final String TYPE_UUID = "CLO";
 	
 	public static enum CollisionType {
 		NORMAL(new Color(255, 100, 100, 255)), ONE_WAY(new Color(180, 180, 180, 255)), NO_GRAV(new Color(100, 100, 255, 255));
@@ -30,7 +34,7 @@ public class CollisionObject implements LayerObject {
 	private RectangleShape shape;
 	
 	private CollisionType type;
-	
+
 	public CollisionObject(CollisionType type, float x, float y, float height, float width, float rotation) {
 		this.type = type;
 		this.shape = new RectangleShape(new Vector2f(width, height));
@@ -106,5 +110,36 @@ public class CollisionObject implements LayerObject {
 		return new CollisionObject(type, getPosition().x, getPosition().y, getHeight(), getWidth(), getRotation());
 	}
 
+	@Override
+	public String typeUuid() {
+		return TYPE_UUID;
+	}
+
+	@Override
+	public Map<String, Object> getAttributes() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("type", type.name());
+		map.put("x", getPosition().x);
+		map.put("y", getPosition().y);
+		map.put("rotation", getRotation());
+		map.put("height", getHeight());
+		map.put("width", getWidth());
+		
+		return map;
+	}
+	public static CollisionObject create(Map<String, Object> attributes) {
+		try {
+			return new CollisionObject(
+					CollisionType.valueOf((String)attributes.get("type")), 
+					((Double)attributes.get("x")).floatValue(),
+					((Double)attributes.get("y")).floatValue(),
+					((Long)attributes.get("height")).intValue(),
+					((Long)attributes.get("width")).intValue(),
+					((Double)attributes.get("rotation")).floatValue() );
+		
+		} catch( ClassCastException | NullPointerException e ) {
+			throw new Error( "Invalid attributes: "+attributes, e );
+		}
+	}
 
 }

@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl.map;
 
+import java.util.Arrays;
+
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
@@ -7,19 +9,30 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.GameMap.World;
+
 public class GameMap {
 
 	public static final class World {
-		final Layer[] graphicLayer = new Layer[LayerType.LAYER_COUNT];
+		final Layer[] graphicLayer;
 		Tileset tileset;
 		Color backgroundColor;
 		
 		World(String tilesetName) {
+			graphicLayer = new Layer[LayerType.LAYER_COUNT];
 			for( LayerType l : LayerType.values() )
 				graphicLayer[l.layerIndex] = new Layer(l);
 			
 			tileset = new Tileset(tilesetName);
 			backgroundColor = Color.BLACK;
+		}
+		World(Color bColor, String tilesetName) {
+			graphicLayer = new Layer[LayerType.LAYER_COUNT];
+			for( LayerType l : LayerType.values() )
+				graphicLayer[l.layerIndex] = new Layer(l);
+			
+			tileset = new Tileset(tilesetName);
+			backgroundColor = bColor;
 		}
 		void setTileset(String tilesetName) {
 			tileset = new Tileset(tilesetName);
@@ -36,12 +49,18 @@ public class GameMap {
 		
 		activeWorld = 0;
 	}
+	GameMap(World world0, World world1) {
+		world[0] = world0;
+		world[0] = world1;
+		activeWorld = 0;
+	}
 	
 	// objectLayer
 	// collisionLayer
 	// triggerLayer
 	// particleLayer
 	
+
 	public void switchWorlds() {
 		activeWorld = activeWorld==0 ? 1 : 0;
 	}

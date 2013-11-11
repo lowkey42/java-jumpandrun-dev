@@ -1,11 +1,15 @@
 package de.secondsystem.game01.impl.map.objects;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
 
 /**
  * TODO: tinting
@@ -14,6 +18,8 @@ import de.secondsystem.game01.impl.map.Tileset;
  */
 public class SpriteLayerObject implements LayerObject {
 
+	public static final String TYPE_UUID = "SLO";
+	
 	private Sprite sprite;
 	
 	private Tileset tileset;
@@ -96,5 +102,36 @@ public class SpriteLayerObject implements LayerObject {
 	public LayerObject copy() {
 		return new SpriteLayerObject(tileset, tileId, sprite.getPosition().x, sprite.getPosition().y, sprite.getRotation(), getHeight(), getWidth());
 	}
+	@Override
+	public String typeUuid() {
+		return TYPE_UUID;
+	}
 
+	@Override
+	public Map<String, Object> getAttributes() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("tile", tileId);
+		map.put("x", getPosition().x);
+		map.put("y", getPosition().y);
+		map.put("rotation", getRotation());
+		map.put("height", getHeight());
+		map.put("width", getWidth());
+		
+		return map;
+	}
+	public static SpriteLayerObject create(Tileset tileset, Map<String, Object> attributes) {
+		try {
+			return new SpriteLayerObject(
+					tileset,
+					((Long)attributes.get("tile")).intValue(), 
+					((Double)attributes.get("x")).floatValue(),
+					((Double)attributes.get("y")).floatValue(),
+					((Double)attributes.get("rotation")).floatValue(),
+					((Long)attributes.get("height")).intValue(),
+					((Long)attributes.get("width")).intValue() );
+		
+		} catch( ClassCastException | NullPointerException e ) {
+			throw new Error( "Invalid attributes: "+attributes, e );
+		}
+	}
 }
