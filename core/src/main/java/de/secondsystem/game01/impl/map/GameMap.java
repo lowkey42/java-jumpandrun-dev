@@ -51,7 +51,7 @@ public class GameMap {
 	}
 	GameMap(World world0, World world1) {
 		world[0] = world0;
-		world[0] = world1;
+		world[1] = world1;
 		activeWorld = 0;
 	}
 	
