@@ -7,9 +7,9 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
-import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
 
 /**
  * TODO: tinting
@@ -18,7 +18,7 @@ import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
  */
 public class SpriteLayerObject implements LayerObject {
 
-	public static final String TYPE_UUID = "SLO";
+	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(SpriteLayerObject.class);
 	
 	private Sprite sprite;
 	
@@ -103,7 +103,7 @@ public class SpriteLayerObject implements LayerObject {
 		return new SpriteLayerObject(tileset, tileId, sprite.getPosition().x, sprite.getPosition().y, sprite.getRotation(), getHeight(), getWidth());
 	}
 	@Override
-	public String typeUuid() {
+	public LayerObjectType typeUuid() {
 		return TYPE_UUID;
 	}
 
@@ -119,16 +119,16 @@ public class SpriteLayerObject implements LayerObject {
 		
 		return map;
 	}
-	public static SpriteLayerObject create(Tileset tileset, Map<String, Object> attributes) {
+	public static SpriteLayerObject create(GameMap map, int worldId, Map<String, Object> attributes) {
 		try {
 			return new SpriteLayerObject(
-					tileset,
-					((Long)attributes.get("tile")).intValue(), 
-					((Double)attributes.get("x")).floatValue(),
-					((Double)attributes.get("y")).floatValue(),
-					((Double)attributes.get("rotation")).floatValue(),
-					((Long)attributes.get("height")).intValue(),
-					((Long)attributes.get("width")).intValue() );
+					map.getTileset(),
+					((Number)attributes.get("tile")).intValue(), 
+					((Number)attributes.get("x")).floatValue(),
+					((Number)attributes.get("y")).floatValue(),
+					((Number)attributes.get("rotation")).floatValue(),
+					((Number)attributes.get("height")).intValue(),
+					((Number)attributes.get("width")).intValue() );
 		
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );

@@ -1,10 +1,5 @@
 package de.secondsystem.game01.impl.game;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
-import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
@@ -12,17 +7,18 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.map.GameMap;
-import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.impl.map.objects.CollisionObject;
-import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
+import de.secondsystem.game01.impl.map.IGameMapSerializer;
+import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+import de.secondsystem.game01.impl.map.Tileset;
 
 public class MainGameState extends GameState {
 
 	private final GameMap map;
 	
 	public MainGameState( String mapId ) {
-		// TODO: load
-		map = new GameMap("test01", "test01");
+		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+		
+		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, false);
 	}
 	
 	@Override

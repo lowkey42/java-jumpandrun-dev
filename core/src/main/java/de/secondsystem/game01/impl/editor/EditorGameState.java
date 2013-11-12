@@ -5,35 +5,31 @@ import java.nio.file.Paths;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Font;
-import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderWindow;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.Mouse.Button;
 import org.jsfml.window.Mouse;
+import org.jsfml.window.Mouse.Button;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
 import de.secondsystem.game01.impl.map.objects.CollisionObject;
-import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
+import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 /**
  * 
@@ -282,11 +278,11 @@ public final class EditorGameState extends GameState {
 	private final boolean processInputKey(KeyEvent event) {
 		switch( event.key ) {
 			case F5:
-				new JsonGameMapSerializer().serialize(Paths.get("assets", "maps", "test01.map"), map);
+				new JsonGameMapSerializer().serialize(map);
 				break;
 				
 			case F9:
-				map = new JsonGameMapSerializer().deserialize(Paths.get("assets", "maps", "test01.map"));
+				map = new JsonGameMapSerializer().deserialize(map.getMapId(), true, true);
 				break;
 		
 			case TAB:

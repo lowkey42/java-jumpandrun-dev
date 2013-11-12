@@ -1,58 +1,75 @@
 package de.secondsystem.game01.impl.map;
 
-import java.util.Arrays;
-
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
-
-import de.secondsystem.game01.impl.map.GameMap.World;
 
 public class GameMap {
 
 	public static final class World {
 		final Layer[] graphicLayer;
-		Tileset tileset;
 		Color backgroundColor;
 		
-		World(String tilesetName) {
+		World() {
 			graphicLayer = new Layer[LayerType.LAYER_COUNT];
 			for( LayerType l : LayerType.values() )
 				graphicLayer[l.layerIndex] = new Layer(l);
 			
-			tileset = new Tileset(tilesetName);
 			backgroundColor = Color.BLACK;
 		}
-		World(Color bColor, String tilesetName) {
-			graphicLayer = new Layer[LayerType.LAYER_COUNT];
-			for( LayerType l : LayerType.values() )
-				graphicLayer[l.layerIndex] = new Layer(l);
-			
-			tileset = new Tileset(tilesetName);
-			backgroundColor = bColor;
+		void addNode( LayerType layer, LayerObject sprite ) {
+			addNode(layer.layerIndex, sprite);
 		}
-		void setTileset(String tilesetName) {
-			tileset = new Tileset(tilesetName);
+		void addNode( int layerIndex, LayerObject sprite ) {
+			graphicLayer[layerIndex].addNode(sprite);
 		}
 	}
+	
+	private String mapId;
 	
 	final World world[] = new World[2];
 	
-	int activeWorld;
+	private Tileset tileset;
 	
-	public GameMap(String tilesetName1, String tilesetName2) {
-		world[0] = new World(tilesetName1);
-		world[1] = new World(tilesetName2);
-		
-		activeWorld = 0;
+	private int activeWorld;
+	
+	final boolean editable;
+	
+	final boolean playable;
+	
+	public GameMap(String mapId, Tileset tileset) {
+		this.mapId = mapId;
+		world[0] = new World();
+		world[1] = new World();
+
+		this.tileset = tileset;
+		this.editable = true;
+		this.playable = true;
 	}
-	GameMap(World world0, World world1) {
-		world[0] = world0;
-		world[1] = world1;
-		activeWorld = 0;
+	GameMap(String mapId, Tileset tileset, boolean playable, boolean editable) {
+		this.mapId = mapId;
+		world[0] = new World();
+		world[1] = new World();
+		
+		this.tileset = tileset;
+		this.editable = editable;
+		this.playable = playable;
+		this.activeWorld = 0;
+	}
+	
+	public String getMapId() {
+		return mapId;
+	}
+	public void setMapId(String mapId) {
+		this.mapId = mapId;
+	}
+	public void setTileset(Tileset tileset) {
+		this.tileset = tileset;
+	}
+	public Tileset getTileset() {
+		return tileset;
 	}
 	
 	// objectLayer
@@ -85,9 +102,12 @@ public class GameMap {
 		
 		rt.setView(cView);
 	}
-	
+
+	public void addNode( int worldId, LayerType layer, LayerObject sprite ) {
+		world[worldId].graphicLayer[layer.layerIndex].addNode(sprite);
+	}
 	public void addNode( LayerType layer, LayerObject sprite ) {
-		world[activeWorld].graphicLayer[layer.layerIndex].addNode(sprite);
+		addNode(activeWorld, layer, sprite);
 	}
 	public LayerObject findNode( LayerType layer, Vector2f point ) {
 		return world[activeWorld].graphicLayer[layer.layerIndex].findNode(point);

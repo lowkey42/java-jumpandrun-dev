@@ -23,4 +23,16 @@ public enum LayerType {
 		visible = _visible;
 		name = _name;
 	}
+
+	public LayerType next() {
+		LayerType ct[] = values();
+		return ct[ (ordinal()+1)%ct.length ];
+	}
+	public LayerType prev() {
+		LayerType ct[] = values();
+		return ct[ ordinal()==0 ? ct.length-1 : (ordinal()-1)%ct.length ]; 
+	}
+	public static LayerType first() {
+		return values()[0];
+	}
 }

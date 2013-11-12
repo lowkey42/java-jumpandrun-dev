@@ -9,9 +9,11 @@ import org.jsfml.system.Vector2f;
 final class Layer {
 	
 	List<LayerObject> objects = new ArrayList<>();
+	final LayerType type;
 	boolean show;
 	
 	public Layer( LayerType type ) {
+		this.type = type;
 		show = type.visible;
 	}
 	

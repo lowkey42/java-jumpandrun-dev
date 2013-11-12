@@ -1,17 +1,14 @@
 package de.secondsystem.game01.impl.map;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.jsfml.graphics.Color;
 import org.json.simple.JSONArray;
@@ -20,8 +17,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import de.secondsystem.game01.impl.map.GameMap.World;
-import de.secondsystem.game01.impl.map.objects.CollisionObject;
-import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
+import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 
 
 /**
@@ -34,47 +30,50 @@ import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
  */
 public class JsonGameMapSerializer implements IGameMapSerializer {
 
+	private static final Path MAP_PATH = Paths.get("assets", "maps");
+	
 	private JSONParser parser = new JSONParser();
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void serialize( Path out, GameMap map) {
+	public void serialize( GameMap map) {
 		JSONObject obj = new JSONObject();
 		obj.put("world", Arrays.asList(serializeWorld(map.world[0]), serializeWorld(map.world[1])));
+		obj.put("tileset", map.getTileset().name );
 		
-		try ( Writer writer = Files.newBufferedWriter(out, StandardCharsets.UTF_8) ){
+		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()), StandardCharsets.UTF_8) ){
 			obj.writeJSONString(writer);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new FormatErrorException("Unable to write map-file '"+MAP_PATH.resolve(map.getMapId())+"': "+e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public synchronized GameMap deserialize(Path in) {
-
-		try ( Reader reader = Files.newBufferedReader(in, StandardCharsets.UTF_8) ){
+	public synchronized GameMap deserialize(String mapId, boolean playable, boolean editable) {
+		try ( Reader reader = Files.newBufferedReader(MAP_PATH.resolve(mapId), StandardCharsets.UTF_8) ){
 			JSONObject obj = (JSONObject) parser.parse(reader);
 			
 			@SuppressWarnings("unchecked")
 			List<JSONObject> worlds = (List<JSONObject>) obj.get("world");
 			
-			return new GameMap(deserializeWorld( worlds.get(0) ), deserializeWorld( worlds.get(1) ));
+			Tileset tileset = new Tileset((String)obj.get("tileset"));
+			
+			GameMap map = new GameMap(mapId, tileset, playable, editable);
+			for( int i=0; i<=1; ++i )
+				deserializeWorld(map, i, worlds.get(0));
+			
+			return map;
 			
 		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new FormatErrorException("Unable to parse map-file '"+MAP_PATH.resolve(mapId)+"': "+e.getMessage(), e);
 		}
-		
-		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	private JSONObject serializeWorld(World world) {
 		JSONObject obj = new JSONObject();
 		obj.put("backgroundColor", encodeColor(world.backgroundColor) );
-		obj.put("tileset", world.tileset.name );
 		obj.put("layer", serializeLayers(world.graphicLayer) );
 		
 		return obj;
@@ -86,6 +85,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		
 		for( Layer l : layers ) {
 			JSONObject layer = new JSONObject();
+			layer.put("layerType", l.type.name);
 			
 			JSONArray layerObjs = new JSONArray();
 			for( LayerObject obj : l.objects )
@@ -103,39 +103,32 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	private JSONObject serializeLayerObject(LayerObject objects) {
 		JSONObject obj = new JSONObject();
 		
-		obj.put("$type", objects.typeUuid());
+		obj.put("$type", objects.typeUuid().shortId);
 		obj.putAll(objects.getAttributes());
 		
 		return obj;
 	}
 
-	private World deserializeWorld(JSONObject obj) {
-		World w = new World(decodeColor((String)obj.get("backgroundColor")), (String)obj.get("tileset") );
-		deserializeLayers(w, (JSONArray)obj.get("layer"));
+	private void deserializeWorld(GameMap map, int worldId, JSONObject obj) {
+		map.world[worldId].backgroundColor = decodeColor((String)obj.get("backgroundColor"));
 		
-		return w;
+		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}
-	private void deserializeLayers( World w, JSONArray array) {
-		int i=0;
-		
-		for( Object l : array ) {
-			for( Object obj : ((JSONArray) ((JSONObject)l).get("objects")) )
-				w.graphicLayer[i].objects.add( deserializeLayerObject(w, (JSONObject) obj) );
-			
-			i++;
-		}
+	@SuppressWarnings("unchecked")
+	private void deserializeLayers( GameMap map, int worldId, JSONArray array) {
+		for( JSONObject l : (Iterable<JSONObject>) array )
+			for( Object obj : ((JSONArray) l.get("objects")) )
+				map.addNode(worldId, LayerType.valueOf((String)l.get("layerType")), deserializeLayerObject(map, worldId, (JSONObject) obj));
 	}
 
 	@SuppressWarnings("unchecked")
-	private LayerObject deserializeLayerObject(World w, JSONObject obj) {		// TODO: use enum for TYPE_UUID & construction
-		if( SpriteLayerObject.TYPE_UUID.equals(obj.get("$type")) )
-			return SpriteLayerObject.create(w.tileset, obj);
+	private LayerObject deserializeLayerObject(GameMap map, int worldId, JSONObject obj) {		// TODO: use enum for TYPE_UUID & construction
+		final LayerObjectType type = LayerObjectType.getByShortId((String) obj.get("$type"));
 		
-		else if( CollisionObject.TYPE_UUID.equals(obj.get("$type")) )
-			return CollisionObject.create(obj);
+		if( type==null )
+			throw new FormatErrorException("Unknown LayerObjectType: "+obj.get("$type"));
 		
-		else
-			throw new Error("Aaaargggg!?!?###");
+		return type.create(map, worldId, obj);
 	}
 
 

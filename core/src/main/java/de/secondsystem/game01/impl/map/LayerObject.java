@@ -5,6 +5,8 @@ import java.util.Map;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.objects.LayerObjectType;
+
 public interface LayerObject {
 	
 	void draw(RenderTarget rt);
@@ -21,6 +23,6 @@ public interface LayerObject {
 	
 	LayerObject copy();
 	
-	String typeUuid();
+	LayerObjectType typeUuid();
 	Map<String, Object> getAttributes();
 }
