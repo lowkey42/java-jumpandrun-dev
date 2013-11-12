@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.map.objects;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
@@ -45,7 +46,7 @@ public class SpriteLayerObject implements LayerObject {
 	public void setTile(Tileset tileset, int tileId) {
 		this.tileset = tileset;
 		this.tileId = tileId;
-		sprite.setTexture(tileset.tiles.get(tileId));
+		sprite.setTexture(tileset.tiles.get(tileId), true);
 		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
 	}
 	
