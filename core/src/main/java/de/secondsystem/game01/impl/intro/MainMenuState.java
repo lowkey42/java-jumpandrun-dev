@@ -14,6 +14,7 @@ public final class MainMenuState extends GameState {
 	@Override
 	protected void onStart(GameContext ctx) {
 		// TODO
+		System.out.println("dfdfd");
 	}
 
 	@Override

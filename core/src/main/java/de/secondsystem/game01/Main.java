@@ -5,12 +5,13 @@ import de.secondsystem.game01.fsm.StateMachineFactory;
 import de.secondsystem.game01.impl.InitState;
 import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.intro.IntroState;
+import de.secondsystem.game01.impl.intro.MainMenuState;
 
 public final class Main {
 
 	public static void main(String[] args) {
 		IStateMachine game = StateMachineFactory.create();
-		game.changeState(new InitState(new MainGameState("")));
+		game.changeState(new InitState(new MainMenuState()));
 		
 		game.run();
 
