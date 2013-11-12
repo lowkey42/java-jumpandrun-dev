@@ -4,7 +4,7 @@ import de.secondsystem.game01.fsm.IStateMachine;
 import de.secondsystem.game01.fsm.StateMachineFactory;
 import de.secondsystem.game01.impl.InitState;
 import de.secondsystem.game01.impl.game.MainGameState;
-import de.secondsystem.game01.impl.into.IntroState;
+import de.secondsystem.game01.impl.intro.IntroState;
 
 public final class Main {
 

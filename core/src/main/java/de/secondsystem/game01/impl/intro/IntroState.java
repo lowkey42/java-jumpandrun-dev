@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.into;
+package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.window.event.Event;
 
