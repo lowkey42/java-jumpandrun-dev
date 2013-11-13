@@ -4,12 +4,19 @@ import org.jsfml.window.Keyboard;
 import org.jsfml.window.Keyboard.Key;
 
 import de.secondsystem.game01.impl.game.entities.AbstractGameEntityController;
+import de.secondsystem.game01.impl.game.entities.IControllable;
 import de.secondsystem.game01.impl.game.entities.IControllable.Direction;
 
-public final class KeyboardController extends AbstractGameEntityController {
+/**
+ * Controls an {@link IControllable} with a controller (gamepad)
+ * 
+ * @author lowkey
+ *
+ */
+public final class ControllerController extends AbstractGameEntityController {
 
 	public void process() {
-		if( Keyboard.isKeyPressed(Key.LEFT) )
+	/*	if(  )
 			proxy.move(Direction.RIGHT);
 		else if( Keyboard.isKeyPressed(Key.LEFT) )
 			proxy.move(Direction.LEFT);
@@ -22,7 +29,7 @@ public final class KeyboardController extends AbstractGameEntityController {
 		if( Keyboard.isKeyPressed(Key.SPACE) )
 			proxy.jump();
 		else
-			proxy.stopJump();
+			proxy.stopJump();*/
 	}
 	
 }

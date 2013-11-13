@@ -3,6 +3,8 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.secondsystem.game01.impl.game.entities.IControllable.Direction;
+
 
 public abstract class AbstractGameEntityController {
 
@@ -21,15 +23,9 @@ public abstract class AbstractGameEntityController {
 	private final class ControllableProxy implements IControllable {
 
 		@Override
-		public void move(boolean direction) {
+		public void move(Direction direction) {
 			for( IGameEntity ge : ges )
 				ge.move(direction);
-		}
-
-		@Override
-		public void look(float degree) {
-			for( IGameEntity ge : ges )
-				ge.look(degree);
 		}
 
 		@Override
@@ -42,12 +38,6 @@ public abstract class AbstractGameEntityController {
 		public void stopJump() {
 			for( IGameEntity ge : ges )
 				ge.stopJump();
-		}
-
-		@Override
-		public void stopMove() {
-			for( IGameEntity ge : ges )
-				ge.stopMove();
 		}
 		
 	}

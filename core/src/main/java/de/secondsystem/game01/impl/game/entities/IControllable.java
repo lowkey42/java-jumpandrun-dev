@@ -2,17 +2,16 @@ package de.secondsystem.game01.impl.game.entities;
 
 public interface IControllable {
 	
-	/**
-	 * @param direction false=left, true=right
-	 */
-	void move(boolean direction);
-	void stopMove();
+	public static enum Direction {
+		UP, DOWN, LEFT, RIGHT, CENTER;
+	}
 	
-	void look(float degree);
+	void move(Direction direction);
 	
 	void jump();
 	void stopJump();
 	
 	// TODO: attack?
+	
 	
 }
