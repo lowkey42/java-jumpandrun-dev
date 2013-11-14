@@ -9,9 +9,11 @@ import org.jsfml.system.Vector2f;
 final class Layer {
 	
 	List<LayerObject> objects = new ArrayList<>();
+	final LayerType type;
 	boolean show;
 	
 	public Layer( LayerType type ) {
+		this.type = type;
 		show = type.visible;
 	}
 	
@@ -32,6 +34,12 @@ final class Layer {
 	}
 	public void remove( LayerObject s ) {
 		objects.remove(s);
+	}
+	
+	public void onGameWorldSwitch(int gameWorldId)
+	{
+		for( LayerObject s : objects )
+			s.onGameWorldSwitch(gameWorldId);
 	}
 	
 }

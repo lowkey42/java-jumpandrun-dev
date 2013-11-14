@@ -3,36 +3,34 @@ package de.secondsystem.game01.impl.editor;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.jbox2d.dynamics.World;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Font;
-import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderWindow;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
 import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.Mouse.Button;
 import org.jsfml.window.Mouse;
+import org.jsfml.window.Mouse.Button;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
 import de.secondsystem.game01.impl.map.objects.CollisionObject;
-import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
+import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 /**
  * 
@@ -55,7 +53,7 @@ public final class EditorGameState extends GameState {
 	private RenderWindow window;
 	
 	private final GameState playGameState;
-	private final GameMap map;
+	private GameMap map;
 	private final Tileset tileset;
 	
 	private final Text editorHint;
@@ -66,8 +64,11 @@ public final class EditorGameState extends GameState {
 	private int currentTile = 0;
 	private float currentTileRotation=0;
 	private float currentTileZoom=1.f;
-	private int currentTileHeight=1;
-	private int currentTileWidth=1;
+	// ADDED + appropriate adjustments // TODO: REMOVE COMMENT
+	private int activeGameWorldId;
+	// altered ! reason: integer -> loss of precision // TODO: REMOVE COMMENT
+	private float currentTileHeight=1;
+	private float currentTileWidth=1;
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
 	private LayerObject selectedObject;
 	private RectangleShape selectedObjectMarker;
@@ -75,6 +76,7 @@ public final class EditorGameState extends GameState {
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
 		this.map = map; // TODO: copy
+		activeGameWorldId = map.getActiveGameWorldId();
 		this.tileset = new Tileset("test01"); // TODO: get from map
 		
 		Font freeSans = new Font();
@@ -115,14 +117,14 @@ public final class EditorGameState extends GameState {
 	private void createMouseSprite() {
 		if( !(mouseTile instanceof SpriteLayerObject) )
 			mouseTile = new SpriteLayerObject(tileset, currentTile, 0, 0, 0);
-		onSpriteTileChnaged();
+		onSpriteTileChanged();
 	}
 	private void createMouseCollisionObj() {
 		if( !(mouseTile instanceof CollisionObject) )
-			mouseTile = new CollisionObject(CollisionType.NORMAL, 0, 0, 50, 50, 0);
-		onSpriteTileChnaged();
+			mouseTile = new CollisionObject(activeGameWorldId, CollisionType.NORMAL, 0, 0, 50, 50, 0);
+		onSpriteTileChanged();
 	}
-	private void onSpriteTileChnaged() {
+	private void onSpriteTileChanged() {
 		currentTileRotation = 0.f;
 		currentTileZoom = 1.f;
 		currentTileHeight = mouseTile.getHeight();
@@ -166,25 +168,25 @@ public final class EditorGameState extends GameState {
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
 		
+		// altered ! reason: removing code repetition // TODO: REMOVE COMMENT
+		Vector2i newPos = new Vector2i(getMouseX(), getMouseY());
+		LayerObject currentLayerObject = selectedObject != null ? selectedObject : mouseTile;
+		currentLayerObject.setRotation(currentTileRotation);
+		currentLayerObject.setDimensions(currentTileWidth*currentTileZoom, currentTileHeight*currentTileZoom);
 		
 		if( selectedObject!=null ) {
 			if( Mouse.isButtonPressed(Button.LEFT) ) {
-				selectedObject.setPosition(rt.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY())));
+				selectedObject.setPosition(rt.mapPixelToCoords(newPos));
 			}
-			
-			selectedObject.setRotation(currentTileRotation);
-			selectedObject.setDimensions(currentTileHeight*currentTileZoom, currentTileWidth*currentTileZoom);
-			
-			selectedObjectMarker.setSize( new Vector2f(selectedObject.getWidth(), selectedObject.getHeight()) );
-			selectedObjectMarker.setOrigin(selectedObject.getOrigin());
+			Vector2f newSize = new Vector2f(selectedObject.getWidth(), selectedObject.getHeight());
+			selectedObjectMarker.setSize( newSize );
+			selectedObjectMarker.setOrigin(new Vector2f(newSize.x/2f, newSize.y/2f));
 			selectedObjectMarker.setRotation(selectedObject.getRotation());
 			selectedObjectMarker.setPosition(selectedObject.getPosition());
 			rt.draw(selectedObjectMarker);
 			
 		} else {
-			mouseTile.setPosition( rt.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY())) );
-			mouseTile.setRotation(currentTileRotation);
-			mouseTile.setDimensions(currentTileHeight*currentTileZoom, currentTileWidth*currentTileZoom);
+			mouseTile.setPosition( rt.mapPixelToCoords(newPos) );
 			mouseTile.draw(rt);
 		}
 
@@ -203,10 +205,20 @@ public final class EditorGameState extends GameState {
 				int offset = event.asMouseWheelEvent().delta<0 ? -1 : 1;
 				
 				if( mouseTile instanceof SpriteLayerObject ) {
-					currentTile = Math.abs( (currentTile+offset) % tileset.tiles.size() );
+					// compute currentTile
+					// example: currentTile = 9; offset = 1; tiles.size() = 10; 9+1=10 % 10 = 0 = currentTile
+					// altered ! reason: wrong computation // TODO: REMOVE COMMENT
+					int ts = tileset.tiles.size();
+					currentTile += offset;
+					currentTile = currentTile<0 ? ts-1 : currentTile % ts;
+					
+					// change the tile
 					((SpriteLayerObject)mouseTile).setTile(tileset, currentTile);
 				} else if( mouseTile instanceof CollisionObject ) {
-					((CollisionObject)mouseTile).setType( offset>0 ? ((CollisionObject)mouseTile).getType().next() : ((CollisionObject)mouseTile).getType().prev() );
+					// altered ! reason: simplicity/beauty // TODO: REMOVE COMMENT
+					CollisionObject co = (CollisionObject) mouseTile;
+					CollisionType type = offset>0 ? co.getType().next() : co.getType().prev();
+					co.setType( type );;
 				}
 				
 				return true;
@@ -220,11 +232,10 @@ public final class EditorGameState extends GameState {
 						return true;
 					
 					case RIGHT:
-						View view = new View(
-								Vector2f.mul(
-										new Vector2f(x+ctx.window.getView().getSize().x/2, y+ctx.window.getView().getSize().y/2),
-										currentLayer.parallax), 
-								Vector2f.div(ctx.window.getView().getSize(), zoom) );
+						// altered ! reason: code shortening // TODO: REMOVE COMMENT
+						Vector2f ws = ctx.window.getView().getSize();
+						View view = new View(					
+								Vector2f.mul(new Vector2f(x+ws.x/2, y+ws.y/2), currentLayer.parallax), Vector2f.div(ws, zoom) );
 						
 						selectedObject = map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view));
 						
@@ -280,13 +291,27 @@ public final class EditorGameState extends GameState {
 	
 	private final boolean processInputKey(KeyEvent event) {
 		switch( event.key ) {
+			case F5:
+				new JsonGameMapSerializer().serialize(map);
+				break;
+				
+			case F9:
+				map = new JsonGameMapSerializer().deserialize(map.getMapId(), true, true);
+				break;
+		
+			case TAB:			
+				map.switchWorlds();
+				activeGameWorldId = map.getActiveGameWorldId();
+				break;
+				
 			case DELETE:
 				if( selectedObject!=null ) {
 					map.remove(currentLayer, selectedObject);
 					deselectSprite();
 				}
 				break; 
-						
+					
+			case PAGEUP:
 			case ADD:
 				if( event.shift )
 					currentTileRotation+=11.25f;
@@ -295,6 +320,8 @@ public final class EditorGameState extends GameState {
 				else 
 					zoom*=2;
 				break;
+				
+			case PAGEDOWN:
 			case SUBTRACT:
 				if( event.shift )
 					currentTileRotation-=11.25f;

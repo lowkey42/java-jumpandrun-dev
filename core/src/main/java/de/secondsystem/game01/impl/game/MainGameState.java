@@ -1,10 +1,8 @@
 package de.secondsystem.game01.impl.game;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
-import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
+import org.jsfml.graphics.View;
+import org.jsfml.system.Clock;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
@@ -12,20 +10,31 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.IGameMapSerializer;
+import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.impl.map.objects.CollisionObject;
-import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
+import de.secondsystem.game01.impl.map.objects.TestCharacter;
 
+// ADDED timing // TODO: REMOVE COMMENT
 public class MainGameState extends GameState {
 
 	private final GameMap map;
 	
+	// character
+	private TestCharacter testCharacter = null; 
+	
+	// time variables
+	public final Clock frameClock = new Clock();
+	
 	public MainGameState( String mapId ) {
-		// TODO: load
-		map = new GameMap("test01");
-
-		map.addNode(LayerType.FOREGROUND_0, new SpriteLayerObject(map.tileset, 0, 200, 200, 0));
-		map.addNode(LayerType.PHYSICS, new CollisionObject( CollisionObject.CollisionType.NORMAL, 100, 100, 150, 10, 0));
+		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+		
+		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, false);
+		
+		// create character
+		testCharacter = new TestCharacter(0, 300.f, 100.f, 50.f, 50.f, 0);
+		map.addNode(0, LayerType.FOREGROUND_1, testCharacter);
+		map.addNode(1, LayerType.FOREGROUND_1, testCharacter);
 	}
 	
 	@Override
@@ -40,7 +49,19 @@ public class MainGameState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx) {
+		// time
+		float dt = frameClock.restart().asSeconds();
+		
+		// physics
+		map.processPhysics(dt);
+		
+		// drawing
 		map.draw(ctx.window);
+		
+		// character
+		testCharacter.update(dt, ctx);
+		
+		// events
 		for(Event event : ctx.window.pollEvents()) {
 	        if(event.type == Event.Type.CLOSED) {
 	            //The user pressed the close button
@@ -49,6 +70,9 @@ public class MainGameState extends GameState {
 	        } else if( event.type==Event.Type.KEY_RELEASED ) {
 	        	if( event.asKeyEvent().key==Key.F12 ) {
 	        		setNextState(new EditorGameState(this, map));
+	        	}
+	        	if( event.asKeyEvent().key==Key.TAB ) {
+					map.switchWorlds();
 	        	}
 	        }
 	    }

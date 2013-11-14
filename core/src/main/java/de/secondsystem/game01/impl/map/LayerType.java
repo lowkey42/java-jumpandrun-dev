@@ -14,6 +14,8 @@ public enum LayerType {
 	public static final int LAYER_COUNT = 7;
 
 	public final int layerIndex;
+	// parallax usually contains values between 0 and 1: lower values -> slower scrolling
+	// a lower scrolling speed has the effect that the background appears to be farther away
 	public final float parallax;
 	public final boolean visible;
 	public final String name;
@@ -22,5 +24,17 @@ public enum LayerType {
 		parallax = _parallax;
 		visible = _visible;
 		name = _name;
+	}
+
+	public LayerType next() {
+		LayerType ct[] = values();
+		return ct[ (ordinal()+1)%ct.length ];
+	}
+	public LayerType prev() {
+		LayerType ct[] = values();
+		return ct[ ordinal()==0 ? ct.length-1 : (ordinal()-1)%ct.length ]; 
+	}
+	public static LayerType first() {
+		return values()[0];
 	}
 }
