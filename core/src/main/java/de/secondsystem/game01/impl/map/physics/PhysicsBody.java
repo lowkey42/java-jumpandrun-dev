@@ -21,7 +21,7 @@ public abstract class PhysicsBody {
 		this.gameWorldId = gameWorldId;
 	}
 	
-	protected void createBody(float x, float y, float width, float height, boolean isStatic)
+	protected void createBody(float x, float y, float width, float height, float rotation, boolean isStatic)
 	{
 		assert(body == null);
 		
@@ -29,6 +29,7 @@ public abstract class PhysicsBody {
 		BodyDef bd = new BodyDef();
 		float sf = GameMap.BOX2D_SCALE_FACTOR;
 		bd.position.set(x*sf, y*sf);  
+		bd.angle = (float)Math.toRadians(rotation);
 		bd.type = isStatic ? BodyType.STATIC : BodyType.DYNAMIC;
 		
 		// define shape of the body
@@ -46,7 +47,7 @@ public abstract class PhysicsBody {
 			FixtureDef fd = new FixtureDef();
 			fd.shape = s;
 			fd.density = 1.0f;
-			fd.friction = 0.1f;
+			fd.friction = 0.01f;
 			fd.restitution = 0.0f;
 			
 			//add fixture to body

@@ -85,7 +85,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		
 		for( Layer l : layers ) {
 			JSONObject layer = new JSONObject();
-			layer.put("layerType", l.type.name);
+			layer.put("layerType", l.type.name());
 			
 			JSONArray layerObjs = new JSONArray();
 			for( LayerObject obj : l.objects )

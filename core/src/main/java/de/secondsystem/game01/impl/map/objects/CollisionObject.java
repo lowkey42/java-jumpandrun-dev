@@ -54,7 +54,7 @@ public class CollisionObject extends PhysicsBody implements LayerObject {
 		shape.setOrigin( shape.getSize().x/2, shape.getSize().y/2);
 		shape.setRotation(rotation);
 		
-		createBody(x, y, width, height, true);
+		createBody(x, y, width, height, rotation, true);
 	}
 	
 	public void setType(CollisionType type) {
