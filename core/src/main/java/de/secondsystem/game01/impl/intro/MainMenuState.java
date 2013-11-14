@@ -2,6 +2,8 @@ package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.window.event.Event;
 
+import java.nio.file.Paths;
+
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 
@@ -11,10 +13,13 @@ import de.secondsystem.game01.impl.GameState;
  */
 public final class MainMenuState extends GameState {
 	
+	Button myButton = new Button("NewGame", Paths.get("assets", "gui", "buttons", "ButtonNormal.png"), 320, 240);
+	
 	@Override
 	protected void onStart(GameContext ctx) {
 		// TODO
-		System.out.println("dfdfd");
+		System.out.println(">> MainMenuState erfolgreich aufgerufen <<");
+		myButton.create();
 	}
 
 	@Override
@@ -31,6 +36,9 @@ public final class MainMenuState extends GameState {
 	            ctx.window.close();
 	        }
 	    }
+		
+		// ctx.window.draw(newsprite); <--- ???
+		
 	}
 
 }
