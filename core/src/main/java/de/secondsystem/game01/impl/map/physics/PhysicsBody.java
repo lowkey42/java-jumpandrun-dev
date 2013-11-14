@@ -47,7 +47,7 @@ public abstract class PhysicsBody {
 			FixtureDef fd = new FixtureDef();
 			fd.shape = s;
 			fd.density = 1.0f;
-			fd.friction = 0.01f;
+			fd.friction = 0.4f;
 			fd.restitution = 0.0f;
 			
 			//add fixture to body

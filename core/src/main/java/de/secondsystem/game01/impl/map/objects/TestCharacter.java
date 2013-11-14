@@ -11,6 +11,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard;
+import org.jsfml.window.Keyboard.Key;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.map.GameMap;
@@ -22,6 +23,8 @@ public class TestCharacter extends PhysicsBody implements LayerObject{
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(TestCharacter.class);
 	
 	private RectangleShape shape = null;
+	
+	private boolean moving = false;
 	
 	private float resetTimer = 0.f;
 	public TestCharacter(int gameWorldId, float x, float y, float width, float height, float rotation) {
@@ -78,6 +81,25 @@ public class TestCharacter extends PhysicsBody implements LayerObject{
 		    	y += 0.05f;
 		    
 		    move(x, y);
+		    
+		    if( x!=0 )
+		    	moving = true;
+		    else if( moving )
+		    	body.setLinearVelocity(new Vec2(0, body.getLinearVelocity().y));
+		    
+//		    if( body.getAngularVelocity()>0.01f )
+//		    	body.setAngularVelocity(0.01f);
+//		    if( body.getAngularVelocity()<-0.01f )
+//		    	body.setAngularVelocity(-0.01f);
+		    
+		    double a = Math.toDegrees(body.getAngle()) % 360;
+		    a = a<0 ? 360+a : a;
+		    if( a<340 && a>20 ) {
+		    	body.setTransform(body.getPosition(), (float)Math.toRadians( a<180 ? 20  : 340) );
+		    	body.setAngularVelocity(0.f);
+		    } else if( a<0 || a>360 )
+		    	System.out.println(a);
+		    
 		    resetTimer = 0.f;
 		}
 	}
@@ -89,8 +111,12 @@ public class TestCharacter extends PhysicsBody implements LayerObject{
 	
 	public void move(float pX, float pY)
 	{
-		body.setLinearVelocity(new Vec2(0, body.getLinearVelocity().y));
-		body.applyLinearImpulse(new Vec2(pX, pY), body.getWorldCenter());
+	//	body.setLinearVelocity(new Vec2(0, body.getLinearVelocity().y));
+	//	body.applyLinearImpulse(new Vec2(pX, pY), body.getWorldCenter());
+		if( body.getLinearVelocity().x<5 )
+			body.applyForce(new Vec2(pX*10, 0), body.getWorldCenter());
+			
+		body.applyForce(new Vec2(0, pY*55), new Vec2(body.getWorldCenter().x, body.getWorldCenter().y*2) );
 	}
 	
 	@Override
