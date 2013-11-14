@@ -3,33 +3,32 @@ package de.secondsystem.game01.impl.map.objects;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jbox2d.common.Vec2;
 import org.jsfml.graphics.Color;
-import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard;
-import org.jsfml.window.Keyboard.Key;
 
-import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.ICameraController;
+import de.secondsystem.game01.impl.map.IUpdateable;
 import de.secondsystem.game01.impl.map.LayerObject;
-import de.secondsystem.game01.impl.map.physics.PhysicsBody;
+import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
+import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.IPhysicsBody.ContactListener;
 
-public class TestCharacter extends PhysicsBody implements LayerObject{
+public class TestCharacter implements LayerObject, IUpdateable, ICameraController, ContactListener{
 	
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(TestCharacter.class);
 	
 	private RectangleShape shape = null;
 	
+	private IPhysicsBody physicsBody;
+	
 	private boolean moving = false;
 	
-	private float resetTimer = 0.f;
-	public TestCharacter(int gameWorldId, float x, float y, float width, float height, float rotation) {
-		super(gameWorldId);
-				
+	
+	public TestCharacter(GameMap map, int gameWorldId, float x, float y, float width, float height, float rotation) {
 		this.shape = new RectangleShape(new Vector2f(width, height));
 		shape.setPosition(x, y);
 		shape.setFillColor(Color.WHITE);
@@ -38,85 +37,68 @@ public class TestCharacter extends PhysicsBody implements LayerObject{
 		shape.setOrigin( shape.getSize().x/2, shape.getSize().y/2);
 		shape.setRotation(rotation);
 		
-		createBody(x, y, width, height, rotation, false);
+		if( map.getPhysicalWorld()!=null ) {
+			physicsBody = map.getPhysicalWorld().createBody(gameWorldId, x, y, width, height, rotation, false, CollisionHandlerType.SOLID);
+			physicsBody.setMaxVelocityX(5);
+			physicsBody.setContactListener(this);
+		}
 		//body.setFixedRotation(true);
 	}
 	
-	public void update(float dt, GameContext ctx)
-	{
-		processMovement(dt);
-		// convert box2d position(0.01pixel is 1 unit) to the position in our coordinate system(1 pixel is 1 unit)
-		float sf = GameMap.BOX2D_SCALE_FACTOR;
-		shape.setPosition(new Vector2f(body.getPosition().x/sf, body.getPosition().y/sf));
-		shape.setRotation((float) Math.toDegrees(body.getAngle()));
-		
-		// set view
-		ConstView cView = ctx.window.getView();
-		Vector2f s = cView.getSize();
-		ctx.window.setView(new View(new Vector2f(getPosition().x, cView.getCenter().y), new Vector2f(s.x, s.y)));
+	@Override
+	public void endContact(IPhysicsBody other) {
+		shape.setFillColor(Color.RED);
 	}
 	
-	private void processMovement(float dt)
-	{
-		resetTimer += dt;
-		if( resetTimer >= GameMap.FIXED_STEP )
-		{
-		    float x = 0;
-		    float y = 0;
-		    
-		    boolean moveRight = Keyboard.isKeyPressed(Keyboard.Key.D);
-		    boolean moveLeft  = Keyboard.isKeyPressed(Keyboard.Key.A);
-		    boolean jump      = Keyboard.isKeyPressed(Keyboard.Key.SPACE);
-		    
-		    if( moveRight )
-		    	x += 0.5f;
-		    else
-		    	if( moveLeft )
-		    		x -= 0.5f;
-		    
-		    if( nearEqual(body.getLinearVelocity().y ,0.f) && jump )
-		    	y -= 1.7f;
-		    
-		    if( body.getLinearVelocity().y > 0)
-		    	y += 0.05f;
-		    
-		    move(x, y);
-		    
-		    if( x!=0 )
-		    	moving = true;
-		    else if( moving )
-		    	body.setLinearVelocity(new Vec2(0, body.getLinearVelocity().y));
-		    
-//		    if( body.getAngularVelocity()>0.01f )
-//		    	body.setAngularVelocity(0.01f);
-//		    if( body.getAngularVelocity()<-0.01f )
-//		    	body.setAngularVelocity(-0.01f);
-		    
-		    double a = Math.toDegrees(body.getAngle()) % 360;
-		    a = a<0 ? 360+a : a;
-		    if( a<340 && a>20 ) {
-		    	body.setTransform(body.getPosition(), (float)Math.toRadians( a<180 ? 20  : 340) );
-		    	body.setAngularVelocity(0.f);
-		    } else if( a<0 || a>360 )
-		    	System.out.println(a);
-		    
-		    resetTimer = 0.f;
+	@Override
+	public void beginContact(IPhysicsBody other) {
+		shape.setFillColor(Color.WHITE);
+	}
+
+	@Override
+	public void update(long frameTime) {
+		processMovement(frameTime/1000.f);	// TODO: move somewhere else
+		
+		if( physicsBody!=null ) {
+			shape.setPosition(physicsBody.getPosition());
+			shape.setRotation(physicsBody.getRotation());
 		}
 	}
 	
-	private boolean nearEqual(float a, float b)
-	{
-		return Math.abs(a - b) < 0.0001f; 
-	}
-	
-	public void move(float pX, float pY)
-	{
-	//	body.setLinearVelocity(new Vec2(0, body.getLinearVelocity().y));
-	//	body.applyLinearImpulse(new Vec2(pX, pY), body.getWorldCenter());
-		if( body.getLinearVelocity().x<5 )
-			body.applyForce(new Vec2(pX*10, 0), body.getWorldCenter());
-			
-		body.applyForce(new Vec2(0, pY*55), new Vec2(body.getWorldCenter().x, body.getWorldCenter().y*2) );
+	private void processMovement(float dt) {
+	    float x = 0;
+	    float y = 0;
+	    
+	    boolean moveRight = Keyboard.isKeyPressed(Keyboard.Key.D);
+	    boolean moveLeft  = Keyboard.isKeyPressed(Keyboard.Key.A);
+	    boolean jump      = Keyboard.isKeyPressed(Keyboard.Key.SPACE);
+	    
+	    if( moveRight )
+	    	x += 0.5f;
+	    else
+	    	if( moveLeft )
+	    		x -= 0.5f;
+	    
+	    if( jump && physicsBody.isStable() )
+	    	y -= 1.7f;
+	 
+	    if( physicsBody.getVelocity().y > 0)
+	    	y += 0.05f;
+	    
+	    physicsBody.move(x*5, y*50);
+	    
+	    if( x!=0 )
+	    	moving = true;
+	    else if( moving )
+	    	physicsBody.resetVelocity(true, false, false);
+	    
+	    
+	    final float r = physicsBody.getRotation();
+	    if( r<340 && r>20 ) {
+	    	physicsBody.forceRotation( r<180 ? 20  : 340 );
+	    	physicsBody.resetVelocity(false, false, true);
+	    	
+	    }
 	}
 	
 	@Override
@@ -170,25 +152,10 @@ public class TestCharacter extends PhysicsBody implements LayerObject{
 		shape.setOrigin(shape.getSize().x/2, shape.getSize().y/2);
 	}
 
-	@Override
-	public LayerObject copy() {
-		return new TestCharacter(gameWorldId, getPosition().x, getPosition().y, getWidth(), getHeight(), getRotation());
-	}
-
-	@Override
-	protected void beginContact(PhysicsBody with) {
-		shape.setFillColor(Color.RED);
-		
-	}
-
-	@Override
-	protected void endContact(PhysicsBody with) {
-		shape.setFillColor(Color.WHITE);
-	}
-
 	public static TestCharacter create(GameMap map, int worldId, Map<String, Object> attributes) {
 		try {
 			return new TestCharacter(
+					map,
 					worldId,
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),
@@ -220,7 +187,12 @@ public class TestCharacter extends PhysicsBody implements LayerObject{
 
 	@Override
 	public void onGameWorldSwitch(int gameWorldId) {
-		this.gameWorldId = gameWorldId;
+		physicsBody.setGameWorldId(gameWorldId);
+	}
+
+	@Override
+	public Vector2f getLastStablePosition() {
+		return null;	// TODO: implement for lazy-camera
 	}
 
 }

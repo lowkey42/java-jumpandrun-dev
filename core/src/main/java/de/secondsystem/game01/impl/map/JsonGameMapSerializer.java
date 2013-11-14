@@ -122,7 +122,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private LayerObject deserializeLayerObject(GameMap map, int worldId, JSONObject obj) {		// TODO: use enum for TYPE_UUID & construction
+	private LayerObject deserializeLayerObject(GameMap map, int worldId, JSONObject obj) {
 		final LayerObjectType type = LayerObjectType.getByShortId((String) obj.get("$type"));
 		
 		if( type==null )

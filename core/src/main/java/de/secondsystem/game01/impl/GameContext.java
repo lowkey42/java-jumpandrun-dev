@@ -8,7 +8,7 @@ import org.jsfml.window.WindowStyle;
 import de.secondsystem.game01.fsm.IContext;
 
 /**
- * Zustandsunabhängiger Status der Anwendung
+ * GameState independent resources (stuff used by most/all GameStates)
  * @author lowkey
  *
  */
@@ -16,13 +16,17 @@ public class GameContext implements IContext {
 
 	public final RenderWindow window;
 	
-	// TODO: context-stuff
+	// TODO: other context-stuff
 	
-	// addition ! reason: lack of anti-aliasing // TODO: REMOVE COMMENT
+	/**
+	 * Creates a new window and initializes resources required by most/all GameStates (e.g. game-configuration)
+	 * @param width Width of the window
+	 * @param height Height of the new window
+	 * @param title Title of the new window
+	 * @param antiAliasingLevel Level of antiAliasing to use or 0 to disable
+	 */
 	public GameContext( int width, int height, String title, int antiAliasingLevel ) {
-		// create window
 		window = new RenderWindow();
-		// anti-aliasing diminishes the stair-step effect
 		ContextSettings settings = new ContextSettings(antiAliasingLevel);
 		window.create(new VideoMode(width, height), title, WindowStyle.DEFAULT, settings);
 		window.setVerticalSyncEnabled(true);

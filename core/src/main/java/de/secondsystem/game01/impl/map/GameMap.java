@@ -1,20 +1,16 @@
 package de.secondsystem.game01.impl.map;
 
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.World;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.physics.PhysicsContactFilter;
-import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
+import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
+import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
 
 public class GameMap {
 	
-	// ADDED physics world // TODO: REMOVE COMMENT
-	// RENAMED World into GameWorld ! reason: World is a class of box2d // TODO: REMOVE COMMENT
 	public static final class GameWorld {
 		final Layer[] graphicLayer;
 		Color backgroundColor;
@@ -40,38 +36,15 @@ public class GameMap {
 	
 	private Tileset tileset;
 	
-	// RENAMED // TODO: REMOVE COMMENT
 	private int activeGameWorldId;
 	
-	final boolean editable;
+	public final boolean editable;
 	
-	final boolean playable;
+	public final boolean playable;
 	
-	// time variables
-	public static final float FIXED_STEP = 1/60f;
-	private final int maxSteps = 5;
-	private float fixedTimestepAccumulator = 0;
+	private final IPhysicalWorld physicalWorld;
 	
-	// physics variables
-	public static World physicsWorld = null;
-	private final int velocityIterations = 8;
-	private final int positionIterations = 3;
-	public static final float BOX2D_SCALE_FACTOR = 0.01f;
-	
-	float resetTimer = 0.f;
-	
-	private void createPhysicsWorld()
-	{
-		Vec2 gravity = new Vec2(0.0f, 10.0f);
-		physicsWorld = new World(gravity);
-		physicsWorld.setSleepingAllowed(true);
-		physicsWorld.setContactListener(new PhysicsContactListener());
-		physicsWorld.setContactFilter(new PhysicsContactFilter());
-	}
-	
-	public GameMap(String mapId, Tileset tileset) {	
-		createPhysicsWorld();
-		
+	public GameMap(String mapId, Tileset tileset) {
 		this.mapId = mapId;
 		gameWorld[0] = new GameWorld();
 		gameWorld[1] = new GameWorld();
@@ -79,11 +52,15 @@ public class GameMap {
 		this.tileset = tileset;
 		this.editable = true;
 		this.playable = true;
+
+		if( playable ) {
+			physicalWorld = new Box2dPhysicalWorld();
+			physicalWorld.init(new Vector2f(0, 11.f));
+		} else
+			physicalWorld = null;
 	}
 	
 	GameMap(String mapId, Tileset tileset, boolean playable, boolean editable) {
-		createPhysicsWorld();
-		
 		this.mapId = mapId;
 		gameWorld[0] = new GameWorld();
 		gameWorld[1] = new GameWorld();
@@ -92,6 +69,12 @@ public class GameMap {
 		this.editable = editable;
 		this.playable = playable;
 		this.activeGameWorldId = 0;
+
+		if( playable ) {
+			physicalWorld = new Box2dPhysicalWorld();
+			physicalWorld.init(new Vector2f(0, 11.f));
+		} else
+			physicalWorld = null;
 	}
 	
 	public String getMapId() {
@@ -116,7 +99,6 @@ public class GameMap {
 	public void switchWorlds() {
 		activeGameWorldId = activeGameWorldId==0 ? 1 : 0;
 		
-		// ADDED // TODO: REMOVE COMMENT
 		for( LayerType l : LayerType.values() ) 
 			gameWorld[activeGameWorldId].graphicLayer[l.layerIndex].onGameWorldSwitch(activeGameWorldId);
 	}
@@ -142,26 +124,17 @@ public class GameMap {
 		
 		rt.setView(cView);
 	}
-	
-	public void processPhysics(float dt)
-	{
-		fixedTimestepAccumulator += dt;
-	    int steps = (int) Math.floor(fixedTimestepAccumulator / FIXED_STEP);
-	    if(steps > 0)
-	    {
-	        fixedTimestepAccumulator -= steps * FIXED_STEP;
-	    }
-	    
-	    int stepsClamped = Math.min(steps, maxSteps);
-	 
-	    for (int i = 0; i < stepsClamped; ++i)
-	    	physicsWorld.step(FIXED_STEP, velocityIterations, positionIterations);
-	    physicsWorld.clearForces();
+	public void update(long frameTimeMs) {
+		for( LayerType l : LayerType.values() )
+			if( l.updated )
+				for( GameWorld world : gameWorld )
+					world.graphicLayer[l.layerIndex].update(frameTimeMs);
+		
+		if( physicalWorld !=null )
+			physicalWorld.update(frameTimeMs);
 	}
 	
-	// ADDED // TODO: REMOVE COMMENT
-	public int getActiveGameWorldId()
-	{
+	public int getActiveGameWorldId() {
 		return activeGameWorldId;
 	}
 
@@ -187,6 +160,10 @@ public class GameMap {
 			s[i] = gameWorld[activeGameWorldId].graphicLayer[i].show;
 		
 		return s;
+	}
+
+	public IPhysicalWorld getPhysicalWorld() {
+		return physicalWorld;
 	}
 	
 }

@@ -14,20 +14,15 @@ public interface LayerObject {
 	void setPosition(Vector2f pos);
 	void setRotation(float degree);
 	
-	// ADDED // TODO: REMOVE COMMENT
 	void onGameWorldSwitch(int gameWorldId);
 	
-	// altered ! reason: wtf... (APPROPRIATE ADJUSTMENTS IN THE DERIVED CLASSES) // TODO: REMOVE COMMENT
 	void setDimensions(float width, float height);
 
-	// altered ! reason: int -> loss of precision (APPROPRIATE ADJUSTMENTS IN THE DERIVED CLASSES) // TODO: REMOVE COMMENT
 	float getHeight();
 	float getWidth();
 	Vector2f getOrigin();
 	float getRotation();
 	Vector2f getPosition();
-	
-	LayerObject copy();
 	
 	LayerObjectType typeUuid();
 	Map<String, Object> getAttributes();

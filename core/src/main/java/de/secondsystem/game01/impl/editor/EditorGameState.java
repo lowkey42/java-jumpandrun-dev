@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.editor;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import org.jbox2d.dynamics.World;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Font;
@@ -64,9 +63,6 @@ public final class EditorGameState extends GameState {
 	private int currentTile = 0;
 	private float currentTileRotation=0;
 	private float currentTileZoom=1.f;
-	// ADDED + appropriate adjustments // TODO: REMOVE COMMENT
-	private int activeGameWorldId;
-	// altered ! reason: integer -> loss of precision // TODO: REMOVE COMMENT
 	private float currentTileHeight=1;
 	private float currentTileWidth=1;
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
@@ -76,7 +72,6 @@ public final class EditorGameState extends GameState {
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
 		this.map = map; // TODO: copy
-		activeGameWorldId = map.getActiveGameWorldId();
 		this.tileset = new Tileset("test01"); // TODO: get from map
 		
 		Font freeSans = new Font();
@@ -121,7 +116,7 @@ public final class EditorGameState extends GameState {
 	}
 	private void createMouseCollisionObj() {
 		if( !(mouseTile instanceof CollisionObject) )
-			mouseTile = new CollisionObject(activeGameWorldId, CollisionType.NORMAL, 0, 0, 50, 50, 0);
+			mouseTile = new CollisionObject(map, map.getActiveGameWorldId(), CollisionType.NORMAL, 0, 0, 50, 50, 0);
 		onSpriteTileChanged();
 	}
 	private void onSpriteTileChanged() {
@@ -139,7 +134,7 @@ public final class EditorGameState extends GameState {
 	}
 	
 	@Override
-	protected void onFrame(GameContext ctx) {
+	protected void onFrame(GameContext ctx, long frameTime) {
 		drawMap(ctx.window);
 		
 		ctx.window.draw(editorHint);
@@ -168,7 +163,6 @@ public final class EditorGameState extends GameState {
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
 		
-		// altered ! reason: removing code repetition // TODO: REMOVE COMMENT
 		Vector2i newPos = new Vector2i(getMouseX(), getMouseY());
 		LayerObject currentLayerObject = selectedObject != null ? selectedObject : mouseTile;
 		currentLayerObject.setRotation(currentTileRotation);
@@ -205,9 +199,7 @@ public final class EditorGameState extends GameState {
 				int offset = event.asMouseWheelEvent().delta<0 ? -1 : 1;
 				
 				if( mouseTile instanceof SpriteLayerObject ) {
-					// compute currentTile
-					// example: currentTile = 9; offset = 1; tiles.size() = 10; 9+1=10 % 10 = 0 = currentTile
-					// altered ! reason: wrong computation // TODO: REMOVE COMMENT
+					// compute currentTile;  example: currentTile = 9; offset = 1; tiles.size() = 10; 9+1=10 % 10 = 0 = currentTile
 					int ts = tileset.tiles.size();
 					currentTile += offset;
 					currentTile = currentTile<0 ? ts-1 : currentTile % ts;
@@ -215,7 +207,6 @@ public final class EditorGameState extends GameState {
 					// change the tile
 					((SpriteLayerObject)mouseTile).setTile(tileset, currentTile);
 				} else if( mouseTile instanceof CollisionObject ) {
-					// altered ! reason: simplicity/beauty // TODO: REMOVE COMMENT
 					CollisionObject co = (CollisionObject) mouseTile;
 					CollisionType type = offset>0 ? co.getType().next() : co.getType().prev();
 					co.setType( type );;
@@ -227,12 +218,11 @@ public final class EditorGameState extends GameState {
 				switch( event.asMouseButtonEvent().button ){
 					case LEFT:
 						if( selectedObject==null ) {
-							map.addNode(currentLayer, mouseTile.copy());
+							map.addNode(currentLayer, mouseTile.typeUuid().create(map, map.getActiveGameWorldId(), mouseTile.getAttributes()));
 						}
 						return true;
 					
 					case RIGHT:
-						// altered ! reason: code shortening // TODO: REMOVE COMMENT
 						Vector2f ws = ctx.window.getView().getSize();
 						View view = new View(					
 								Vector2f.mul(new Vector2f(x+ws.x/2, y+ws.y/2), currentLayer.parallax), Vector2f.div(ws, zoom) );
@@ -301,7 +291,6 @@ public final class EditorGameState extends GameState {
 		
 			case TAB:			
 				map.switchWorlds();
-				activeGameWorldId = map.getActiveGameWorldId();
 				break;
 				
 			case DELETE:

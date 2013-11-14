@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.map.objects;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
@@ -23,7 +22,6 @@ public class SpriteLayerObject implements LayerObject {
 	
 	private Sprite sprite;
 	
-	private Tileset tileset;
 	private int tileId;
 	
 	public SpriteLayerObject(Sprite sprite) {
@@ -33,7 +31,6 @@ public class SpriteLayerObject implements LayerObject {
 		this(tileset, tileId, x, y, rotation, 0, 0);
 	}
 	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
-		this.tileset = tileset;
 		this.tileId = tileId;
 		sprite = new Sprite();
 		sprite.setTexture(tileset.tiles.get(tileId));
@@ -44,7 +41,6 @@ public class SpriteLayerObject implements LayerObject {
 	}
 	
 	public void setTile(Tileset tileset, int tileId) {
-		this.tileset = tileset;
 		this.tileId = tileId;
 		sprite.setTexture(tileset.tiles.get(tileId), true);
 		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
@@ -98,10 +94,6 @@ public class SpriteLayerObject implements LayerObject {
 	@Override
 	public Vector2f getPosition() {
 		return sprite.getPosition();
-	}
-	@Override
-	public LayerObject copy() {
-		return new SpriteLayerObject(tileset, tileId, sprite.getPosition().x, sprite.getPosition().y, sprite.getRotation(), getWidth(), getHeight());
 	}
 	@Override
 	public LayerObjectType typeUuid() {

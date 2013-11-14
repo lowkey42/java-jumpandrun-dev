@@ -28,7 +28,7 @@ public final class MainMenuState extends GameState {
 	}
 
 	@Override
-	protected void onFrame(GameContext ctx) {
+	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO
 		for(Event event : ctx.window.pollEvents()) {
 	        if(event.type == Event.Type.CLOSED) {

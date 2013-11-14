@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.map.objects;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jbox2d.dynamics.World;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
@@ -11,18 +10,23 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.LayerObject;
-import de.secondsystem.game01.impl.map.physics.PhysicsBody;
+import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
+import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 
-public class CollisionObject extends PhysicsBody implements LayerObject {
+public class CollisionObject implements LayerObject {
 
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(CollisionObject.class);
 	
 	public static enum CollisionType {
-		// altered ! reason: transparency makes it easier to see where to set the collision object // TODO: REMOVE COMMENT
-		NORMAL(new Color(255, 100, 100, 150)), ONE_WAY(new Color(180, 180, 180, 150)), NO_GRAV(new Color(100, 100, 255, 150));
-		
+		NORMAL	(CollisionHandlerType.SOLID, new Color(255, 100, 100, 150)), 
+		ONE_WAY	(CollisionHandlerType.ONE_WAY, new Color(180, 180, 180, 150)), 
+		NO_GRAV	(CollisionHandlerType.NO_GRAV, new Color(100, 100, 255, 150));
+
+		final CollisionHandlerType handlerType;
 		final Color fillColor;
-		private CollisionType(Color fillColor) {
+		
+		private CollisionType(CollisionHandlerType handlerType, Color fillColor) {
+			this.handlerType = handlerType;
 			this.fillColor = fillColor;
 		}
 		public CollisionType next() {
@@ -38,23 +42,30 @@ public class CollisionObject extends PhysicsBody implements LayerObject {
 		}
 	}
 	
-	private RectangleShape shape;
+	private final RectangleShape shape;
+	
+	protected final IPhysicsBody physicsBody;
 	
 	private CollisionType type;
 
-	public CollisionObject(int gameWorldID, CollisionType type, float x, float y, float width, float height, float rotation) {
-		super(gameWorldID);
-		
+	public CollisionObject(GameMap map, int gameWorldID, CollisionType type, float x, float y, float width, float height, float rotation) {
 		this.type = type;
-		this.shape = new RectangleShape(new Vector2f(width, height));
-		shape.setPosition(x, y);
-		shape.setFillColor(type.fillColor);
-		shape.setOutlineColor(Color.YELLOW);
-		shape.setOutlineThickness(2);
-		shape.setOrigin( shape.getSize().x/2, shape.getSize().y/2);
-		shape.setRotation(rotation);
 		
-		createBody(x, y, width, height, rotation, true);
+		if( map.editable ) {
+			this.shape = new RectangleShape(new Vector2f(width, height));
+			shape.setPosition(x, y);
+			shape.setFillColor(type.fillColor);
+			shape.setOutlineColor(Color.YELLOW);
+			shape.setOutlineThickness(2);
+			shape.setOrigin( shape.getSize().x/2, shape.getSize().y/2);
+			shape.setRotation(rotation);
+		} else 
+			shape = null;
+		
+		if( map.getPhysicalWorld()!=null )
+			physicsBody = map.getPhysicalWorld().createBody(gameWorldID, x, y, width, height, rotation, true, type.handlerType);
+		else
+			physicsBody = null;
 	}
 	
 	public void setType(CollisionType type) {
@@ -117,11 +128,6 @@ public class CollisionObject extends PhysicsBody implements LayerObject {
 	}
 
 	@Override
-	public LayerObject copy() {
-		return new CollisionObject(gameWorldId, type, getPosition().x, getPosition().y, getWidth(), getHeight(), getRotation());
-	}
-
-	@Override
 	public LayerObjectType typeUuid() {
 		return TYPE_UUID;
 	}
@@ -142,6 +148,7 @@ public class CollisionObject extends PhysicsBody implements LayerObject {
 	public static CollisionObject create(GameMap map, int worldId, Map<String, Object> attributes) {
 		try {
 			return new CollisionObject(
+					map,
 					worldId,
 					CollisionType.valueOf((String)attributes.get("type")), 
 					((Number)attributes.get("x")).floatValue(),
@@ -154,18 +161,6 @@ public class CollisionObject extends PhysicsBody implements LayerObject {
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );
 		}
-	}
-
-	@Override
-	protected void beginContact(PhysicsBody with) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void endContact(PhysicsBody with) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

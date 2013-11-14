@@ -41,5 +41,11 @@ final class Layer {
 		for( LayerObject s : objects )
 			s.onGameWorldSwitch(gameWorldId);
 	}
+
+	public void update(long frameTimeMs) {
+		for( LayerObject s : objects )
+			if( s instanceof IUpdateable )
+				((IUpdateable)s).update(frameTimeMs);
+	}
 	
 }
