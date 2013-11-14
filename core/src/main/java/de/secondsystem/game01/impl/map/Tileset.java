@@ -22,9 +22,13 @@ public class Tileset {
 		this.name = name;
 		
 		try {
+			// "\s*" ignores any number of whitespace characters
+			// split("\\s*,\\s*") ignores "   ,   " in example: "file1   ,   file2" and splits file1
+			// and file2 into two strings
 			String[] tileFiles = readFile("assets/tilesets/"+name+".txt").split("\\s*,\\s*");
 			
 			List<ConstTexture> tTiles = new ArrayList<ConstTexture>(tileFiles.length);
+			// go through the string array (tileFiles), create for each(:) file a texture and add it to tTiles
 			for( String fn : tileFiles ) {
 				Texture texture = new Texture();
 				texture.loadFromFile(Paths.get("assets/tiles/"+fn));
@@ -32,6 +36,7 @@ public class Tileset {
 				tTiles.add(texture);
 			}
 			
+			// save tTiles in a constant/unmodifiable list (no write access)
 			tiles = Collections.unmodifiableList(tTiles);
 			
 		} catch( IOException e ) {
@@ -39,7 +44,7 @@ public class Tileset {
 		}
 	}
 	
-	
+	// some magic
 	static String readFile(String path ) throws IOException {
 	  byte[] encoded = Files.readAllBytes(Paths.get(path));
 	  return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(encoded)).toString();

@@ -32,7 +32,7 @@ public class SpriteLayerObject implements LayerObject {
 	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation) {
 		this(tileset, tileId, x, y, rotation, 0, 0);
 	}
-	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float height, float width) {
+	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
 		this.tileset = tileset;
 		this.tileId = tileId;
 		sprite = new Sprite();
@@ -40,7 +40,7 @@ public class SpriteLayerObject implements LayerObject {
 		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
 		sprite.setPosition(x, y);
 		sprite.setRotation(rotation);
-		setDimensions(height>0?height:sprite.getTexture().getSize().y, width>0?width:sprite.getTexture().getSize().x);
+		setDimensions(width>0?width:sprite.getTexture().getSize().x, height>0?height:sprite.getTexture().getSize().y);
 	}
 	
 	public void setTile(Tileset tileset, int tileId) {
@@ -56,7 +56,7 @@ public class SpriteLayerObject implements LayerObject {
 	}
 	
 	@Override
-	public void setDimensions(float height, float width) {
+	public void setDimensions(float width, float height) {
 		sprite.setScale(width/sprite.getTexture().getSize().x, height/sprite.getTexture().getSize().y);
 	}
 
@@ -76,13 +76,13 @@ public class SpriteLayerObject implements LayerObject {
 	}
 
 	@Override
-	public int getHeight() {
-		return (int) (sprite.getTexture().getSize().y * sprite.getScale().y);
+	public float getHeight() {
+		return (sprite.getTexture().getSize().y * sprite.getScale().y);
 	}
 
 	@Override
-	public int getWidth() {
-		return (int) (sprite.getTexture().getSize().x * sprite.getScale().x);
+	public float getWidth() {
+		return (sprite.getTexture().getSize().x * sprite.getScale().x);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class SpriteLayerObject implements LayerObject {
 	}
 	@Override
 	public LayerObject copy() {
-		return new SpriteLayerObject(tileset, tileId, sprite.getPosition().x, sprite.getPosition().y, sprite.getRotation(), getHeight(), getWidth());
+		return new SpriteLayerObject(tileset, tileId, sprite.getPosition().x, sprite.getPosition().y, sprite.getRotation(), getWidth(), getHeight());
 	}
 	@Override
 	public LayerObjectType typeUuid() {
@@ -115,8 +115,8 @@ public class SpriteLayerObject implements LayerObject {
 		map.put("x", getPosition().x);
 		map.put("y", getPosition().y);
 		map.put("rotation", getRotation());
-		map.put("height", getHeight());
 		map.put("width", getWidth());
+		map.put("height", getHeight());
 		
 		return map;
 	}
@@ -128,11 +128,16 @@ public class SpriteLayerObject implements LayerObject {
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),
 					((Number)attributes.get("rotation")).floatValue(),
-					((Number)attributes.get("height")).intValue(),
-					((Number)attributes.get("width")).intValue() );
+					((Number)attributes.get("width")).floatValue(),
+					((Number)attributes.get("height")).floatValue());
 		
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );
 		}
+	}
+	@Override
+	public void onGameWorldSwitch(int gameWorldId) {
+		// TODO Auto-generated method stub
+		
 	}
 }

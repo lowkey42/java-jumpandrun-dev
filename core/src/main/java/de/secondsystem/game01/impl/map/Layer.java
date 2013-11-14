@@ -36,4 +36,10 @@ final class Layer {
 		objects.remove(s);
 	}
 	
+	public void onGameWorldSwitch(int gameWorldId)
+	{
+		for( LayerObject s : objects )
+			s.onGameWorldSwitch(gameWorldId);
+	}
+	
 }

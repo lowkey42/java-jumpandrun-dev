@@ -16,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.secondsystem.game01.impl.map.GameMap.World;
+import de.secondsystem.game01.impl.map.GameMap.GameWorld;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 
 
@@ -38,7 +38,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	@Override
 	public void serialize( GameMap map) {
 		JSONObject obj = new JSONObject();
-		obj.put("world", Arrays.asList(serializeWorld(map.world[0]), serializeWorld(map.world[1])));
+		obj.put("world", Arrays.asList(serializeGameWorld(map.gameWorld[0]), serializeGameWorld(map.gameWorld[1])));
 		obj.put("tileset", map.getTileset().name );
 		
 		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()), StandardCharsets.UTF_8) ){
@@ -61,7 +61,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			
 			GameMap map = new GameMap(mapId, tileset, playable, editable);
 			for( int i=0; i<=1; ++i )
-				deserializeWorld(map, i, worlds.get(0));
+				deserializeGameWorld(map, i, worlds.get(i));
 			
 			return map;
 			
@@ -71,7 +71,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private JSONObject serializeWorld(World world) {
+	private JSONObject serializeGameWorld(GameWorld world) {
 		JSONObject obj = new JSONObject();
 		obj.put("backgroundColor", encodeColor(world.backgroundColor) );
 		obj.put("layer", serializeLayers(world.graphicLayer) );
@@ -109,14 +109,14 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		return obj;
 	}
 
-	private void deserializeWorld(GameMap map, int worldId, JSONObject obj) {
-		map.world[worldId].backgroundColor = decodeColor((String)obj.get("backgroundColor"));
+	private void deserializeGameWorld(GameMap map, int worldId, JSONObject obj) {
+		map.gameWorld[worldId].backgroundColor = decodeColor((String)obj.get("backgroundColor"));
 		
 		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}
 	@SuppressWarnings("unchecked")
-	private void deserializeLayers( GameMap map, int worldId, JSONArray array) {
-		for( JSONObject l : (Iterable<JSONObject>) array )
+	private void deserializeLayers( GameMap map, int worldId, JSONArray layerArray) {
+		for( JSONObject l : (Iterable<JSONObject>) layerArray )
 			for( Object obj : ((JSONArray) l.get("objects")) )
 				map.addNode(worldId, LayerType.valueOf((String)l.get("layerType")), deserializeLayerObject(map, worldId, (JSONObject) obj));
 	}

@@ -10,12 +10,15 @@ import de.secondsystem.game01.impl.map.LayerObject;
 public enum LayerObjectType {
 
 	SPRITE		("sp", SpriteLayerObject.class),
-	COLLISION	("cl", CollisionObject.class);
+	COLLISION	("cl", CollisionObject.class),
+	TEST_CHARACTER ("tc", TestCharacter.class);
 	
 	private static final String CONSTRUCT_METHOD_NAME = "create";
 	
 	public final String shortId;
+	// all classes derived from LayerObject
 	private final Class<? extends LayerObject> clazz;
+	// pointer to a method
 	private final Method constructMethod;
 	
 	private LayerObjectType(String shortId, Class<? extends LayerObject> clazz) {
