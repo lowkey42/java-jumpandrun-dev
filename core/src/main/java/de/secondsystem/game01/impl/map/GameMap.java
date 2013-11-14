@@ -159,11 +159,6 @@ public class GameMap {
 	    physicsWorld.clearForces();
 	}
 	
-	public World getPhysicsWorld()
-	{
-		return physicsWorld;
-	}
-	
 	// ADDED // TODO: REMOVE COMMENT
 	public int getActiveGameWorldId()
 	{
