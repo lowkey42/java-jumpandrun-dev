@@ -115,14 +115,14 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}
 	@SuppressWarnings("unchecked")
-	private void deserializeLayers( GameMap map, int worldId, JSONArray layerArray) {
+	private void deserializeLayers( IGameMap map, int worldId, JSONArray layerArray) {
 		for( JSONObject l : (Iterable<JSONObject>) layerArray )
 			for( Object obj : ((JSONArray) l.get("objects")) )
 				map.addNode(worldId, LayerType.valueOf((String)l.get("layerType")), deserializeLayerObject(map, worldId, (JSONObject) obj));
 	}
 
 	@SuppressWarnings("unchecked")
-	private LayerObject deserializeLayerObject(GameMap map, int worldId, JSONObject obj) {
+	private LayerObject deserializeLayerObject(IGameMap map, int worldId, JSONObject obj) {
 		final LayerObjectType type = LayerObjectType.getByShortId((String) obj.get("$type"));
 		
 		if( type==null )

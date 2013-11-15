@@ -36,12 +36,6 @@ final class Layer {
 		objects.remove(s);
 	}
 	
-	public void onGameWorldSwitch(int gameWorldId)
-	{
-		for( LayerObject s : objects )
-			s.onGameWorldSwitch(gameWorldId);
-	}
-
 	public void update(long frameTimeMs) {
 		for( LayerObject s : objects )
 			if( s instanceof IUpdateable )

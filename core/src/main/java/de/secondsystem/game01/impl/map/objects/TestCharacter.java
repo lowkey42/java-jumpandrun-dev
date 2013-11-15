@@ -9,15 +9,16 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard;
 
-import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.ICameraController;
+import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.IWorldSwitchListener;
 import de.secondsystem.game01.impl.map.IUpdateable;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody.ContactListener;
 
-public class TestCharacter implements LayerObject, IUpdateable, ICameraController, ContactListener{
+public class TestCharacter implements LayerObject, IUpdateable, ICameraController, ContactListener, IWorldSwitchListener {
 	
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(TestCharacter.class);
 	
@@ -28,7 +29,7 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 	private boolean moving = false;
 	
 	
-	public TestCharacter(GameMap map, int gameWorldId, float x, float y, float width, float height, float rotation) {
+	public TestCharacter(IGameMap map, int gameWorldId, float x, float y, float width, float height, float rotation) {
 		this.shape = new RectangleShape(new Vector2f(width, height));
 		shape.setPosition(x, y);
 		shape.setFillColor(Color.WHITE);
@@ -43,6 +44,8 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 			physicsBody.setContactListener(this);
 		}
 		//body.setFixedRotation(true);
+		
+		map.registerWorldSwitchListener(this);	// TODO: have to be deregistered
 	}
 	
 	@Override
@@ -152,7 +155,7 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 		shape.setOrigin(shape.getSize().x/2, shape.getSize().y/2);
 	}
 
-	public static TestCharacter create(GameMap map, int worldId, Map<String, Object> attributes) {
+	public static TestCharacter create(IGameMap map, int worldId, Map<String, Object> attributes) {
 		try {
 			return new TestCharacter(
 					map,
@@ -186,13 +189,13 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 	}
 
 	@Override
-	public void onGameWorldSwitch(int gameWorldId) {
-		physicsBody.setGameWorldId(gameWorldId);
+	public Vector2f getLastStablePosition() {
+		return null;	// TODO: implement for lazy-camera
 	}
 
 	@Override
-	public Vector2f getLastStablePosition() {
-		return null;	// TODO: implement for lazy-camera
+	public void onWorldSwitch(int newWorldId) {
+		physicsBody.setGameWorldId(newWorldId);
 	}
 
 }
