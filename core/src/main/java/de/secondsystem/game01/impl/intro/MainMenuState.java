@@ -4,6 +4,7 @@ import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.game.MainGameState;
 
 /**
  * TODO
@@ -24,6 +25,7 @@ public final class MainMenuState extends GameState {
 		// TODO
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO
@@ -32,15 +34,18 @@ public final class MainMenuState extends GameState {
 	          case CLOSED: ctx.window.close();
 	        	 break;
 	          case MOUSE_BUTTON_RELEASED: System.out.println("Button released! "+ event.asMouseButtonEvent().button);
-	          	;
-	          case MOUSE_MOVED: System.out.println("Mouse moved! "+ event.asMouseEvent().position);
+	          	setNextState(new MainGameState("test01"));
+	          	break;
+	          	
+	          case MOUSE_BUTTON_PRESSED: 
+	          case MOUSE_MOVED: myButton.mouseover(ctx.window);
 	        	 break;	        	       
 	        }
 	    }
 		
 		
 		myButton.draw(ctx.window);
-		//ctx.window.draw(newsprite); <--- ???
+			
 		
 	}
 

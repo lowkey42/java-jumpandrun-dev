@@ -7,6 +7,9 @@ import java.io.IOException;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.IntRect;
+import org.jsfml.window.Mouse;
+import org.jsfml.window.Window;
 
 /**
  * Diese Klasse stellt einen Button mit diversen Funktionen bereit
@@ -19,8 +22,10 @@ public final class Button {
 	String title, text;
 	int pos_x, pos_y;
 	
-	Sprite newsprite;
-	
+	final Sprite newsprite;
+	final int height;
+	final int width;
+		
 	// Konstruktoren
 	Button(String text, Path file, int pos_x, int pos_y){
 		this.file = file;
@@ -28,11 +33,11 @@ public final class Button {
 		this.pos_y = pos_y;
 		this.text = text;
 		
-		Texture newbutton = new Texture();
-		
+		Texture newButton = new Texture();
+				
 		try {
 			// Versuche Texturdatei zu laden
-			newbutton.loadFromFile(file);
+			newButton.loadFromFile(file);
 		
 			System.out.println("DATEI ERFOLGREICH EINGEBUNDEN!");
 		} catch(IOException ex) {
@@ -41,12 +46,18 @@ public final class Button {
 			ex.printStackTrace();
 		}
 		
-		newsprite = new Sprite(newbutton);
+		height = newButton.getSize().y / 3;
+		width = newButton.getSize().x;
+		
+		newsprite = new Sprite(newButton);
+
+		changeTextureClip(0);
 		newsprite.setPosition(pos_x, pos_y);
+
 	}
 	
 	Button(String text, int pos_x, int pos_y){
-		this(text, Paths.get("assets", "gui", "buttons", "ButtonNormal.png"), pos_x, pos_y);
+		this(text, Paths.get("assets", "gui", "buttons", "ButtonClass.png"), pos_x, pos_y);
 	}
 	
 	// Methoden	
@@ -58,4 +69,17 @@ public final class Button {
 		rt.draw(newsprite);
 	}
 	
+	void mouseover(Window window){
+		
+		if(this.newsprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
+			changeTextureClip( Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1);
+		}else{
+			changeTextureClip(0);
+		}
+		
+	}
+	
+	private void changeTextureClip(int pos) {
+		newsprite.setTextureRect(new IntRect(0,height*pos,width,height));
+	}
 }
