@@ -15,10 +15,13 @@ public enum LayerObjectType {
 	
 	private static final String CONSTRUCT_METHOD_NAME = "create";
 	
+	/** Shortened id of this type (must be unique) */
 	public final String shortId;
-	// all classes derived from LayerObject
+	
+	/** Reference to the concrete class, implementing this LO-Type */
 	private final Class<? extends LayerObject> clazz;
-	// pointer to a method
+	
+	/** Reference to the create-Method of the implementation */
 	private final Method constructMethod;
 	
 	private LayerObjectType(String shortId, Class<? extends LayerObject> clazz) {

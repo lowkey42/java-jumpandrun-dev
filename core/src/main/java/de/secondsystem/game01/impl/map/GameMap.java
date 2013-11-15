@@ -140,7 +140,6 @@ public class GameMap implements IGameMap {
 		for( LayerType l : LayerType.values() ) {
 			Layer layer = gameWorld[activeGameWorldId].graphicLayer[l.layerIndex];
 			
-			// parallax explanation can be found in the class "LayerType"
 			if( layer.show ) {
 				if( l.parallax!=1.f )
 					rt.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );

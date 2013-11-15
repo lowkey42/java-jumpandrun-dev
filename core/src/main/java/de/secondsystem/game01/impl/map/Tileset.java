@@ -22,29 +22,41 @@ public class Tileset {
 		this.name = name;
 		
 		try {
-			// "\s*" ignores any number of whitespace characters
-			// split("\\s*,\\s*") ignores "   ,   " in example: "file1   ,   file2" and splits file1
-			// and file2 into two strings
+			/** load file to String and split it on commas (whitespace are ignored); e.g. "tile1.png, tile2.jpeg" is parsed as ["tile1.png","tile2.jpeg"] */
 			String[] tileFiles = readFile("assets/tilesets/"+name+".txt").split("\\s*,\\s*");
 			
-			List<ConstTexture> tTiles = new ArrayList<ConstTexture>(tileFiles.length);
-			// go through the string array (tileFiles), create for each(:) file a texture and add it to tTiles
-			for( String fn : tileFiles ) {
-				Texture texture = new Texture();
-				texture.loadFromFile(Paths.get("assets/tiles/"+fn));
-				
-				tTiles.add(texture);
-			}
-			
-			// save tTiles in a constant/unmodifiable list (no write access)
-			tiles = Collections.unmodifiableList(tTiles);
+			// save textures in a unmodifiable list (not the list nor its content can be modified)
+			tiles = Collections.unmodifiableList(loadTextures(tileFiles));
 			
 		} catch( IOException e ) {
 			throw new Error("Unable to load tileset: "+name, e);
 		}
 	}
+
+	/** 
+	 * Load each tile as a new {@link Texture}
+	 * @param tileFiles tile-names as Strings
+	 * @return the loaded textures
+	 * @throws IOException at least one file couldn't be loaded
+	 */
+	private static final List<ConstTexture> loadTextures( String... tileFiles ) throws IOException {
+		List<ConstTexture> tTiles = new ArrayList<ConstTexture>(tileFiles.length);
+		for( String fn : tileFiles ) {
+			Texture texture = new Texture();
+			texture.loadFromFile(Paths.get("assets/tiles/"+fn.trim()));
+			
+			tTiles.add(texture);
+		}
+		
+		return tTiles;
+	}
 	
-	// some magic
+	/**
+	 * Read the file to a {@link String}
+	 * @param path The path to the file
+	 * @return The content of the file
+	 * @throws IOException The file couldn't be opened/read
+	 */
 	static String readFile(String path ) throws IOException {
 	  byte[] encoded = Files.readAllBytes(Paths.get(path));
 	  return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(encoded)).toString();
