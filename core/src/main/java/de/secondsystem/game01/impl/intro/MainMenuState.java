@@ -2,8 +2,6 @@ package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.window.event.Event;
 
-import java.nio.file.Paths;
-
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 
@@ -13,13 +11,12 @@ import de.secondsystem.game01.impl.GameState;
  */
 public final class MainMenuState extends GameState {
 	
-	Button myButton = new Button("NewGame", Paths.get("assets", "gui", "buttons", "ButtonNormal.png"), 320, 240);
+	Button myButton = new Button("NEW GAME", 320, 240);
 	
 	@Override
 	protected void onStart(GameContext ctx) {
 		// TODO
 		System.out.println(">> MainMenuState erfolgreich aufgerufen <<");
-		myButton.create();
 	}
 
 	@Override
@@ -31,13 +28,19 @@ public final class MainMenuState extends GameState {
 	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO
 		for(Event event : ctx.window.pollEvents()) {
-	        if(event.type == Event.Type.CLOSED) {
-	            //The user pressed the close button
-	            ctx.window.close();
+	        switch(event.type){
+	          case CLOSED: ctx.window.close();
+	        	 break;
+	          case MOUSE_BUTTON_RELEASED: System.out.println("Button released! "+ event.asMouseButtonEvent().button);
+	          	;
+	          case MOUSE_MOVED: System.out.println("Mouse moved! "+ event.asMouseEvent().position);
+	        	 break;	        	       
 	        }
 	    }
 		
-		// ctx.window.draw(newsprite); <--- ???
+		
+		myButton.draw(ctx.window);
+		//ctx.window.draw(newsprite); <--- ???
 		
 	}
 
