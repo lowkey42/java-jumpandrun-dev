@@ -82,10 +82,10 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 	    if( jump && physicsBody.isStable() )
 	    	y -= 1.7f;
 	 
-	    if( physicsBody.getVelocity().y > 0)
-	    	y += 0.05f;
+	    //if( physicsBody.getVelocity().y > 0)
+	    	//y += 0.05f;
 	    
-	    physicsBody.move(x*5, y*50);
+	    physicsBody.move(x*5, y*30);
 	    
 	    if( x!=0 )
 	    	moving = true;

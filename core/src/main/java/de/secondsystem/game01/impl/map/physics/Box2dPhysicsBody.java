@@ -108,10 +108,11 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 
 	@Override
 	public void move(float x, float y) {
-		if( body.getLinearVelocity().x<=maxXVel )
+		
+		if( Math.abs(body.getLinearVelocity().x+x)<=maxXVel )
 			body.applyForce(new Vec2(x, 0), body.getWorldCenter());
 		
-		if( body.getLinearVelocity().y<=maxYVel )
+		if( Math.abs(body.getLinearVelocity().y+y)<=maxYVel )
 			body.applyForce(new Vec2(0, y), body.getWorldCenter());
 	}
 
