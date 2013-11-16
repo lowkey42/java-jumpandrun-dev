@@ -12,7 +12,7 @@ import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 /**
- * Diese Klasse stellt einen Button mit diversen Funktionen bereit
+ * This class provides a functional button with different attributes
  * @author Sebastian
  *
  */
@@ -26,7 +26,7 @@ public final class Button {
 	final int height;
 	final int width;
 		
-	// Konstruktoren
+	// Constructors
 	Button(String text, Path file, int pos_x, int pos_y){
 		this.file = file;
 		this.pos_x = pos_x;
@@ -36,7 +36,7 @@ public final class Button {
 		Texture newButton = new Texture();
 				
 		try {
-			// Versuche Texturdatei zu laden
+			// Try to load the texture file
 			newButton.loadFromFile(file);
 		
 			System.out.println("DATEI ERFOLGREICH EINGEBUNDEN!");
@@ -50,9 +50,8 @@ public final class Button {
 		width = newButton.getSize().x;
 		
 		newsprite = new Sprite(newButton);
-
-		changeTextureClip(0);
 		newsprite.setPosition(pos_x, pos_y);
+		changeTextureClip(0);
 
 	}
 	
@@ -60,26 +59,23 @@ public final class Button {
 		this(text, Paths.get("assets", "gui", "buttons", "ButtonClass.png"), pos_x, pos_y);
 	}
 	
-	// Methoden	
+	// Methods	
 	
-	// Sprite zeichnen
+	// Draw a sprite
 	void draw(RenderTarget rt){
-		
-		// TODO --> Überprüfung ob zuvor erfolgreich eine Textur geladen wurde
 		rt.draw(newsprite);
 	}
 	
 	void mouseover(Window window){
-		
 		if(this.newsprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
-			changeTextureClip( Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1);
-		}else{
+			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1);
+		} else {
 			changeTextureClip(0);
 		}
-		
 	}
 	
 	private void changeTextureClip(int pos) {
 		newsprite.setTextureRect(new IntRect(0,height*pos,width,height));
 	}
+	
 }
