@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.map;
+package de.secondsystem.game01.model;
 
 public interface IUpdateable {
 

@@ -107,13 +107,17 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public void move(float x, float y) {
+	public byte move(float x, float y) {
+		x = limit(body.getLinearVelocity().x, x, maxXVel);
+		y = limit(body.getLinearVelocity().y, y, maxYVel);
 		
-		if( Math.abs(body.getLinearVelocity().x+x)<=maxXVel )
-			body.applyForce(new Vec2(x, 0), body.getWorldCenter());
+		body.applyForce(new Vec2(x, y), body.getWorldCenter());
 		
-		if( Math.abs(body.getLinearVelocity().y+y)<=maxYVel )
-			body.applyForce(new Vec2(0, y), body.getWorldCenter());
+		return (byte) ((x!=0 ? 2 : 0) & (y!=0 ? 1 : 0));
+	}
+	
+	private static float limit( float current, float mod, float max ) {
+		return mod<0 ? Math.max(mod, -max-current) : Math.min(mod, max-current);
 	}
 
 	@Override

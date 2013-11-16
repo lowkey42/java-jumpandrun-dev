@@ -30,7 +30,7 @@ public interface IPhysicsBody {
 	void setMaxVelocityX( float x );
 	void setMaxVelocityY( float y );
 	
-	void move( float x, float y );
+	byte move( float x, float y );
 	
 	void rotate( float angle );
 	

@@ -12,11 +12,11 @@ import org.jsfml.window.Keyboard;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.IWorldSwitchListener;
-import de.secondsystem.game01.impl.map.IUpdateable;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody.ContactListener;
+import de.secondsystem.game01.model.IUpdateable;
 
 public class TestCharacter implements LayerObject, IUpdateable, ICameraController, ContactListener, IWorldSwitchListener {
 	

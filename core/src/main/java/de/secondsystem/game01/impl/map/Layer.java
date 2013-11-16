@@ -6,6 +6,8 @@ import java.util.List;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.model.IUpdateable;
+
 final class Layer {
 	
 	List<LayerObject> objects = new ArrayList<>();

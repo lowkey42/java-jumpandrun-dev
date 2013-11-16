@@ -9,12 +9,12 @@ import org.jsfml.window.event.Event;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
+import de.secondsystem.game01.impl.game.controller.KeyboardController;
+import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
-import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.impl.map.objects.TestCharacter;
 
 public class MainGameState extends GameState {
 
@@ -22,17 +22,18 @@ public class MainGameState extends GameState {
 	
 	private ICameraController cameraController;
 	
+	private KeyboardController controller = new KeyboardController();
+	
 	
 	public MainGameState( String mapId ) {
 		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
 		
 		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, true);
 		
-		// create character
-		TestCharacter testCharacter = new TestCharacter(map, 0, 300.f, 100.f, 50.f, 50.f, 0);
-		map.addNode(0, LayerType.OBJECTS, testCharacter);
-		map.addNode(1, LayerType.OBJECTS, testCharacter);
-		cameraController = testCharacter;
+		final IControllableGameEntity player = map.getEntityManager().createPlayer(300, 100);
+		
+		cameraController = player;
+		controller.addGE(player);
 	}
 	
 	@Override
@@ -47,6 +48,8 @@ public class MainGameState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
+		controller.process();
+		
 		// update worlds
 		map.update(frameTime);
 

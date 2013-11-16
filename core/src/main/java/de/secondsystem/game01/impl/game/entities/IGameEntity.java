@@ -2,19 +2,20 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
-import org.jsfml.graphics.RenderTarget;
+import de.secondsystem.game01.impl.map.ICameraController;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IUpdateable;
 
 /**
  * All objects in a map (player, enemies, triggers)
  * @author lowkey
  *
  */
-public interface IGameEntity extends IControllable {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController {
 
 	UUID uuid();
 	
-	void onFrame( RenderTarget target );
-	
-	// TODO: position, sprite, physics, linked-GEs, hidden, ???
+	void setFollowWorldSwitch( boolean followWorldSwitch );
+	boolean getFollowWorldSwitch();
 	
 }

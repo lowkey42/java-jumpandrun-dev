@@ -2,14 +2,13 @@ package de.secondsystem.game01.impl.map;
 
 import java.util.Map;
 
-import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
+import de.secondsystem.game01.model.IDrawable;
 
-public interface LayerObject {
+public interface LayerObject extends IDrawable {
 	
-	void draw(RenderTarget rt);
 	boolean inside(Vector2f point);
 	void setPosition(Vector2f pos);
 	void setRotation(float degree);

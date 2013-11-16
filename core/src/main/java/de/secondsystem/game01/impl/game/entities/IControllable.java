@@ -2,14 +2,17 @@ package de.secondsystem.game01.impl.game.entities;
 
 public interface IControllable {
 	
-	public static enum Direction {
-		UP, DOWN, LEFT, RIGHT, CENTER;
+	public static enum HDirection {
+		LEFT, RIGHT;
+	}
+	public static enum VDirection {
+		UP, DOWN;
 	}
 	
-	void move(Direction direction);
+	void moveHorizontally(HDirection direction);
+	void moveVertically(VDirection direction);
 	
 	void jump();
-	void stopJump();
 	
 	// TODO: attack?
 	

@@ -1,11 +1,13 @@
 package de.secondsystem.game01.impl.map;
 
-import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IUpdateable;
 
-public interface IGameMap {
+public interface IGameMap extends IDrawable, IUpdateable {
 
 	String getMapId();
 
@@ -14,12 +16,10 @@ public interface IGameMap {
 	void setTileset(Tileset tileset);
 
 	Tileset getTileset();
+	
+	IGameEntityManager getEntityManager();
 
 	void switchWorlds();
-
-	void draw(RenderTarget rt);
-
-	void update(long frameTimeMs);
 
 	int getActiveGameWorldId();
 

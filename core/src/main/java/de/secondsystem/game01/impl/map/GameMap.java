@@ -9,6 +9,8 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.entities.GameEntityManager;
+import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
 
@@ -47,6 +49,8 @@ public class GameMap implements IGameMap {
 	
 	private final IPhysicalWorld physicalWorld;
 	
+	private final IGameEntityManager entityManager;
+	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
 	public GameMap(String mapId, Tileset tileset) {
@@ -63,6 +67,8 @@ public class GameMap implements IGameMap {
 			physicalWorld.init(new Vector2f(0, 11.f));
 		} else
 			physicalWorld = null;
+		
+		entityManager = new GameEntityManager(this);
 	}
 	
 	GameMap(String mapId, Tileset tileset, boolean playable, boolean editable) {
@@ -80,6 +86,8 @@ public class GameMap implements IGameMap {
 			physicalWorld.init(new Vector2f(0, 11.f));
 		} else
 			physicalWorld = null;
+		
+		entityManager = new GameEntityManager(this);
 	}
 	
 	/* (non-Javadoc)
@@ -148,6 +156,9 @@ public class GameMap implements IGameMap {
 				
 				layer.draw(rt);
 			}
+			
+			if( l==LayerType.OBJECTS )
+				entityManager.draw(rt);
 		}
 		
 		rt.setView(cView);
@@ -161,6 +172,8 @@ public class GameMap implements IGameMap {
 			if( l.updated )
 				for( GameWorld world : gameWorld )
 					world.graphicLayer[l.layerIndex].update(frameTimeMs);
+		
+		entityManager.update(frameTimeMs);
 		
 		if( physicalWorld !=null )
 			physicalWorld.update(frameTimeMs);
@@ -243,6 +256,11 @@ public class GameMap implements IGameMap {
 	@Override
 	public boolean isEditable() {
 		return editable;
+	}
+
+	@Override
+	public IGameEntityManager getEntityManager() {
+		return entityManager;
 	}
 	
 }

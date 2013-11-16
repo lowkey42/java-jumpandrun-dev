@@ -2,7 +2,7 @@ package de.secondsystem.game01.impl.map.physics;
 
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.IUpdateable;
+import de.secondsystem.game01.model.IUpdateable;
 
 public interface IPhysicalWorld extends IUpdateable {
 
