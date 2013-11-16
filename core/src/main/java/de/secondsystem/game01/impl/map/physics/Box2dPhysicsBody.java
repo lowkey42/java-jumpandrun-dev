@@ -5,6 +5,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.system.Vector2f;
 
@@ -17,8 +18,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private ContactListener contactListener;
 	private float maxXVel = Float.MAX_VALUE;
 	private float maxYVel = Float.MAX_VALUE;
+	int numFootContacts = 0;
 	
-	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x, float y, float width, float height, float rotation, boolean isStatic, CollisionHandlerType type) {
+	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x, float y, 
+			float width, float height, float rotation, boolean isStatic, CollisionHandlerType type, boolean createFoot) {
 		this.gameWorldId = gameWorldId;
 		this.type = type;
 		
@@ -37,17 +40,28 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		// create the body
 		body = world.createBody(bd);
 		
+		
 		if( !isStatic )
 		{
 			// fixture definition
 			FixtureDef fd = new FixtureDef();
 			fd.shape = s;
 			fd.density = 1.0f;
-			fd.friction = 0.6f;
+			fd.friction = 0.1f;
 			fd.restitution = 0.0f;
 			
 			//add fixture to body
 			body.createFixture(fd);
+			
+			if( createFoot )
+			{
+				s.setAsBox(width/3f*BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0, height/2f*BOX2D_SCALE_FACTOR), rotation);
+				fd.isSensor = true;
+			    Fixture footFixture = body.createFixture(fd);
+			    footFixture.setUserData( this );
+				body.setFixedRotation(true);
+			}
+
 		}
 		else
 			body.createFixture(s, 0f);	
@@ -99,11 +113,22 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 
 	@Override
 	public boolean isStable() {
-		return nearEqual(body.getLinearVelocity().y ,0.f);	// TODO: find better check
+		return numFootContacts > 0;
+		//return nearEqual(body.getLinearVelocity().y ,0.f);	// TODO: find better check
 	}
 
 	private static boolean nearEqual(float a, float b) {
 		return Math.abs(a - b) < 0.0000001f; 
+	}
+	
+	public void incFootContacts()
+	{
+		numFootContacts++;
+	}
+	
+	public void decFootContacts()
+	{
+		numFootContacts--;
 	}
 
 	@Override
