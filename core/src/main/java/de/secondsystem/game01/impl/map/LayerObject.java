@@ -13,9 +13,7 @@ public interface LayerObject {
 	boolean inside(Vector2f point);
 	void setPosition(Vector2f pos);
 	void setRotation(float degree);
-	
-	void onGameWorldSwitch(int gameWorldId);
-	
+		
 	void setDimensions(float width, float height);
 
 	float getHeight();

@@ -7,7 +7,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
 
@@ -112,7 +112,8 @@ public class SpriteLayerObject implements LayerObject {
 		
 		return map;
 	}
-	public static SpriteLayerObject create(GameMap map, int worldId, Map<String, Object> attributes) {
+	
+	public static SpriteLayerObject create(IGameMap map, int worldId, Map<String, Object> attributes) {
 		try {
 			return new SpriteLayerObject(
 					map.getTileset(),
@@ -126,10 +127,5 @@ public class SpriteLayerObject implements LayerObject {
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );
 		}
-	}
-	@Override
-	public void onGameWorldSwitch(int gameWorldId) {
-		// TODO Auto-generated method stub
-		
 	}
 }

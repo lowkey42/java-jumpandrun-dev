@@ -14,12 +14,15 @@ public enum LayerType {
 	public static final int LAYER_COUNT = 7;
 
 	public final int layerIndex;
-	// parallax usually contains values between 0 and 1: lower values -> slower scrolling
-	// a lower scrolling speed has the effect that the background appears to be farther away
+	
+	/** parallax usually contains values between 0 and 1: lower values -> slower scrolling
+	 * a lower scrolling speed has the effect that the background appears to be farther away
+	 */
 	public final float parallax;
 	public final boolean visible;
 	public final boolean updated;
 	public final String name;
+	
 	private LayerType(int _layerIndex, float _parallax, boolean _visible, boolean _updated, String _name) {
 		layerIndex = _layerIndex;
 		parallax = _parallax;

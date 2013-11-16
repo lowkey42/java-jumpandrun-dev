@@ -1,5 +1,8 @@
 package de.secondsystem.game01.impl.map;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
@@ -9,7 +12,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
 
-public class GameMap {
+public class GameMap implements IGameMap {
 	
 	public static final class GameWorld {
 		final Layer[] graphicLayer;
@@ -44,6 +47,8 @@ public class GameMap {
 	
 	private final IPhysicalWorld physicalWorld;
 	
+	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
+	
 	public GameMap(String mapId, Tileset tileset) {
 		this.mapId = mapId;
 		gameWorld[0] = new GameWorld();
@@ -77,15 +82,31 @@ public class GameMap {
 			physicalWorld = null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#getMapId()
+	 */
+	@Override
 	public String getMapId() {
 		return mapId;
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#setMapId(java.lang.String)
+	 */
+	@Override
 	public void setMapId(String mapId) {
 		this.mapId = mapId;
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#setTileset(de.secondsystem.game01.impl.map.Tileset)
+	 */
+	@Override
 	public void setTileset(Tileset tileset) {
 		this.tileset = tileset;
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#getTileset()
+	 */
+	@Override
 	public Tileset getTileset() {
 		return tileset;
 	}
@@ -96,13 +117,21 @@ public class GameMap {
 	// particleLayer
 	
 	
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#switchWorlds()
+	 */
+	@Override
 	public void switchWorlds() {
 		activeGameWorldId = activeGameWorldId==0 ? 1 : 0;
 		
-		for( LayerType l : LayerType.values() ) 
-			gameWorld[activeGameWorldId].graphicLayer[l.layerIndex].onGameWorldSwitch(activeGameWorldId);
+		for( IWorldSwitchListener listener : worldSwitchListeners )
+			listener.onWorldSwitch(activeGameWorldId);
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#draw(org.jsfml.graphics.RenderTarget)
+	 */
+	@Override
 	public void draw(RenderTarget rt) {
 		final ConstView cView = rt.getView();
 		
@@ -111,7 +140,6 @@ public class GameMap {
 		for( LayerType l : LayerType.values() ) {
 			Layer layer = gameWorld[activeGameWorldId].graphicLayer[l.layerIndex];
 			
-			// parallax explanation can be found in the class "LayerType"
 			if( layer.show ) {
 				if( l.parallax!=1.f )
 					rt.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
@@ -124,6 +152,10 @@ public class GameMap {
 		
 		rt.setView(cView);
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#update(long)
+	 */
+	@Override
 	public void update(long frameTimeMs) {
 		for( LayerType l : LayerType.values() )
 			if( l.updated )
@@ -134,26 +166,54 @@ public class GameMap {
 			physicalWorld.update(frameTimeMs);
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#getActiveGameWorldId()
+	 */
+	@Override
 	public int getActiveGameWorldId() {
 		return activeGameWorldId;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(int, de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
+	 */
+	@Override
 	public void addNode( int worldId, LayerType layer, LayerObject sprite ) {
 		gameWorld[worldId].graphicLayer[layer.layerIndex].addNode(sprite);
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
+	 */
+	@Override
 	public void addNode( LayerType layer, LayerObject sprite ) {
 		addNode(activeGameWorldId, layer, sprite);
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#findNode(de.secondsystem.game01.impl.map.LayerType, org.jsfml.system.Vector2f)
+	 */
+	@Override
 	public LayerObject findNode( LayerType layer, Vector2f point ) {
 		return gameWorld[activeGameWorldId].graphicLayer[layer.layerIndex].findNode(point);
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#remove(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
+	 */
+	@Override
 	public void remove( LayerType layer, LayerObject s ) {
 		gameWorld[activeGameWorldId].graphicLayer[layer.layerIndex].remove(s);
 	}
 		
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#flipShowLayer(de.secondsystem.game01.impl.map.LayerType)
+	 */
+	@Override
 	public boolean flipShowLayer( LayerType layer ) {
 		return gameWorld[activeGameWorldId].graphicLayer[layer.layerIndex].show = !gameWorld[activeGameWorldId].graphicLayer[layer.layerIndex].show;
 	}
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#getShownLayer()
+	 */
+	@Override
 	public boolean[] getShownLayer() {
 		boolean[] s = new boolean[LayerType.LAYER_COUNT];
 		for( int i=0; i<LayerType.LAYER_COUNT; ++i )
@@ -162,8 +222,27 @@ public class GameMap {
 		return s;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#getPhysicalWorld()
+	 */
+	@Override
 	public IPhysicalWorld getPhysicalWorld() {
 		return physicalWorld;
+	}
+
+	@Override
+	public void registerWorldSwitchListener(IWorldSwitchListener listener) {
+		worldSwitchListeners.add(listener);
+	}
+
+	@Override
+	public void deregisterWorldSwitchListener(IWorldSwitchListener listener) {
+		worldSwitchListeners.remove(listener);
+	}
+
+	@Override
+	public boolean isEditable() {
+		return editable;
 	}
 	
 }

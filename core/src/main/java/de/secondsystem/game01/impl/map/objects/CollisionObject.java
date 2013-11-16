@@ -8,7 +8,7 @@ import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
@@ -48,10 +48,10 @@ public class CollisionObject implements LayerObject {
 	
 	private CollisionType type;
 
-	public CollisionObject(GameMap map, int gameWorldID, CollisionType type, float x, float y, float width, float height, float rotation) {
+	public CollisionObject(IGameMap map, int gameWorldID, CollisionType type, float x, float y, float width, float height, float rotation) {
 		this.type = type;
 		
-		if( map.editable ) {
+		if( map.isEditable() ) {
 			this.shape = new RectangleShape(new Vector2f(width, height));
 			shape.setPosition(x, y);
 			shape.setFillColor(type.fillColor);
@@ -145,7 +145,7 @@ public class CollisionObject implements LayerObject {
 		return map;
 	}
 	
-	public static CollisionObject create(GameMap map, int worldId, Map<String, Object> attributes) {
+	public static CollisionObject create(IGameMap map, int worldId, Map<String, Object> attributes) {
 		try {
 			return new CollisionObject(
 					map,
@@ -161,12 +161,6 @@ public class CollisionObject implements LayerObject {
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );
 		}
-	}
-
-	@Override
-	public void onGameWorldSwitch(int gameWorldId) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
