@@ -24,7 +24,8 @@ public final class MainMenuState extends GameState {
 	
 	@Override
 	protected void onStart(GameContext ctx) {
-		// TODO --> Entfernen? System.out.println(">> MainMenuState erfolgreich aufgerufen <<");
+		// TODO
+		System.out.println("MAINMENUSTATE");
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public final class MainMenuState extends GameState {
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		// TODO Preparing the following code to be able to be used with more than 1 button
+		// TODO Preparing the following code to be able to be used with more than 1 button --> outsourcing into button class
 		for(Event event : ctx.window.pollEvents()) {
 	        switch(event.type){
 	          case CLOSED: ctx.window.close();
@@ -44,6 +45,8 @@ public final class MainMenuState extends GameState {
 	          	// Checking if the current mouse position is inside the Button and only the left mouse button is pressed
 	          	if(editorBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new MainGameState("test01"));
+	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
+	          		//setNextState(new MainSettingsMenu());
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		ctx.window.close();
 	          	break;
