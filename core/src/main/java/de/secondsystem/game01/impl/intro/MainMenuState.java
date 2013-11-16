@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.window.event.Event;
+import org.jsfml.window.Mouse;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
@@ -28,13 +29,15 @@ public final class MainMenuState extends GameState {
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		// TODO
+		// TODO Preparing the following code to be able to be used with more than 1 button
 		for(Event event : ctx.window.pollEvents()) {
 	        switch(event.type){
 	          case CLOSED: ctx.window.close();
 	        	 break;
 	          case MOUSE_BUTTON_RELEASED: System.out.println("Button released! "+ event.asMouseButtonEvent().button);
-	          	setNextState(new MainGameState("test01"));
+	          	// Checking if the current mouse position is inside the Button and only the left button is pressed
+	          	if(myButton.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button.toString() == "LEFT")
+	          		setNextState(new MainGameState("test01"));
 	          	break;
 	          	
 	          case MOUSE_BUTTON_PRESSED: 
@@ -43,9 +46,7 @@ public final class MainMenuState extends GameState {
 	        }
 	    }
 		
-		
 		myButton.draw(ctx.window);
-			
 		
 	}
 
