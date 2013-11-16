@@ -11,6 +11,7 @@ public interface IPhysicalWorld extends IUpdateable {
 	@Override
 	void update(long frameTime);
 	
-	IPhysicsBody createBody( int gameWorldIdMask, float x, float y, float width, float height, float rotation, boolean isStatic, CollisionHandlerType type );
+	IPhysicsBody createBody( int gameWorldIdMask, float x, float y, float width, 
+			float height, float rotation, boolean isStatic, CollisionHandlerType type, boolean createFoot);
 	
 }

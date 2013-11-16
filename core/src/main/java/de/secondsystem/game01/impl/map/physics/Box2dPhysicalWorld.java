@@ -48,8 +48,8 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	@Override
 	public IPhysicsBody createBody(int gameWorldIdMask, float x, float y,
 			float width, float height, float rotation, boolean isStatic,
-			CollisionHandlerType type) {
-		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type);
+			CollisionHandlerType type, boolean createFoot) {
+		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot);
 	}
 
 }

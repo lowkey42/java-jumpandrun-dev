@@ -13,6 +13,11 @@ class PhysicsContactListener implements ContactListener {
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) arg0.getFixtureB().getBody().getUserData();
 		body1.beginContact(body2);
 		body2.beginContact(body1);
+		
+		if( arg0.getFixtureA().getUserData() != null)
+			body1.incFootContacts();
+		if( arg0.getFixtureB().getUserData() != null )
+			body2.incFootContacts();
 	}
 
 	@Override
@@ -21,6 +26,11 @@ class PhysicsContactListener implements ContactListener {
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) arg0.getFixtureB().getBody().getUserData();
 		body1.endContact(body2);
 		body2.endContact(body1);
+		
+		if( arg0.getFixtureA().getUserData() != null)
+			body1.decFootContacts();
+		if( arg0.getFixtureB().getUserData() != null )
+			body2.decFootContacts();
 	}
 
 	@Override

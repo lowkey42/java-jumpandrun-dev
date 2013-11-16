@@ -3,6 +3,11 @@ package de.secondsystem.game01.impl.map.objects;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
@@ -27,7 +32,7 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 	private IPhysicsBody physicsBody;
 	
 	private boolean moving = false;
-	
+	private float jumpTimer = 0.f;
 	
 	public TestCharacter(IGameMap map, int gameWorldId, float x, float y, float width, float height, float rotation) {
 		this.shape = new RectangleShape(new Vector2f(width, height));
@@ -39,11 +44,10 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 		shape.setRotation(rotation);
 		
 		if( map.getPhysicalWorld()!=null ) {
-			physicsBody = map.getPhysicalWorld().createBody(gameWorldId, x, y, width, height, rotation, false, CollisionHandlerType.SOLID);
+			physicsBody = map.getPhysicalWorld().createBody(gameWorldId, x, y, width, height, rotation, false, CollisionHandlerType.SOLID, true);
 			physicsBody.setMaxVelocityX(5);
 			physicsBody.setContactListener(this);
 		}
-		//body.setFixedRotation(true);
 		
 		map.registerWorldSwitchListener(this);	// TODO: have to be deregistered
 	}
@@ -60,6 +64,7 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 
 	@Override
 	public void update(long frameTime) {
+		jumpTimer += frameTime/1000.f;
 		processMovement(frameTime/1000.f);	// TODO: move somewhere else
 		
 		if( physicsBody!=null ) {
@@ -82,8 +87,11 @@ public class TestCharacter implements LayerObject, IUpdateable, ICameraControlle
 	    	if( moveLeft )
 	    		x -= 0.5f;
 	    
-	    if( jump && physicsBody.isStable() )
+	    if( jump && physicsBody.isStable() && jumpTimer >= 100.f)
+	    {
 	    	y -= 1.7f;
+	    	jumpTimer = 0.f;
+	    }
 	 
 	    //if( physicsBody.getVelocity().y > 0)
 	    	//y += 0.05f;

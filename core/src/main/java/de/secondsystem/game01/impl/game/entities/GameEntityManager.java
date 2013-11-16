@@ -42,7 +42,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		repr.shape.setOutlineThickness(2f);
 		repr.shape.setOrigin( repr.shape.getSize().x/2, repr.shape.getSize().y/2);
 				
-		final IPhysicsBody physicsBody = map.getPhysicalWorld().createBody(map.getActiveGameWorldId(), x, y, 50, 50, 0, false, CollisionHandlerType.SOLID);
+		final IPhysicsBody physicsBody = map.getPhysicalWorld().createBody(map.getActiveGameWorldId(), x, y, 50, 50, 0, false, CollisionHandlerType.SOLID, true);
 		
 		ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this,
 				map.getActiveGameWorldId(), 

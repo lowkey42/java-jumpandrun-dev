@@ -22,6 +22,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private VDirection vDirection;
 	
 	private boolean jump = false;
+	private long jumpTimer = 0L;
 	
 	private boolean moved;
 
@@ -48,11 +49,17 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 	@Override
 	public void jump() {
+		if( jumpTimer < 100L )
+			return;
+		
 		jump = true;
+		jumpTimer = 0L;
 	}
 	
 	@Override
 	public void update(long frameTimeMs) {
+		jumpTimer += frameTimeMs;
+		
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
 		
 		physicsBody.move(moveAcceleration*frameTimeMs * xMove, jump && physicsBody.isStable() ? -jumpAcceleration*frameTimeMs : 0 );
@@ -63,7 +70,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    	physicsBody.resetVelocity(true, false, false);
 	    	moved = false;
 	    }
-		
+	    
 		super.update(frameTimeMs);
 		
 		hDirection = null;
