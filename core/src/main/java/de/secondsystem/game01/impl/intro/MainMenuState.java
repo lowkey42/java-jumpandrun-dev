@@ -47,8 +47,9 @@ public final class MainMenuState extends GameState {
 	          		setNextState(new MainGameState("test01"));
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		//setNextState(new MainSettingsMenu());
+	          		;
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-	          		ctx.window.close();
+	          		ctx.window.close();	          	
 	          	break;
 	          case MOUSE_BUTTON_PRESSED: 
 	          case MOUSE_MOVED: 
