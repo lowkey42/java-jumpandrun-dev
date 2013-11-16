@@ -1,9 +1,11 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.util.Map;
 import java.util.UUID;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 
 /**
@@ -26,15 +28,16 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean moved;
 
-	public ControllableGameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation,
-			IPhysicsBody physicsBody, float moveAcceleration, float jumpAcceleration, float maxMoveSpeed, float maxJumpSpeed) {
-		super(uuid, em, gameWorldId, representation, physicsBody);
+	public ControllableGameEntity(UUID uuid,
+			GameEntityManager em, IGameMap map,
+			Attributes attributes) {
+		super(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, attributes));
+
+		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
+		this.physicsBody.setMaxVelocityY( attributes.getFloat("maxJumpSpeed",Float.MAX_VALUE) );
 		
-		this.physicsBody.setMaxVelocityX(maxMoveSpeed);
-		this.physicsBody.setMaxVelocityY(maxJumpSpeed);
-		
-		this.moveAcceleration = moveAcceleration;
-		this.jumpAcceleration = jumpAcceleration;
+		this.moveAcceleration = attributes.getFloat("moveAcceleration");
+		this.jumpAcceleration = attributes.getFloat("jumpAcceleration");
 	}
 
 	@Override

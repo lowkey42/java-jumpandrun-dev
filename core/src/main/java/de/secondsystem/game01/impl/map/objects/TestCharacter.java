@@ -23,6 +23,7 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody.ContactListener;
 import de.secondsystem.game01.model.IUpdateable;
 
+@Deprecated
 public class TestCharacter implements LayerObject, IUpdateable, ICameraController, ContactListener, IWorldSwitchListener {
 	
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(TestCharacter.class);

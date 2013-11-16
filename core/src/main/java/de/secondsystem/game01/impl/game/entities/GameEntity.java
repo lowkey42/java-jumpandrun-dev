@@ -5,10 +5,10 @@ import java.util.UUID;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.IWorldSwitchListener;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
@@ -26,6 +26,13 @@ class GameEntity implements IGameEntity, IWorldSwitchListener {
 	protected IPhysicsBody physicsBody;
 	
 	protected IDrawable representation;
+	
+
+	public GameEntity(UUID uuid,
+			GameEntityManager em, IGameMap map,
+			Attributes attributes) {
+		this(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, attributes));
+	}
 	
 	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody) {
 		this.uuid = uuid;

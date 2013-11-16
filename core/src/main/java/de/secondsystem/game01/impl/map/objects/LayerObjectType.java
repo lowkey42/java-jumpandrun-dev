@@ -10,8 +10,7 @@ import de.secondsystem.game01.impl.map.LayerObject;
 public enum LayerObjectType {
 
 	SPRITE		("sp", SpriteLayerObject.class),
-	COLLISION	("cl", CollisionObject.class),
-	TEST_CHARACTER ("tc", TestCharacter.class);
+	COLLISION	("cl", CollisionObject.class);
 	
 	private static final String CONSTRUCT_METHOD_NAME = "create";
 	

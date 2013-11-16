@@ -1,23 +1,35 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
-import org.jsfml.graphics.Color;
-import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.system.Vector2f;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
-import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
-import de.secondsystem.game01.model.IDrawable;
-import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.Attributes;
 
 public final class GameEntityManager implements IGameEntityManager {
 
 	private final Map<UUID, IGameEntity> entities = new HashMap<>();
+	
+	private static final LoadingCache<String, Map<String, Object>> ARCHETYPE_CACHE = 
+			CacheBuilder.newBuilder().concurrencyLevel(3).maximumSize(100).build(new ArchetypeLoader());
 	
 	final IGameMap map;
 	
@@ -25,79 +37,29 @@ public final class GameEntityManager implements IGameEntityManager {
 		this.map = map;
 	}
 	
-/*	public IGameEntity create(IDrawable representation, IPhysicsBody physicsBody) {
-		return new GameEntity(UUID.randomUUID(), representation, physicsBody);
-	}*/
-	
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.game.entities.IGameEntityManager#createPlayer(float, float)
-	 */
 	@Override
-	public IControllableGameEntity createPlayer( float x, float y ) {
-		TmpPlayerRepr repr = new TmpPlayerRepr();
-		repr.shape = new RectangleShape(new Vector2f(50, 50));
-		repr.shape.setPosition(x, y);
-		repr.shape.setFillColor(Color.WHITE);
-		repr.shape.setOutlineColor(Color.BLACK);
-		repr.shape.setOutlineThickness(2f);
-		repr.shape.setOrigin( repr.shape.getSize().x/2, repr.shape.getSize().y/2);
-				
-		final IPhysicsBody physicsBody = map.getPhysicalWorld().createBody(map.getActiveGameWorldId(), x, y, 50, 50, 0, false, CollisionHandlerType.SOLID, true);
-		
-		ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this,
-				map.getActiveGameWorldId(), 
-				repr, 
-				physicsBody, 
-				2.f, 
-				25.f, 
-				4.f, 
-				120.f );
-		
-		entities.put(e.uuid(), e);
-		
-		return e;
+	public IControllableGameEntity createControllable( String type, Map<String, Object> args ) {
+		try {
+			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
+			
+			ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this, map, attributes );
+			entities.put(e.uuid(), e);
+			
+			return e;
+			
+		} catch (ExecutionException e) {
+			throw new Error(e.getMessage(), e);
+		}
 	}
 	
-	private static class TmpPlayerRepr implements IDrawable, IMoveable {
-
-		RectangleShape shape;
-		
-		@Override public void setPosition(Vector2f pos) {
-			shape.setPosition(pos);
-		}
-
-		@Override public void setRotation(float degree) {
-			shape.setRotation(degree);
-		}
-
-		@Override public float getRotation() {
-			return shape.getRotation();
-		}
-
-		@Override public Vector2f getPosition() {
-			return shape.getPosition();
-		}
-
-		@Override public void draw(RenderTarget renderTarget) {
-			renderTarget.draw(shape);
-		}
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.game.entities.IGameEntityManager#destroy(java.util.UUID)
-	 */
 	@Override
 	public void destroy( UUID eId ) {
-		// TODO
+		entities.remove(eId);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.game.entities.IGameEntityManager#get(java.util.UUID)
-	 */
 	@Override
 	public IGameEntity get( UUID eId ) {
-		return null; // TODO
+		return entities.get(eId);
 	}
 
 	@Override
@@ -112,4 +74,27 @@ public final class GameEntityManager implements IGameEntityManager {
 			entity.update(frameTimeMs);
 	}
 	
+	
+	private static final class ArchetypeLoader extends CacheLoader<String, Map<String, Object>> {
+
+		private final Path BASE_PATH = Paths.get("assets", "entities");
+		
+		private JSONParser parser = new JSONParser();
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public synchronized Map<String, Object> load(String key) throws Exception {
+			try ( Reader reader = Files.newBufferedReader(BASE_PATH.resolve(key), StandardCharsets.UTF_8) ){
+				JSONObject obj = (JSONObject) parser.parse(reader);
+					
+				return Collections.unmodifiableMap(obj);
+				
+			} catch (IOException | ParseException e) {
+				System.err.println("Unable to load entity archetype: "+e.getMessage());
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+	}
 }

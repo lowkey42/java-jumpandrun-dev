@@ -15,6 +15,8 @@ import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class MainGameState extends GameState {
 
@@ -30,7 +32,7 @@ public class MainGameState extends GameState {
 		
 		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, true);
 		
-		final IControllableGameEntity player = map.getEntityManager().createPlayer(300, 100);
+		final IControllableGameEntity player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 		
 		cameraController = player;
 		controller.addGE(player);
