@@ -1,1 +1,1 @@
-test01.png, test02.png, bg.jpg
+test01.png, test02.png, bg.jpg, ladder.png

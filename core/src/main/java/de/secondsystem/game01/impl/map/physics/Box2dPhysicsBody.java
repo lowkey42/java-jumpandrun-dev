@@ -9,6 +9,8 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
+
 final class Box2dPhysicsBody implements IPhysicsBody {
 	private static final float BOX2D_SCALE_FACTOR = 0.01f;
 	
@@ -40,16 +42,19 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		// create the body
 		body = world.createBody(bd);
 		
+		FixtureDef fd = new FixtureDef();
+		fd.shape = s;
+		if( CollisionHandlerType.NO_GRAV == type  )
+			fd.isSensor = true;
 		
 		if( !isStatic )
 		{
 			// fixture definition
-			FixtureDef fd = new FixtureDef();
-			fd.shape = s;
+			
 			fd.density = 1.0f;
 			fd.friction = 0.1f;
 			fd.restitution = 0.0f;
-			
+
 			//add fixture to body
 			body.createFixture(fd);
 			
@@ -64,8 +69,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 
 		}
 		else
-			body.createFixture(s, 0f);	
-		
+			body.createFixture(fd);	
+
 		body.setUserData(this);
 	}
 	
@@ -100,10 +105,16 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public void beginContact(Box2dPhysicsBody other) {
 		if( contactListener!=null )
 			contactListener.beginContact(other);
+		
+		if( CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() )
+			body.setGravityScale(0.f);
 	}
 	public void endContact(Box2dPhysicsBody other) {
 		if( contactListener!=null )
 			contactListener.endContact(other);
+		
+		if( CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() )
+			body.setGravityScale(1.f);
 	}
 
 	@Override
@@ -115,6 +126,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public boolean isStable() {
 		return numFootContacts > 0;
 		//return nearEqual(body.getLinearVelocity().y ,0.f);	// TODO: find better check
+	}
+	
+	@Override
+	public boolean isAffectedByGravity()
+	{
+		return body.getGravityScale() != 0.f;
 	}
 
 	private static boolean nearEqual(float a, float b) {
