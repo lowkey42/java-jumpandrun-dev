@@ -64,6 +64,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		jumpTimer += frameTimeMs;
 		
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
+		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
+		
+		if( !physicsBody.isAffectedByGravity() )
+		{
+			physicsBody.move(0.f, moveAcceleration*frameTimeMs * yMove );
+			physicsBody.resetVelocity(false, true, false);
+		}
 		
 		physicsBody.move(moveAcceleration*frameTimeMs * xMove, jump && physicsBody.isStable() ? -jumpAcceleration*frameTimeMs : 0 );
 	    
