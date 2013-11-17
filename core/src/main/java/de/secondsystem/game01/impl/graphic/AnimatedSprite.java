@@ -9,9 +9,12 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IMoveable;
+
 
 // temporary solution, end solution depends on the animated sprites
-public class AnimatedSprite {
+public class AnimatedSprite implements IDrawable, IMoveable{
 	
 	private Sprite  sprite = new Sprite();
 	private int frameWidth;
@@ -41,19 +44,7 @@ public class AnimatedSprite {
 		
 	}
 	
-    public void draw(RenderTarget rt, float frameNum)
-    {
-    	int column = (int) frameNum % numFramesX;
-    	
-    	int row = (int) frameNum / numFramesX;
-    	
-    	IntRect rect = new IntRect(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
-    	
-    	sprite.setTextureRect(rect);
-    	rt.draw(sprite);
-	}
 
-	
 	public Sprite getSprite()
 	{
 		return sprite;
@@ -67,6 +58,48 @@ public class AnimatedSprite {
 	public int getFrameHeight()
 	{
 		return frameHeight;
+	}
+
+	@Override
+	public void draw(RenderTarget renderTarget) {
+    	renderTarget.draw(sprite);
+	}
+
+
+
+	public void flip() {
+		sprite.scale(-1.f, 1.f);
+	}
+
+
+	public void setFrame(float frameNum) {
+    	int column = (int) frameNum % numFramesX;
+    	
+    	int row = (int) frameNum / numFramesX;
+    	
+    	IntRect rect = new IntRect(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
+    	
+    	sprite.setTextureRect(rect);
+	}
+
+	@Override
+	public void setPosition(Vector2f pos) {
+		sprite.setPosition(pos);	
+	}
+
+	@Override
+	public void setRotation(float degree) {
+		sprite.setRotation(degree);
+	}
+
+	@Override
+	public float getRotation() {
+		return sprite.getRotation();
+	}
+
+	@Override
+	public Vector2f getPosition() {
+		return sprite.getPosition();
 	}
 	
 	

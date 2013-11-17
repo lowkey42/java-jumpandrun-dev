@@ -19,14 +19,14 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private float jumpAcceleration;
 	
-	private HDirection hDirection;
+	protected HDirection hDirection;
 	
-	private VDirection vDirection;
+	protected VDirection vDirection;
 	
-	private boolean jump = false;
+	protected boolean jump = false;
 	private long jumpTimer = 0L;
 	
-	private boolean moved;
+	protected boolean moved;
 
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map,
@@ -55,6 +55,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( jumpTimer < 100L )
 			return;
 		
+		physicsBody.useObject(false);
 		jump = true;
 		jumpTimer = 0L;
 	}
@@ -65,6 +66,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
 		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
+		
+		if( yMove == -1) // if the user pressed w
+			physicsBody.useObject(true);
 		
 		if( !physicsBody.isAffectedByGravity() )
 		{

@@ -1,12 +1,10 @@
 package de.secondsystem.game01.impl.game.entities;
 
-import java.util.Map;
-
-import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
@@ -17,6 +15,7 @@ import de.secondsystem.game01.model.IMoveable;
 final class GameEntityHelper {
 
 	public static IDrawable createRepresentation( Attributes attributes ) {
+		/*
 		TmpPlayerRepr repr = new TmpPlayerRepr();	// TODO
 		repr.shape = new RectangleShape(new Vector2f(attributes.getFloat("width"), attributes.getFloat("height")));
 		repr.shape.setPosition(attributes.getFloat("x"), attributes.getFloat("y"));
@@ -24,7 +23,9 @@ final class GameEntityHelper {
 		repr.shape.setOutlineColor(Color.BLACK);
 		repr.shape.setOutlineThickness(2f);
 		repr.shape.setOrigin( repr.shape.getSize().x/2, repr.shape.getSize().y/2);
+		*/
 		
+		AnimatedSprite repr = new AnimatedSprite("stickman.png", attributes.getFloat("x"), attributes.getFloat("y"), 5, 39, 49);
 		return repr;
 	}
 	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, Attributes attributes ) {

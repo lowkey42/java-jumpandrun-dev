@@ -43,6 +43,10 @@ public interface IPhysicsBody {
 	
 	boolean isAffectedByGravity();
 
+	void useObject(boolean use); // e.g. ladders, switches... with w or upkey 
+	
+	boolean isUsingObject();
+	
 	interface ContactListener {
 		void beginContact( IPhysicsBody other );
 		void endContact( IPhysicsBody other );

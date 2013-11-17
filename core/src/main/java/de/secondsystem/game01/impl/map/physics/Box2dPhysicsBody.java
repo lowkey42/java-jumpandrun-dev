@@ -21,6 +21,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private float maxXVel = Float.MAX_VALUE;
 	private float maxYVel = Float.MAX_VALUE;
 	int numFootContacts = 0;
+	private boolean usingObject;
+	private boolean collisionWithLadder = false;
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x, float y, 
 			float width, float height, float rotation, boolean isStatic, CollisionHandlerType type, boolean createFoot) {
@@ -107,14 +109,23 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			contactListener.beginContact(other);
 		
 		if( CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() )
-			body.setGravityScale(0.f);
+			collisionWithLadder = true;
+		else
+		{
+			usingObject = false;
+			body.setGravityScale(1.f);
+		}
 	}
 	public void endContact(Box2dPhysicsBody other) {
 		if( contactListener!=null )
 			contactListener.endContact(other);
 		
 		if( CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() )
+		{
+			collisionWithLadder = false;
 			body.setGravityScale(1.f);
+			usingObject = false;
+		}
 	}
 
 	@Override
@@ -125,7 +136,6 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public boolean isStable() {
 		return numFootContacts > 0;
-		//return nearEqual(body.getLinearVelocity().y ,0.f);	// TODO: find better check
 	}
 	
 	@Override
@@ -198,5 +208,25 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public Vector2f getVelocity() {
 		return new Vector2f(body.getPosition().x, body.getPosition().y);
+	}
+	
+	@Override
+	public void useObject(boolean use) {
+		usingObject = use;
+		if( usingObject )
+		{
+			if( collisionWithLadder )
+				body.setGravityScale(0.f);
+		}
+		else
+		{
+			body.setGravityScale(1.f);
+			usingObject = false;
+		}
+	}
+
+	@Override
+	public boolean isUsingObject() {
+		return usingObject;
 	}
 }
