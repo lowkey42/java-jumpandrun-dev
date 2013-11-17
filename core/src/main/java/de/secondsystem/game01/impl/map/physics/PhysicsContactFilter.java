@@ -22,7 +22,7 @@ class PhysicsContactFilter extends ContactFilter {
         		break;
         		
         	case NO_GRAV: // TODO
-        		break;
+        		//return false;
         		
         	case SOLID:
         		 switch( body2.getCollisionHandlerType() ) {
@@ -33,6 +33,7 @@ class PhysicsContactFilter extends ContactFilter {
 	             		break;
 	             		
 	             	case NO_GRAV: // TODO
+	             		//return false;
 	             	case SOLID:
 	             		break;
         		 }
