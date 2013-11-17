@@ -14,6 +14,12 @@ import de.secondsystem.game01.model.IMoveable;
 
 
 // temporary solution, end solution depends on the animated sprites
+/* TODO: should 
+ * 	... implement IUpdateable, IDimensioned & IAnimated
+ *  ... keep its current frame & animation stored inside (abstraction)
+ *  ... not require the instantiating code to know about that shit: height/width of a single frame; number of frames; number/positions of animations
+ *  ... just expose functionality defined in its interfaces (draw, update, set/getPosition, getHeight/Width, play)
+ */
 public class AnimatedSprite implements IDrawable, IMoveable{
 	
 	private Sprite  sprite = new Sprite();

@@ -1,12 +1,9 @@
 package de.secondsystem.game01.impl.game.entities;
 
-import java.util.Map;
 import java.util.UUID;
 
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IDrawable;
 
 /**
  * e.g. player

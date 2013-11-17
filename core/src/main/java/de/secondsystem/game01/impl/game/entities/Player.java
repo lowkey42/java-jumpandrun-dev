@@ -12,7 +12,8 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 
-public class Player extends ControllableGameEntity implements IWorldSwitchListener{
+@Deprecated // Not required if the animatedSprite is implemented correctly
+class Player extends ControllableGameEntity implements IWorldSwitchListener{
 	
 	public Player(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
