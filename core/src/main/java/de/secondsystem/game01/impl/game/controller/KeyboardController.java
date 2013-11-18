@@ -1,26 +1,32 @@
 package de.secondsystem.game01.impl.game.controller;
 
 import org.jsfml.window.Keyboard;
-import org.jsfml.window.Keyboard.Key;
 
 import de.secondsystem.game01.impl.game.entities.AbstractGameEntityController;
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
+import de.secondsystem.game01.model.Settings.KeyMapping;
 
 public final class KeyboardController extends AbstractGameEntityController {
 
+	private final KeyMapping mapping;
+	
+	public KeyboardController(KeyMapping mapping) {
+		this.mapping = mapping;
+	}
+	
 	public void process() {
-		if( Keyboard.isKeyPressed(Key.A) )
+		if( Keyboard.isKeyPressed(mapping.moveLeft) )
 			proxy.moveHorizontally(HDirection.LEFT);
-		else if( Keyboard.isKeyPressed(Key.D) )
+		else if( Keyboard.isKeyPressed(mapping.moveRight) )
 			proxy.moveHorizontally(HDirection.RIGHT);
 
-		if( Keyboard.isKeyPressed(Key.W) )
+		if( Keyboard.isKeyPressed(mapping.moveUp) )
 			proxy.moveVertically(VDirection.UP);
-		else if( Keyboard.isKeyPressed(Key.S) )
+		else if( Keyboard.isKeyPressed(mapping.moveDown) )
 			proxy.moveVertically(VDirection.DOWN);
 
-		if( Keyboard.isKeyPressed(Key.SPACE) )
+		if( Keyboard.isKeyPressed(mapping.jump) )
 			proxy.jump();
 	}
 	

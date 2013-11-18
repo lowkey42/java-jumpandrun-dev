@@ -24,7 +24,9 @@ public class MainGameState extends GameState {
 	
 	private ICameraController cameraController;
 	
-	private KeyboardController controller = new KeyboardController();
+	private final IControllableGameEntity player;
+	
+	private KeyboardController controller;
 	
 	
 	public MainGameState( String mapId ) {
@@ -32,15 +34,15 @@ public class MainGameState extends GameState {
 		
 		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, true);
 		
-		final IControllableGameEntity player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
+		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 		
 		cameraController = player;
-		controller.addGE(player);
 	}
 	
 	@Override
 	protected void onStart(GameContext ctx) {
-		// TODO: load map, save game, etc.
+		controller = new KeyboardController(ctx.settings.keyMapping);
+		controller.addGE(player);
 	}
 
 	@Override

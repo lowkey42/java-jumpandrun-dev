@@ -23,9 +23,7 @@ public class InitState implements IState {
 
 	@Override
 	public IState update() {
-		ctx = new GameContext(1280, 786, "test", 0);
-		
-		// TODO: init-stuff
+		ctx = new GameContext();
 		
 		return nextState;
 	}
