@@ -6,13 +6,17 @@ import org.jsfml.window.Mouse;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
+import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 
 /**
  * TODO
  *
  */
 public final class MainMenuState extends GameState {
+	
 	
 	Button newGameBt = new Button("NEW GAME", 500, 40);
 	Button loadGameBt = new Button("LOAD GAME", 500, 190);
@@ -45,6 +49,8 @@ public final class MainMenuState extends GameState {
 	          	// Checking if the current mouse position is inside the Button and only the left mouse button is pressed
 	          	if(newGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new MainGameState("test01"));
+	          	if(editorBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
+	          		setNextState(new EditorGameState(this, new JsonGameMapSerializer().deserialize("test01", true, true)));
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new SettingsMenuState());
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
