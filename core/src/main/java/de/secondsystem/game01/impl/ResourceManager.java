@@ -110,21 +110,6 @@ public abstract class ResourceManager<T> {
 		}
 	};
 	
-	public static final ResourceManager<ConstSoundBuffer> sound = new ResourceManager<ConstSoundBuffer>(100) {
-		@Override protected Path getBasePath() {
-			return Paths.get("assets", "sounds");
-		}
-		@Override protected ConstSoundBuffer load(Path path) {
-			SoundBuffer sound = new SoundBuffer();
-			try {
-			    sound.loadFromFile(path);
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
-			}
-			return sound;
-		}
-	};
-	
 	
 	private static final int CONCURRENCY_LEVEL = 5;
 	
