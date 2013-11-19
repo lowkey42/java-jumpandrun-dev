@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Font;
 import org.jsfml.graphics.RectangleShape;
@@ -22,6 +23,7 @@ import org.jsfml.window.event.KeyEvent;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerObject;
@@ -84,9 +86,9 @@ public final class EditorGameState extends GameState {
 		this.map = map; // TODO: copy
 		this.tileset = new Tileset("test01"); // TODO: get from map
 		
-		Font freeSans = new Font();
+		ConstFont freeSans;
 		try {
-		    freeSans.loadFromFile(Paths.get("assets/FreeSans.otf"));
+		    freeSans = ResourceManager.font.get("FreeSans.otf");
 		    
 		} catch(IOException ex) {
 		    throw new Error(ex);

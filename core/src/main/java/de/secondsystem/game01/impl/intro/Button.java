@@ -1,22 +1,21 @@
 package de.secondsystem.game01.impl.intro;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.io.IOException;
 
-/*import org.jsfml.audio.Sound;
-import org.jsfml.audio.SoundBuffer;*/
-
-import org.jsfml.graphics.Color;
+import org.jsfml.graphics.ConstFont;
+import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.FloatRect;
-import org.jsfml.graphics.Font;
-import org.jsfml.graphics.Text;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.IntRect;
+import org.jsfml.graphics.Text;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
+
+import de.secondsystem.game01.impl.ResourceManager;
+/*import org.jsfml.audio.Sound;
+import org.jsfml.audio.SoundBuffer;*/
+import org.jsfml.graphics.Color;
+import org.jsfml.graphics.IntRect;
 
 /**
  * This class provides a functional button with different attributes
@@ -25,7 +24,6 @@ import org.jsfml.window.Window;
  */
 public final class Button {
 
-	final Path file;
 	String title, text;
 	int pos_x, pos_y;
 	IOnClickListener clickListener;
@@ -39,31 +37,17 @@ public final class Button {
 	
 	
 	// Constructors
-	Button(String text, Path file, Path fonttype, int pos_x, int pos_y, IOnClickListener clickListener){
-		this.file = file;
+	Button(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this.pos_x = pos_x;
 		this.pos_y = pos_y;
 		this.clickListener = clickListener;
 		
 		// Loading standard Font for buttons
-		Font myFont = new Font();
 		try {
-		    myFont.loadFromFile(fonttype);
-		} catch(IOException ex) {
-		    //Failed to load font
-		    ex.printStackTrace();
-		}
+		ConstFont myFont = ResourceManager.font.get(fonttype);
 		
 		// Loading Standard Texture for buttons
-		Texture newButton = new Texture();
-		try {
-			// Try to load the texture file
-			newButton.loadFromFile(file);
-		} catch(IOException ex) {
-			//Failed to load texture
-			System.out.println("DATEI KONNTE NICHT GELADEN WERDEN!");
-			ex.printStackTrace();
-		}
+		ConstTexture newButton = ResourceManager.texture_gui.get(file);
 		
 		height = newButton.getSize().y / 3;
 		width = newButton.getSize().x;
@@ -95,14 +79,17 @@ public final class Button {
 		
 		SoundBuffer buttonPressedBuffer;*/
 		
+		} catch( IOException e ) {
+			throw new Error(e.getMessage(), e);
+		}
 	}
 	
-	Button(String text, int pos_x, int pos_y, IOnClickListener clickListener){
-		this(text, Paths.get("assets", "gui", "buttons", "ButtonClass.png"), Paths.get("assets", "FreeSansBold.otf"), pos_x, pos_y, clickListener);
+	Button(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
+		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
 	}
 	
-	Button(String text, int pos_x, int pos_y){
-		this(text, Paths.get("assets", "gui", "buttons", "ButtonClass.png"), Paths.get("assets", "FreeSansBold.otf"), pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
+	Button(String text, int pos_x, int pos_y) {
+		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 	
 	
