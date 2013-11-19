@@ -41,6 +41,8 @@ import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
  * Shift +/-:	rotate
  * 1-9:			change layer
  * +/-:			zoom
+ * shift + mousewheel: scale tile
+ * scale selected objects with the mouse by clicking the marked area on the left/top sides
  * 
  * @author lowkey
  *
@@ -48,7 +50,7 @@ import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 public final class EditorGameState extends GameState {
 
 	private static final float CAM_MOVE_SPEED = 5.f;
-	
+	private static final float TILE_SCALE_FACTOR = 1.1f;
 	private RenderWindow window;
 	
 	private final GameState playGameState;
@@ -68,6 +70,14 @@ public final class EditorGameState extends GameState {
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
 	private LayerObject selectedObject;
 	private RectangleShape selectedObjectMarker;
+	private RectangleShape tileScaleWidthMarker;
+	private RectangleShape tileScaleHeightMarker;
+	
+	private boolean tileScaleWidth;
+	private boolean tileScaleHeight;
+
+	private boolean moveSelectedObject = false;
+	private Vector2f lastMousePos;
 	
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
@@ -92,12 +102,13 @@ public final class EditorGameState extends GameState {
 		
 		createMouseSprite();
 		
-		selectedObjectMarker = new RectangleShape(new Vector2f(1,1));
-		selectedObjectMarker.setOutlineColor(Color.BLUE);
-		selectedObjectMarker.setOutlineThickness(4);
-		selectedObjectMarker.setFillColor(Color.TRANSPARENT);
+		selectedObjectMarker  = createMarker(new Vector2f(1,1), Color.BLUE, 4.f, Color.TRANSPARENT);
+		
+		tileScaleHeightMarker = createMarker(new Vector2f(1,1), Color.TRANSPARENT, 0, new Color(255, 100, 100, 150));
+		
+		tileScaleWidthMarker  = createMarker(new Vector2f(1,1), Color.TRANSPARENT, 0, new Color(255, 100, 100, 150));
 	}
-
+	
 	@Override
 	protected void onStart(GameContext ctx) {
 		window = ctx.window;
@@ -108,7 +119,33 @@ public final class EditorGameState extends GameState {
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	private View getTransformedView(GameContext ctx)
+	{
+		Vector2f ws = ctx.window.getView().getSize();
+		View view = new View(					
+				Vector2f.mul(new Vector2f(x+ws.x/2, y+ws.y/2), currentLayer.parallax), Vector2f.div(ws, zoom) );
+		return view;
+	}
+	
+	private RectangleShape createMarker(Vector2f size, Color outlineColor, float outlineThickness, Color fillColor)
+	{
+		RectangleShape marker = new RectangleShape(size);
+		marker.setOutlineColor(outlineColor);
+		marker.setOutlineThickness(outlineThickness);
+		marker.setFillColor(fillColor);
+		
+		return marker;
+	}
+	
+	private void setupMarker(RectangleShape marker, Vector2f size, Vector2f origin, Vector2f pos, float rotation)
+	{
+		marker.setSize(size);
+		marker.setOrigin(origin);
+		marker.setPosition(pos);
+		marker.setRotation(rotation);
+	}
+	
 	private void createMouseSprite() {
 		if( !(mouseTile instanceof SpriteLayerObject) )
 			mouseTile = new SpriteLayerObject(tileset, currentTile, 0, 0, 0);
@@ -162,6 +199,7 @@ public final class EditorGameState extends GameState {
 		map.draw(rt);
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
+		Vector2f v = rt.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), rt.getView());
 		
 		Vector2i newPos = new Vector2i(getMouseX(), getMouseY());
 		LayerObject currentLayerObject = selectedObject != null ? selectedObject : mouseTile;
@@ -169,21 +207,39 @@ public final class EditorGameState extends GameState {
 		currentLayerObject.setDimensions(currentTileWidth*currentTileZoom, currentTileHeight*currentTileZoom);
 		
 		if( selectedObject!=null ) {
-			if( Mouse.isButtonPressed(Button.LEFT) ) {
+			if( moveSelectedObject ) {
 				selectedObject.setPosition(rt.mapPixelToCoords(newPos));
 			}
 			Vector2f newSize = new Vector2f(selectedObject.getWidth(), selectedObject.getHeight());
-			selectedObjectMarker.setSize( newSize );
-			selectedObjectMarker.setOrigin(new Vector2f(newSize.x/2f, newSize.y/2f));
-			selectedObjectMarker.setRotation(selectedObject.getRotation());
-			selectedObjectMarker.setPosition(selectedObject.getPosition());
+			setupMarker(selectedObjectMarker, newSize, new Vector2f(newSize.x/2f, newSize.y/2f), selectedObject.getPosition(), selectedObject.getRotation());
 			rt.draw(selectedObjectMarker);
+			
+			// draw tile scale markers if the mouse is over
+			setupMarker(tileScaleHeightMarker, new Vector2f( newSize.x, 8.f), 
+					new Vector2f(newSize.x/2f, newSize.y/2f), selectedObject.getPosition(), selectedObject.getRotation());
+			
+			setupMarker(tileScaleWidthMarker, new Vector2f( 8.f, newSize.y), 
+					new Vector2f(newSize.x/2f, newSize.y/2f), selectedObject.getPosition(), selectedObject.getRotation());
+				
+			
+			if( tileScaleHeightMarker.getGlobalBounds().contains(new Vector2f(v.x, v.y)) )		
+				rt.draw(tileScaleHeightMarker);
+
+			if( tileScaleWidthMarker.getGlobalBounds().contains(new Vector2f(v.x, v.y)) )		
+				rt.draw(tileScaleWidthMarker);
+			
+			if( tileScaleWidth )
+				currentTileWidth  += 0.45f*(lastMousePos.x - getMouseX());
+
+			if( tileScaleHeight )
+				currentTileHeight += 0.45f*(lastMousePos.y - getMouseY());
 			
 		} else {
 			mouseTile.setPosition( rt.mapPixelToCoords(newPos) );
 			mouseTile.draw(rt);
 		}
-
+		
+		lastMousePos = new Vector2f(getMouseX(), getMouseY());
 		rt.setView(cView);
 	}
 	
@@ -198,18 +254,28 @@ public final class EditorGameState extends GameState {
 				
 				int offset = event.asMouseWheelEvent().delta<0 ? -1 : 1;
 				
-				if( mouseTile instanceof SpriteLayerObject ) {
-					// compute currentTile;  example: currentTile = 9; offset = 1; tiles.size() = 10; 9+1=10 % 10 = 0 = currentTile
-					int ts = tileset.tiles.size();
-					currentTile += offset;
-					currentTile = currentTile<0 ? ts-1 : currentTile % ts;
-					
-					// change the tile
-					((SpriteLayerObject)mouseTile).setTile(tileset, currentTile);
-				} else if( mouseTile instanceof CollisionObject ) {
-					CollisionObject co = (CollisionObject) mouseTile;
-					CollisionType type = offset>0 ? co.getType().next() : co.getType().prev();
-					co.setType( type );;
+				if( Keyboard.isKeyPressed(Key.LSHIFT) )
+				{
+					if( offset == 1 )
+						currentTileZoom *= event.asMouseWheelEvent().delta*TILE_SCALE_FACTOR;
+					else
+						currentTileZoom /= event.asMouseWheelEvent().delta*TILE_SCALE_FACTOR*-1;
+				}
+				else
+				{
+					if( mouseTile instanceof SpriteLayerObject ) {
+						// compute currentTile;  example: currentTile = 9; offset = 1; tiles.size() = 10; 9+1=10 % 10 = 0 = currentTile
+						int ts = tileset.tiles.size();
+						currentTile += offset;
+						currentTile = currentTile<0 ? ts-1 : currentTile % ts;
+						
+						// change the tile
+						((SpriteLayerObject)mouseTile).setTile(tileset, currentTile);
+					} else if( mouseTile instanceof CollisionObject ) {
+						CollisionObject co = (CollisionObject) mouseTile;
+						CollisionType type = offset>0 ? co.getType().next() : co.getType().prev();
+						co.setType( type );;
+					}
 				}
 				
 				return true;
@@ -217,12 +283,16 @@ public final class EditorGameState extends GameState {
 			case MOUSE_BUTTON_RELEASED:
 				switch( event.asMouseButtonEvent().button ){
 					case LEFT:
+						moveSelectedObject = false;
+						
 						if( selectedObject==null ) {
 							map.addNode(currentLayer, mouseTile.typeUuid().create(map, map.getActiveGameWorldId(), mouseTile.getAttributes()));
 						}
 						return true;
 					
 					case RIGHT:
+						tileScaleWidth  = false;
+						tileScaleHeight = false;
 						Vector2f ws = ctx.window.getView().getSize();
 						View view = new View(					
 								Vector2f.mul(new Vector2f(x+ws.x/2, y+ws.y/2), currentLayer.parallax), Vector2f.div(ws, zoom) );
@@ -238,11 +308,34 @@ public final class EditorGameState extends GameState {
 						} else {
 							deselectSprite();
 						}
-						
+									
 					default:
 						return false;
 				}
 				
+			case MOUSE_BUTTON_PRESSED:
+				View view = getTransformedView(ctx);
+				Vector2f v = ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view);	
+				switch( event.asMouseButtonEvent().button )
+				{
+				
+				case LEFT:
+					if( selectedObject != null && selectedObject.inside(v) )
+						moveSelectedObject = true;
+					
+					return true;
+				case RIGHT:		
+					if( tileScaleWidthMarker.getGlobalBounds().contains(new Vector2f(v.x, v.y)) )
+						tileScaleWidth = true;
+					
+					if(	tileScaleHeightMarker.getGlobalBounds().contains(new Vector2f(v.x, v.y)))
+						tileScaleHeight = true;
+					
+					lastMousePos = new Vector2f(getMouseX(), getMouseY());
+				default:
+					return false;
+				}
+			
 			default:
 				return false;
 		}
