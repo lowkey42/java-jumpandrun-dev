@@ -26,7 +26,7 @@ import org.jsfml.graphics.IntRect;
  * @author Sebastian
  *
  */
-public final class Button {
+public final class MenuButton {
 
 	String title, text;
 	int pos_x, pos_y;
@@ -41,7 +41,7 @@ public final class Button {
 	
 	
 	// Constructors
-	Button(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
+	MenuButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this.pos_x = pos_x;
 		this.pos_y = pos_y;
 		this.clickListener = clickListener;
@@ -80,12 +80,12 @@ public final class Button {
 	}
 	
 	
-	Button(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
+	MenuButton(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
 	}
 	
 	
-	Button(String text, int pos_x, int pos_y) {
+	MenuButton(String text, int pos_x, int pos_y) {
 		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 	
