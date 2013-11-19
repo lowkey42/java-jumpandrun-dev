@@ -12,6 +12,8 @@ import java.util.List;
 import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.Texture;
 
+import de.secondsystem.game01.impl.ResourceManager;
+
 public class Tileset {
 
 	public final String name;
@@ -41,12 +43,8 @@ public class Tileset {
 	 */
 	private static final List<ConstTexture> loadTextures( String... tileFiles ) throws IOException {
 		List<ConstTexture> tTiles = new ArrayList<ConstTexture>(tileFiles.length);
-		for( String fn : tileFiles ) {
-			Texture texture = new Texture();
-			texture.loadFromFile(Paths.get("assets/tiles/"+fn.trim()));
-			
-			tTiles.add(texture);
-		}
+		for( String fn : tileFiles )
+			tTiles.add( ResourceManager.texture_tiles.get(fn.trim()) );
 		
 		return tTiles;
 	}

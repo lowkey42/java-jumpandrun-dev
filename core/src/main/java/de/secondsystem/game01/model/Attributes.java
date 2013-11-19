@@ -66,4 +66,9 @@ public class Attributes extends HashMap<String, Object> {
 		return val!=null ? val : defaultValue;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Attributes getObject(String key) {
+		Object val = get(key);
+		return val!=null ? new Attributes((Map<String, Object>)val ) : null;
+	}
 }
