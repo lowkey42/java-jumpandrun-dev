@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IAnimated;
+import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 /**
  * e.g. player
@@ -63,6 +65,22 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
 		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
+		
+		if( representation instanceof IAnimated )
+		{
+			IAnimated anim = ((IAnimated) representation);
+		
+			if( xMove == 1 )
+			{		
+				anim.play(AnimationType.MOVE_RIGHT, 0.3f, true, false, anim.isFlipped());
+			}
+			else 
+				if( xMove == -1 )
+					anim.play(AnimationType.MOVE_LEFT, 0.3f, true, false, !anim.isFlipped());
+				else
+					anim.play(AnimationType.IDLE, 1.f, true, true, false);
+		}
+
 		
 		if( yMove == -1) // if the user pressed w
 			physicsBody.useObject(true);

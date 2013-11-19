@@ -2,6 +2,8 @@ package de.secondsystem.game01.impl.intro;
 
 import java.io.IOException;
 
+import org.jsfml.audio.ConstSoundBuffer;
+import org.jsfml.audio.Sound;
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.FloatRect;
@@ -12,6 +14,8 @@ import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
+
+
 /*import org.jsfml.audio.Sound;
 import org.jsfml.audio.SoundBuffer;*/
 import org.jsfml.graphics.Color;
@@ -65,28 +69,21 @@ public final class Button {
 		myText.setPosition(newsprite.getPosition().x + width / 2, newsprite.getPosition().y + height / 2);
 
 		/* TODO --> stabile sound implementations
-		SoundBuffer buttonOverBuffer = new SoundBuffer();
-		try {
-		    buttonOverBuffer.loadFromFile(Paths.get("assets", "gui", "buttons", "Button_over.wav"));
-		    System.out.println("Sound duration: " + buttonOverBuffer.getDuration().asSeconds() + " seconds");
-		} catch(IOException ex) {
-		    //Something went wrong
-		    System.err.println("Failed to load the sound:");
-		    ex.printStackTrace();
-		}
-
-		buttonOver = new Sound(buttonOverBuffer);
+		ConstSoundBuffer buttonOverBuffer = ResourceManager.sound.get("Button_over.wav");
 		
-		SoundBuffer buttonPressedBuffer;*/
+		Sound buttonOver = new Sound(buttonOverBuffer);
+		buttonOver.play();*/
 		
 		} catch( IOException e ) {
 			throw new Error(e.getMessage(), e);
 		}
 	}
 	
+	
 	Button(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
 	}
+	
 	
 	Button(String text, int pos_x, int pos_y) {
 		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});

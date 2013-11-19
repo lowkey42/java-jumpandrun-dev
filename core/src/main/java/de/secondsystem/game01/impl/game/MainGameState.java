@@ -11,6 +11,7 @@ import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
+import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -79,6 +80,9 @@ public class MainGameState extends GameState {
 	        	}
 	        	if( event.asKeyEvent().key==Key.TAB ) {
 					map.switchWorlds();
+	        	}
+	        	if( event.asKeyEvent().key==Key.ESCAPE ) {
+	        		setNextState(new MainMenuState(this));
 	        	}
 	        }
 	    }

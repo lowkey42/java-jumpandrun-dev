@@ -1,0 +1,3 @@
+{"MOVE_LEFT":{"texture": "stickman.png", "frameWidth": 39, "frameHeight":49, "numRowFrames": 5, "frameStart": 1, "frameEnd":5, "fps": 24},
+ "MOVE_RIGHT":{"texture": "stickman.png", "frameWidth": 39, "frameHeight":49, "numRowFrames": 5, "frameStart": 1, "frameEnd":5, "fps": 24},
+ "IDLE":{"texture": "stickman.png", "frameWidth": 39, "frameHeight":49, "numRowFrames": 5, "frameStart": 0, "frameEnd":0, "fps": 24}}

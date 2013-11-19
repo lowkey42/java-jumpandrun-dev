@@ -7,6 +7,22 @@ public interface IAnimated {
 	 * @param animation unique name of animation 
 	 * @param speedFactor 1.0=normal speed; <1 slower; >1 faster
 	 */
-	void play( String animation, float speedFactor );
+	void play( AnimationType animation, float speedFactor, boolean repeated, boolean cancelCurrentAnimation, boolean flipTexture );
+	void stop();
+	void resume();
+	void flip();
+	boolean isFlipped();
+	AnimationType getCurrentAnimationType();
+	
+	public enum AnimationType {
+		JUMP,
+		MOVE_LEFT,
+		MOVE_RIGHT,
+		IDLE,
+		CLIMB_UP,
+		CLIMB_DOWN,
+		CLIMB_RIGHT,
+		CLIMB_LEFT
+	}
 	
 }

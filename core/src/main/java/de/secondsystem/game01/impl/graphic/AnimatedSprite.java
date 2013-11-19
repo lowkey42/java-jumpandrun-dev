@@ -1,16 +1,17 @@
 package de.secondsystem.game01.impl.graphic;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.graphic.AnimationTexture.AnimationData;
+import de.secondsystem.game01.model.IAnimated;
+import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.IUpdateable;
 
 
 // temporary solution, end solution depends on the animated sprites
@@ -20,72 +21,26 @@ import de.secondsystem.game01.model.IMoveable;
  *  ... not require the instantiating code to know about that shit: height/width of a single frame; number of frames; number/positions of animations
  *  ... just expose functionality defined in its interfaces (draw, update, set/getPosition, getHeight/Width, play)
  */
-public class AnimatedSprite implements IDrawable, IMoveable{
+public class AnimatedSprite implements IDrawable, IMoveable, IAnimated, IUpdateable, IDimensioned {
 	
 	private Sprite  sprite = new Sprite();
-	private int frameWidth;
-	private int frameHeight;
-	private int numFramesX;
+	
+	private boolean repeated = false;
+	private boolean playing = false;
+	private AnimationTexture animationTexture;
+	private AnimationData currentAnimationData;
+	private AnimationType currentAnimationType;
+	private float   currentFrame;
+	private float animationSpeed;
+	
+	public AnimatedSprite(AnimationTexture animationTexture) {
+		this.animationTexture = animationTexture;
+	}
 
-	public AnimatedSprite(String textureFilename, float x, float y, int numFrames,
-            int frameWidth, int frameHeight)
-	{
-		// create texture
-		Texture tex = new Texture();
-		
-		try {
-			// TODO: load textures from a file
-			tex.loadFromFile(Paths.get("assets/sprites/"+textureFilename));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		sprite.setTexture(tex);
-		sprite.setPosition(new Vector2f(x,y));
-		sprite.setOrigin(frameWidth/2f, frameHeight/2f);
-		
-		numFramesX = (int) Math.round((double)tex.getSize().x / frameWidth);
-		this.frameWidth  = frameWidth;
-		this.frameHeight = frameHeight;
-		
-	}
-	
-
-	public Sprite getSprite()
-	{
-		return sprite;
-	}
-	
-	public int getFrameWidth()
-	{
-		return frameWidth;
-	}
-	
-	public int getFrameHeight()
-	{
-		return frameHeight;
-	}
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
     	renderTarget.draw(sprite);
-	}
-
-
-
-	public void flip() {
-		sprite.scale(-1.f, 1.f);
-	}
-
-
-	public void setFrame(float frameNum) {
-    	int column = (int) frameNum % numFramesX;
-    	
-    	int row = (int) frameNum / numFramesX;
-    	
-    	IntRect rect = new IntRect(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
-    	
-    	sprite.setTextureRect(rect);
 	}
 
 	@Override
@@ -107,6 +62,81 @@ public class AnimatedSprite implements IDrawable, IMoveable{
 	public Vector2f getPosition() {
 		return sprite.getPosition();
 	}
+
+
+	@Override
+	public float getHeight() {
+		return currentAnimationData.frameHeight;
+	}
+
+
+	@Override
+	public float getWidth() {
+		return currentAnimationData.frameWidth;
+	}
+
+
+	@Override
+	public void update(long frameTimeMs) {
+		if( playing )
+		{
+			currentFrame = currentAnimationData.calculateNextFrame(currentFrame, frameTimeMs*animationSpeed);
+			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
+			if( currentAnimationData.isAnimationFinished() )
+				stop();
+		}
+	}
+
+
+	@Override
+	public void play(AnimationType animation, float speedFactor,
+			boolean repeated, boolean cancelCurrentAnimation, boolean flipTexture) {
+		if( currentAnimationType != animation || cancelCurrentAnimation )
+		{
+			currentAnimationData = animationTexture.get(animation);
+			sprite.setTexture(currentAnimationData.texture);
+			sprite.setOrigin(currentAnimationData.frameWidth/2.f, currentAnimationData.frameHeight/2.f);
+			assert( currentAnimationData != null );
+			currentAnimationType = animation;
+			currentFrame = currentAnimationData.frameStart;
+			if( flipTexture )
+				flip();
+		}
+
+		animationSpeed = speedFactor;
+		this.repeated = repeated;
+		playing = true;
+	}
 	
+	@Override
+	public void stop() {	
+		playing = false;
+	}
+
+
+	@Override
+	public void resume() {
+		playing = true;
+	}
+
+
+	@Override
+	public AnimationType getCurrentAnimationType() {
+		return currentAnimationType;
+	}
+
+
+	@Override
+	public void flip() {
+		sprite.scale(-1.f, 1.f);	
+	}
+
+
+	@Override
+	public boolean isFlipped() {
+		return sprite.getScale().x < 0;
+		
+	}
 	
+
 }

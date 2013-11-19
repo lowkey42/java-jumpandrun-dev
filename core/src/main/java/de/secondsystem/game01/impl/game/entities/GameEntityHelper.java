@@ -1,10 +1,14 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.io.IOException;
+
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
+import de.secondsystem.game01.impl.graphic.AnimationTexture;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
@@ -25,7 +29,16 @@ final class GameEntityHelper {
 		repr.shape.setOrigin( repr.shape.getSize().x/2, repr.shape.getSize().y/2);
 		*/
 		
-		AnimatedSprite repr = new AnimatedSprite("stickman.png", attributes.getFloat("x"), attributes.getFloat("y"), 5, 39, 49);
+		AnimationTexture animationTexture = null;
+		try {
+			
+			animationTexture = ResourceManager.animation.get("stickman.anim");;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		AnimatedSprite repr = new AnimatedSprite(animationTexture);
 		return repr;
 	}
 	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, Attributes attributes ) {

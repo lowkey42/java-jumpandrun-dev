@@ -14,6 +14,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import de.secondsystem.game01.impl.graphic.AnimationTexture;
+
 
 public abstract class ResourceManager<T> {
 
@@ -61,6 +63,20 @@ public abstract class ResourceManager<T> {
 			return texture;
 		}
 	};
+	
+	public static final ResourceManager<AnimationTexture> animation = new ResourceManager<AnimationTexture>(100) {
+		@Override protected Path getBasePath() {
+			return Paths.get("assets", "animations");
+		}
+		@Override protected AnimationTexture load(Path path) {
+			try {
+				return new AnimationTexture(path);
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+	};
+	
 
 	public static final ResourceManager<ConstFont> font = new ResourceManager<ConstFont>(5) {
 		@Override protected Path getBasePath() {
