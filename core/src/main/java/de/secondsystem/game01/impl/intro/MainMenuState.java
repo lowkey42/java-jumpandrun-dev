@@ -1,6 +1,13 @@
 package de.secondsystem.game01.impl.intro;
 
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
+import org.jsfml.graphics.Image;
+import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Texture;
+import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.Mouse;
 
@@ -8,7 +15,6 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
-import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 
 /**
@@ -17,19 +23,41 @@ import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
  */
 public final class MainMenuState extends GameState {
 	
+	GameState playGameState;
+	
+	Image backdropTx;
+	Texture backdropBuffer = new Texture();
+	Sprite backdrop = new Sprite();
 	
 	Button newGameBt = new Button("NEW GAME", 500, 40);
 	Button loadGameBt = new Button("LOAD GAME", 500, 190);
 	Button editorBt = new Button("EDITOR", 500, 340);
 	Button settingsBt = new Button("SETTINGS", 500, 490);
 	Button exitGameBt = new Button("EXIT GAME", 500, 640);
+	
+	public MainMenuState(GameState playGameState) {
+	// Transfering last State into playGameState	
+	this.playGameState = playGameState;
+	}
 
-	//Text myText = new Text("Text", font("x"));
 	
 	@Override
 	protected void onStart(GameContext ctx) {
 		// TODO
-		System.out.println("MAINMENUSTATE");
+		
+		// Creating Backdrop Texture via monitor screenshot to be rendered on every frame
+		backdropTx = ctx.window.capture();
+		try {
+		backdropTx.saveToFile(Paths.get("assets", "sprites", "test.png"));
+		} catch( IOException f ) {
+			throw new Error(f.getMessage(), f);	}
+		try {
+		backdropBuffer.loadFromFile(Paths.get("assets", "sprites", "test.png"));
+		} catch( IOException e ) {
+			throw new Error(e.getMessage(), e);	}
+		
+		backdrop.setTexture(backdropBuffer);
+		backdrop.setPosition(0, 0);
 	}
 
 	@Override
@@ -37,10 +65,14 @@ public final class MainMenuState extends GameState {
 		// TODO
 	}
 
+	
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO Preparing the following code to be able to be used with more than 1 button --> outsourcing into button class
+		
+		ctx.window.draw(backdrop);		
+		
 		for(Event event : ctx.window.pollEvents()) {
 	        switch(event.type){
 	          case CLOSED: ctx.window.close();
@@ -56,6 +88,9 @@ public final class MainMenuState extends GameState {
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		ctx.window.close();	          	
 	          	break;
+	          case KEY_RELEASED:
+	        	if(event.asKeyEvent().key==Key.ESCAPE) {
+	        		setNextState(playGameState); }
 	          case MOUSE_BUTTON_PRESSED: 
 	          case MOUSE_MOVED: 
 	        	newGameBt.mouseover(ctx.window); 
@@ -72,8 +107,7 @@ public final class MainMenuState extends GameState {
 		settingsBt.draw(ctx.window);
 		loadGameBt.draw(ctx.window);
 		exitGameBt.draw(ctx.window);
-		
-		
+			
 	}
 
 }

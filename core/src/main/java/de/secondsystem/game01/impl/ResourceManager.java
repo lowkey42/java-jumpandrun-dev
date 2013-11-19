@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
+import org.jsfml.audio.ConstSoundBuffer;
+import org.jsfml.audio.SoundBuffer;
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.Font;
@@ -74,6 +76,21 @@ public abstract class ResourceManager<T> {
 				throw new RuntimeException(e.getMessage(), e);
 			}
 			return font;
+		}
+	};
+	
+	public static final ResourceManager<ConstSoundBuffer> sound = new ResourceManager<ConstSoundBuffer>(100) {
+		@Override protected Path getBasePath() {
+			return Paths.get("assets", "sounds");
+		}
+		@Override protected ConstSoundBuffer load(Path path) {
+			SoundBuffer sound = new SoundBuffer();
+			try {
+			    sound.loadFromFile(path);
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			return sound;
 		}
 	};
 	
