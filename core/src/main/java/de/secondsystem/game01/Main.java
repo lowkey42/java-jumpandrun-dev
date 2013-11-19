@@ -10,7 +10,7 @@ public final class Main {
 	public static void main(String[] args) {
 		IStateMachine game = StateMachineFactory.create();
 		game.changeState(new InitState(new MainMenuState()));
-		//game.changeState(new InitState(new MainGameState("test01")));
+		// game.changeState(new InitState(new MainGameState("test01")));
 		
 		game.run();
 

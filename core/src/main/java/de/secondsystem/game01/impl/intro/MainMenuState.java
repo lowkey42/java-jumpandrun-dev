@@ -43,11 +43,10 @@ public final class MainMenuState extends GameState {
 	        	 break;
 	          case MOUSE_BUTTON_RELEASED:
 	          	// Checking if the current mouse position is inside the Button and only the left mouse button is pressed
-	          	if(editorBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
+	          	if(newGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new MainGameState("test01"));
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-	          		//setNextState(new MainSettingsMenu());
-	          		;
+	          		setNextState(new SettingsMenuState());
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		ctx.window.close();	          	
 	          	break;

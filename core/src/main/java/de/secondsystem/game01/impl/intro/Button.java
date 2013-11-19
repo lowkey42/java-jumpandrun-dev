@@ -4,8 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.IOException;
 
-import org.jsfml.audio.Sound;
-import org.jsfml.audio.SoundBuffer;
+/*import org.jsfml.audio.Sound;
+import org.jsfml.audio.SoundBuffer;*/
+
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.Font;
@@ -76,6 +77,7 @@ public final class Button {
 		myText = new Text(text, myFont, 26);
 		FloatRect textRect = myText.getGlobalBounds();
 		myText.setOrigin(textRect.width / 2, textRect.height / 1.5f);
+		// TODO --> Alternative: myText.setOrigin(myText.getGlobalBounds().width / 2, myText.getGlobalBounds().height / 1.5f);
 		myText.setPosition(newsprite.getPosition().x + width / 2, newsprite.getPosition().y + height / 2);
 
 		/* TODO --> stabile sound implementations
@@ -114,6 +116,8 @@ public final class Button {
 	// Methods
 	// Draw a sprite
 	void draw(RenderTarget rt){
+		// TODO --> Decide if myText.setPosition should be done inside draw method
+		// myText.setPosition(newsprite.getPosition().x + width / 2, newsprite.getPosition().y + height / 2);
 		rt.draw(newsprite);
 		rt.draw(myText);
 	}
