@@ -11,6 +11,7 @@ import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.Mouse;
 
+import de.secondsystem.game01.impl.FinalizeState;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
@@ -46,16 +47,7 @@ public final class MainMenuState extends GameState {
 		// TODO
 		
 		// Creating Backdrop Texture via monitor screenshot to be rendered on every frame
-		backdropTx = ctx.window.capture();
-		try {
-		backdropTx.saveToFile(Paths.get("assets", "sprites", "test.png"));
-		} catch( IOException f ) {
-			throw new Error(f.getMessage(), f);	}
-		try {
-		backdropBuffer.loadFromFile(Paths.get("assets", "sprites", "test.png"));
-		} catch( IOException e ) {
-			throw new Error(e.getMessage(), e);	}
-		
+		backdropBuffer.update(ctx.window);
 		backdrop.setTexture(backdropBuffer);
 		backdrop.setPosition(0, 0);
 	}
@@ -86,7 +78,7 @@ public final class MainMenuState extends GameState {
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new SettingsMenuState());
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-	          		ctx.window.close();	          	
+	          		setNextState(new FinalizeState());
 	          	break;
 	          case KEY_RELEASED:
 	        	if(event.asKeyEvent().key==Key.ESCAPE) {
