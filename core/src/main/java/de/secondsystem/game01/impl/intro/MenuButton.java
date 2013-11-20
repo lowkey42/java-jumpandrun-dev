@@ -77,12 +77,12 @@ public final class MenuButton {
 	
 	
 	MenuButton(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
-		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
+		this(text, "MainMenuButton.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
 	}
 	
 	
 	MenuButton(String text, int pos_x, int pos_y) {
-		this(text, "ButtonClass.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
+		this(text, "MainMenuButton.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 	
 	
