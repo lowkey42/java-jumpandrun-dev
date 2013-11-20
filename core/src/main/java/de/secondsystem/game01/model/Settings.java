@@ -43,7 +43,7 @@ public final class Settings {
 		height = 786;
 		width = 1280;
 		antiAliasingLevel = 0;
-		verticalSync = true;
+		verticalSync = false;
 		fullscreen = false;
 		keyMapping = new KeyMapping();
 	}
