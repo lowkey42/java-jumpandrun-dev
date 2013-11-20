@@ -2,11 +2,13 @@ package de.secondsystem.game01.impl.intro;
 
 import java.io.IOException;
 
-import org.jsfml.audio.ConstSoundBuffer;
-import org.jsfml.audio.Sound;
+/*import org.jsfml.audio.Sound;
+import org.jsfml.audio.SoundBuffer;*/
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.FloatRect;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
@@ -14,12 +16,6 @@ import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
-
-
-/*import org.jsfml.audio.Sound;
-import org.jsfml.audio.SoundBuffer;*/
-import org.jsfml.graphics.Color;
-import org.jsfml.graphics.IntRect;
 
 /**
  * This class provides a functional button with different attributes

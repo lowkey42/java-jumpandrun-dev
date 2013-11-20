@@ -51,6 +51,11 @@ public final class AnimationTexture {
 	}
 	
 	
+	/**
+	 * [immutable]
+	 * @author lowkey
+	 *
+	 */
 	public static final class AnimationData {
 		public final ConstTexture texture;
 		public final int frameWidth;
@@ -59,7 +64,6 @@ public final class AnimationTexture {
 		public final int frameStart;
 		public final int frameEnd;
 		public final float fps;
-		private boolean animationFinished = false;
 		
 		public AnimationData(Attributes animAttr) throws IOException {
 			this.texture 	  = ResourceManager.texture.get(animAttr.getString("texture"));
@@ -72,31 +76,30 @@ public final class AnimationTexture {
 			
 		}
 		
-		public final float calculateNextFrame(float currentFrame, float deltaTime) {
+		/**
+		 * 
+		 * @param currentFrame
+		 * @param deltaTime
+		 * @param repeated
+		 * @return next frame or <0 after animation finished
+		 */
+		public final float calculateNextFrame(float currentFrame, float deltaTime, boolean repeated) {
 			currentFrame += fps/1000.f * deltaTime;
-			animationFinished = false;
 			
 			if( currentFrame > frameEnd )
 			{
-				currentFrame = ((currentFrame-frameStart) % (frameEnd-frameStart)) + frameStart;
-				animationFinished = true;
+				currentFrame = !repeated ? -1 : ((currentFrame-frameStart) % (frameEnd-frameStart)) + frameStart;
 			}
 			
 			return currentFrame;
 		}
 		
-		public final IntRect calculateTextureFrame(float currentFrame)
-		{
+		public final IntRect calculateTextureFrame(float currentFrame) {
 	    	int column = (int) currentFrame % numRowFrames;
 	    	
 	    	int row = (int) currentFrame / numRowFrames;
 	    	
 	    	return new IntRect(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
-		}
-		
-		public boolean isAnimationFinished()
-		{
-			return animationFinished;
 		}
 	}
 	

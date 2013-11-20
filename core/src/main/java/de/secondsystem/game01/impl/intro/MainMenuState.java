@@ -1,15 +1,12 @@
 package de.secondsystem.game01.impl.intro;
 
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import org.jsfml.graphics.Image;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.event.Event;
 import org.jsfml.window.Mouse;
+import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.FinalizeState;
 import de.secondsystem.game01.impl.GameContext;
