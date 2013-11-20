@@ -185,7 +185,7 @@ public final class EditorGameState extends GameState {
 				ctx.window.close();
 
 			} else if (event.type == Event.Type.KEY_RELEASED
-					&& event.asKeyEvent().key == Key.F12) {
+					&& (event.asKeyEvent().key == Key.F12 || event.asKeyEvent().key == Key.ESCAPE)) {
 				setNextState(playGameState);
 
 			} else
