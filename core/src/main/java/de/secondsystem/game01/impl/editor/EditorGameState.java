@@ -21,6 +21,7 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerObject;
@@ -185,9 +186,12 @@ public final class EditorGameState extends GameState {
 				ctx.window.close();
 
 			} else if (event.type == Event.Type.KEY_RELEASED
-					&& (event.asKeyEvent().key == Key.F12 || event.asKeyEvent().key == Key.ESCAPE)) {
+					&& event.asKeyEvent().key == Key.F12) {
 				setNextState(playGameState);
 
+			} else if (event.type == Event.Type.KEY_RELEASED
+					&& event.asKeyEvent().key == Key.ESCAPE) {
+				setNextState(new MainMenuState(this));
 			} else
 				processInput(ctx, event);
 		}
