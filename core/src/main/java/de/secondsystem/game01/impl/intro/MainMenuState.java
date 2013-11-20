@@ -35,8 +35,8 @@ public final class MainMenuState extends GameState {
 	MenuButton exitGameBt = new MenuButton("EXIT GAME", 500, 640);
 	
 	public MainMenuState(GameState playGameState) {
-	// Transfering last State into playGameState	
-	this.playGameState = playGameState;
+		// Transfering last State into playGameState	
+		this.playGameState = playGameState;
 	}
 
 	
@@ -76,7 +76,7 @@ public final class MainMenuState extends GameState {
 	          	if(editorBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new EditorGameState(this, new JsonGameMapSerializer().deserialize("test01", true, true)));
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-	          		setNextState(new SettingsMenuState());
+	          		setNextState(new SettingsMenuState(this));
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new FinalizeState());
 	          	break;

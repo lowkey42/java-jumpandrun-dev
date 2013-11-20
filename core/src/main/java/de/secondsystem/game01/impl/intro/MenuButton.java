@@ -18,13 +18,13 @@ import org.jsfml.window.Window;
 import de.secondsystem.game01.impl.ResourceManager;
 
 /**
- * This class provides a functional button with different attributes
+ * This class provides a functional universal button with push ability
  * @author Sebastian
  *
  */
 public final class MenuButton {
 
-	String title, text;
+	String text;
 	int pos_x, pos_y;
 	IOnClickListener clickListener;
 	
@@ -42,11 +42,11 @@ public final class MenuButton {
 		this.pos_y = pos_y;
 		this.clickListener = clickListener;
 		
-		// Loading standard Font for buttons
 		try {
+		// Loading standard Font for MenuButtons
 		ConstFont myFont = ResourceManager.font.get(fonttype);
 		
-		// Loading Standard Texture for buttons
+		// Loading Standard Texture for MenuButtons
 		ConstTexture newButton = ResourceManager.texture_gui.get(file);
 		
 		height = newButton.getSize().y / 3;
