@@ -4,6 +4,7 @@ package de.secondsystem.game01.impl.intro;
 import org.jsfml.graphics.Image;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
+import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
@@ -43,11 +44,15 @@ public final class MainMenuState extends GameState {
 	protected void onStart(GameContext ctx) {
 		// TODO
 		
-		// Creating Backdrop Texture via monitor screenshot to be rendered on every frame
-		backdropBuffer.update(ctx.window);
-		backdrop.setTexture(backdropBuffer);
-		backdrop.setPosition(0, 0);
-	}
+		// Creating Backdrop Texture via monitor screenshot of the stage before rendered on every frame
+				try {
+					backdropBuffer.create(ctx.settings.width, ctx.settings.height);
+				} catch (TextureCreationException e) {
+					e.printStackTrace();
+				}
+				backdropBuffer.update(ctx.window);
+				backdrop.setTexture(backdropBuffer);
+			}
 
 	@Override
 	protected void onStop(GameContext ctx) {
@@ -59,9 +64,7 @@ public final class MainMenuState extends GameState {
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO Preparing the following code to be able to be used with more than 1 button --> outsourcing into button class
-		
-		ctx.window.draw(backdrop);		
-		
+
 		for(Event event : ctx.window.pollEvents()) {
 	        switch(event.type){
 	          case CLOSED: ctx.window.close();
@@ -91,6 +94,8 @@ public final class MainMenuState extends GameState {
 	        }
 	    }
 
+		ctx.window.draw(backdrop);
+		
 		newGameBt.draw(ctx.window);
 		editorBt.draw(ctx.window);
 		settingsBt.draw(ctx.window);
@@ -98,5 +103,4 @@ public final class MainMenuState extends GameState {
 		exitGameBt.draw(ctx.window);
 			
 	}
-
 }
