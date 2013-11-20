@@ -36,6 +36,7 @@ public class MainGameState extends GameState {
 		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, true);
 		
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
+		player.setFollowWorldSwitch(true);
 		
 		cameraController = player;
 	}

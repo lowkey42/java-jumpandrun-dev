@@ -22,7 +22,6 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
 		physicsWorld.setContactListener(new PhysicsContactListener());
-		physicsWorld.setContactFilter(new PhysicsContactFilter());
 	}
 
 	@Override

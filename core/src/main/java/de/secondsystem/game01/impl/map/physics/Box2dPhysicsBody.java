@@ -1,5 +1,8 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -7,6 +10,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
 final class Box2dPhysicsBody implements IPhysicsBody {
@@ -21,6 +25,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	int numFootContacts = 0;
 	private boolean usingObject;
 	private boolean collisionWithLadder = false;
+	private final Set<Contact> activeContacts = new HashSet<>();
 
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
@@ -104,27 +109,39 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		return (float) (a < 0 ? 360 + a : a);
 	}
 
-	public void beginContact(Box2dPhysicsBody other) {
-		if (contactListener != null)
-			contactListener.beginContact(other);
-
-		if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType())
-			collisionWithLadder = true;
-		else {
-			usingObject = false;
-			body.setGravityScale(1.f);
+	public boolean beginContact(Contact contact, Box2dPhysicsBody other) {
+		if( activeContacts.add(contact) ) {
+			if (contactListener != null)
+				contactListener.beginContact(other);
+	
+			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType())
+				collisionWithLadder = true;
+			else {
+				usingObject = false;
+				body.setGravityScale(1.f);
+			}
+			
+			return true;
 		}
+		
+		return false;
 	}
 
-	public void endContact(Box2dPhysicsBody other) {
-		if (contactListener != null)
-			contactListener.endContact(other);
-
-		if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType()) {
-			collisionWithLadder = false;
-			body.setGravityScale(1.f);
-			usingObject = false;
+	public boolean endContact(Contact contact, Box2dPhysicsBody other) {
+		if( activeContacts.remove(contact) ) {
+			if (contactListener != null)
+				contactListener.endContact(other);
+	
+			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType()) {
+				collisionWithLadder = false;
+				body.setGravityScale(1.f);
+				usingObject = false;
+			}
+			
+			return true;
 		}
+		
+		return false;
 	}
 
 	@Override
