@@ -77,7 +77,7 @@ public final class SlideButton {
 	void mouseover(Window window, FloatRect gbounds){
 		// TODO --> test if there is an alternative:    if(gbounds.contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
 		if(Mouse.getPosition(window).x < this.sliderSprite.getPosition().x + width && Mouse.getPosition(window).x > this.sliderSprite.getPosition().x){
-			this.sliderSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition().x) - (this.sliderSprite.getPosition().x)), height));
+			this.sliderSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.sliderSprite.getPosition().x)), height));
 			System.out.println("inside " + this.sliderSprite);
 		}
 		
