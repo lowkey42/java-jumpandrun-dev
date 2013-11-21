@@ -11,7 +11,7 @@ import org.jsfml.system.Vector2f;
 
 public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	
-	private static final float FIXED_STEP = 1/60f;
+	private static final float FIXED_STEP = 1/60f/2;
 	private static final int maxSteps = 5;
 	private static final int velocityIterations = 8;
 	private static final int positionIterations = 3;
@@ -25,6 +25,7 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
 		physicsWorld.setContactListener(new PhysicsContactListener());
+		physicsWorld.setAutoClearForces(false);
 	}
 
 	@Override
@@ -38,8 +39,12 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	    
 	    int stepsClamped = Math.min(steps, maxSteps);
 	 
-	    for (int i = 0; i < stepsClamped; ++i)
+	    for (int i = 0; i < stepsClamped; ++i) {
 	    	physicsWorld.step(FIXED_STEP, velocityIterations, positionIterations);
+	    	
+	    	if( i>0 && i%2==0 )
+	    	    physicsWorld.clearForces();
+	    }
 	    physicsWorld.clearForces();
 	}
 
