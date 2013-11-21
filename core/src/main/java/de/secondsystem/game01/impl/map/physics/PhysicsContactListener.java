@@ -12,11 +12,29 @@ class PhysicsContactListener implements ContactListener {
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
 		
+		// fixtureUserDataA/B
+		Object fixtureUDA = contact.getFixtureA().getUserData();
+		Object fixtureUDB = contact.getFixtureB().getUserData();
+		boolean isFootA = fixtureUDA != null && ((String)fixtureUDA).compareTo("foot") == 0 ? true : false;
+		boolean isFootB = fixtureUDB != null && ((String)fixtureUDB).compareTo("foot") == 0 ? true : false;
+		
+		boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
+		boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
+		
 		if( !isFiltered(body1, body2) ) {
-			if( body1.beginContact(contact, body2) && contact.getFixtureA().getUserData() != null && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-				body1.incFootContacts();
-			if( body2.beginContact(contact, body1) && contact.getFixtureB().getUserData() != null && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-				body2.incFootContacts();
+			if( body1.beginContact(contact, body2) )
+				if( isFootA && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+					body1.incFootContacts();
+				else
+					if( isHandA )
+						body1.setTouchingBody(body2);
+			
+			if( body2.beginContact(contact, body1) )
+				if( isFootB && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+					body2.incFootContacts();
+				else
+					if( isHandB )
+						body2.setTouchingBody(body1);
 		}
 	}
 
@@ -25,10 +43,28 @@ class PhysicsContactListener implements ContactListener {
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
 		
-		if( body1.endContact(contact, body2) && contact.getFixtureA().getUserData() != null && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-			body1.decFootContacts();
-		if( body2.endContact(contact, body1) && contact.getFixtureB().getUserData() != null && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-			body2.decFootContacts();
+		// fixtureUserDataA/B
+		Object fixtureUDA = contact.getFixtureA().getUserData();
+		Object fixtureUDB = contact.getFixtureB().getUserData();
+		boolean isFootA = fixtureUDA != null && ((String)fixtureUDA).compareTo("foot") == 0 ? true : false;
+		boolean isFootB = fixtureUDB != null && ((String)fixtureUDB).compareTo("foot") == 0 ? true : false;
+		
+		boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
+		boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
+		
+		if( body1.endContact(contact, body2) )
+			if( isFootA && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+				body1.decFootContacts();
+			else
+				if( isHandA )
+					body1.setTouchingBody(null);
+		
+		if( body2.endContact(contact, body1) )
+			if( isFootB && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+				body2.decFootContacts();
+			else
+				if( isHandB )
+					body2.setTouchingBody(null);
 	}
 
 	@Override

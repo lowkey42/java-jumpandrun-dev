@@ -33,6 +33,12 @@ public abstract class AbstractGameEntityController {
 			for( IControllableGameEntity ge : ges )
 				ge.moveVertically(direction);
 		}
+
+		@Override
+		public void liftObject(boolean lift) {
+			for( IControllableGameEntity ge : ges )
+				ge.liftObject(lift);		
+		}
 		
 	}
 	

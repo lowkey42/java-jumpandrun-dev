@@ -21,14 +21,14 @@ final class GameEntityHelper {
 		}
 		return repr;
 	}
-	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, Attributes attributes ) {
+	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean canPickUpObjects, boolean liftable, Attributes attributes ) {
 		return map.getPhysicalWorld().createBody(attributes.getInteger("worldId", map.getActiveGameWorldId()),
 				attributes.getFloat("x"), 
 				attributes.getFloat("y"), 
 				attributes.getFloat("width"), 
 				attributes.getFloat("height"), 
 				attributes.getFloat("rotation", 0), 
-				false, CollisionHandlerType.SOLID, jumper);
+				false, CollisionHandlerType.SOLID, jumper, canPickUpObjects, liftable);
 	}
 	
 	private GameEntityHelper() {}

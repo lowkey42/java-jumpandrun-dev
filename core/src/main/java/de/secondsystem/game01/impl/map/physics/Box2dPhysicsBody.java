@@ -11,6 +11,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
 final class Box2dPhysicsBody implements IPhysicsBody {
@@ -26,13 +27,18 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private boolean usingObject;
 	private boolean collisionWithLadder = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
-
+	private IPhysicalWorld physicsWorld;
+	private RevoluteJoint revoluteJoint = null;
+	private IPhysicsBody touchingBody;
+	private final boolean liftable;
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
-			boolean isStatic, CollisionHandlerType type, boolean createFoot) {
+			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean liftable) {
 		this.gameWorldId = gameWorldId;
 		this.type = type;
-
+		physicsWorld = world;
+		this.liftable = liftable;
+		
 		// body definition
 		BodyDef bd = new BodyDef();
 		bd.position.set(new Vec2(x, y).mul(BOX2D_SCALE_FACTOR));
@@ -65,12 +71,19 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			body.createFixture(fd);
 
 			if (createFoot) {
-				s.setAsBox(width / 3f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0,
-						height / 2f * BOX2D_SCALE_FACTOR), rotation);
+				s.setAsBox(width / 3f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0.f, height / 2f * BOX2D_SCALE_FACTOR), rotation);
 				fd.isSensor = true;
 				Fixture footFixture = body.createFixture(fd);
-				footFixture.setUserData(this);
+				footFixture.setUserData(new String("foot"));
 				body.setFixedRotation(true);
+			}
+			
+			if (createHand) {
+				s.setAsBox(width / 4f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(width / 2f * BOX2D_SCALE_FACTOR, 0.f), rotation);
+				fd.isSensor = true;
+				fd.density = 0.f;
+				Fixture handFixture = body.createFixture(fd);
+				handFixture.setUserData(new String("hand"));
 			}
 
 		} else
@@ -78,7 +91,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 
 		body.setUserData(this);
 	}
-
+	
+	@Override
 	public Body getBody() {
 		return body;
 	}
@@ -113,8 +127,13 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		if( activeContacts.add(contact) ) {
 			if (contactListener != null)
 				contactListener.beginContact(other);
-	
-			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType())
+			
+			Object fixtureUDA = contact.getFixtureA().getUserData();
+			Object fixtureUDB = contact.getFixtureB().getUserData();
+			boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
+			boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
+			
+			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() && !isHandA && !isHandB)
 				collisionWithLadder = true;
 			else {
 				usingObject = false;
@@ -132,7 +151,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			if (contactListener != null)
 				contactListener.endContact(other);
 	
-			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType()) {
+			Object fixtureUDA = contact.getFixtureA().getUserData();
+			Object fixtureUDB = contact.getFixtureB().getUserData();
+			boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
+			boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
+			
+			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() && !isHandA && !isHandB) {
 				collisionWithLadder = false;
 				body.setGravityScale(1.f);
 				usingObject = false;
@@ -237,5 +261,43 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public boolean isUsingObject() {
 		return usingObject;
+	}
+
+	@Override
+	public RevoluteJoint bind(IPhysicsBody other, Vec2 anchor) {
+		assert( physicsWorld != null);
+		if( other.isLiftable() )
+			revoluteJoint = physicsWorld.createRevoluteJoint(body, other.getBody(), anchor);
+		
+		return revoluteJoint;	
+	}
+
+	@Override
+	public void unbind() {
+		if( revoluteJoint != null )
+		{
+			physicsWorld.destroyJoint(revoluteJoint);
+			revoluteJoint = null;
+		}
+	}
+
+	@Override
+	public void setTouchingBody(IPhysicsBody body) {
+		touchingBody = body;
+	}
+
+	@Override
+	public IPhysicsBody getTouchingBody() {
+		return touchingBody;
+	}
+
+	@Override
+	public boolean hasJoint() {
+		return revoluteJoint != null;
+	}
+
+	@Override
+	public boolean isLiftable() {
+		return liftable;
 	}
 }

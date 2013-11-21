@@ -31,7 +31,8 @@ class GameEntity implements IGameEntity, IWorldSwitchListener {
 	public GameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		this(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, attributes));
+		this(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), 
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes));
 	}
 	
 	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody) {

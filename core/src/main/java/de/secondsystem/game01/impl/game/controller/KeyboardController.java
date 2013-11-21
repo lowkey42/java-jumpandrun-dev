@@ -28,6 +28,11 @@ public final class KeyboardController extends AbstractGameEntityController {
 
 		if( Keyboard.isKeyPressed(mapping.jump) )
 			proxy.jump();
+		
+		if( Keyboard.isKeyPressed(mapping.use) )
+			proxy.liftObject(true);
+		else
+			proxy.liftObject(false);	
 	}
 	
 }

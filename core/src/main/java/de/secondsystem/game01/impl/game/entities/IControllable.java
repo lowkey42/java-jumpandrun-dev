@@ -14,7 +14,9 @@ public interface IControllable {
 	
 	void jump();
 	
-	// TODO: attack?
+	void liftObject(boolean lift);
+	
+	// TODO: attack
 	
 	
 }

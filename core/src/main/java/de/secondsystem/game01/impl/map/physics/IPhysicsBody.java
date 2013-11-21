@@ -1,5 +1,8 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
 public interface IPhysicsBody {
@@ -45,6 +48,16 @@ public interface IPhysicsBody {
 	void useObject(boolean use); // e.g. ladders, switches... with w or upkey 
 	
 	boolean isUsingObject();
+	
+	RevoluteJoint bind(IPhysicsBody other, Vec2 anchor);
+	void unbind();
+	
+	void setTouchingBody(IPhysicsBody body);
+	IPhysicsBody getTouchingBody();
+	
+	Body getBody();
+	boolean hasJoint();
+	boolean isLiftable();
 	
 	interface ContactListener {
 		void beginContact( IPhysicsBody other );

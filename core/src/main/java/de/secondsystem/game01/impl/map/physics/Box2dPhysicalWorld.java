@@ -4,6 +4,9 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
+import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jsfml.system.Vector2f;
 
 public final class Box2dPhysicalWorld implements IPhysicalWorld {
@@ -47,8 +50,21 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	@Override
 	public IPhysicsBody createBody(int gameWorldIdMask, float x, float y,
 			float width, float height, float rotation, boolean isStatic,
-			CollisionHandlerType type, boolean createFoot) {
-		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot);
+			CollisionHandlerType type, boolean createFoot, boolean createHand, boolean liftable) {
+		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot, createHand, liftable);
+	}
+
+	@Override
+	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
+		RevoluteJointDef jointDef = new RevoluteJointDef();
+		jointDef.initialize(body1, body2, anchor);
+		
+		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
+	}
+
+	@Override
+	public void destroyJoint(Joint joint) {
+		physicsWorld.destroyJoint(joint);
 	}
 
 }
