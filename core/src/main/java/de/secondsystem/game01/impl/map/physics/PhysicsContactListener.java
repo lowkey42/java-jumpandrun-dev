@@ -21,21 +21,19 @@ class PhysicsContactListener implements ContactListener {
 		boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
 		boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
 		
-		if( !isFiltered(body1, body2) ) {
-			if( body1.beginContact(contact, body2) )
-				if( isFootA && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-					body1.incFootContacts();
-				else
-					if( isHandA )
-						body1.setTouchingBody(body2);
-			
-			if( body2.beginContact(contact, body1) )
-				if( isFootB && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-					body2.incFootContacts();
-				else
-					if( isHandB )
-						body2.setTouchingBody(body1);
-		}
+		if( body1.beginContact(contact, body2) )
+			if( isFootA && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+				body1.incFootContacts();
+			else
+				if( isHandA )
+					body1.setTouchingBody(body2);
+		
+		if( body2.beginContact(contact, body1) )
+			if( isFootB && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+				body2.incFootContacts();
+			else
+				if( isHandB )
+					body2.setTouchingBody(body1);
 	}
 
 	@Override
@@ -77,7 +75,7 @@ class PhysicsContactListener implements ContactListener {
         Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.m_fixtureA.getBody().getUserData();
         Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.m_fixtureB.getBody().getUserData();
         
-        contact.setEnabled(!isFiltered(body1, body2));
+        contact.setEnabled(!isFiltered(body1, body2));   
 	}
 	
 	protected boolean isFiltered(Box2dPhysicsBody body1, Box2dPhysicsBody body2) {
@@ -87,7 +85,7 @@ class PhysicsContactListener implements ContactListener {
         // dispatch and handle the different collisionTypes
         switch( body1.getCollisionHandlerType() ) {
         	case ONE_WAY:
-        		if( body2.getCollisionHandlerType()==CollisionHandlerType.SOLID && body2.body.getLinearVelocity().y < 0 )
+        		if( body2.getCollisionHandlerType()==CollisionHandlerType.SOLID && !body2.isAbove(body1) )
         			return true;
         		
         		break;
@@ -97,7 +95,7 @@ class PhysicsContactListener implements ContactListener {
         	case SOLID:
         		 switch( body2.getCollisionHandlerType() ) {
 	        		 case ONE_WAY:
-	             		if( body1.body.getLinearVelocity().y < 0 )
+	             		if( !body1.isAbove(body2) )
 	             			return true;
 	             		
 	             		break;

@@ -1,7 +1,6 @@
 package de.secondsystem.game01.impl.intro;
 
 
-import org.jsfml.graphics.Image;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
@@ -24,7 +23,6 @@ public final class MainMenuState extends GameState {
 	
 	GameState playGameState;
 	
-	Image backdropTx;
 	Texture backdropBuffer = new Texture();
 	Sprite backdrop = new Sprite();
 	
@@ -33,6 +31,10 @@ public final class MainMenuState extends GameState {
 	MenuButton editorBt = new MenuButton("EDITOR", 500, 340);
 	MenuButton settingsBt = new MenuButton("SETTINGS", 500, 490);
 	MenuButton exitGameBt = new MenuButton("EXIT GAME", 500, 640);
+	
+	public MainMenuState(){
+		this.playGameState = null;
+	}
 	
 	public MainMenuState(GameState playGameState) {
 		// Transfering last State into playGameState	
@@ -45,7 +47,6 @@ public final class MainMenuState extends GameState {
 		// TODO
 		
 		// Creating Backdrop Texture via monitor screenshot of the stage before rendered on every frame
-			if(this.playGameState != null){
 				try {
 					backdropBuffer.create(ctx.settings.width, ctx.settings.height);
 				} catch (TextureCreationException e) {
@@ -54,7 +55,6 @@ public final class MainMenuState extends GameState {
 				backdropBuffer.update(ctx.window);
 				backdrop.setTexture(backdropBuffer);
 				}
-	}
 
 	@Override
 	protected void onStop(GameContext ctx) {
@@ -78,7 +78,7 @@ public final class MainMenuState extends GameState {
 	          	if(editorBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new EditorGameState(this, new JsonGameMapSerializer().deserialize("test01", true, true)));
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-	          		setNextState(new SettingsMenuState(this));
+	          		setNextState(new SettingsMenuState(playGameState, backdrop));
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new FinalizeState());
 	          	break;

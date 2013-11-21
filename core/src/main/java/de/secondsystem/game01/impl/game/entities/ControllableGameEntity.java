@@ -31,7 +31,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	protected boolean moved;
 
 	private boolean lifting = false;
-
+	
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
@@ -57,7 +57,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 	@Override
 	public void jump() {
-		if( jumpTimer < 100L )
+		if( jumpTimer < 200L )
 			return;
 		
 		physicsBody.useObject(false);

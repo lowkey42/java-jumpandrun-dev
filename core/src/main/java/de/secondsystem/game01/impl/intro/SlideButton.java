@@ -11,9 +11,12 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
+import org.jsfml.window.event.Event;
+import org.jsfml.window.event.Event.Type;
 
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.intro.MenuButton.IOnClickListener;
+import de.secondsystem.game01.model.Settings;
 	
 	/**
 	 * This class provides a slideable button with values between 0 and 100
@@ -24,7 +27,7 @@ public final class SlideButton {
 
 	// Attributes
 	String text;
-	short value;
+	short value = 0;
 	int pos_x, pos_y;
 	
 	final int width;
@@ -40,6 +43,7 @@ public final class SlideButton {
 	SlideButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this.pos_x = pos_x;
 		this.pos_y = pos_y;
+		this.text = text;
 		this.clickListener = clickListener;
 	
 		try {
@@ -50,7 +54,6 @@ public final class SlideButton {
 		ConstTexture slideButton = ResourceManager.texture_gui.get(file);
 		
 		height = slideButton.getSize().y / 2;
-		value = (short)((slideButton.getSize().x) - 20 / 100); 
 		width = slideButton.getSize().x;
 	
 		// Button Sprite generation and positioning
@@ -74,17 +77,27 @@ public final class SlideButton {
 	}
 	
 	
-	void mouseover(Window window, FloatRect gbounds){
-		// TODO --> test if there is an alternative:    if(gbounds.contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
-		if(Mouse.getPosition(window).x < this.sliderSprite.getPosition().x + width && Mouse.getPosition(window).x > this.sliderSprite.getPosition().x){
-			this.sliderSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.sliderSprite.getPosition().x)), height));
-			System.out.println("inside " + this.sliderSprite);
-		}
+	void mouseover(Window window, Event event){
 		
+		// TODO --> test if there is an alternative:    if(gbounds.contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
+		if(Mouse.getPosition(window).x < this.sliderSprite.getPosition().x + width - 10 && Mouse.getPosition(window).x > this.sliderSprite.getPosition().x + 10
+		&& Mouse.getPosition(window).y < this.sliderSprite.getPosition().y + height - 10 && Mouse.getPosition(window).y > this.sliderSprite.getPosition().y + 10){
+			if(event.type == (Type.MOUSE_BUTTON_PRESSED) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT){
+			this.sliderSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.sliderSprite.getPosition().x)), height));
+			// Transforming Coordinates into a value (MousePosX - LeftUpCornerSprite - 10 pixels for Border / 4.8 (--> (500pixel - 20) / 100 (max))
+			value = (short)((Mouse.getPosition(window).x - this.sliderSprite.getPosition().x - 10)/4.8);
+			System.out.println(this.text + ": current value: " + value);
+			
+			
+			}
+		}
 		
 	}
 	
 	
+	void convertValue(){
+		
+	}
 	
 	void draw(RenderTarget rt) {
 		rt.draw(sliderSprite);		
