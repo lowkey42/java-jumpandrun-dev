@@ -4,24 +4,23 @@ import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
-import org.jsfml.window.Mouse;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
-import de.secondsystem.game01.impl.FinalizeState;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.editor.EditorGameState;
-import de.secondsystem.game01.impl.game.MainGameState;
-import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+
 
 public final class SettingsMenuState extends GameState {
 
 	
 	GameState playGameState;
 	
-	SlideButton sliderOne = new SlideButton("VOLUME", 600, 80);
-	SlideButton sliderTwo = new SlideButton("BRIGHTNESS", 600, 280);
+	SlideButton sliderOneBack = new SlideButton("", 600, 80);
+	SlideButton sliderOneFront = new SlideButton("Volume", 600, 80);
+	
+	SlideButton sliderTwoBack = new SlideButton("", 600, 280);
+	SlideButton sliderTwoFront = new SlideButton("Brightness", 600, 280);
 	
 	Texture backdropBuffer = new Texture();
 	Sprite backdrop = new Sprite();
@@ -71,8 +70,8 @@ public final class SettingsMenuState extends GameState {
 	        		setNextState(playGameState); }
 	          case MOUSE_BUTTON_PRESSED: 
 	          case MOUSE_MOVED: 
-	        	  sliderOne.mouseover(ctx.window, sliderOne.sliderSprite.getGlobalBounds());
-	        	  sliderTwo.mouseover(ctx.window, sliderTwo.sliderSprite.getGlobalBounds());
+	        	  sliderOneFront.mouseover(ctx.window, event);
+	        	  sliderTwoFront.mouseover(ctx.window, event);
 	        	
 	        	break;	        	       
 	        }
@@ -80,8 +79,11 @@ public final class SettingsMenuState extends GameState {
 		
 		ctx.window.draw(backdrop);
 		
-		sliderOne.draw(ctx.window);
-		sliderTwo.draw(ctx.window);
+		sliderOneBack.draw(ctx.window);
+		sliderOneFront.draw(ctx.window);
+		
+		sliderTwoBack.draw(ctx.window);
+		sliderTwoFront.draw(ctx.window);
 		
 	}
 	

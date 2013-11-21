@@ -34,6 +34,10 @@ public final class MainMenuState extends GameState {
 	MenuButton settingsBt = new MenuButton("SETTINGS", 500, 490);
 	MenuButton exitGameBt = new MenuButton("EXIT GAME", 500, 640);
 	
+	public MainMenuState(){
+		this.playGameState = null;
+	}
+	
 	public MainMenuState(GameState playGameState) {
 		// Transfering last State into playGameState	
 		this.playGameState = playGameState;
@@ -45,7 +49,6 @@ public final class MainMenuState extends GameState {
 		// TODO
 		
 		// Creating Backdrop Texture via monitor screenshot of the stage before rendered on every frame
-			if(this.playGameState != null){
 				try {
 					backdropBuffer.create(ctx.settings.width, ctx.settings.height);
 				} catch (TextureCreationException e) {
@@ -54,7 +57,6 @@ public final class MainMenuState extends GameState {
 				backdropBuffer.update(ctx.window);
 				backdrop.setTexture(backdropBuffer);
 				}
-	}
 
 	@Override
 	protected void onStop(GameContext ctx) {
