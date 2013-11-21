@@ -31,6 +31,9 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private RevoluteJoint revoluteJoint = null;
 	private Box2dPhysicsBody touchingBody;
 	private final boolean liftable;
+	
+	private final float height;
+	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
 			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean liftable) {
@@ -38,6 +41,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		this.type = type;
 		physicsWorld = world;
 		this.liftable = liftable;
+		this.height = height;
 		
 		// body definition
 		BodyDef bd = new BodyDef();
@@ -71,10 +75,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			body.createFixture(fd);
 
 			if (createFoot) {
-				s.setAsBox(width / 3f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0.f, height / 2f * BOX2D_SCALE_FACTOR), rotation);
+				s.setAsBox(width / 3.f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0.f, height / 2.f * BOX2D_SCALE_FACTOR), rotation);
 				fd.isSensor = true;
 				Fixture footFixture = body.createFixture(fd);
-				footFixture.setUserData(new String("foot"));
+				footFixture.setUserData(new String("foot")); 
 				body.setFixedRotation(true);
 			}
 			
@@ -103,7 +107,11 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public int getGameWorldId() {
 		return gameWorldId;
 	}
-
+	
+	public boolean isAbove(Box2dPhysicsBody body) {
+		return (getPosition().y + height/2.f) <= (body.getPosition().y - body.height/2.f);
+	}
+	
 	@Override
 	public void setContactListener(ContactListener contactListener) {
 		this.contactListener = contactListener;
@@ -298,4 +306,6 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public boolean isLiftable() {
 		return liftable;
 	}
+	
+	
 }
