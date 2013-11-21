@@ -25,27 +25,28 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
 		physicsWorld.setContactListener(new PhysicsContactListener());
-		physicsWorld.setAutoClearForces(false);
+		physicsWorld.setAutoClearForces(true);
 	}
 
 	@Override
 	public void update(long frameTime) {
-		fixedTimestepAccumulator += frameTime/1000.f;
-	    int steps = (int) Math.floor(fixedTimestepAccumulator / FIXED_STEP);
-	    if(steps > 0)
-	    {
-	        fixedTimestepAccumulator -= steps * FIXED_STEP;
-	    }
-	    
-	    int stepsClamped = Math.min(steps, maxSteps);
-	 
-	    for (int i = 0; i < stepsClamped; ++i) {
-	    	physicsWorld.step(FIXED_STEP, velocityIterations, positionIterations);
-	    	
-	    	if( i>0 && i%2==0 )
-	    	    physicsWorld.clearForces();
-	    }
-	    physicsWorld.clearForces();
+		physicsWorld.step(frameTime/1000.f, velocityIterations, positionIterations);
+//		fixedTimestepAccumulator += frameTime/1000.f;
+//	    int steps = (int) Math.floor(fixedTimestepAccumulator / FIXED_STEP);
+//	    if(steps > 0)
+//	    {
+//	        fixedTimestepAccumulator -= steps * FIXED_STEP;
+//	    }
+//	    
+//	    int stepsClamped = Math.min(steps, maxSteps);
+//	 
+//	    for (int i = 0; i < stepsClamped; ++i) {
+//	    	physicsWorld.step(FIXED_STEP, velocityIterations, positionIterations);
+//	    	
+//	    	if( i>0 && i%2==0 )
+//	    	    physicsWorld.clearForces();
+//	    }
+//	    physicsWorld.clearForces();
 	}
 
 	Body createBody(BodyDef def) {
