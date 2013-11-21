@@ -54,7 +54,6 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot, createHand, liftable);
 	}
 
-	@Override
 	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
 		RevoluteJointDef jointDef = new RevoluteJointDef();
 		jointDef.initialize(body1, body2, anchor);
@@ -62,7 +61,6 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
 	}
 
-	@Override
 	public void destroyJoint(Joint joint) {
 		physicsWorld.destroyJoint(joint);
 	}

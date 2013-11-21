@@ -27,9 +27,9 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private boolean usingObject;
 	private boolean collisionWithLadder = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
-	private IPhysicalWorld physicsWorld;
+	private Box2dPhysicalWorld physicsWorld;
 	private RevoluteJoint revoluteJoint = null;
-	private IPhysicsBody touchingBody;
+	private Box2dPhysicsBody touchingBody;
 	private final boolean liftable;
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
@@ -92,7 +92,6 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		body.setUserData(this);
 	}
 	
-	@Override
 	public Body getBody() {
 		return body;
 	}
@@ -267,7 +266,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public RevoluteJoint bind(IPhysicsBody other, Vec2 anchor) {
 		assert( physicsWorld != null);
 		if( other.isLiftable() )
-			revoluteJoint = physicsWorld.createRevoluteJoint(body, other.getBody(), anchor);
+			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), anchor);
 		
 		return revoluteJoint;	
 	}
@@ -281,9 +280,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		}
 	}
 
-	@Override
 	public void setTouchingBody(IPhysicsBody body) {
-		touchingBody = body;
+		touchingBody = (Box2dPhysicsBody) body;
 	}
 
 	@Override
