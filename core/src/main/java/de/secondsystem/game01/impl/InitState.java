@@ -34,6 +34,7 @@ public class InitState implements IState {
 
 	@Override
 	public IContext exit() {
+		ctx.window.clear();
 		return ctx;
 	}
 
