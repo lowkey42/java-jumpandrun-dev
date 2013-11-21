@@ -112,6 +112,7 @@ public final class MenuButton {
 		}
 	}
 	
+		
 	private void changeTextureClip(int pos) {
 		newsprite.setTextureRect(new IntRect(0,height*pos,width,height));
 	}
