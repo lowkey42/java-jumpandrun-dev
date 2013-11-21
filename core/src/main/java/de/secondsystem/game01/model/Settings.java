@@ -10,6 +10,10 @@ public final class Settings {
 	
 	public final int width;
 	
+	public final short volume;
+	
+	public final short brightness;
+	
 	public final int antiAliasingLevel;
 	
 	public final boolean verticalSync;
@@ -42,6 +46,8 @@ public final class Settings {
 	public Settings() {
 		height = 786;
 		width = 1280;
+		volume = 90;
+		brightness = 50;
 		antiAliasingLevel = 0;
 		verticalSync = true;
 		fullscreen = false;
