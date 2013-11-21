@@ -1,24 +1,19 @@
 package de.secondsystem.game01.impl.intro;
 
-import org.jsfml.graphics.Color;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
-import org.jsfml.graphics.TextureCreationException;
-import org.jsfml.window.Mouse;
-import org.jsfml.window.Window;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.game.MainGameState;
 
 
 public final class SettingsMenuState extends GameState {
 
 	
 	GameState playGameState;
-	Window oldCtxWin;
 	
 	MenuButton changeRes = new MenuButton("Change Resolution", 200, 120);
 	MenuButton vSync = new MenuButton("VSync", 200, 320);
@@ -33,25 +28,16 @@ public final class SettingsMenuState extends GameState {
 	Texture backdropBuffer = new Texture();
 	Sprite backdrop = new Sprite();
 	
-	public SettingsMenuState(GameState playGameState, Window oldCtxWin) {
+	public SettingsMenuState(GameState playGameState, Sprite backdrop) {
 		// Transfering last State into playGameState	
 		this.playGameState = playGameState;
-		this.oldCtxWin = oldCtxWin;
+		this.backdrop = backdrop;
 	}
 	
 	
 	@Override
 	protected void onStart(GameContext ctx) {
-		System.out.println(">> SettingsMenu erfolgreich aufgerufen <<");
-		ctx.window.clear();
-		try {
-			backdropBuffer.create(ctx.settings.width, ctx.settings.height);
-		} catch (TextureCreationException e) {
-			e.printStackTrace();
-		}
-		backdropBuffer.update(oldCtxWin);
-		backdrop.setTexture(backdropBuffer);
-		ctx.window.display();
+	
 	}
 	
 	
@@ -61,6 +47,7 @@ public final class SettingsMenuState extends GameState {
 	}
 	
 	
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO
@@ -78,9 +65,9 @@ public final class SettingsMenuState extends GameState {
 	          	
 	          	break;
 	          case KEY_RELEASED:
-	        	/*if(event.asKeyEvent().key==Key.ESCAPE) {
+	        	if(event.asKeyEvent().key==Key.ESCAPE) {
 	        		ctx.window.draw(backdrop);
-	        		setNextState(playGameState); }*/
+	        		setNextState(playGameState); }
 	          case MOUSE_BUTTON_PRESSED: 
 	          case MOUSE_MOVED: 
 	        	  changeRes.mouseover(ctx.window);

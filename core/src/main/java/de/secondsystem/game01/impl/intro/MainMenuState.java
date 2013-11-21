@@ -1,13 +1,11 @@
 package de.secondsystem.game01.impl.intro;
 
 
-import org.jsfml.graphics.Image;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.Mouse;
-import org.jsfml.window.Window;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.FinalizeState;
@@ -25,8 +23,6 @@ public final class MainMenuState extends GameState {
 	
 	GameState playGameState;
 	
-	Window oldCtxWin;
-	Image backdropTx;
 	Texture backdropBuffer = new Texture();
 	Sprite backdrop = new Sprite();
 	
@@ -58,7 +54,6 @@ public final class MainMenuState extends GameState {
 				}
 				backdropBuffer.update(ctx.window);
 				backdrop.setTexture(backdropBuffer);
-				oldCtxWin = ctx.window;
 				}
 
 	@Override
@@ -83,7 +78,7 @@ public final class MainMenuState extends GameState {
 	          	if(editorBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new EditorGameState(this, new JsonGameMapSerializer().deserialize("test01", true, true)));
 	          	if(settingsBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-	          		setNextState(new SettingsMenuState(playGameState, oldCtxWin));
+	          		setNextState(new SettingsMenuState(playGameState, backdrop));
 	          	if(exitGameBt.newsprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x, (Mouse.getPosition(ctx.window).y)) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
 	          		setNextState(new FinalizeState());
 	          	break;
