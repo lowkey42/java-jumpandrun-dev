@@ -45,6 +45,7 @@ public final class MainMenuState extends GameState {
 		// TODO
 		
 		// Creating Backdrop Texture via monitor screenshot of the stage before rendered on every frame
+			if(this.playGameState != null){
 				try {
 					backdropBuffer.create(ctx.settings.width, ctx.settings.height);
 				} catch (TextureCreationException e) {
@@ -52,7 +53,8 @@ public final class MainMenuState extends GameState {
 				}
 				backdropBuffer.update(ctx.window);
 				backdrop.setTexture(backdropBuffer);
-			}
+				}
+	}
 
 	@Override
 	protected void onStop(GameContext ctx) {
@@ -101,6 +103,8 @@ public final class MainMenuState extends GameState {
 		settingsBt.draw(ctx.window);
 		loadGameBt.draw(ctx.window);
 		exitGameBt.draw(ctx.window);
+		
+		
 			
 	}
 }
