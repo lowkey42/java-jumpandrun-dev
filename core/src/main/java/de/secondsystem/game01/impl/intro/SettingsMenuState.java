@@ -20,10 +20,8 @@ public final class SettingsMenuState extends GameState {
 	MenuButton apply = new MenuButton("APPLY", 540, 520);
 	MenuButton back = new MenuButton("BACK", 870, 520);
 
-	SlideButton sliderOneBack = new SlideButton("", 620, 100);
-	SlideButton sliderOneFront = new SlideButton("Volume", 620, 100);
-	SlideButton sliderTwoBack = new SlideButton("", 620, 300);
-	SlideButton sliderTwoFront = new SlideButton("Brightness", 620, 300);
+	SlideButton sliderOne = new SlideButton("Volume", 620, 100);
+	SlideButton sliderTwo = new SlideButton("Brightness", 620, 300);
 
 	Texture backdropBuffer = new Texture();
 	Sprite backdrop = new Sprite();
@@ -83,8 +81,8 @@ public final class SettingsMenuState extends GameState {
 				antiA.mouseover(ctx.window);
 				back.mouseover(ctx.window);
 				apply.mouseover(ctx.window);
-				sliderOneFront.mouseover(ctx.window, event);
-				sliderTwoFront.mouseover(ctx.window, event);
+				sliderOne.mouseover(ctx.window, event);
+				sliderTwo.mouseover(ctx.window, event);
 
 				break;
 			}
@@ -92,10 +90,10 @@ public final class SettingsMenuState extends GameState {
 
 		ctx.window.draw(backdrop);
 
-		sliderOneBack.draw(ctx.window);
-		sliderOneFront.draw(ctx.window);
-		sliderTwoBack.draw(ctx.window);
-		sliderTwoFront.draw(ctx.window);
+		//sliderOneBack.draw(ctx.window);
+		sliderOne.draw(ctx.window);
+		//sliderTwoBack.draw(ctx.window);
+		sliderTwo.draw(ctx.window);
 
 		changeRes.draw(ctx.window);
 		vSync.draw(ctx.window);

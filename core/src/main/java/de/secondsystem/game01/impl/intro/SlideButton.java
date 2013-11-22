@@ -33,7 +33,9 @@ public final class SlideButton {
 	final int width;
 	final int height;
 	//final Text myText;
-	final Sprite sliderSprite;
+	
+	final Sprite foregroundSprite;
+	final Sprite backgroundSprite;
 	
 	IOnClickListener clickListener;
 	
@@ -57,9 +59,11 @@ public final class SlideButton {
 		width = slideButton.getSize().x;
 	
 		// Button Sprite generation and positioning
-		sliderSprite = new Sprite(slideButton);
-		sliderSprite.setPosition(pos_x, pos_y);
-		changeTextureClip(0);
+		foregroundSprite = new Sprite(slideButton);
+		backgroundSprite = new Sprite(slideButton);
+		foregroundSprite.setPosition(pos_x, pos_y);
+		backgroundSprite.setPosition(pos_x, pos_y);
+		changeTextureClip();
 		
 		} catch ( IOException e ) {
 			throw new Error(e.getMessage(), e);
@@ -79,13 +83,14 @@ public final class SlideButton {
 	
 	void mouseover(Window window, Event event){
 		
-		// TODO --> test if there is an alternative:    if(gbounds.contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
-		if(Mouse.getPosition(window).x < this.sliderSprite.getPosition().x + width - 10 && Mouse.getPosition(window).x > this.sliderSprite.getPosition().x + 10
-		&& Mouse.getPosition(window).y < this.sliderSprite.getPosition().y + height - 10 && Mouse.getPosition(window).y > this.sliderSprite.getPosition().y + 10){
+		// TODO --> test if there is an alternative:    
+		//if(foregroundSprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
+		if(Mouse.getPosition(window).x < this.foregroundSprite.getPosition().x + width - 10 && Mouse.getPosition(window).x > this.foregroundSprite.getPosition().x + 10
+		&& Mouse.getPosition(window).y < this.foregroundSprite.getPosition().y + height - 10 && Mouse.getPosition(window).y > this.foregroundSprite.getPosition().y + 10){
 			if(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT)){
-			this.sliderSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.sliderSprite.getPosition().x)), height));
+			this.foregroundSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.foregroundSprite.getPosition().x)), height));
 			// Transforming Coordinates into a value (MousePosX - LeftUpCornerSprite - 10 pixels for Border / 4.8 (--> (500pixel - 20) / 100 (max))
-			value = (short)((Mouse.getPosition(window).x - this.sliderSprite.getPosition().x - 10)/4.8);
+			value = (short)((Mouse.getPosition(window).x - this.foregroundSprite.getPosition().x - 10)/4.8);
 			System.out.println(this.text + ": current value: " + value);
 			
 			
@@ -100,12 +105,14 @@ public final class SlideButton {
 	}
 	
 	void draw(RenderTarget rt) {
-		rt.draw(sliderSprite);		
+		rt.draw(backgroundSprite);
+		rt.draw(foregroundSprite);				
 	}
 	
 	
-	private void changeTextureClip(int pos) {
-		sliderSprite.setTextureRect(new IntRect(0,height*pos,width,height));
+	private void changeTextureClip() {
+		foregroundSprite.setTextureRect(new IntRect(0,height*1,width,height));
+		backgroundSprite.setTextureRect(new IntRect(0,height*0,width,height));
 	}
 	
 	

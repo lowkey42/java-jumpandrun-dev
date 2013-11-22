@@ -61,7 +61,6 @@ public final class MenuButton {
 		myText = new Text(text, myFont, 26);
 		FloatRect textRect = myText.getGlobalBounds();
 		myText.setOrigin(textRect.width / 2, textRect.height / 1.5f);
-		// TODO --> Alternative: myText.setOrigin(myText.getGlobalBounds().width / 2, myText.getGlobalBounds().height / 1.5f);
 		myText.setPosition(newsprite.getPosition().x + width / 2, newsprite.getPosition().y + height / 2);
 
 		/* TODO --> stabile sound implementations
