@@ -82,7 +82,7 @@ public final class SlideButton {
 		// TODO --> test if there is an alternative:    if(gbounds.contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
 		if(Mouse.getPosition(window).x < this.sliderSprite.getPosition().x + width - 10 && Mouse.getPosition(window).x > this.sliderSprite.getPosition().x + 10
 		&& Mouse.getPosition(window).y < this.sliderSprite.getPosition().y + height - 10 && Mouse.getPosition(window).y > this.sliderSprite.getPosition().y + 10){
-			if(event.type == (Type.MOUSE_BUTTON_PRESSED) && event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT){
+			if(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT)){
 			this.sliderSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.sliderSprite.getPosition().x)), height));
 			// Transforming Coordinates into a value (MousePosX - LeftUpCornerSprite - 10 pixels for Border / 4.8 (--> (500pixel - 20) / 100 (max))
 			value = (short)((Mouse.getPosition(window).x - this.sliderSprite.getPosition().x - 10)/4.8);
