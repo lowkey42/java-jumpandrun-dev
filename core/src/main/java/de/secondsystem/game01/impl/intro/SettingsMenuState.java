@@ -18,7 +18,11 @@ public final class SettingsMenuState extends GameState {
 	MenuButton vSync = new MenuButton("VSync", 200, 320);
 	MenuButton antiA = new MenuButton("Antialiasing", 200, 520);
 	MenuButton apply = new MenuButton("APPLY", 540, 520);
-	MenuButton back = new MenuButton("BACK", 870, 520);
+	MenuButton back = new MenuButton("BACK", 870, 520, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(MainMenu);
+		}
+	});
 
 	SlideButton sliderOne = new SlideButton("Volume", 620, 100);
 	SlideButton sliderTwo = new SlideButton("Brightness", 620, 300);
@@ -61,11 +65,8 @@ public final class SettingsMenuState extends GameState {
 				// event.asMouseButtonEvent().button ==
 				// org.jsfml.window.Mouse.Button.LEFT)
 				// setNextState(new MainGameState("test01"));
-				if (back.newsprite.getGlobalBounds().contains(
-						Mouse.getPosition(ctx.window).x,
-						(Mouse.getPosition(ctx.window).y))
-						&& event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT) {
-					setNextState(MainMenu);
+				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
+					back.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 				}
 
 				break;
@@ -76,11 +77,6 @@ public final class SettingsMenuState extends GameState {
 				}
 			case MOUSE_BUTTON_PRESSED:
 			case MOUSE_MOVED:
-				changeRes.mouseover(ctx.window);
-				vSync.mouseover(ctx.window);
-				antiA.mouseover(ctx.window);
-				back.mouseover(ctx.window);
-				apply.mouseover(ctx.window);
 				sliderOne.mouseover(ctx.window, event);
 				sliderTwo.mouseover(ctx.window, event);
 

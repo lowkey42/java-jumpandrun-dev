@@ -20,16 +20,39 @@ import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
  */
 public final class MainMenuState extends GameState {
 
-	GameState playGameState;
+	private final GameState playGameState;
 
 	
-	Sprite backdrop = new Sprite();
+	private final Sprite backdrop = new Sprite();
 
-	MenuButton newGameBt = new MenuButton("NEW GAME", 500, 40);
-	MenuButton loadGameBt = new MenuButton("LOAD GAME", 500, 190);
-	MenuButton editorBt = new MenuButton("EDITOR", 500, 340);
-	MenuButton settingsBt = new MenuButton("SETTINGS", 500, 490);
-	MenuButton exitGameBt = new MenuButton("EXIT GAME", 500, 640);
+	private final MenuButton newGameBt = new MenuButton("NEW GAME", 500, 40, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(new MainGameState("test01"));
+		}
+	});
+	private final MenuButton loadGameBt = new MenuButton("LOAD GAME", 500, 190, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			System.out.println("LOAD GAME..... NOT");
+		}
+	});
+	private final MenuButton editorBt = new MenuButton("EDITOR", 500, 340, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(new EditorGameState(MainMenuState.this,
+					new JsonGameMapSerializer().deserialize("test01",
+							true, true)));
+		}
+	});
+	private final MenuButton settingsBt = new MenuButton("SETTINGS", 500, 490, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(new SettingsMenuState(MainMenuState.this, playGameState,
+					backdrop));
+		}
+	});
+	private final MenuButton exitGameBt = new MenuButton("EXIT GAME", 500, 640, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(new FinalizeState());
+		}
+	});
 
 	public MainMenuState() {
 		this.playGameState = null;
@@ -75,44 +98,19 @@ public final class MainMenuState extends GameState {
 				ctx.window.close();
 				break;
 			case MOUSE_BUTTON_RELEASED:
-				// Checking if the current mouse position is inside the Button
-				// and only the left mouse button is pressed
-				if (newGameBt.newsprite.getGlobalBounds().contains(
-						Mouse.getPosition(ctx.window).x,
-						(Mouse.getPosition(ctx.window).y))
-						&& event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-					setNextState(new MainGameState("test01"));
-				if (editorBt.newsprite.getGlobalBounds().contains(
-						Mouse.getPosition(ctx.window).x,
-						(Mouse.getPosition(ctx.window).y))
-						&& event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-					setNextState(new EditorGameState(this,
-							new JsonGameMapSerializer().deserialize("test01",
-									true, true)));
-				if (settingsBt.newsprite.getGlobalBounds().contains(
-						Mouse.getPosition(ctx.window).x,
-						(Mouse.getPosition(ctx.window).y))
-						&& event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-					setNextState(new SettingsMenuState(this, playGameState,
-							backdrop));
-				if (exitGameBt.newsprite.getGlobalBounds().contains(
-						Mouse.getPosition(ctx.window).x,
-						(Mouse.getPosition(ctx.window).y))
-						&& event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT)
-					setNextState(new FinalizeState());
+				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
+					newGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					editorBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					settingsBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					exitGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+				}
 				break;
+				
 			case KEY_RELEASED:
-				if (event.asKeyEvent().key == Key.ESCAPE) {
+				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE) {
 					setNextState(playGameState);
 				}
-			case MOUSE_BUTTON_PRESSED:
-			case MOUSE_MOVED:
-				newGameBt.mouseover(ctx.window);
-				editorBt.mouseover(ctx.window);
-				settingsBt.mouseover(ctx.window);
-				loadGameBt.mouseover(ctx.window);
-				exitGameBt.mouseover(ctx.window);
-				break;
+
 			}
 		}
 

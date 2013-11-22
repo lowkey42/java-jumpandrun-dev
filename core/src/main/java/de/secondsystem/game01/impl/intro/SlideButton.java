@@ -92,11 +92,8 @@ public final class SlideButton {
 			// Transforming Coordinates into a value (MousePosX - LeftUpCornerSprite - 10 pixels for Border / 4.8 (--> (500pixel - 20) / 100 (max))
 			value = (short)((Mouse.getPosition(window).x - this.foregroundSprite.getPosition().x - 10)/4.8);
 			System.out.println(this.text + ": current value: " + value);
-			
-			
 			}
 		}
-		
 	}
 	
 	

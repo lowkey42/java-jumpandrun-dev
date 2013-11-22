@@ -2,6 +2,10 @@ package de.secondsystem.game01.impl.intro;
 
 import java.io.IOException;
 
+
+
+
+
 /*import org.jsfml.audio.Sound;
 import org.jsfml.audio.SoundBuffer;*/
 import org.jsfml.graphics.Color;
@@ -16,30 +20,33 @@ import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.game.MainGameState;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IUpdateable;
 
 /**
  * This class provides a functional universal button with push ability
  * @author Sebastian
  *
  */
-public final class MenuButton {
+public final class MenuButton implements IDrawable, IUpdateable {
 
-	String text;
-	int pos_x, pos_y;
-	IOnClickListener clickListener;
+	public interface IOnClickListener {
+		void onClick();
+	}
+
+	private final IOnClickListener clickListener;
 	
-	final Text myText;
-	final Sprite newsprite;
-	final int height;
-	final int width;
+	private final Text myText;
+	private final Sprite newsprite;
+	private final int height;
+	private final int width;
 	
 	// Sound buttonOver;
 	
 	
 	// Constructors
-	MenuButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
-		this.pos_x = pos_x;
-		this.pos_y = pos_y;
+	public MenuButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this.clickListener = clickListener;
 		
 		try {
@@ -75,33 +82,31 @@ public final class MenuButton {
 	}
 	
 	
-	MenuButton(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
+	public MenuButton(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this(text, "MainMenuButton.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
 	}
 	
 	
-	MenuButton(String text, int pos_x, int pos_y) {
+	public MenuButton(String text, int pos_x, int pos_y) {
 		this(text, "MainMenuButton.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 	
-	
-	// Interfaces	
-	
-	public interface IOnClickListener {
-		void onClick();
-	}
-	
-	
+
+
 	// Methods
 	// Draw a sprite
-	void draw(RenderTarget rt){
+	@Override
+	public void draw(RenderTarget rt){
+		if( rt instanceof Window )
+			mouseover( (Window) rt );
+		
 		// TODO --> Decide if myText.setPosition should be done inside draw method
 		// myText.setPosition(newsprite.getPosition().x + width / 2, newsprite.getPosition().y + height / 2);
 		rt.draw(newsprite);
 		rt.draw(myText);
 	}
 	
-	void mouseover(Window window){
+	private void mouseover(Window window){
 		if(this.newsprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
 			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); myText.setColor(Color.RED);
 			//System.out.println("  OVER  ");
@@ -114,6 +119,18 @@ public final class MenuButton {
 		
 	private void changeTextureClip(int pos) {
 		newsprite.setTextureRect(new IntRect(0,height*pos,width,height));
+	}
+
+
+	@Override
+	public void update(long frameTimeMs) {
+		
+	}
+	
+	public void onButtonReleased(float x, float y) {
+		if( newsprite.getGlobalBounds().contains(x, y) ) {
+			clickListener.onClick();
+		}
 	}
 	
 }
