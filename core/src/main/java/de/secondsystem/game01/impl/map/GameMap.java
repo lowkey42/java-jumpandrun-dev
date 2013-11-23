@@ -1,10 +1,7 @@
 package de.secondsystem.game01.impl.map;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.script.ScriptException;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
@@ -86,12 +83,7 @@ public class GameMap implements IGameMap {
 
 		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), new Attribute("map", this), new Attribute("entities", entityManager) );
 	}
-	
-	@Override
-	public void loadScript( String name ) throws IOException, ScriptException {
-		scripts.load(name);
-	}
-	
+		
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getMapId()
 	 */
@@ -282,6 +274,11 @@ public class GameMap implements IGameMap {
 	@Override
 	public IGameEntityManager getEntityManager() {
 		return entityManager;
+	}
+
+	@Override
+	public ScriptEnvironment getScriptEnv() {
+		return scripts;
 	}
 	
 }

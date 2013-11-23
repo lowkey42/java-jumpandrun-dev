@@ -69,7 +69,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			Object scriptsObj = obj.get("scripts");
 			if( scriptsObj instanceof JSONArray ) {
 				for( Object scriptName : ((JSONArray) scriptsObj) ) {
-					map.loadScript(scriptName.toString());
+					map.getScriptEnv().load(scriptName.toString());
 				}
 			}
 			
