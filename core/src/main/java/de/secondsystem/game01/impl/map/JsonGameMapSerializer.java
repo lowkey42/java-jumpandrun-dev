@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.script.ScriptException;
+
 import org.jsfml.graphics.Color;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -40,6 +42,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		JSONObject obj = new JSONObject();
 		obj.put("world", Arrays.asList(serializeGameWorld(map.gameWorld[0]), serializeGameWorld(map.gameWorld[1])));
 		obj.put("tileset", map.getTileset().name );
+		obj.put("scripts", map.scripts.list());
 		
 		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()), StandardCharsets.UTF_8) ){
 			obj.writeJSONString(writer);
@@ -63,10 +66,19 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			for( int i=0; i<=1; ++i )
 				deserializeGameWorld(map, i, worlds.get(i));
 			
+			Object scriptsObj = obj.get("scripts");
+			if( scriptsObj instanceof JSONArray ) {
+				for( Object scriptName : ((JSONArray) scriptsObj) ) {
+					map.loadScript(scriptName.toString());
+				}
+			}
+			
 			return map;
 			
 		} catch (IOException | ParseException e) {
 			throw new FormatErrorException("Unable to parse map-file '"+MAP_PATH.resolve(mapId)+"': "+e.getMessage(), e);
+		} catch (ScriptException e) {
+			throw new FormatErrorException("Unable to parse map-file (Script-Error) '"+MAP_PATH.resolve(mapId)+"': "+e.getMessage(), e);
 		}
 	}
 

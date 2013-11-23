@@ -1,5 +1,9 @@
 package de.secondsystem.game01.impl.map;
 
+import java.io.IOException;
+
+import javax.script.ScriptException;
+
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
@@ -26,6 +30,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	void addNode(int worldId, LayerType layer, LayerObject sprite);
 
 	void addNode(LayerType layer, LayerObject sprite);
+	
+	void loadScript( String name ) throws IOException, ScriptException;
 
 	LayerObject findNode(LayerType layer, Vector2f point);
 

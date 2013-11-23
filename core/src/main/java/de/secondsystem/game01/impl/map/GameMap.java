@@ -1,7 +1,10 @@
 package de.secondsystem.game01.impl.map;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.script.ScriptException;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
@@ -13,6 +16,9 @@ import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
+import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
+import de.secondsystem.game01.impl.scripting.ScriptEnvironment.ScriptType;
+import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class GameMap implements IGameMap {
 	
@@ -53,22 +59,11 @@ public class GameMap implements IGameMap {
 	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
+	final ScriptEnvironment scripts; 
+	
+	
 	public GameMap(String mapId, Tileset tileset) {
-		this.mapId = mapId;
-		gameWorld[0] = new GameWorld();
-		gameWorld[1] = new GameWorld();
-
-		this.tileset = tileset;
-		this.editable = true;
-		this.playable = true;
-
-		if( playable ) {
-			physicalWorld = new Box2dPhysicalWorld();
-			physicalWorld.init(new Vector2f(0, 11.f));
-		} else
-			physicalWorld = null;
-		
-		entityManager = new GameEntityManager(this);
+		this(mapId, tileset, true, true);
 	}
 	
 	GameMap(String mapId, Tileset tileset, boolean playable, boolean editable) {
@@ -88,6 +83,13 @@ public class GameMap implements IGameMap {
 			physicalWorld = null;
 		
 		entityManager = new GameEntityManager(this);
+
+		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), new Attribute("map", this), new Attribute("entities", entityManager) );
+	}
+	
+	@Override
+	public void loadScript( String name ) throws IOException, ScriptException {
+		scripts.load(name);
 	}
 	
 	/* (non-Javadoc)
