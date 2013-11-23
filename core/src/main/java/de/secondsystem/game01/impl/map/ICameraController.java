@@ -5,7 +5,5 @@ import org.jsfml.system.Vector2f;
 public interface ICameraController {
 
 	Vector2f getPosition();
-
-	Vector2f getLastStablePosition();
 	
 }

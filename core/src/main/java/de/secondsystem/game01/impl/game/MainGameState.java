@@ -1,8 +1,6 @@
 package de.secondsystem.game01.impl.game;
 
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.View;
-import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
@@ -13,7 +11,6 @@ import de.secondsystem.game01.impl.game.controller.KeyboardController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
-import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.model.Attributes;
@@ -23,7 +20,7 @@ public class MainGameState extends GameState {
 
 	private final GameMap map;
 	
-	private ICameraController cameraController;
+	private final Camera camera;
 	
 	private final IControllableGameEntity player;
 	
@@ -40,7 +37,7 @@ public class MainGameState extends GameState {
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 		player.setFollowWorldSwitch(true);
 		
-		cameraController = player;
+		camera = new Camera(player);
 	}
 	
 	@Override
@@ -61,9 +58,10 @@ public class MainGameState extends GameState {
 		// update worlds
 		map.update(frameTime);
 
+		camera.update(frameTime);
 		
 		final ConstView cView = ctx.window.getView();
-		ctx.window.setView(new View(new Vector2f(cameraController.getPosition().x, cView.getCenter().y), cView.getSize() ));
+		ctx.window.setView(camera.createView(cView));
 		
 		// drawing
 		map.draw(ctx.window);

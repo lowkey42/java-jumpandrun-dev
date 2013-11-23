@@ -90,10 +90,4 @@ class GameEntity implements IGameEntity, IWorldSwitchListener {
 		return (representation instanceof IMoveable) ? ((IMoveable)representation).getPosition() : null;
 	}
 
-	@Override
-	public Vector2f getLastStablePosition() {
-		// TODO
-		return null;
-	}
-
 }
