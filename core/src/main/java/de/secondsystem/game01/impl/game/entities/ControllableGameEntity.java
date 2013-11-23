@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.UUID;
 
 import org.jbox2d.common.Vec2;
+import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
@@ -60,7 +61,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( jumpTimer < 200L )
 			return;
 		
-		physicsBody.useObject(false);
+		physicsBody.useLadder(false);
 		jump = true;
 		jumpTimer = 0L;
 	}
@@ -89,7 +90,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 		
 		if( yMove == -1) // if the user pressed w
-			physicsBody.useObject(true);
+			physicsBody.useLadder(true);
 		
 		if( !physicsBody.isAffectedByGravity() )
 		{
@@ -109,12 +110,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( lifting)
 		{
 			IPhysicsBody touchingBody = physicsBody.getTouchingBody();
-			if( touchingBody != null && !physicsBody.hasJoint())
-				physicsBody.bind(touchingBody, new Vec2(physicsBody.getPosition().x, physicsBody.getPosition().y));
+			if( touchingBody != null && !physicsBody.isBound())
+				physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
 		}
 		else
-			if( physicsBody.hasJoint() )
-				physicsBody.unbind();
+			physicsBody.unbind();
 		
 		super.update(frameTimeMs);
 		
@@ -126,6 +126,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void liftObject(boolean lift) {
 		lifting = lift;
+	}
+	
+	@Override
+	public void onWorldSwitch(int newWorldId) {
+		super.onWorldSwitch(newWorldId);
+		
+		physicsBody.unbind();
 	}
 	
 

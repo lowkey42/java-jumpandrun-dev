@@ -15,7 +15,7 @@ final class GameEntityHelper {
 	public static IDrawable createRepresentation( Attributes attributes ) { // TODO
 		AnimatedSprite repr;
 		try {
-			repr = new AnimatedSprite(ResourceManager.animation.get("stickman.anim"));
+			repr = new AnimatedSprite(ResourceManager.animation.get("dude.anim"), 50.f, 55.f);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

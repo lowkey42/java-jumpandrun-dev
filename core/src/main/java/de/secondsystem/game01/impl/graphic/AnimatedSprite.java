@@ -23,11 +23,19 @@ public class AnimatedSprite implements IDrawable, IMoveable, IAnimated, IUpdatea
 	private AnimationType currentAnimationType;
 	private float   currentFrame;
 	private float animationSpeed;
+	private final float width;
+	private final float height;
 	
-	public AnimatedSprite(AnimationTexture animationTexture) {
+	public AnimatedSprite(AnimationTexture animationTexture, float width, float height) {
 		this.animationTexture = animationTexture;
+		this.width  = width;
+		this.height = height;
 	}
-
+	
+	private void setDimensions(float width, float height) {
+		float widthScale = width/currentAnimationData.frameWidth;
+		sprite.setScale(sprite.getScale().x < 0 ? widthScale*(-1) : widthScale, height/currentAnimationData.frameHeight);
+	}
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
@@ -91,8 +99,10 @@ public class AnimatedSprite implements IDrawable, IMoveable, IAnimated, IUpdatea
 			assert( currentAnimationData != null );
 			currentAnimationType = animation;
 			currentFrame = currentAnimationData.frameStart;
+			setDimensions(width, height);
 			if( flipTexture )
 				flip();
+			
 		}
 
 		animationSpeed = speedFactor;

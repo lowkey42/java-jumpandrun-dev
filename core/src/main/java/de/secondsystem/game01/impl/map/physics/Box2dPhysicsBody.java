@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -24,7 +25,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private float maxXVel = Float.MAX_VALUE;
 	private float maxYVel = Float.MAX_VALUE;
 	int numFootContacts = 0;
-	private boolean usingObject;
+	private boolean usingLadder;
 	private boolean collisionWithLadder = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
 	private Box2dPhysicalWorld physicsWorld;
@@ -33,6 +34,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private final boolean liftable;
 	
 	private final float height;
+	private final float width;
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
@@ -42,6 +44,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		physicsWorld = world;
 		this.liftable = liftable;
 		this.height = height;
+		this.width  = width;
 		
 		// body definition
 		BodyDef bd = new BodyDef();
@@ -109,7 +112,26 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 	
 	public boolean isAbove(Box2dPhysicsBody body) {
-		return (getPosition().y + height/2.f) <= (body.getPosition().y - body.height/2.f);
+		Transform t = body.body.getTransform();
+		
+		Vec2 pos = body.body.getLocalCenter();
+		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
+		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
+		
+		t = this.body.getTransform();
+		pos = this.body.getLocalCenter();
+		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
+		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
+		
+		boolean checkLeftPoint  = ((v2.x - v1.x)*(p1.y - v1.y) - (v2.y - v1.y)*(p1.x - v1.x)) <= 0;
+		boolean checkRightPoint = ((v2.x - v1.x)*(p2.y - v1.y) - (v2.y - v1.y)*(p2.x - v1.x)) <= 0;
+		if( p1.x < v1.x )
+			return checkRightPoint;
+		else
+			if( p2.x > v2.x)
+				return checkLeftPoint;
+			else
+				return checkLeftPoint && checkRightPoint;
 	}
 	
 	@Override
@@ -143,7 +165,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() && !isHandA && !isHandB)
 				collisionWithLadder = true;
 			else {
-				usingObject = false;
+				usingLadder = false;
 				body.setGravityScale(1.f);
 			}
 			
@@ -166,7 +188,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() && !isHandA && !isHandB) {
 				collisionWithLadder = false;
 				body.setGravityScale(1.f);
-				usingObject = false;
+				usingLadder = false;
 			}
 			
 			return true;
@@ -254,29 +276,27 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public void useObject(boolean use) {
-		usingObject = use;
-		if (usingObject) {
+	public void useLadder(boolean use) {
+		usingLadder = use;
+		if (usingLadder) {
 			if (collisionWithLadder)
 				body.setGravityScale(0.f);
 		} else {
 			body.setGravityScale(1.f);
-			usingObject = false;
+			usingLadder = false;
 		}
 	}
 
 	@Override
-	public boolean isUsingObject() {
-		return usingObject;
+	public boolean isUsingLadder() {
+		return usingLadder;
 	}
 
 	@Override
-	public RevoluteJoint bind(IPhysicsBody other, Vec2 anchor) {
+	public void bind(IPhysicsBody other, Vector2f anchor) {
 		assert( physicsWorld != null);
 		if( other.isLiftable() )
-			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), anchor);
-		
-		return revoluteJoint;	
+			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), new Vec2(anchor.x, anchor.y));
 	}
 
 	@Override
@@ -298,7 +318,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public boolean hasJoint() {
+	public boolean isBound() {
 		return revoluteJoint != null;
 	}
 

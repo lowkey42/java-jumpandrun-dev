@@ -44,16 +44,16 @@ public interface IPhysicsBody {
 	
 	boolean isAffectedByGravity();
 
-	void useObject(boolean use); // e.g. ladders, switches... with w or upkey 
+	void useLadder(boolean use);
 	
-	boolean isUsingObject();
+	boolean isUsingLadder();
 	
-	RevoluteJoint bind(IPhysicsBody other, Vec2 anchor);	// FIXME: Access to private package org.jbox2d
+	void bind(IPhysicsBody other, Vector2f anchor);
 	void unbind();
 
 	IPhysicsBody getTouchingBody();
 	
-	boolean hasJoint();
+	boolean isBound();
 	boolean isLiftable();
 	
 	interface ContactListener {
