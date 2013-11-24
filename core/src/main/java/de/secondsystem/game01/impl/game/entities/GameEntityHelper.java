@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.game.entities;
 import java.io.IOException;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
@@ -34,6 +35,10 @@ final class GameEntityHelper {
 				i(jumper, PhysicalBodyFeatures.SIDE_CONTACT_CHECK)|
 				i(canPickUpObjects,PhysicalBodyFeatures.STABLE_CHECK)|
 				i(createTestFixture, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
+	}
+	
+	public static EntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {
+		return null;	// TODO
 	}
 	
 	private static int i( boolean cond, int f ) {

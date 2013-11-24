@@ -5,14 +5,17 @@ import java.util.UUID;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.IPhysicsBody.ContactListener;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
-class GameEntity implements IGameEntity {
+class GameEntity implements IGameEntity, ContactListener {
 
 	private final UUID uuid;
 	
@@ -24,22 +27,27 @@ class GameEntity implements IGameEntity {
 	
 	protected IDrawable representation;
 	
+	protected EntityEventHandler eventHandler;
+	
 	protected final IGameMap map;
 	
 	public GameEntity(UUID uuid,
-			GameEntityManager em, IGameMap map,
+			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map);
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody, IGameMap map) {
+	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody, IGameMap map, EntityEventHandler eventHandler) {
 		this.uuid = uuid;
 		this.em = em;
 		this.gameWorldId = gameWorldId;
 		this.representation = representation;
 		this.physicsBody = physicsBody;
 		this.map = map;
+		
+		if( physicsBody!=null )
+			physicsBody.setOwner(this);
 	}
 	
 	@Override
@@ -85,6 +93,20 @@ class GameEntity implements IGameEntity {
 			
 		} else
 			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
+	}
+
+	@Override
+	public void beginContact(IPhysicsBody other) {
+		if( eventHandler!=null && !other.isStatic() && eventHandler.isHandled(EntityEventType.TOUCHED) ) {
+			eventHandler.handle(EntityEventType.TOUCHED, this, other);
+		}
+	}
+
+	@Override
+	public void endContact(IPhysicsBody other) {
+		if( eventHandler!=null && !other.isStatic() && eventHandler.isHandled(EntityEventType.UNTOUCHED) ) {
+			eventHandler.handle(EntityEventType.UNTOUCHED, this, other);
+		}
 	}
 
 }
