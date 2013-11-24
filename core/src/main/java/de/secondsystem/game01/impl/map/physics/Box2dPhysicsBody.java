@@ -32,6 +32,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private Box2dPhysicalWorld physicsWorld;
 	private RevoluteJoint revoluteJoint = null;
 	private Box2dPhysicsBody touchingBody;
+	private Object owner;
 	
 	private final float height;
 	private final float width;
@@ -373,6 +374,15 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public boolean isWorldSwitchPossible() {
 		return collisionsWithTestFixture > 0;
 	}
-	
+
+	@Override
+	public Object getOwner() {
+		return owner;
+	}
+
+	@Override
+	public void setOwner(Object owner) {
+		this.owner = owner;
+	}
 	
 }

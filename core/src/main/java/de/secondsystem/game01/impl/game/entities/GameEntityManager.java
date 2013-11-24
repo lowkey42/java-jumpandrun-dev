@@ -42,7 +42,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		try {
 			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
 			
-			ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this, map, attributes );
+			ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this, map, GameEntityHelper.createEventHandler(this, attributes), attributes );
 			entities.put(e.uuid(), e);
 			
 			return e;

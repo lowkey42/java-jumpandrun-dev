@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
@@ -33,10 +34,10 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private boolean lifting = false;
 	
 	public ControllableGameEntity(UUID uuid,
-			GameEntityManager em, IGameMap map,
+			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map);
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 
 		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
 		this.physicsBody.setMaxVelocityY( attributes.getFloat("maxJumpSpeed",Float.MAX_VALUE) );

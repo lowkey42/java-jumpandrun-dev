@@ -4,6 +4,9 @@ import org.jsfml.system.Vector2f;
 
 public interface IPhysicsBody {
 
+	Object getOwner();
+	void setOwner( Object owner );
+	
 	void setContactListener( ContactListener contactListener );
 	
 	void setGameWorldId(int id);
@@ -54,7 +57,7 @@ public interface IPhysicsBody {
 	
 	boolean isStatic();
 	
-	interface ContactListener {
+	public interface ContactListener {
 		void beginContact( IPhysicsBody other );
 		void endContact( IPhysicsBody other );
 	}
