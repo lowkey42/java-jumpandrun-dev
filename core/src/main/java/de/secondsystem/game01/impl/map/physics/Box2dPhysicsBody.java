@@ -36,9 +36,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private final float height;
 	private final float width;
 	
+	// if the testFixture is colliding in the other world then don't allow switching the world
+	private int collisionsWithTestFixture;
+	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
-			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean liftable) {
+			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture, boolean liftable) {
 		this.gameWorldId = gameWorldId;
 		this.type = type;
 		physicsWorld = world;
@@ -56,8 +59,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		PolygonShape s = new PolygonShape();
 
 		// input half extents
-		s.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f
-				* BOX2D_SCALE_FACTOR);
+		s.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR);
 
 		// create the body
 		body = world.createBody(bd);
@@ -70,15 +72,24 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		if (!isStatic) {
 			// fixture definition
 
-			fd.density = 1.0f;
+			fd.density = 1.f;
 			fd.friction = 0.1f;
 			fd.restitution = 0.0f;
 
 			// add fixture to body
 			body.createFixture(fd);
-
+			
+			if ( createTestFixture ) {
+				s.setAsBox(width / 2.1f * BOX2D_SCALE_FACTOR, height / 2.1f * BOX2D_SCALE_FACTOR);
+				fd.isSensor = true;
+				fd.density = 0.f;
+				Fixture testFixture = body.createFixture(fd);
+				testFixture.setUserData(new String("testFixture"));
+			}
+				
 			if (createFoot) {
 				s.setAsBox(width / 3.f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0.f, height / 2.f * BOX2D_SCALE_FACTOR), rotation);
+				fd.density = 1.f;
 				fd.isSensor = true;
 				Fixture footFixture = body.createFixture(fd);
 				footFixture.setUserData(new String("foot")); 
@@ -111,27 +122,31 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		return gameWorldId;
 	}
 	
+	
 	public boolean isAbove(Box2dPhysicsBody body) {
 		Transform t = body.body.getTransform();
 		
 		Vec2 pos = body.body.getLocalCenter();
+		// top-left and top-right points of the one-way platform
 		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
-		
+
 		t = this.body.getTransform();
 		pos = this.body.getLocalCenter();
+		// bottom-left and bottom-right points of the entity/player
 		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
 		
-		boolean checkLeftPoint  = ((v2.x - v1.x)*(p1.y - v1.y) - (v2.y - v1.y)*(p1.x - v1.x)) <= 0;
-		boolean checkRightPoint = ((v2.x - v1.x)*(p2.y - v1.y) - (v2.y - v1.y)*(p2.x - v1.x)) <= 0;
-		if( p1.x < v1.x )
-			return checkRightPoint;
+		if( p1.x < v1.x && v1.y < v2.y)
+			return p1.y <= v1.y && p1.y <= v2.y;
 		else
-			if( p2.x > v2.x)
-				return checkLeftPoint;
-			else
-				return checkLeftPoint && checkRightPoint;
+			if( p2.x > v2.x && v2.y < v1.y)
+				return p1.y <= v1.y && p1.y <= v2.y;
+			else { 
+				// the cross product of 2 vectors tells us whether the second vector is on the left(cp<0), right(cp>0) side of the first vector or above(cp=0)
+				// we construct 2 vectors using 3 points(v1,v2,p1 and v1,v2,p2) and check the sign of the cross product
+				return ((v2.x - v1.x)*(p1.y - v1.y) - (v2.y - v1.y)*(p1.x - v1.x)) <= 0 && ((v2.x - v1.x)*(p2.y - v1.y) - (v2.y - v1.y)*(p2.x - v1.x)) <= 0;
+			}
 	}
 	
 	@Override
@@ -152,44 +167,60 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		return (float) (a < 0 ? 360 + a : a);
 	}
 
-	public boolean beginContact(Contact contact, Box2dPhysicsBody other) {
+	public boolean beginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 		if( activeContacts.add(contact) ) {
 			if (contactListener != null)
 				contactListener.beginContact(other);
 			
-			Object fixtureUDA = contact.getFixtureA().getUserData();
-			Object fixtureUDB = contact.getFixtureB().getUserData();
-			boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
-			boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
-			
-			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() && !isHandA && !isHandB)
-				collisionWithLadder = true;
-			else {
-				usingLadder = false;
-				body.setGravityScale(1.f);
-			}
-			
+			Object fixtureUD = fixture.getUserData();
+			boolean isHand = fixtureUD != null && ((String)fixtureUD).compareTo("hand") == 0 ? true : false;
+			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
+
+			if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+				numFootContacts++;
+			else
+				if( isHand )
+					setTouchingBody(other);
+				else {
+					if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isHand)
+						collisionWithLadder = true;
+					else {
+						usingLadder = false;
+						body.setGravityScale(1.f);
+					}
+				}
+					
 			return true;
 		}
 		
 		return false;
 	}
+	
+	public void addCollisionsWithTestFixture(int num) {
+		collisionsWithTestFixture += num;
+	}
 
-	public boolean endContact(Contact contact, Box2dPhysicsBody other) {
+	public boolean endContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 		if( activeContacts.remove(contact) ) {
 			if (contactListener != null)
 				contactListener.endContact(other);
 	
-			Object fixtureUDA = contact.getFixtureA().getUserData();
-			Object fixtureUDB = contact.getFixtureB().getUserData();
-			boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
-			boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
-			
-			if (CollisionHandlerType.NO_GRAV == other.getCollisionHandlerType() && !isHandA && !isHandB) {
-				collisionWithLadder = false;
-				body.setGravityScale(1.f);
-				usingLadder = false;
-			}
+			Object fixtureUD = fixture.getUserData();
+			boolean isHand = fixtureUD != null && ((String)fixtureUD).compareTo("hand") == 0 ? true : false;
+			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
+
+				if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+					numFootContacts--;
+				else
+					if( isHand )
+						setTouchingBody(null);
+					else {
+						if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isHand ) {
+							collisionWithLadder = false;
+							body.setGravityScale(1.f);
+							usingLadder = false;
+						}
+					}
 			
 			return true;
 		}
@@ -210,14 +241,6 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public boolean isAffectedByGravity() {
 		return body.getGravityScale() != 0.f;
-	}
-
-	public void incFootContacts() {
-		numFootContacts++;
-	}
-
-	public void decFootContacts() {
-		numFootContacts--;
 	}
 
 	@Override
@@ -325,6 +348,11 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public boolean isLiftable() {
 		return liftable;
+	}
+
+	@Override
+	public boolean isTestFixtureColliding() {
+		return collisionsWithTestFixture > 0;
 	}
 	
 	

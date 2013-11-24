@@ -1,10 +1,13 @@
 package de.secondsystem.game01.impl.game.controller;
 
 import org.jsfml.window.Keyboard;
+import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.game.entities.AbstractGameEntityController;
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
+import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.model.Settings.KeyMapping;
 
 public final class KeyboardController extends AbstractGameEntityController {
@@ -35,4 +38,11 @@ public final class KeyboardController extends AbstractGameEntityController {
 			proxy.liftObject(false);	
 	}
 	
+	public void processEvents(Event event) {
+    	if( event.type==Event.Type.KEY_RELEASED ) {
+        	if( event.asKeyEvent().key==Key.TAB ) {
+        		proxy.switchWorlds();
+        	}
+        }
+	}
 }

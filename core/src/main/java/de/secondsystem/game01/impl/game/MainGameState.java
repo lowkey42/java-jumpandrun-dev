@@ -79,13 +79,12 @@ public class MainGameState extends GameState {
 	        	if( event.asKeyEvent().key==Key.F12 ) {
 	        		setNextState(new EditorGameState(this, map));
 	        	}
-	        	if( event.asKeyEvent().key==Key.TAB ) {
-					map.switchWorlds();
-	        	}
 	        	if( event.asKeyEvent().key==Key.ESCAPE ) {
 	        		setNextState(new MainMenuState(this));
 	        	}
 	        }
+	        
+	        controller.processEvents(event);
 	    }
 	}
 

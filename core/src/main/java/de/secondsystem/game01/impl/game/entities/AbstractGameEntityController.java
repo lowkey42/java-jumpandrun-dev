@@ -39,6 +39,12 @@ public abstract class AbstractGameEntityController {
 			for( IControllableGameEntity ge : ges )
 				ge.liftObject(lift);		
 		}
+
+		@Override
+		public void switchWorlds() {
+			for( IControllableGameEntity ge : ges )
+				ge.switchWorlds();	
+		}
 		
 	}
 	

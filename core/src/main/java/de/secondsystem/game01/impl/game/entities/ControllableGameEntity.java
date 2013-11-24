@@ -37,7 +37,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes));
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, true, attributes), map);
 
 		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
 		this.physicsBody.setMaxVelocityY( attributes.getFloat("maxJumpSpeed",Float.MAX_VALUE) );
@@ -133,6 +133,14 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		super.onWorldSwitch(newWorldId);
 		
 		physicsBody.unbind();
+	}
+
+	@Override
+	public void switchWorlds() {
+		if( !physicsBody.isTestFixtureColliding() )
+			map.switchWorlds();
+		else
+			System.out.println("That's a bad idea.");
 	}
 	
 

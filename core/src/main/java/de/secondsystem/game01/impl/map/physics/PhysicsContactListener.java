@@ -3,69 +3,50 @@ package de.secondsystem.game01.impl.map.physics;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.contacts.Contact;
 
 class PhysicsContactListener implements ContactListener {
 
 	@Override
 	public void beginContact(Contact contact) {
-		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
-		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
+		Box2dPhysicsBody body1 = (Box2dPhysicsBody) fixtureA.getBody().getUserData();
+		Box2dPhysicsBody body2 = (Box2dPhysicsBody) fixtureB.getBody().getUserData();
 		
-		// fixtureUserDataA/B
-		Object fixtureUDA = contact.getFixtureA().getUserData();
-		Object fixtureUDB = contact.getFixtureB().getUserData();
-		boolean isFootA = fixtureUDA != null && ((String)fixtureUDA).compareTo("foot") == 0 ? true : false;
-		boolean isFootB = fixtureUDB != null && ((String)fixtureUDB).compareTo("foot") == 0 ? true : false;
-		
-		boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
-		boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
-		
-		if( !isFiltered(body1, body2))
+		if( body1.getGameWorldId() == body2.getGameWorldId() )
 		{
-			if( body1.beginContact(contact, body2) )
-				if( isFootA && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-					body1.incFootContacts();
-				else
-					if( isHandA )
-						body1.setTouchingBody(body2);
-			
-			if( body2.beginContact(contact, body1) )
-				if( isFootB && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-					body2.incFootContacts();
-				else
-					if( isHandB )
-						body2.setTouchingBody(body1);
+			body1.beginContact(contact, body2, fixtureA);
+			body2.beginContact(contact, body1, fixtureB);
 		}
+		else
+			if( fixtureA.getUserData() != null && ((String)fixtureA.getUserData()).compareTo("testFixture") == 0 
+			&& body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body2.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
+				body1.addCollisionsWithTestFixture(1);
+		
+			if( fixtureB.getUserData() != null && ((String)fixtureB.getUserData()).compareTo("testFixture") == 0 
+			&& body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body1.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
+				body2.addCollisionsWithTestFixture(1);
 	}
 
 	@Override
 	public void endContact(Contact contact) {
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
 		
-		// fixtureUserDataA/B
-		Object fixtureUDA = contact.getFixtureA().getUserData();
-		Object fixtureUDB = contact.getFixtureB().getUserData();
-		boolean isFootA = fixtureUDA != null && ((String)fixtureUDA).compareTo("foot") == 0 ? true : false;
-		boolean isFootB = fixtureUDB != null && ((String)fixtureUDB).compareTo("foot") == 0 ? true : false;
+		body1.endContact(contact, body2, fixtureA);	
+		body2.endContact(contact, body1, fixtureB);
 		
-		boolean isHandA = fixtureUDA != null && ((String)fixtureUDA).compareTo("hand") == 0 ? true : false;
-		boolean isHandB = fixtureUDB != null && ((String)fixtureUDB).compareTo("hand") == 0 ? true : false;
-		
-		if( body1.endContact(contact, body2) )
-			if( isFootA && body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-				body1.decFootContacts();
-			else
-				if( isHandA )
-					body1.setTouchingBody(null);
-		
-		if( body2.endContact(contact, body1) )
-			if( isFootB && body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-				body2.decFootContacts();
-			else
-				if( isHandB )
-					body2.setTouchingBody(null);
+		if( fixtureA.getUserData() != null && ((String)fixtureA.getUserData()).compareTo("testFixture") == 0 
+		&& body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body2.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
+			body1.addCollisionsWithTestFixture(-1);
+
+		if( fixtureB.getUserData() != null && ((String)fixtureB.getUserData()).compareTo("testFixture") == 0 
+		&& body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body1.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
+			body2.addCollisionsWithTestFixture(-1);
 	}
 
 	@Override
@@ -77,7 +58,7 @@ class PhysicsContactListener implements ContactListener {
 	public void preSolve(Contact contact, Manifold arg1) {
         Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.m_fixtureA.getBody().getUserData();
         Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.m_fixtureB.getBody().getUserData();
-        
+		
         // TODO: call endContact after world-switch if the object doesn't exist in the new world
         contact.setEnabled(!isFiltered(body1, body2));   
 	}

@@ -27,20 +27,22 @@ class GameEntity implements IGameEntity, IWorldSwitchListener {
 	
 	protected IDrawable representation;
 	
-
+	protected final IGameMap map;
+	
 	public GameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes));
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, true, attributes), map);
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody) {
+	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody, IGameMap map) {
 		this.uuid = uuid;
 		this.em = em;
 		this.gameWorldId = gameWorldId;
 		this.representation = representation;
 		this.physicsBody = physicsBody;
+		this.map = map;
 	}
 	
 	@Override

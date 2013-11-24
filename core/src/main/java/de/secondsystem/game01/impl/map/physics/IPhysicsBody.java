@@ -53,6 +53,8 @@ public interface IPhysicsBody {
 
 	IPhysicsBody getTouchingBody();
 	
+	boolean isTestFixtureColliding();
+	
 	boolean isBound();
 	boolean isLiftable();
 	

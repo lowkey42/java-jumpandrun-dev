@@ -64,10 +64,10 @@ public class Camera implements IUpdateable {
 				
 				timeAcc= Math.min( timeAcc+frameTimeMs/500.f, 1 );
 
-				x = recenterTarget.x*timeAcc + (1-timeAcc)*recenterStarted.x;
-				y = recenterTarget.y*timeAcc + (1-timeAcc)*recenterStarted.y;
+				x = lerp(recenterStarted.x, recenterTarget.x, timeAcc);
+				y = lerp(recenterStarted.y, recenterTarget.y, timeAcc);
 				
-				recentering = timeAcc < 1.f;
+				recentering = timeAcc <= 1.f;
 				
 			} else {
 				x = nc.x;
@@ -75,7 +75,12 @@ public class Camera implements IUpdateable {
 			}
 		}
 	}
-
+	
+	// linear interpolation
+	private float lerp(float v0, float v1, float t) {
+		return v0+(v1-v0)*t;
+	}
+	
 	public ConstView createView( ConstView base ) {
 		return new View(new Vector2f(x, y), base.getSize());
 	}

@@ -56,8 +56,8 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	@Override
 	public IPhysicsBody createBody(int gameWorldIdMask, float x, float y,
 			float width, float height, float rotation, boolean isStatic,
-			CollisionHandlerType type, boolean createFoot, boolean createHand, boolean liftable) {
-		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot, createHand, liftable);
+			CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture, boolean liftable) {
+		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot, createHand, createTestFixture, liftable);
 	}
 
 	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
