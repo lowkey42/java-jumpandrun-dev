@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -20,7 +21,7 @@ public class GameContext implements IContext {
 
 	private static final String WINDOW_TITLE = "GAME_01";
 	
-	public static final Path CONFIG_PATH = Paths.get("game.cfg");
+	public static final Path CONFIG_PATH = Paths.get("game-cfg.properties");
 	
 	public final RenderWindow window;
 	
@@ -35,7 +36,13 @@ public class GameContext implements IContext {
 	 * @param antiAliasingLevel Level of antiAliasing to use or 0 to disable
 	 */
 	public GameContext() {
-		settings = Settings.load(CONFIG_PATH);
+		try {
+			settings = Settings.load(CONFIG_PATH);
+			
+		} catch (IOException e) {
+			throw new Error("Unable to load config-file from '"+CONFIG_PATH.toAbsolutePath().toString()+"': "+e.getMessage(), e);
+		}
+		
 		window = new RenderWindow();
 		ContextSettings ctxSettings = new ContextSettings(settings.antiAliasingLevel);
 		int style = settings.fullscreen ? WindowStyle.FULLSCREEN : WindowStyle.CLOSE|WindowStyle.TITLEBAR;
