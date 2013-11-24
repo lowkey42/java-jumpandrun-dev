@@ -2,7 +2,6 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
-import org.jbox2d.common.Vec2;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -36,7 +35,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		super(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), 
+		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, true, attributes), map);
 
 		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
@@ -129,18 +128,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	@Override
-	public void onWorldSwitch(int newWorldId) {
-		super.onWorldSwitch(newWorldId);
-		
-		physicsBody.unbind();
-	}
-
-	@Override
 	public void switchWorlds() {
-		if( !physicsBody.isTestFixtureColliding() )
-			map.switchWorlds();
-		else
-			System.out.println("That's a bad idea.");
+		setWorldId(getWorldId()==0 ? 1 : 0);
 	}
 	
 

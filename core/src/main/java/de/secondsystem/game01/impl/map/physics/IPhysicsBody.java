@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.map.physics;
 
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
 public interface IPhysicsBody {

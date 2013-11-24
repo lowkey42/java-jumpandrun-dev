@@ -15,7 +15,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController {
 
 	UUID uuid();
 	
-	void setFollowWorldSwitch( boolean followWorldSwitch );
-	boolean getFollowWorldSwitch();
+	int getWorldId();
+	void setWorldId(int newWorldId);
 	
 }

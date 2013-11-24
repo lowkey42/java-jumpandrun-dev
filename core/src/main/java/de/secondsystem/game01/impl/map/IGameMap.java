@@ -21,8 +21,10 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	IGameEntityManager getEntityManager();
 
 	void switchWorlds();
+	
+	void setActiveWorldId(int worldId);
 
-	int getActiveGameWorldId();
+	int getActiveWorldId();
 
 	void addNode(int worldId, LayerType layer, LayerObject sprite);
 

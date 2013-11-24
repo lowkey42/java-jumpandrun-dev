@@ -35,7 +35,6 @@ public class MainGameState extends GameState {
 		map.getEntityManager().createControllable( "enemy", new Attributes(new Attribute("x",400), new Attribute("y",100)) );
 		
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
-		player.setFollowWorldSwitch(true);
 		
 		camera = new Camera(player);
 	}
@@ -62,6 +61,7 @@ public class MainGameState extends GameState {
 		
 		final ConstView cView = ctx.window.getView();
 		ctx.window.setView(camera.createView(cView));
+		map.setActiveWorldId(camera.getWorldId());
 		
 		// drawing
 		map.draw(ctx.window);

@@ -6,18 +6,15 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.IGameMap.IWorldSwitchListener;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
-class GameEntity implements IGameEntity, IWorldSwitchListener {
+class GameEntity implements IGameEntity {
 
 	private final UUID uuid;
-
-	private boolean followWorldSwitch;
 	
 	protected final GameEntityManager em;
 	
@@ -32,7 +29,7 @@ class GameEntity implements IGameEntity, IWorldSwitchListener {
 	public GameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		this(uuid, em, attributes.getInteger("worldId", map.getActiveGameWorldId()), 
+		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, true, attributes), map);
 	}
 	
@@ -67,29 +64,27 @@ class GameEntity implements IGameEntity, IWorldSwitchListener {
 	}
 
 	@Override
-	public void onWorldSwitch(int newWorldId) {
-		physicsBody.setGameWorldId(newWorldId);
-		gameWorldId = newWorldId;
-	}
-
-	@Override
-	public void setFollowWorldSwitch(boolean followWorldSwitch) {
-		this.followWorldSwitch = followWorldSwitch;
-		
-		if( followWorldSwitch )
-			em.map.registerWorldSwitchListener(this);
-		else
-			em.map.deregisterWorldSwitchListener(this);
-	}
-
-	@Override
-	public boolean getFollowWorldSwitch() {
-		return followWorldSwitch;
-	}
-
-	@Override
 	public Vector2f getPosition() {
 		return (representation instanceof IMoveable) ? ((IMoveable)representation).getPosition() : null;
+	}
+
+	@Override
+	public int getWorldId() {
+		return gameWorldId;
+	}
+
+	@Override
+	public void setWorldId(int newWorldId) {
+		if( physicsBody==null || !physicsBody.isTestFixtureColliding() ) {
+			gameWorldId = newWorldId;
+			
+			if( physicsBody!=null ) {
+				physicsBody.setGameWorldId(newWorldId);
+				physicsBody.unbind();
+			}
+			
+		} else
+			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
 	}
 
 }

@@ -23,7 +23,7 @@ final class GameEntityHelper {
 	}
 	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 
 			canPickUpObjects, boolean liftable, boolean createTestFixture, Attributes attributes ) {
-		return map.getPhysicalWorld().createBody(attributes.getInteger("worldId", map.getActiveGameWorldId()),
+		return map.getPhysicalWorld().createBody(attributes.getInteger("worldId", map.getActiveWorldId()),
 				attributes.getFloat("x"), 
 				attributes.getFloat("y"), 
 				attributes.getFloat("width"), 

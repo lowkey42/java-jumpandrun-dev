@@ -11,6 +11,7 @@ public class Camera implements IUpdateable {
 	
 	private float x;
 	private float y;
+	private int worldId;
 	
 	private ICameraController cameraController;
 	
@@ -37,6 +38,13 @@ public class Camera implements IUpdateable {
 	
 	@Override
 	public void update(long frameTimeMs) {
+		if( worldId!=cameraController.getWorldId() ) {
+			// TODO: Add magic here
+			System.out.println("Magic just happend here");
+			
+			worldId = cameraController.getWorldId();
+		}
+		
 		final Vector2f nc = cameraController.getPosition();
 		
 		if( inDistance(nc, 20) ) {
@@ -64,8 +72,8 @@ public class Camera implements IUpdateable {
 				
 				timeAcc= Math.min( timeAcc+frameTimeMs/500.f, 1 );
 
-				x = lerp(recenterStarted.x, recenterTarget.x, timeAcc);
-				y = lerp(recenterStarted.y, recenterTarget.y, timeAcc);
+				x = interpolateLinear(recenterStarted.x, recenterTarget.x, timeAcc);
+				y = interpolateLinear(recenterStarted.y, recenterTarget.y, timeAcc);
 				
 				recentering = timeAcc <= 1.f;
 				
@@ -76,13 +84,16 @@ public class Camera implements IUpdateable {
 		}
 	}
 	
-	// linear interpolation
-	private float lerp(float v0, float v1, float t) {
-		return v0+(v1-v0)*t;
+	private static float interpolateLinear(float valStart, float valTarget, float timeDiff) {
+		return valStart+(valTarget-valStart)*timeDiff;
 	}
 	
 	public ConstView createView( ConstView base ) {
 		return new View(new Vector2f(x, y), base.getSize());
+	}
+	
+	public int getWorldId() {
+		return worldId;
 	}
 	
 	private boolean inDistance(Vector2f vec, float dist) {

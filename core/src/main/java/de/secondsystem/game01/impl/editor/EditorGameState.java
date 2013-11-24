@@ -151,7 +151,7 @@ public final class EditorGameState extends GameState {
 
 	private void createMouseCollisionObj() {
 		if (!(mouseTile instanceof CollisionObject))
-			mouseTile = new CollisionObject(map, map.getActiveGameWorldId(),
+			mouseTile = new CollisionObject(map, map.getActiveWorldId(),
 					CollisionType.NORMAL, 0, 0, 50, 50, 0);
 		onSpriteTileChanged();
 	}
@@ -308,7 +308,7 @@ public final class EditorGameState extends GameState {
 					map.addNode(
 							currentLayer,
 							mouseTile.typeUuid().create(map,
-									map.getActiveGameWorldId(),
+									map.getActiveWorldId(),
 									mouseTile.getAttributes()));
 				}
 				return true;
