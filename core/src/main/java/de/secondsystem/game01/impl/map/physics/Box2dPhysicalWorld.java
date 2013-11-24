@@ -16,7 +16,7 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	private static final int velocityIterations = 8;
 	private static final int positionIterations = 3;
 
-	private World physicsWorld;
+	World physicsWorld;
 	
 	private float fixedTimestepAccumulator = 0;
 	
@@ -53,13 +53,6 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		return physicsWorld.createBody(def);
 	}
 
-	@Override
-	public IPhysicsBody createBody(int gameWorldIdMask, float x, float y,
-			float width, float height, float rotation, boolean isStatic,
-			CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture, boolean liftable) {
-		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, isStatic, type, createFoot, createHand, createTestFixture, liftable);
-	}
-
 	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
 		RevoluteJointDef jointDef = new RevoluteJointDef();
 		jointDef.initialize(body1, body2, anchor);
@@ -69,6 +62,22 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 
 	public void destroyJoint(Joint joint) {
 		physicsWorld.destroyJoint(joint);
+	}
+
+	@Override
+	public IPhysicsBody createStaticBody(int gameWorldIdMask, float x, float y,
+			float width, float height, float rotation, CollisionHandlerType type) {
+		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, true, type, false, false, false);
+	}
+
+	@Override
+	public IPhysicsBody createDynamicBody(int gameWorldIdMask, float x,
+			float y, float width, float height, float rotation,
+			CollisionHandlerType type, int features) {
+		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, false, type, 
+				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.STABLE_CHECK), 
+				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.SIDE_CONTACT_CHECK),
+				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
 	}
 
 }

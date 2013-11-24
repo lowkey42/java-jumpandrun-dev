@@ -36,7 +36,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, true, attributes), map);
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map);
 
 		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
 		this.physicsBody.setMaxVelocityY( attributes.getFloat("maxJumpSpeed",Float.MAX_VALUE) );
@@ -60,7 +60,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( jumpTimer < 200L )
 			return;
 		
-		physicsBody.useLadder(false);
+		physicsBody.climb(false);
 		jump = true;
 		jumpTimer = 0L;
 	}
@@ -89,9 +89,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 		
 		if( yMove == -1) // if the user pressed w
-			physicsBody.useLadder(true);
+			physicsBody.climb(true);
 		
-		if( !physicsBody.isAffectedByGravity() )
+		if( physicsBody.isClimbing() )
 		{
 			physicsBody.move(0.f, moveAcceleration*frameTimeMs * yMove );
 			physicsBody.resetVelocity(false, true, false);

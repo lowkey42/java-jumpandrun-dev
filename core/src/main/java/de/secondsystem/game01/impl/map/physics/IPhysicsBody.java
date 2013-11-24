@@ -40,21 +40,19 @@ public interface IPhysicsBody {
 	
 	void resetVelocity( boolean x, boolean y, boolean rotation );
 	
-	boolean isAffectedByGravity();
+	boolean isClimbing();
 
-	void useLadder(boolean use);
-	
-	boolean isUsingLadder();
+	void climb(boolean climb);
 	
 	void bind(IPhysicsBody other, Vector2f anchor);
 	void unbind();
+	boolean isBound();
 
 	IPhysicsBody getTouchingBody();
 	
-	boolean isTestFixtureColliding();
+	boolean isWorldSwitchPossible();
 	
-	boolean isBound();
-	boolean isLiftable();
+	boolean isStatic();
 	
 	interface ContactListener {
 		void beginContact( IPhysicsBody other );

@@ -30,7 +30,7 @@ class GameEntity implements IGameEntity {
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, true, attributes), map);
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map);
 	}
 	
 	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody, IGameMap map) {
@@ -75,7 +75,7 @@ class GameEntity implements IGameEntity {
 
 	@Override
 	public void setWorldId(int newWorldId) {
-		if( physicsBody==null || !physicsBody.isTestFixtureColliding() ) {
+		if( physicsBody==null || !physicsBody.isWorldSwitchPossible() ) {
 			gameWorldId = newWorldId;
 			
 			if( physicsBody!=null ) {

@@ -12,6 +12,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
@@ -25,29 +26,29 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private float maxXVel = Float.MAX_VALUE;
 	private float maxYVel = Float.MAX_VALUE;
 	int numFootContacts = 0;
-	private boolean usingLadder;
+	private boolean climbing;
 	private boolean collisionWithLadder = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
 	private Box2dPhysicalWorld physicsWorld;
 	private RevoluteJoint revoluteJoint = null;
 	private Box2dPhysicsBody touchingBody;
-	private final boolean liftable;
 	
 	private final float height;
 	private final float width;
+	private final boolean isStatic;
 	
 	// if the testFixture is colliding in the other world then don't allow switching the world
 	private int collisionsWithTestFixture;
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
-			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture, boolean liftable) {
+			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture) {
 		this.gameWorldId = gameWorldId;
 		this.type = type;
 		physicsWorld = world;
-		this.liftable = liftable;
 		this.height = height;
 		this.width  = width;
+		this.isStatic = isStatic;
 		
 		// body definition
 		BodyDef bd = new BodyDef();
@@ -116,6 +117,29 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 
 	public void setGameWorldId(int id) {
 		gameWorldId = id;
+		
+		// could/should be done much less hackish
+		boolean gravContact = false;
+		
+		for( ContactEdge c=body.getContactList(); c!=null;  c=c.next ) {
+			Box2dPhysicsBody body1 = (Box2dPhysicsBody) c.contact.getFixtureA().getBody().getUserData();
+			Box2dPhysicsBody body2 = (Box2dPhysicsBody) c.contact.getFixtureB().getBody().getUserData();
+			
+			
+			
+			if( (body1.getGameWorldId() == body2.getGameWorldId()) && (body1.getCollisionHandlerType()==CollisionHandlerType.NO_GRAV || body2.getCollisionHandlerType()==CollisionHandlerType.NO_GRAV) ) {
+				gravContact = true;
+				break;
+			}
+		}
+		
+		if( !gravContact ) {
+			collisionWithLadder = false;
+			body.setGravityScale(1.f);
+			climbing = false;
+		} else {
+			collisionWithLadder = true;
+		}
 	}
 
 	public int getGameWorldId() {
@@ -185,7 +209,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 					if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isHand)
 						collisionWithLadder = true;
 					else {
-						usingLadder = false;
+						climbing = false;
 						body.setGravityScale(1.f);
 					}
 				}
@@ -218,7 +242,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 						if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isHand ) {
 							collisionWithLadder = false;
 							body.setGravityScale(1.f);
-							usingLadder = false;
+							climbing = false;
 						}
 					}
 			
@@ -239,8 +263,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public boolean isAffectedByGravity() {
-		return body.getGravityScale() != 0.f;
+	public boolean isClimbing() {
+		return climbing;
 	}
 
 	@Override
@@ -299,26 +323,21 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public void useLadder(boolean use) {
-		usingLadder = use;
-		if (usingLadder) {
-			if (collisionWithLadder)
+	public void climb(boolean use) {
+		if (use) {
+			if (collisionWithLadder) {
 				body.setGravityScale(0.f);
+				climbing = true;
+			}
 		} else {
 			body.setGravityScale(1.f);
-			usingLadder = false;
+			climbing = false;
 		}
 	}
 
 	@Override
-	public boolean isUsingLadder() {
-		return usingLadder;
-	}
-
-	@Override
 	public void bind(IPhysicsBody other, Vector2f anchor) {
-		assert( physicsWorld != null);
-		if( other.isLiftable() )
+		if( !other.isStatic() )
 			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), new Vec2(anchor.x, anchor.y));
 	}
 
@@ -346,12 +365,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public boolean isLiftable() {
-		return liftable;
+	public boolean isStatic() {
+		return isStatic;
 	}
 
 	@Override
-	public boolean isTestFixtureColliding() {
+	public boolean isWorldSwitchPossible() {
 		return collisionsWithTestFixture > 0;
 	}
 	
