@@ -14,7 +14,8 @@ public interface IControllable {
 	
 	void jump();
 	
-	void liftObject(boolean lift);
+	void liftObject();
+	void incThrowingPower();
 	void switchWorlds();
 	
 	// TODO: attack

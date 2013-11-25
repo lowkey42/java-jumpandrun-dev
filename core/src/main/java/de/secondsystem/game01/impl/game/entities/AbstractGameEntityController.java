@@ -35,15 +35,21 @@ public abstract class AbstractGameEntityController {
 		}
 
 		@Override
-		public void liftObject(boolean lift) {
+		public void liftObject() {
 			for( IControllableGameEntity ge : ges )
-				ge.liftObject(lift);		
+				ge.liftObject();		
 		}
 
 		@Override
 		public void switchWorlds() {
 			for( IControllableGameEntity ge : ges )
 				ge.switchWorlds();	
+		}
+		
+		@Override
+		public void incThrowingPower() {
+			for( IControllableGameEntity ge : ges )
+				ge.incThrowingPower();	
 		}
 		
 	}

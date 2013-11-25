@@ -32,15 +32,17 @@ public final class KeyboardController extends AbstractGameEntityController {
 			proxy.jump();
 		
 		if( Keyboard.isKeyPressed(mapping.use) )
-			proxy.liftObject(true);
-		else
-			proxy.liftObject(false);	
+			proxy.incThrowingPower();
 	}
 	
 	public void processEvents(Event event) {
     	if( event.type==Event.Type.KEY_RELEASED ) {
         	if( event.asKeyEvent().key==Key.TAB ) {
         		proxy.switchWorlds();
+        	}
+        	
+        	if( event.asKeyEvent().key==mapping.use ) {
+        		proxy.liftObject();
         	}
         }
 	}

@@ -25,13 +25,17 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private ContactListener contactListener;
 	private float maxXVel = Float.MAX_VALUE;
 	private float maxYVel = Float.MAX_VALUE;
+	private float maxThrowVel = Float.MAX_VALUE;
+	
 	int numFootContacts = 0;
 	private boolean climbing;
 	private boolean collisionWithLadder = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
 	private Box2dPhysicalWorld physicsWorld;
 	private RevoluteJoint revoluteJoint = null;
-	private Box2dPhysicsBody touchingBody;
+	private Box2dPhysicsBody touchingBodyRight;
+	private Box2dPhysicsBody touchingBodyLeft;
+	private Body liftingBody = null;
 	private Object owner;
 	
 	private final float height;
@@ -99,11 +103,17 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			}
 			
 			if (createHand) {
+				// right hand
 				s.setAsBox(width / 4f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(width / 2f * BOX2D_SCALE_FACTOR, 0.f), rotation);
 				fd.isSensor = true;
 				fd.density = 0.f;
 				Fixture handFixture = body.createFixture(fd);
-				handFixture.setUserData(new String("hand"));
+				handFixture.setUserData(new String("rightHand"));
+				
+				// left hand
+				s.setAsBox(width / 4f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(-width / 2f * BOX2D_SCALE_FACTOR, 0.f), rotation);
+				handFixture = body.createFixture(fd);
+				handFixture.setUserData(new String("leftHand"));
 			}
 
 		} else
@@ -198,22 +208,26 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 				contactListener.beginContact(other);
 			
 			Object fixtureUD = fixture.getUserData();
-			boolean isHand = fixtureUD != null && ((String)fixtureUD).compareTo("hand") == 0 ? true : false;
+			boolean isRightHand = fixtureUD != null && ((String)fixtureUD).compareTo("rightHand") == 0 ? true : false;
+			boolean isLeftHand = fixtureUD != null && ((String)fixtureUD).compareTo("leftHand") == 0 ? true : false;
 			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
 
 			if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
 				numFootContacts++;
 			else
-				if( isHand )
-					setTouchingBody(other);
-				else {
-					if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isHand)
-						collisionWithLadder = true;
+				if( isRightHand )
+					setTouchingBodyRight(other);
+				else
+					if( isLeftHand )
+						setTouchingBodyLeft(other);
 					else {
-						climbing = false;
-						body.setGravityScale(1.f);
+						if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand)
+							collisionWithLadder = true;
+						else {
+							climbing = false;
+							body.setGravityScale(1.f);
+						}
 					}
-				}
 					
 			return true;
 		}
@@ -231,28 +245,36 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 				contactListener.endContact(other);
 	
 			Object fixtureUD = fixture.getUserData();
-			boolean isHand = fixtureUD != null && ((String)fixtureUD).compareTo("hand") == 0 ? true : false;
+			boolean isRightHand = fixtureUD != null && ((String)fixtureUD).compareTo("rightHand") == 0 ? true : false;
+			boolean isLeftHand = fixtureUD != null && ((String)fixtureUD).compareTo("leftHand") == 0 ? true : false;
 			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
 
 				if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
 					numFootContacts--;
 				else
-					if( isHand )
-						setTouchingBody(null);
-					else {
-						if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isHand ) {
-							collisionWithLadder = false;
-							body.setGravityScale(1.f);
-							climbing = false;
+					if( isRightHand )
+						setTouchingBodyRight(null);
+					else
+						if( isLeftHand )
+							setTouchingBodyLeft(null);
+						else {
+							if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand ) {
+								collisionWithLadder = false;
+								body.setGravityScale(1.f);
+								climbing = false;
+							}
 						}
-					}
 			
 			return true;
 		}
 		
 		return false;
 	}
-
+	
+	Body getLiftingBody() {
+		return liftingBody;
+	}
+	
 	@Override
 	public CollisionHandlerType getCollisionHandlerType() {
 		return type;
@@ -339,7 +361,11 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public void bind(IPhysicsBody other, Vector2f anchor) {
 		if( !other.isStatic() )
+		{
+			other.forcePosition(getPosition().x, (getPosition().y-height/2.f-((Box2dPhysicsBody) other).height/2.f));
 			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), new Vec2(anchor.x, anchor.y));
+			liftingBody = ((Box2dPhysicsBody)other).body;
+		}
 	}
 
 	@Override
@@ -351,13 +377,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		}
 	}
 
-	public void setTouchingBody(IPhysicsBody body) {
-		touchingBody = (Box2dPhysicsBody) body;
+	private void setTouchingBodyRight(IPhysicsBody body) {
+		touchingBodyRight = (Box2dPhysicsBody) body;
 	}
 
-	@Override
-	public IPhysicsBody getTouchingBody() {
-		return touchingBody;
+	private void setTouchingBodyLeft(IPhysicsBody body) {
+		touchingBodyLeft = (Box2dPhysicsBody) body;
 	}
 
 	@Override
@@ -383,6 +408,29 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public void setOwner(Object owner) {
 		this.owner = owner;
+	}
+	
+	@Override
+	public void throwBoundBody(float x) {
+		Body body = revoluteJoint.getBodyB();
+		unbind();
+		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
+		body.applyLinearImpulse(new Vec2(x, 0.f), body.getPosition());
+	}
+
+	@Override
+	public void setMaxThrowVelocity(float vel) {
+		maxThrowVel = vel;
+	}
+	
+	@Override
+	public IPhysicsBody getTouchingBodyRight() {
+		return touchingBodyRight;
+	}
+
+	@Override
+	public IPhysicsBody getTouchingBodyLeft() {
+		return touchingBodyLeft;
 	}
 	
 }

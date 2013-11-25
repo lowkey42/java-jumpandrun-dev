@@ -32,6 +32,7 @@ public interface IPhysicsBody {
 	
 	void setMaxVelocityX( float x );
 	void setMaxVelocityY( float y );
+	void setMaxThrowVelocity( float vel );
 	
 	byte move( float x, float y );
 	
@@ -51,7 +52,10 @@ public interface IPhysicsBody {
 	void unbind();
 	boolean isBound();
 
-	IPhysicsBody getTouchingBody();
+	void throwBoundBody(float x);
+	
+	IPhysicsBody getTouchingBodyRight();
+	IPhysicsBody getTouchingBodyLeft();
 	
 	boolean isWorldSwitchPossible();
 	

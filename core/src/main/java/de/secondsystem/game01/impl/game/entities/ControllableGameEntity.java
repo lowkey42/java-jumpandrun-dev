@@ -17,6 +17,7 @@ import de.secondsystem.game01.model.IAnimated.AnimationType;
  *
  */
 class ControllableGameEntity extends GameEntity implements IControllableGameEntity {
+	private final float THROWING_POWER_INC = 1.f;
 	
 	private float moveAcceleration;
 	
@@ -31,7 +32,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	protected boolean moved;
 
-	private boolean lifting = false;
+	private float throwingPower = 0.f;
+	
+	private HDirection facingDirection = HDirection.RIGHT;
+	
+	private float lastFrameTimeMs = 0.f;
 	
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
@@ -41,6 +46,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
 		this.physicsBody.setMaxVelocityY( attributes.getFloat("maxJumpSpeed",Float.MAX_VALUE) );
+		this.physicsBody.setMaxThrowVelocity( attributes.getFloat("maxThrowSpeed",Float.MAX_VALUE) );
 		
 		this.moveAcceleration = attributes.getFloat("moveAcceleration");
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration");
@@ -69,6 +75,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void update(long frameTimeMs) {
 		jumpTimer += frameTimeMs;
+		lastFrameTimeMs = frameTimeMs;
 		
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
 		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
@@ -80,10 +87,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			if( xMove == 1 )
 			{		
 				anim.play(AnimationType.MOVE_RIGHT, 0.3f, true, false, anim.isFlipped());
+				facingDirection = HDirection.RIGHT;
 			}
 			else 
-				if( xMove == -1 )
+				if( xMove == -1 ) {
 					anim.play(AnimationType.MOVE_LEFT, 0.3f, true, false, !anim.isFlipped());
+					facingDirection = HDirection.LEFT;
+				}
 				else
 					anim.play(AnimationType.IDLE, 1.f, true, true, false);
 		}
@@ -106,15 +116,6 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    	physicsBody.resetVelocity(true, false, false);
 	    	moved = false;
 	    }
-	    
-		if( lifting)
-		{
-			IPhysicsBody touchingBody = physicsBody.getTouchingBody();
-			if( touchingBody != null && !physicsBody.isBound())
-				physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
-		}
-		else
-			physicsBody.unbind();
 		
 		super.update(frameTimeMs);
 		
@@ -124,13 +125,34 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 
 	@Override
-	public void liftObject(boolean lift) {
-		lifting = lift;
+	public void liftObject() {
+		if( !physicsBody.isBound() ) {
+			IPhysicsBody touchingBody;
+			if( facingDirection == HDirection.RIGHT ) {
+				touchingBody = physicsBody.getTouchingBodyRight();
+			}
+			else
+				touchingBody = physicsBody.getTouchingBodyLeft();
+			
+			if( touchingBody != null )
+				physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
+		}
+		else 
+		{
+			final float xMove = facingDirection==HDirection.RIGHT ? 1.f : -1.f;
+			physicsBody.throwBoundBody(xMove*throwingPower);
+			throwingPower = 0.f;
+		}
 	}
 	
 	@Override
 	public void switchWorlds() {
 		setWorldId(getWorldId()==0 ? 1 : 0);
+	}
+	
+	@Override
+	public void incThrowingPower() {
+		throwingPower += THROWING_POWER_INC*lastFrameTimeMs/1000.f;
 	}
 	
 

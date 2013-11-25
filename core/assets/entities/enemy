@@ -1,2 +1,2 @@
-{"moveAcceleration":2, "jumpAcceleration":10, "maxMoveSpeed":4, "maxJumpSpeed":120,
+{"moveAcceleration":2, "jumpAcceleration":10, "maxMoveSpeed":4, "maxJumpSpeed":120, "maxThrowSpeed":4,
 "width":39, "height":49}
