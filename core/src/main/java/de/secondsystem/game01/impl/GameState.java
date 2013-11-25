@@ -15,6 +15,7 @@ public abstract class GameState implements IState {
 	private GameContext ctx;
 	private IState nextState;
 	private final Clock frameClock = new Clock();
+	private boolean firstFrame = false;
 
 	protected abstract void onStart(GameContext ctx);
 	protected abstract void onStop(GameContext ctx);
@@ -30,6 +31,7 @@ public abstract class GameState implements IState {
 		
 		this.ctx = (GameContext) newCtx;
 		onStart(ctx);
+		firstFrame = true;
 	}
 
 	@Override
@@ -45,7 +47,12 @@ public abstract class GameState implements IState {
 		
 	//	ctx.window.clear();
 
-		final long frameTime = frameClock.restart().asMilliseconds();
+		long frameTime = frameClock.restart().asMilliseconds();
+		if( firstFrame ) {
+			firstFrame = false;
+			frameTime = 1;
+		}
+		
 //		if( frameTime > 26 ) {
 //			System.out.println("JITTER: "+frameTime+"  of "+(frameTime-(1000./60.)));
 //		}
