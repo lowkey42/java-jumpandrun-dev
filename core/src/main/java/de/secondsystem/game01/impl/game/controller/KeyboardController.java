@@ -27,9 +27,6 @@ public final class KeyboardController extends AbstractGameEntityController {
 			proxy.moveVertically(VDirection.UP);
 		else if( Keyboard.isKeyPressed(mapping.moveDown) )
 			proxy.moveVertically(VDirection.DOWN);
-
-		if( Keyboard.isKeyPressed(mapping.jump) )
-			proxy.jump();
 		
 		if( Keyboard.isKeyPressed(mapping.use) )
 			proxy.incThrowingPower();
@@ -44,6 +41,13 @@ public final class KeyboardController extends AbstractGameEntityController {
         	if( event.asKeyEvent().key==mapping.use ) {
         		proxy.liftObject();
         	}
+        	
         }
+    	else
+	    	if( event.type==Event.Type.KEY_PRESSED ) {
+	        	if( event.asKeyEvent().key==mapping.jump) {
+	        		proxy.jump();
+	        	}
+	        }
 	}
 }

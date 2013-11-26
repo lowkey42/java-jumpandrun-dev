@@ -52,7 +52,7 @@ public interface IPhysicsBody {
 	void unbind();
 	boolean isBound();
 
-	void throwBoundBody(float x);
+	void throwBoundBody(float x, float y);
 	
 	IPhysicsBody getTouchingBodyRight();
 	IPhysicsBody getTouchingBodyLeft();

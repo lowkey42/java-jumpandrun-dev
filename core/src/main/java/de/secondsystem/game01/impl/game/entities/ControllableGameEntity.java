@@ -64,7 +64,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 	@Override
 	public void jump() {
-		if( jumpTimer < 200L )
+		if( jumpTimer < 100L )
 			return;
 		
 		physicsBody.climb(false);
@@ -94,8 +94,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 					anim.play(AnimationType.MOVE_LEFT, 0.3f, true, false, !anim.isFlipped());
 					facingDirection = HDirection.LEFT;
 				}
-				else
+				else {
 					anim.play(AnimationType.IDLE, 1.f, true, true, false);
+				}
 		}
 
 		
@@ -140,7 +141,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		else 
 		{
 			final float xMove = facingDirection==HDirection.RIGHT ? 1.f : -1.f;
-			physicsBody.throwBoundBody(xMove*throwingPower);
+			physicsBody.throwBoundBody(xMove*throwingPower, -1*throwingPower);
 			throwingPower = 0.f;
 		}
 	}
@@ -152,7 +153,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	@Override
 	public void incThrowingPower() {
-		throwingPower += THROWING_POWER_INC*lastFrameTimeMs/1000.f;
+		if( physicsBody.isBound() )
+			throwingPower += THROWING_POWER_INC*lastFrameTimeMs/1000.f;
 	}
 	
 

@@ -30,6 +30,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	int numFootContacts = 0;
 	private boolean climbing;
 	private boolean collisionWithLadder = false;
+	private boolean collisionWithOneWayPlatform = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
 	private Box2dPhysicalWorld physicsWorld;
 	private RevoluteJoint revoluteJoint = null;
@@ -166,8 +167,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 
-		t = this.body.getTransform();
-		pos = this.body.getLocalCenter();
+		t = isBound() ? revoluteJoint.getBodyA().getTransform() : this.body.getTransform();
+		pos = isBound() ? revoluteJoint.getBodyA().getLocalCenter() : this.body.getLocalCenter();
 		// bottom-left and bottom-right points of the entity/player
 		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
@@ -182,6 +183,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 				// we construct 2 vectors using 3 points(v1,v2,p1 and v1,v2,p2) and check the sign of the cross product
 				return ((v2.x - v1.x)*(p1.y - v1.y) - (v2.y - v1.y)*(p1.x - v1.x)) <= 0 && ((v2.x - v1.x)*(p2.y - v1.y) - (v2.y - v1.y)*(p2.x - v1.x)) <= 0;
 			}
+	}
+	
+	public void setCollisionWithOneWayPlatform(boolean collision) {
+		collisionWithOneWayPlatform = collision;
 	}
 	
 	@Override
@@ -282,7 +287,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 
 	@Override
 	public boolean isStable() {
-		return numFootContacts > 0;
+		return numFootContacts > 0 && !collisionWithOneWayPlatform;
 	}
 
 	@Override
@@ -364,6 +369,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		{
 			other.forcePosition(getPosition().x, (getPosition().y-height/2.f-((Box2dPhysicsBody) other).height/2.f));
 			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), new Vec2(anchor.x, anchor.y));
+			((Box2dPhysicsBody) other).revoluteJoint = revoluteJoint;
 			liftingBody = ((Box2dPhysicsBody)other).body;
 		}
 	}
@@ -373,6 +379,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		if( revoluteJoint != null )
 		{
 			physicsWorld.destroyJoint(revoluteJoint);
+			((Box2dPhysicsBody)revoluteJoint.getBodyB().getUserData()).revoluteJoint = null;
 			revoluteJoint = null;
 		}
 	}
@@ -411,11 +418,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 	
 	@Override
-	public void throwBoundBody(float x) {
+	public void throwBoundBody(float x, float y) {
 		Body body = revoluteJoint.getBodyB();
 		unbind();
 		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
-		body.applyLinearImpulse(new Vec2(x, 0.f), body.getPosition());
+		y = y < 0 ? Math.max(y, -maxThrowVel) : Math.min(y, maxThrowVel);
+		body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
 	}
 
 	@Override

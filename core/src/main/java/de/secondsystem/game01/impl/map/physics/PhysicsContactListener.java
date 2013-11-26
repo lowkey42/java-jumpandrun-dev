@@ -66,12 +66,15 @@ class PhysicsContactListener implements ContactListener {
 	protected boolean isFiltered(Box2dPhysicsBody body1, Box2dPhysicsBody body2) {
         if( body1.getGameWorldId() != body2.getGameWorldId() )
         	return true;
-        
+        body1.setCollisionWithOneWayPlatform(false);
+        body2.setCollisionWithOneWayPlatform(false);
         // dispatch and handle the different collisionTypes
         switch( body1.getCollisionHandlerType() ) {
         	case ONE_WAY:
-        		if( body2.getCollisionHandlerType()==CollisionHandlerType.SOLID && !body2.isAbove(body1) )
+        		if( body2.getCollisionHandlerType()==CollisionHandlerType.SOLID && !body2.isAbove(body1) ) {
+        			body2.setCollisionWithOneWayPlatform(true);
         			return true;
+        		}
         		
         		break;
         		
@@ -80,8 +83,10 @@ class PhysicsContactListener implements ContactListener {
         	case SOLID:
         		 switch( body2.getCollisionHandlerType() ) {
 	        		 case ONE_WAY:
-	             		if( !body1.isAbove(body2) )
+	             		if( !body1.isAbove(body2) ) {
+	             			body1.setCollisionWithOneWayPlatform(true);
 	             			return true;
+	             		}
 	             		
 	             		break;
 	             		
