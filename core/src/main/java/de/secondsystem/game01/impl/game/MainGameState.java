@@ -32,7 +32,7 @@ public class MainGameState extends GameState {
 		
 		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, true);
 		
-		map.getEntityManager().createControllable( "enemy", new Attributes(new Attribute("x",400), new Attribute("y",100)) );
+	//	map.getEntityManager().createControllable( "enemy", new Attributes(new Attribute("x",400), new Attribute("y",100)) );
 		
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 		

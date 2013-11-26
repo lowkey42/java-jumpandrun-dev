@@ -177,14 +177,8 @@ public class GameMap implements IGameMap {
 		ftSum += System.currentTimeMillis()-ps;
 		ftCount++;
 		
-		if( System.currentTimeMillis()-ps > 5 ) {
+		if( System.currentTimeMillis()-ps > 10 ) {
 			System.out.println("pTime-Peak: "+(System.currentTimeMillis()-ps));
-		}
-		
-		if( ftCount>=240 ) {
-			System.out.println("pTime: "+(ftSum/ftCount));
-			ftCount = 0;
-			ftSum = 0;
 		}
 			
 	}

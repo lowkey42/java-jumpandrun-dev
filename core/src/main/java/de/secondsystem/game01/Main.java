@@ -8,6 +8,12 @@ import de.secondsystem.game01.impl.intro.MainMenuState;
 public final class Main {
 
 	public static void main(String[] args) {
+		try {
+			System.loadLibrary("My_evilXHack");		// heavy wizardry
+		} catch( UnsatisfiedLinkError e ) {
+			// obviously not a x64_linux system or "-Djava.library.path=lib_nativ" is not set
+		}
+		
 		IStateMachine game = StateMachineFactory.create();
 		game.changeState(new InitState(new MainMenuState()));
 				
