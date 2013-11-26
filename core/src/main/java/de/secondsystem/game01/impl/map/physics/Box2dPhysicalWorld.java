@@ -25,12 +25,21 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
 		physicsWorld.setContactListener(new PhysicsContactListener());
-		physicsWorld.setAutoClearForces(true);
+	//	physicsWorld.setAutoClearForces(true);
 	}
 
 	@Override
 	public void update(long frameTime) {
-		physicsWorld.step(frameTime/1000.f, velocityIterations, positionIterations);
+		float dt = frameTime/1000.f;
+		float max = 1.f/60;
+		while (dt>=max) {
+			physicsWorld.step(max/2, velocityIterations, positionIterations);
+			dt -= max/2;
+		}
+		physicsWorld.step(dt, velocityIterations, positionIterations); //This syncs up the physics engine to the current frame
+		physicsWorld.clearForces();
+
+//		physicsWorld.step(frameTime/1000.f, velocityIterations, positionIterations);
 //		fixedTimestepAccumulator += frameTime/1000.f;
 //	    int steps = (int) Math.floor(fixedTimestepAccumulator / FIXED_STEP);
 //	    if(steps > 0)

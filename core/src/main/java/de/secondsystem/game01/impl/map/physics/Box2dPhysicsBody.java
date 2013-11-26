@@ -80,7 +80,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			// fixture definition
 
 			fd.density = 1.f;
-			fd.friction = 0.1f;
+			fd.friction = 0.2f;
 			fd.restitution = 0.0f;
 
 			// add fixture to body
@@ -300,7 +300,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		x = limit(body.getLinearVelocity().x, x, maxXVel);
 		y = limit(body.getLinearVelocity().y, y, maxYVel);
 
-		body.applyForce(new Vec2(x, y), body.getWorldCenter());
+		//body.applyForce(new Vec2(x, y), body.getWorldCenter());
+		body.applyLinearImpulse(new Vec2(x/15, y/65), body.getWorldCenter());
 
 		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
 	}
