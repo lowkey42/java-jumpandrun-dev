@@ -18,7 +18,7 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
-final class Box2dPhysicsBody implements IPhysicsBody {
+class Box2dPhysicsBody implements IPhysicsBody {
 	private static final float BOX2D_SCALE_FACTOR = 0.01f;
 
 	final Body body;
@@ -169,8 +169,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 
-		t = isBound() ? revoluteJoint.getBodyA().getTransform() : this.body.getTransform();
-		pos = isBound() ? revoluteJoint.getBodyA().getLocalCenter() : this.body.getLocalCenter();
+		t = isBound(null) ? revoluteJoint.getBodyA().getTransform() : this.body.getTransform();
+		pos = isBound(null) ? revoluteJoint.getBodyA().getLocalCenter() : this.body.getLocalCenter();
 		// bottom-left and bottom-right points of the entity/player
 		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
@@ -292,10 +292,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		return numFootContacts > 0 && !collisionWithOneWayPlatform;
 	}
 
-	@Override
-	public boolean isClimbing() {
-		return climbing;
-	}
+//	@Override
+//	public boolean isClimbing() {
+//		return climbing;
+//	}
 
 	@Override
 	public byte move(float x, float y) {
@@ -319,13 +319,13 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public void forcePosition(float x, float y) {
-		body.setTransform(new Vec2(x, y).mul(BOX2D_SCALE_FACTOR),
+	public void setPosition(Vector2f pos) {
+		body.setTransform(new Vec2(pos.x, pos.y).mul(BOX2D_SCALE_FACTOR),
 				body.getAngle());
 	}
 
 	@Override
-	public void forceRotation(float angle) {
+	public void setRotation(float angle) {
 		body.setTransform(body.getPosition(), (float) Math.toRadians(angle));
 	}
 
@@ -353,18 +353,18 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		return new Vector2f(body.getPosition().x, body.getPosition().y);
 	}
 
-	@Override
-	public void climb(boolean use) {
-		if (use) {
-			if (collisionWithLadder) {
-				body.setGravityScale(0.f);
-				climbing = true;
-			}
-		} else {
-			body.setGravityScale(1.f);
-			climbing = false;
-		}
-	}
+//	@Override
+//	public void climb(boolean use) {
+//		if (use) {
+//			if (collisionWithLadder) {
+//				body.setGravityScale(0.f);
+//				climbing = true;
+//			}
+//		} else {
+//			body.setGravityScale(1.f);
+//			climbing = false;
+//		}
+//	}
 
 	@Override
 	public boolean bind(IPhysicsBody other, Vector2f anchor) {
@@ -374,7 +374,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			
 			Box2dPhysicsBody b = (Box2dPhysicsBody) other;
 			//if( b.body.getMass() <= maxTestValue ) // lifting is possible {
-			other.forcePosition(getPosition().x, (getPosition().y-height/2.f-b.height/2.f));
+			other.setPosition(new Vector2f(getPosition().x, (getPosition().y-height/2.f-b.height/2.f)));
 			// isLiftingPossible = true;
 			// }
 			
@@ -389,7 +389,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public void unbind() {
+	public void unbind(IPhysicsBody other) {
 		if( revoluteJoint != null )
 		{
 			physicsWorld.destroyJoint(revoluteJoint);
@@ -399,7 +399,7 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public boolean isBound() {
+	public boolean isBound(IPhysicsBody other) {
 		return revoluteJoint != null;
 	}
 
@@ -408,10 +408,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		return isStatic;
 	}
 
-	@Override
-	public boolean isWorldSwitchPossible() {
-		return collisionsWithTestFixture > 0;
-	}
+//	@Override
+//	public boolean isWorldSwitchPossible() {
+//		return collisionsWithTestFixture > 0;
+//	}
 
 	@Override
 	public Object getOwner() {
@@ -423,37 +423,37 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		this.owner = owner;
 	}
 	
-	@Override
-	public void throwBoundBody(float x, float y) {
-		Body body = revoluteJoint.getBodyB();
-		unbind();
-		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
-		y = y < 0 ? Math.max(y, -maxThrowVel) : Math.min(y, maxThrowVel);
-		Box2dPhysicsBody b = ((Box2dPhysicsBody)body.getUserData());
-		float newX = x > 0 ? b.getPosition().x+width/2.f+20f : b.getPosition().x-width/2.f-20f;
-		if( y > 0) 
-			b.forcePosition(newX, b.getPosition().y);
-		
-		if( Math.abs(x) < 1.f ) {
-			b.forcePosition(newX, b.getPosition().y + b.height/2.f);
-		}
-		else
-			body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
-	}
+//	@Override
+//	public void throwBoundBody(float x, float y) {
+//		Body body = revoluteJoint.getBodyB();
+//		unbind();
+//		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
+//		y = y < 0 ? Math.max(y, -maxThrowVel) : Math.min(y, maxThrowVel);
+//		Box2dPhysicsBody b = ((Box2dPhysicsBody)body.getUserData());
+//		float newX = x > 0 ? b.getPosition().x+width/2.f+20f : b.getPosition().x-width/2.f-20f;
+//		if( y > 0) 
+//			b.forcePosition(newX, b.getPosition().y);
+//		
+//		if( Math.abs(x) < 1.f ) {
+//			b.forcePosition(newX, b.getPosition().y + b.height/2.f);
+//		}
+//		else
+//			body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
+//	}
+//
+//	@Override
+//	public void setMaxThrowVelocity(float vel) {
+//		maxThrowVel = vel;
+//	}
+//	
+//	@Override
+//	public IPhysicsBody getTouchingBodyRight() {
+//		return touchingBodiesRight.size() > 0 ? touchingBodiesRight.get(0) : null;
+//	}
+//
+//	@Override
+//	public IPhysicsBody getTouchingBodyLeft() {
+//		return touchingBodiesLeft.size() > 0 ? touchingBodiesLeft.get(0) : null;
+//	}
 
-	@Override
-	public void setMaxThrowVelocity(float vel) {
-		maxThrowVel = vel;
-	}
-	
-	@Override
-	public IPhysicsBody getTouchingBodyRight() {
-		return touchingBodiesRight.size() > 0 ? touchingBodiesRight.get(0) : null;
-	}
-
-	@Override
-	public IPhysicsBody getTouchingBodyLeft() {
-		return touchingBodiesLeft.size() > 0 ? touchingBodiesLeft.get(0) : null;
-	}
-	
 }

@@ -63,7 +63,14 @@ public class CollisionObject implements LayerObject {
 			shape = null;
 		
 		if( map.getPhysicalWorld()!=null )
-			physicsBody = map.getPhysicalWorld().createStaticBody(gameWorldID, x, y, width, height, rotation, type.handlerType);
+			physicsBody = map.getPhysicalWorld().factory()
+				.inWorld(gameWorldID)
+				.position(x, y)
+				.dimension(width, height)
+				.rotation(rotation)
+				.type(type.handlerType)
+				.staticBody()
+				.create();
 		else
 			physicsBody = null;
 	}

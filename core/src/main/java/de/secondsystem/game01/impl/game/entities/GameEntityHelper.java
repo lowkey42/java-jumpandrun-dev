@@ -7,8 +7,9 @@ import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
+import de.secondsystem.game01.impl.map.physics.IPhysicalWorld.PhysicsBodyFactory;
+import de.secondsystem.game01.impl.map.physics.IPhysicalWorld.StaticPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
-import de.secondsystem.game01.impl.map.physics.PhysicalBodyFeatures;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 
@@ -25,24 +26,33 @@ final class GameEntityHelper {
 	}
 	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 
 			canPickUpObjects, boolean createTestFixture, Attributes attributes ) {
-		return map.getPhysicalWorld().createDynamicBody(attributes.getInteger("worldId", map.getActiveWorldId()),
-				attributes.getFloat("x"), 
-				attributes.getFloat("y"), 
-				attributes.getFloat("width"), 
-				attributes.getFloat("height"), 
-				attributes.getFloat("rotation", 0), 
-				CollisionHandlerType.SOLID, 
-				i(jumper, PhysicalBodyFeatures.SIDE_CONTACT_CHECK)|
-				i(canPickUpObjects,PhysicalBodyFeatures.STABLE_CHECK)|
-				i(createTestFixture, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
+		PhysicsBodyFactory factory = map.getPhysicalWorld().factory()
+				.inWorld(attributes.getInteger("worldId", map.getActiveWorldId()));
+		
+		Float x = attributes.getFloat("x");
+		Float y = attributes.getFloat("y");
+		if( x!=null && y!=null )
+			factory.position(x, y);
+		
+		Float width = attributes.getFloat("width");
+		Float height = attributes.getFloat("height");
+		if( width!=null && height!=null )
+			factory.dimension(width, height);
+
+		Float rotation = attributes.getFloat("rotation");
+		if( rotation!=null )
+			factory.rotation(rotation);
+		
+		
+		StaticPhysicsBodyFactory bodyFactory = factory.dynamicBody();
+		
+		// TODO
+		
+		return bodyFactory.create();
 	}
 	
 	public static EntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {
 		return null;	// TODO
-	}
-	
-	private static int i( boolean cond, int f ) {
-		return cond ? f : 0;
 	}
 	
 	private GameEntityHelper() {}
