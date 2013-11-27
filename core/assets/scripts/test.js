@@ -14,7 +14,7 @@ function testFunc(owner, timer) {
 	//owner.moveVertically(VDirection.UP); // doesn't work TODO: Find out how to use enum in JavaScript
 	//owner.jump; // works
 	//owner.switchWorlds(); // works
-	println("Works like a charm. " + timer.getTickCount());
+	println("Works like a charm. ");
 	//println(timer.getTickCount()); // doesn't work // TODO: Find out why...
 }
 
