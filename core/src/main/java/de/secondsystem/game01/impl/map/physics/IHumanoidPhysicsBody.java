@@ -2,7 +2,7 @@ package de.secondsystem.game01.impl.map.physics;
 
 import java.util.List;
 
-public interface IHumanoidPhysicsBody extends IPhysicsBody {
+public interface IHumanoidPhysicsBody extends IDynamicPhysicsBody {
 
 	void setMaxThrowVelocity( float vel );
 	void setMaxLiftWeight( float weight );
@@ -13,8 +13,6 @@ public interface IHumanoidPhysicsBody extends IPhysicsBody {
 
 	boolean liftBody(IPhysicsBody other);
 	boolean throwLiftedBody(float strength);
-	
-	boolean isWorldSwitchPossible();
 	
 	/**
 	 * @return all reachable bodies that are usable or liftable

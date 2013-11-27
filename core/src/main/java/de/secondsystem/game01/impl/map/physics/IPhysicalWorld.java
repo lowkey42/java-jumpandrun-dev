@@ -31,7 +31,7 @@ public interface IPhysicalWorld extends IUpdateable {
 		IPhysicsBody create();
 	}
 	public interface DynamicPhysicsBodyFactory extends StaticPhysicsBodyFactory {
-		IPhysicsBody create();
+		IDynamicPhysicsBody create();
 		
 		DynamicPhysicsBodyFactory maxXSpeed(float speed);
 		DynamicPhysicsBodyFactory maxYSpeed(float speed);

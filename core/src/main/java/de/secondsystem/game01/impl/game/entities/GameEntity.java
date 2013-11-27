@@ -8,6 +8,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody.ContactListener;
 import de.secondsystem.game01.model.Attributes;
@@ -23,7 +24,7 @@ class GameEntity implements IGameEntity, ContactListener {
 	
 	protected int gameWorldId;
 	
-	protected IPhysicsBody physicsBody;
+	protected IDynamicPhysicsBody physicsBody;
 	
 	protected IDrawable representation;
 	
@@ -38,7 +39,7 @@ class GameEntity implements IGameEntity, ContactListener {
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IPhysicsBody physicsBody, IGameMap map, EntityEventHandler eventHandler) {
+	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, EntityEventHandler eventHandler) {
 		this.uuid = uuid;
 		this.em = em;
 		this.gameWorldId = gameWorldId;
@@ -83,15 +84,10 @@ class GameEntity implements IGameEntity, ContactListener {
 
 	@Override
 	public void setWorldId(int newWorldId) {
-		if( physicsBody==null || !physicsBody.isWorldSwitchPossible() ) {
+		if( physicsBody==null || physicsBody.tryWorldSwitch(newWorldId) )
 			gameWorldId = newWorldId;
 			
-			if( physicsBody!=null ) {
-				physicsBody.setGameWorldId(newWorldId);
-				physicsBody.unbind();
-			}
-			
-		} else
+		else
 			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
 	}
 

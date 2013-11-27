@@ -155,7 +155,7 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	}
 	
 	class Box2dDynamicPhysicsBodyFactory extends Box2dStaticPhysicsBodyFactory implements DynamicPhysicsBodyFactory {
-		@Override public IPhysicsBody create() {
+		@Override public IDynamicPhysicsBody create() {
 			// TODO Auto-generated method stub
 			return null;
 		}

@@ -11,28 +11,9 @@ public interface IPhysicsBody extends IMoveable {
 	
 	void setContactListener( ContactListener contactListener );
 	
-	void setGameWorldId(int id);
-	
 	CollisionHandlerType getCollisionHandlerType();
 	boolean isStatic();
-		
-	/**
-	 * Indicates if the body stands stable (e.g. on a static body)
-	 * Might be useful for isJumpAllowed or something like this ;-)
-	 * @return true if the body is stable, currently
-	 */
-	boolean isStable();
-	
-	Vector2f getVelocity();
-	
-	void setMaxVelocityX( float x );
-	void setMaxVelocityY( float y );
-	
-	byte move( float x, float y );
-	void rotate( float angle );
-	
-	void resetVelocity( boolean x, boolean y, boolean rotation );
-	
+
 	/**
 	 * Binds to the other's body. Binds the body on top of the binding body if the mass is not too high.
 	 * @return true if binding on top of the binding body is possible
