@@ -14,6 +14,7 @@ import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.model.Timer;
 
 class GameEntity implements IGameEntity, ContactListener {
 
@@ -31,6 +32,8 @@ class GameEntity implements IGameEntity, ContactListener {
 	
 	protected final IGameMap map;
 	
+	protected Timer timer = null;
+	
 	public GameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
 			Attributes attributes) {
@@ -45,9 +48,13 @@ class GameEntity implements IGameEntity, ContactListener {
 		this.representation = representation;
 		this.physicsBody = physicsBody;
 		this.map = map;
+		this.eventHandler = eventHandler;
 		
 		if( physicsBody!=null )
 			physicsBody.setOwner(this);
+		
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.TIMER_TICK) ) 
+			timer = new Timer();
 	}
 	
 	@Override
@@ -59,6 +66,10 @@ class GameEntity implements IGameEntity, ContactListener {
 	public void update(long frameTimeMs) {
 		if( representation instanceof IUpdateable )
 			((IUpdateable) representation).update(frameTimeMs);
+		
+		if( timer != null ) {
+			timer.update(frameTimeMs, this);
+		}	
 	}
 
 	@Override
@@ -107,6 +118,17 @@ class GameEntity implements IGameEntity, ContactListener {
 		if( eventHandler!=null && !other.isStatic() && eventHandler.isHandled(EntityEventType.UNTOUCHED) ) {
 			eventHandler.handle(EntityEventType.UNTOUCHED, this, other);
 		}
+	}
+
+	@Override
+	public void onTick(long frameTimeMs) {
+		eventHandler.handle(EntityEventType.TIMER_TICK, this, timer);
+	}
+
+	@Override
+	public void setTimerInterval(long intervalMs) {
+		if( timer != null )
+			timer.setInterval(intervalMs);
 	}
 
 }

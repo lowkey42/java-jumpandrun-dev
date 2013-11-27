@@ -1,9 +1,14 @@
 package de.secondsystem.game01.impl.game.entities;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
@@ -37,8 +42,23 @@ final class GameEntityHelper {
 				i(createTestFixture, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
 	}
 	
-	public static EntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {
-		return null;	// TODO
+	public static EntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {		
+		Object eventsObj = attributes.getObject("events");
+		
+		if( eventsObj instanceof Map ) {
+			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
+			@SuppressWarnings("unchecked")
+			HashMap<String, String> events = (HashMap<String, String>) eventsObj;
+			for( String eventType : events.keySet() ) {
+				ScriptEntityEventHandler event = null;
+				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.getById(eventType), events.get(eventType));
+				eventHandler.addEntityEventHandler(EntityEventType.getById(eventType), event);
+			}
+			
+			return eventHandler;
+		}
+		
+		return null;
 	}
 	
 	private static int i( boolean cond, int f ) {

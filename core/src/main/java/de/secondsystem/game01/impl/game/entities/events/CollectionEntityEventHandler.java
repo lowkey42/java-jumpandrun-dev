@@ -10,6 +10,10 @@ public class CollectionEntityEventHandler implements EntityEventHandler {
 
 	private final Map<EntityEventType, EntityEventHandler> handlers = new HashMap<>();
 	
+	public void addEntityEventHandler(EntityEventType type, EntityEventHandler handler) {
+		handlers.put(type, handler);
+	}
+	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner,
 			Object... args) {
