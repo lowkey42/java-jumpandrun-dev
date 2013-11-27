@@ -174,17 +174,12 @@ public class GameMap implements IGameMap {
 		if( physicalWorld !=null )
 			physicalWorld.update(frameTimeMs);
 		
-		ftSum += System.currentTimeMillis()-ps;
-		ftCount++;
-		
 		if( System.currentTimeMillis()-ps > 10 ) {
 			System.out.println("pTime-Peak: "+(System.currentTimeMillis()-ps));
 		}
 			
 	}
 	
-	private float ftSum = 0;
-	private long ftCount = 0;
 	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getActiveWorldId()
