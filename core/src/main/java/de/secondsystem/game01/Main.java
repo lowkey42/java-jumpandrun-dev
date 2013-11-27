@@ -12,6 +12,7 @@ public final class Main {
 			System.loadLibrary("My_evilXHack");		// heavy wizardry
 		} catch( UnsatisfiedLinkError e ) {
 			// obviously not a x64_linux system or "-Djava.library.path=lib_nativ" is not set
+			System.out.println("You just won 100 cookies !");
 		}
 		
 		IStateMachine game = StateMachineFactory.create();

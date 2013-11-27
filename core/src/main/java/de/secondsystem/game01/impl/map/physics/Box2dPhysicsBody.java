@@ -1,6 +1,8 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -32,10 +34,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	private boolean collisionWithLadder = false;
 	private boolean collisionWithOneWayPlatform = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
+	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
+	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
 	private Box2dPhysicalWorld physicsWorld;
 	private RevoluteJoint revoluteJoint = null;
-	private Box2dPhysicsBody touchingBodyRight;
-	private Box2dPhysicsBody touchingBodyLeft;
 	private Body liftingBody = null;
 	private Object owner;
 	
@@ -220,11 +222,11 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
 				numFootContacts++;
 			else
-				if( isRightHand )
-					setTouchingBodyRight(other);
+				if( isRightHand && other.getCollisionHandlerType() == CollisionHandlerType.SOLID )
+					touchingBodiesRight.add(other);
 				else
-					if( isLeftHand )
-						setTouchingBodyLeft(other);
+					if( isLeftHand && other.getCollisionHandlerType() == CollisionHandlerType.SOLID )
+						touchingBodiesLeft.add(other);
 					else {
 						if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand)
 							collisionWithLadder = true;
@@ -258,10 +260,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 					numFootContacts--;
 				else
 					if( isRightHand )
-						setTouchingBodyRight(null);
+						touchingBodiesRight.remove(other);
 					else
 						if( isLeftHand )
-							setTouchingBodyLeft(null);
+							touchingBodiesLeft.remove(other);
 						else {
 							if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand ) {
 								collisionWithLadder = false;
@@ -365,14 +367,25 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	@Override
-	public void bind(IPhysicsBody other, Vector2f anchor) {
+	public boolean bind(IPhysicsBody other, Vector2f anchor) {
 		if( !other.isStatic() )
 		{
-			other.forcePosition(getPosition().x, (getPosition().y-height/2.f-((Box2dPhysicsBody) other).height/2.f));
-			revoluteJoint = physicsWorld.createRevoluteJoint(body, ((Box2dPhysicsBody) other).getBody(), new Vec2(anchor.x, anchor.y));
-			((Box2dPhysicsBody) other).revoluteJoint = revoluteJoint;
-			liftingBody = ((Box2dPhysicsBody)other).body;
+			boolean isLiftingPossible = false;
+			
+			Box2dPhysicsBody b = (Box2dPhysicsBody) other;
+			//if( b.body.getMass() <= maxTestValue ) // lifting is possible {
+			other.forcePosition(getPosition().x, (getPosition().y-height/2.f-b.height/2.f));
+			// isLiftingPossible = true;
+			// }
+			
+			revoluteJoint = physicsWorld.createRevoluteJoint(body, b.getBody(), new Vec2(anchor.x, anchor.y));
+			b.revoluteJoint = revoluteJoint;
+			liftingBody = b.body;
+			
+			return isLiftingPossible;
 		}
+		
+		return false;
 	}
 
 	@Override
@@ -383,14 +396,6 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			((Box2dPhysicsBody)revoluteJoint.getBodyB().getUserData()).revoluteJoint = null;
 			revoluteJoint = null;
 		}
-	}
-
-	private void setTouchingBodyRight(IPhysicsBody body) {
-		touchingBodyRight = (Box2dPhysicsBody) body;
-	}
-
-	private void setTouchingBodyLeft(IPhysicsBody body) {
-		touchingBodyLeft = (Box2dPhysicsBody) body;
 	}
 
 	@Override
@@ -424,7 +429,16 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		unbind();
 		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
 		y = y < 0 ? Math.max(y, -maxThrowVel) : Math.min(y, maxThrowVel);
-		body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
+		Box2dPhysicsBody b = ((Box2dPhysicsBody)body.getUserData());
+		float newX = x > 0 ? b.getPosition().x+width/2.f+20f : b.getPosition().x-width/2.f-20f;
+		if( y > 0) 
+			b.forcePosition(newX, b.getPosition().y);
+		
+		if( Math.abs(x) < 1.f ) {
+			b.forcePosition(newX, b.getPosition().y + b.height/2.f);
+		}
+		else
+			body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
 	}
 
 	@Override
@@ -434,12 +448,12 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	
 	@Override
 	public IPhysicsBody getTouchingBodyRight() {
-		return touchingBodyRight;
+		return touchingBodiesRight.size() > 0 ? touchingBodiesRight.get(0) : null;
 	}
 
 	@Override
 	public IPhysicsBody getTouchingBodyLeft() {
-		return touchingBodyLeft;
+		return touchingBodiesLeft.size() > 0 ? touchingBodiesLeft.get(0) : null;
 	}
 	
 }

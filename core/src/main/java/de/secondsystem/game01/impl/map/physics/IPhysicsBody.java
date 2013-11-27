@@ -48,7 +48,11 @@ public interface IPhysicsBody {
 
 	void climb(boolean climb);
 	
-	void bind(IPhysicsBody other, Vector2f anchor);
+	/**
+	 * Binds to the other's body. Binds the body on top of the binding body if the mass is not too high.
+	 * @return true if binding on top of the binding body is possible
+	 */
+	boolean bind(IPhysicsBody other, Vector2f anchor);
 	void unbind();
 	boolean isBound();
 

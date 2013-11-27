@@ -17,7 +17,7 @@ import de.secondsystem.game01.model.IAnimated.AnimationType;
  *
  */
 class ControllableGameEntity extends GameEntity implements IControllableGameEntity {
-	private final float THROWING_POWER_INC = 1.f;
+	private final float THROWING_POWER_INC = 2.f;
 	
 	private float moveAcceleration;
 	
@@ -36,7 +36,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private HDirection facingDirection = HDirection.RIGHT;
 	
-	private float lastFrameTimeMs = 0.f;
+	private boolean liftingEvent = false;
+	
+	private boolean incThrowingPowerEvent = false;
+	
+	private boolean lifting;
+	
+	private boolean pulling;
 	
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
@@ -75,39 +81,31 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void update(long frameTimeMs) {
 		jumpTimer += frameTimeMs;
-		lastFrameTimeMs = frameTimeMs;
 		
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
 		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
+			
+		processMovement(frameTimeMs, xMove, yMove);
 		
-		if( representation instanceof IAnimated )
-		{
-			IAnimated anim = ((IAnimated) representation);
+		processClimbing(frameTimeMs, xMove, yMove);
 		
-			if( xMove == 1 )
-			{		
-				anim.play(AnimationType.MOVE_RIGHT, 0.3f, true, false, anim.isFlipped());
-				facingDirection = HDirection.RIGHT;
-			}
-			else 
-				if( xMove == -1 ) {
-					anim.play(AnimationType.MOVE_LEFT, 0.3f, true, false, !anim.isFlipped());
-					facingDirection = HDirection.LEFT;
-				}
-				else {
-					anim.play(AnimationType.IDLE, 1.f, true, true, false);
-				}
-		}
-
+	    if( liftingEvent )
+	    	onLiftingEvent(yMove);
+	    
+	    if( incThrowingPowerEvent )
+	    	onIncThrowingPowerEvent(frameTimeMs);
+	    
+		super.update(frameTimeMs);
 		
-		if( yMove == -1) // if the user pressed w
-			physicsBody.climb(true);
-		
-		if( physicsBody.isClimbing() )
-		{
-			physicsBody.move(0.f, moveAcceleration*frameTimeMs * yMove );
-			physicsBody.resetVelocity(false, true, false);
-		}
+		hDirection = null;
+		jump = false;
+		vDirection = null;
+		liftingEvent = false;
+		incThrowingPowerEvent = false;
+	}
+	
+	private void processMovement(long frameTimeMs, float xMove, float yMove) {
+		facingDirection = xMove == 1 ? HDirection.RIGHT : xMove == -1 ? HDirection.LEFT : facingDirection;
 		
 		physicsBody.move(moveAcceleration*frameTimeMs * xMove, jump && physicsBody.isStable() ? -jumpAcceleration*frameTimeMs : 0 );
 	    
@@ -117,16 +115,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    	physicsBody.resetVelocity(true, false, false);
 	    	moved = false;
 	    }
-		
-		super.update(frameTimeMs);
-		
-		hDirection = null;
-		jump = false;
-		vDirection = null;
+	    
+	    animateMovement(xMove, yMove);
 	}
 
-	@Override
-	public void liftObject() {
+	private void onLiftingEvent(float yMove) {
+		lifting = false;
+		pulling = false;
 		if( !physicsBody.isBound() ) {
 			IPhysicsBody touchingBody;
 			if( facingDirection == HDirection.RIGHT ) {
@@ -135,15 +130,54 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			else
 				touchingBody = physicsBody.getTouchingBodyLeft();
 			
-			if( touchingBody != null )
-				physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
+			if( touchingBody != null ) {
+				lifting = physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
+				pulling = !lifting;
+			}
 		}
 		else 
 		{
 			final float xMove = facingDirection==HDirection.RIGHT ? 1.f : -1.f;
-			physicsBody.throwBoundBody(xMove*throwingPower, -1*throwingPower);
+			physicsBody.throwBoundBody(xMove*throwingPower, yMove*throwingPower);
 			throwingPower = 0.f;
 		}
+	}
+	
+	private void animateMovement(float xMove, float yMove) {
+		if( representation instanceof IAnimated )
+		{
+			IAnimated anim = ((IAnimated) representation);
+		
+			if( xMove == 1 )		
+				anim.play(AnimationType.MOVE_RIGHT, 0.3f, true, false, anim.isFlipped());
+			else 
+				if( xMove == -1 ) 
+					anim.play(AnimationType.MOVE_LEFT, 0.3f, true, false, !anim.isFlipped());
+				else {
+					anim.play(AnimationType.IDLE, 1.f, true, true, false);
+				}
+		}
+	}
+	
+	private void processClimbing(float frameTimeMs, float xMove, float yMove) {
+		if( yMove == -1 && !incThrowingPowerEvent ) 
+			physicsBody.climb(true);
+			
+		if( physicsBody.isClimbing() )
+		{
+			physicsBody.move(0.f, moveAcceleration*frameTimeMs * yMove );
+			physicsBody.resetVelocity(false, true, false);
+		}
+	}
+	
+	private void onIncThrowingPowerEvent(long frameTimeMs) {
+		if( physicsBody.isBound() )
+			throwingPower += THROWING_POWER_INC*frameTimeMs/1000.f;
+	}
+	
+	@Override
+	public void liftObject() {
+		liftingEvent = true;
 	}
 	
 	@Override
@@ -153,8 +187,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	@Override
 	public void incThrowingPower() {
-		if( physicsBody.isBound() )
-			throwingPower += THROWING_POWER_INC*lastFrameTimeMs/1000.f;
+		incThrowingPowerEvent = true;
 	}
 	
 
