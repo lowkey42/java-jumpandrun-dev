@@ -235,7 +235,10 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 							body.setGravityScale(1.f);
 						}
 					}
-					
+			
+			if( owner instanceof ContactListener )
+				((ContactListener) owner).beginContact(other);
+			
 			return true;
 		}
 		
@@ -271,6 +274,9 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 								climbing = false;
 							}
 						}
+				
+			if( owner instanceof ContactListener )
+				((ContactListener) owner).beginContact(other);
 			
 			return true;
 		}

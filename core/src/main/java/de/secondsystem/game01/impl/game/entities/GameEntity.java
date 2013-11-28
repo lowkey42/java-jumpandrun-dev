@@ -67,9 +67,8 @@ class GameEntity implements IGameEntity, ContactListener {
 		if( representation instanceof IUpdateable )
 			((IUpdateable) representation).update(frameTimeMs);
 		
-		if( timer != null ) {
-			timer.update(frameTimeMs, this);
-		}	
+		if( timer != null )
+			timer.update(frameTimeMs, this);	
 	}
 
 	@Override
@@ -126,9 +125,46 @@ class GameEntity implements IGameEntity, ContactListener {
 	}
 
 	@Override
-	public void setTimerInterval(long intervalMs) {
+	public void setInterval(long intervalMs) {
 		if( timer != null )
 			timer.setInterval(intervalMs);
+	}
+
+	@Override
+	public void onUsed() {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.USED) ) 
+			eventHandler.handle(EntityEventType.USED, this);
+	}
+
+	@Override
+	public float onUsedDraged(float force) {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.USED_DRAGED) ) 
+			return (float) eventHandler.handle(EntityEventType.USED_DRAGED, this, force);
+		return 0.f;
+	}
+
+	@Override
+	public void onLifted(IGameEntity liftingEntity) {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.LIFTED) ) 
+			eventHandler.handle(EntityEventType.LIFTED, this, liftingEntity);
+	}
+
+	@Override
+	public void onUnlifted(IGameEntity unliftingEntity) {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.UNLIFTED) ) 
+			eventHandler.handle(EntityEventType.UNLIFTED, this, unliftingEntity);
+	}
+
+	@Override
+	public void onViewed() {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.VIEWED) ) 
+			eventHandler.handle(EntityEventType.VIEWED, this);
+	}
+
+	@Override
+	public void onUnviewed() {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.UNVIEWED) ) 
+			eventHandler.handle(EntityEventType.UNVIEWED, this);
 	}
 
 }

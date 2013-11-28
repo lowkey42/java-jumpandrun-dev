@@ -10,6 +10,8 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
+import de.secondsystem.game01.model.IEventDriven;
+import de.secondsystem.game01.model.IUpdateable;
 
 /**
  * e.g. player
@@ -80,8 +82,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	@Override
 	public void update(long frameTimeMs) {
-		jumpTimer += frameTimeMs;
+		if( timer != null )
+			timer.update(frameTimeMs, this);
 		
+		jumpTimer += frameTimeMs;
+			
 		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
 		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
 			
@@ -94,9 +99,10 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    
 	    if( incThrowingPowerEvent )
 	    	onIncThrowingPowerEvent(frameTimeMs);
+	    	
+		if( representation instanceof IUpdateable )
+			((IUpdateable) representation).update(frameTimeMs);
 	    
-		super.update(frameTimeMs);
-		
 		hDirection = null;
 		jump = false;
 		vDirection = null;
@@ -133,6 +139,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			if( touchingBody != null ) {
 				lifting = physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
 				pulling = !lifting;
+				if( lifting )
+					((IEventDriven) touchingBody.getOwner()).onLifted(this);
 			}
 		}
 		else 

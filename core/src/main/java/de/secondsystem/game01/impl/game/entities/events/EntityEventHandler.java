@@ -71,9 +71,9 @@ public interface EntityEventHandler {
 				this.id = id;
 			}
 		
-		public static EntityEventType getById(String shortId) {
+		public static EntityEventType getById(String id) {
 				for( EntityEventType type : values() )
-					if( type.id.equals(shortId) )
+					if( type.id.equals(id) )
 						return type;
 				
 				return null;
