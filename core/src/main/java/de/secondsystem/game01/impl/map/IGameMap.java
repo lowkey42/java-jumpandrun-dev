@@ -3,7 +3,7 @@ package de.secondsystem.game01.impl.map;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
-import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
+import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
@@ -38,7 +38,7 @@ public interface IGameMap extends IDrawable, IUpdateable {
 
 	boolean[] getShownLayer();
 
-	IPhysicalWorld getPhysicalWorld();
+	IPhysicsWorld getPhysicalWorld();
 
 	boolean isEditable();
 	

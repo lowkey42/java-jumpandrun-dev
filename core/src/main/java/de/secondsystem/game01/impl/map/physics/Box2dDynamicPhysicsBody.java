@@ -1,24 +1,54 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
 class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		IDynamicPhysicsBody {
 
-	private float maxXVel = Float.MAX_VALUE;
-	private float maxYVel = Float.MAX_VALUE;
+	private float maxXVel;
+	private float maxYVel;
 
 	private boolean collisionWithOneWayPlatform = false;
+
+	// if the testFixture is colliding in the other world then don't allow switching the world
+	private int collisionsWithTestFixture;
+
+	private final Set<Contact> activeContacts = new HashSet<>();
+
+	protected int numFootContacts = 0;
+	private boolean climbing;
+	private boolean collisionWithLadder = false;
+	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
+	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
 	
-	
-	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
-			float y, float width, float height, float rotation,
-			boolean isStatic, CollisionHandlerType type, boolean createFoot,
-			boolean createHand, boolean createTestFixture) {
-		super(world, gameWorldId, x, y, width, height, rotation, isStatic, type,
-				createFoot, createHand, createTestFixture);
-		// TODO Auto-generated constructor stub
+	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
+			float width, float height, CollisionHandlerType type, 
+			boolean createFoot, boolean createTestFixture, float maxXVel, float maxYVel) {
+		super(world, gameWorldId, width, height, type);
+		
+		this.maxXVel = maxXVel;
+		this.maxYVel = maxYVel;
+	}
+
+	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	@Override
+	protected Body createBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+		return super.createBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+	}
+
+	public void addCollisionsWithTestFixture(int num) {
+		collisionsWithTestFixture += num;
 	}
 	
 
@@ -29,10 +59,10 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 
 	@Override
 	public byte move(float x, float y) {
-		x = limit(body.getLinearVelocity().x, x, maxXVel);
-		y = limit(body.getLinearVelocity().y, y, maxYVel);
+		x = limit(getBody().getLinearVelocity().x, x, maxXVel);
+		y = limit(getBody().getLinearVelocity().y, y, maxYVel);
 
-		body.applyForce(new Vec2(x, y), body.getWorldCenter());
+		getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
 		//body.applyLinearImpulse(new Vec2(x/15, y/65), body.getWorldCenter());
 
 		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
@@ -45,16 +75,16 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 
 	@Override
 	public void rotate(float angle) {
-		body.applyAngularImpulse((float) Math.toRadians(angle));
+		getBody().applyAngularImpulse((float) Math.toRadians(angle));
 	}
 
 	@Override
 	public void resetVelocity(boolean x, boolean y, boolean rotation) {
-		body.setLinearVelocity(new Vec2(x ? 0 : body.getLinearVelocity().x,
-				y ? 0 : body.getLinearVelocity().y));
+		getBody().setLinearVelocity(new Vec2(x ? 0 : getBody().getLinearVelocity().x,
+				y ? 0 : getBody().getLinearVelocity().y));
 
 		if (rotation)
-			body.setAngularVelocity(0);
+			getBody().setAngularVelocity(0);
 	}
 
 	@Override
@@ -69,7 +99,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 
 	@Override
 	public Vector2f getVelocity() {
-		return new Vector2f(body.getPosition().x, body.getPosition().y);
+		return new Vector2f(getBody().getPosition().x, getBody().getPosition().y);
 	}
 	
 	
@@ -83,4 +113,70 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		collisionWithOneWayPlatform = collision;
 	}
 	
+//	public boolean beginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
+//		if( activeContacts.add(contact) ) {
+//			if (contactListener != null)
+//				contactListener.beginContact(other);
+//			
+//			Object fixtureUD = fixture.getUserData();
+//			boolean isRightHand = fixtureUD != null && ((String)fixtureUD).compareTo("rightHand") == 0 ? true : false;
+//			boolean isLeftHand = fixtureUD != null && ((String)fixtureUD).compareTo("leftHand") == 0 ? true : false;
+//			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
+//
+//			if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+//				numFootContacts++;
+//			else
+//				if( isRightHand && other.getCollisionHandlerType() == CollisionHandlerType.SOLID )
+//					touchingBodiesRight.add(other);
+//				else
+//					if( isLeftHand && other.getCollisionHandlerType() == CollisionHandlerType.SOLID )
+//						touchingBodiesLeft.add(other);
+//					else {
+//						if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand)
+//							collisionWithLadder = true;
+//						else {
+//							climbing = false;
+//							body.setGravityScale(1.f);
+//						}
+//					}
+//					
+//			return true;
+//		}
+//		
+//		return false;
+//	}
+//
+//	public boolean endContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
+//		if( activeContacts.remove(contact) ) {
+//			if (contactListener != null)
+//				contactListener.endContact(other);
+//	
+//			Object fixtureUD = fixture.getUserData();
+//			boolean isRightHand = fixtureUD != null && ((String)fixtureUD).compareTo("rightHand") == 0 ? true : false;
+//			boolean isLeftHand = fixtureUD != null && ((String)fixtureUD).compareTo("leftHand") == 0 ? true : false;
+//			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
+//
+//				if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
+//					numFootContacts--;
+//				else
+//					if( isRightHand )
+//						touchingBodiesRight.remove(other);
+//					else
+//						if( isLeftHand )
+//							touchingBodiesLeft.remove(other);
+//						else {
+//							if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand ) {
+//								collisionWithLadder = false;
+//								body.setGravityScale(1.f);
+//								climbing = false;
+//							}
+//						}
+//			
+//			return true;
+//		}
+//		
+//		return false;
+//	}
+	
+
 }

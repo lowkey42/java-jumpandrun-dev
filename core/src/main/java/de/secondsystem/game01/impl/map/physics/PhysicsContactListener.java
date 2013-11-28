@@ -15,19 +15,10 @@ class PhysicsContactListener implements ContactListener {
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) fixtureA.getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) fixtureB.getBody().getUserData();
 		
-		if( body1.getGameWorldId() == body2.getGameWorldId() )
-		{
-			body1.beginContact(contact, body2, fixtureA);
-			body2.beginContact(contact, body1, fixtureB);
+		if( contact.isEnabled() && body2.isInWorld(body1.getWorldIdMask()) ) {
+			body1.onBeginContact(contact, body2, fixtureA);
+			body2.onBeginContact(contact, body1, fixtureB);
 		}
-		else
-			if( fixtureA.getUserData() != null && ((String)fixtureA.getUserData()).compareTo("testFixture") == 0 
-			&& body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body2.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
-				body1.addCollisionsWithTestFixture(1);
-		
-			if( fixtureB.getUserData() != null && ((String)fixtureB.getUserData()).compareTo("testFixture") == 0 
-			&& body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body1.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
-				body2.addCollisionsWithTestFixture(1);
 	}
 
 	@Override
@@ -37,16 +28,8 @@ class PhysicsContactListener implements ContactListener {
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
 		
-		body1.endContact(contact, body2, fixtureA);	
-		body2.endContact(contact, body1, fixtureB);
-		
-		if( fixtureA.getUserData() != null && ((String)fixtureA.getUserData()).compareTo("testFixture") == 0 
-		&& body2.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body2.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
-			body1.addCollisionsWithTestFixture(-1);
-
-		if( fixtureB.getUserData() != null && ((String)fixtureB.getUserData()).compareTo("testFixture") == 0 
-		&& body1.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV && body1.getCollisionHandlerType() != CollisionHandlerType.ONE_WAY)
-			body2.addCollisionsWithTestFixture(-1);
+		body1.onEndContact(contact, body2, fixtureA);	
+		body2.onEndContact(contact, body1, fixtureB);
 	}
 
 	@Override
@@ -56,48 +39,16 @@ class PhysicsContactListener implements ContactListener {
 
 	@Override
 	public void preSolve(Contact contact, Manifold arg1) {
-        Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.m_fixtureA.getBody().getUserData();
-        Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.m_fixtureB.getBody().getUserData();
+        Box2dPhysicsBody bodyA = (Box2dPhysicsBody) contact.m_fixtureA.getBody().getUserData();
+        Box2dPhysicsBody bodyB = (Box2dPhysicsBody) contact.m_fixtureB.getBody().getUserData();
 		
-        // TODO: call endContact after world-switch if the object doesn't exist in the new world
-        contact.setEnabled(!isFiltered(body1, body2));   
+        contact.setEnabled(!isFiltered(contact, bodyA, bodyB));   
 	}
 	
-	protected boolean isFiltered(Box2dPhysicsBody body1, Box2dPhysicsBody body2) {
-        if( body1.getGameWorldId() != body2.getGameWorldId() )
-        	return true;
-        body1.setCollisionWithOneWayPlatform(false);
-        body2.setCollisionWithOneWayPlatform(false);
-        // dispatch and handle the different collisionTypes
-        switch( body1.getCollisionHandlerType() ) {
-        	case ONE_WAY:
-        		if( body2.getCollisionHandlerType()==CollisionHandlerType.SOLID && !body2.isAbove(body1) ) {
-        			body2.setCollisionWithOneWayPlatform(true);
-        			return true;
-        		}
-        		
-        		break;
-        		
-        	case NO_GRAV: // TODO
-        		break;	
-        	case SOLID:
-        		 switch( body2.getCollisionHandlerType() ) {
-	        		 case ONE_WAY:
-	             		if( !body1.isAbove(body2) ) {
-	             			body1.setCollisionWithOneWayPlatform(true);
-	             			return true;
-	             		}
-	             		
-	             		break;
-	             		
-	             	case NO_GRAV: // TODO
-	             		break;
-	             	case SOLID:
-	             		break;
-        		 }
-        }
-        
-        return false;
+	protected boolean isFiltered(Contact contact, Box2dPhysicsBody bodyA, Box2dPhysicsBody bodyB) {
+        return !bodyB.isInWorld(bodyA.getWorldIdMask())
+        	|| bodyA.isContactFiltered(contact, bodyB, contact.m_fixtureA)
+        	|| bodyB.isContactFiltered(contact, bodyA, contact.m_fixtureB);
 	}
 
 }

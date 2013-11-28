@@ -9,12 +9,7 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.physics.IPhysicalWorld.DynamicPhysicsBodyFactory;
-import de.secondsystem.game01.impl.map.physics.IPhysicalWorld.HumanoidPhysicsBodyFactory;
-import de.secondsystem.game01.impl.map.physics.IPhysicalWorld.PhysicsBodyFactory;
-import de.secondsystem.game01.impl.map.physics.IPhysicalWorld.StaticPhysicsBodyFactory;
-
-public final class Box2dPhysicalWorld implements IPhysicalWorld {
+public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	
 	private static final float FIXED_STEP = 1/60f/2;
 	private static final int maxSteps = 5;
@@ -115,7 +110,12 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		float rotation;
 		float width;
 		float height;
+		float density = 1.f;
+		Float fixedWeight;
+		float friction = 0.5f;
+		float restitution = 0.f;
 		CollisionHandlerType type = CollisionHandlerType.SOLID;
+		PhysicsBodyShape shape = null;
 		
 		@Override public PhysicsBodyFactory inWorld(int worldId) {
 			worldMask |= worldId;
@@ -138,17 +138,39 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 			this.height = height;
 			return this;
 		}
+
+		@Override public PhysicsBodyFactory weight(float weight) {
+			fixedWeight = weight;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory density(float weightPerPx) {
+			density = weightPerPx;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory friction(float friction) {
+			this.friction = friction;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory restitution(float restitution) {
+			this.restitution = restitution;
+			return this;
+		}
 	
 		@Override public PhysicsBodyFactory type(CollisionHandlerType type) {
 			this.type = type;
 			return this;
 		}
 	
-		@Override public StaticPhysicsBodyFactory staticBody() {
+		@Override public StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape) {
+			this.shape = shape;
 			return new Box2dStaticPhysicsBodyFactory();
 		}
 	
-		@Override public DynamicPhysicsBodyFactory dynamicBody() {
+		@Override public DynamicPhysicsBodyFactory dynamicBody(PhysicsBodyShape shape) {
+			this.shape = shape;
 			return new Box2dDynamicPhysicsBodyFactory();
 		}
 	
@@ -159,7 +181,9 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	
 		class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
 			@Override public IPhysicsBody create() {
-				return new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, x, y, width, height, rotation, true, type);
+				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type);
+				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+				return b;
 			}
 		}
 		
@@ -170,8 +194,9 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 			float maxYSpeed = Float.MAX_VALUE;
 			
 			@Override public IDynamicPhysicsBody create() {
-				// TODO Auto-generated method stub
-				return null;
+				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
+				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+				return b;
 			}
 	
 			@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
@@ -196,16 +221,11 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		}
 		
 		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
-			@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
-				// TODO Auto-generated method stub
-				return this;
-			}
-	
-			@Override public DynamicPhysicsBodyFactory worldSwitch(boolean allowed) {
-				// TODO Auto-generated method stub
-				return this;
-			}
-	
+			float maxSlope = 45;
+			float maxReach = 10;
+			float maxThrowSpeed = Float.MAX_VALUE;
+			float maxLiftWeight = Float.MAX_VALUE;
+			
 			@Override public HumanoidPhysicsBodyFactory maxXSpeed(float speed) {
 				return (HumanoidPhysicsBodyFactory) super.maxXSpeed(speed);
 			}
@@ -215,18 +235,30 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 			}
 	
 			@Override public HumanoidPhysicsBodyFactory maxSlope(float degree) {
-				// TODO Auto-generated method stub
+				maxSlope = degree;
 				return this;
 			}
 	
 			@Override public HumanoidPhysicsBodyFactory maxReach(float px) {
-				// TODO Auto-generated method stub
+				maxReach = px;
+				return this;
+			}
+
+			@Override public HumanoidPhysicsBodyFactory maxThrowSpeed(float speed) {
+				maxThrowSpeed = speed;
+				return this;
+			}
+
+			@Override public HumanoidPhysicsBodyFactory maxLiftWeight(float weight) {
+				maxLiftWeight = weight;
 				return this;
 			}
 	
 			@Override public IHumanoidPhysicsBody create() {
-				// TODO Auto-generated method stub
-				return null;
+				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed, 
+						maxThrowSpeed, maxLiftWeight, maxSlope, maxReach);
+				b.initBody(x, y, rotation, null, friction, restitution, density, fixedWeight);
+				return b;
 			}
 		}
 	}

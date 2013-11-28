@@ -12,7 +12,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
-import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
+import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment.ScriptType;
 import de.secondsystem.game01.model.Attributes.Attribute;
@@ -50,7 +50,7 @@ public class GameMap implements IGameMap {
 	
 	public final boolean playable;
 	
-	private final IPhysicalWorld physicalWorld;
+	private final IPhysicsWorld physicalWorld;
 	
 	private final IGameEntityManager entityManager;
 	
@@ -246,7 +246,7 @@ public class GameMap implements IGameMap {
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getPhysicalWorld()
 	 */
 	@Override
-	public IPhysicalWorld getPhysicalWorld() {
+	public IPhysicsWorld getPhysicalWorld() {
 		return physicalWorld;
 	}
 

@@ -8,11 +8,14 @@ public interface IPhysicsBody extends IMoveable {
 
 	Object getOwner();
 	void setOwner( Object owner );
+	IPhysicsWorld getParent();
 	
 	void setContactListener( ContactListener contactListener );
 	
 	CollisionHandlerType getCollisionHandlerType();
 	boolean isStatic();
+	
+	float getWeight();
 
 	/**
 	 * Binds to the other's body. Binds the body on top of the binding body if the mass is not too high.
@@ -21,11 +24,4 @@ public interface IPhysicsBody extends IMoveable {
 	boolean bind(IPhysicsBody other, Vector2f anchor);
 	void unbind(IPhysicsBody other);
 	boolean isBound(IPhysicsBody other);
-	
-	
-	public interface ContactListener {
-		void beginContact( IPhysicsBody other );
-		void endContact( IPhysicsBody other );
-	}
-	
 }

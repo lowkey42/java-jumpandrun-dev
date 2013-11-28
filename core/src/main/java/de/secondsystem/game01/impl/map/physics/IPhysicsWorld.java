@@ -4,7 +4,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.model.IUpdateable;
 
-public interface IPhysicalWorld extends IUpdateable {
+public interface IPhysicsWorld extends IUpdateable {
 
 	void init(Vector2f gravity);
 
@@ -20,11 +20,17 @@ public interface IPhysicalWorld extends IUpdateable {
 		PhysicsBodyFactory position(float x, float y);
 		PhysicsBodyFactory rotation(float rotation);
 		PhysicsBodyFactory dimension(float width, float height);
+		
+		PhysicsBodyFactory weight(float weight);
+		PhysicsBodyFactory density(float density);
+		
+		PhysicsBodyFactory friction(float friction);
+		PhysicsBodyFactory restitution(float restitution); ///< elasticity [0,1]
 
 		PhysicsBodyFactory type(CollisionHandlerType type);
 		
-		StaticPhysicsBodyFactory staticBody();
-		DynamicPhysicsBodyFactory dynamicBody();
+		StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape);
+		DynamicPhysicsBodyFactory dynamicBody(PhysicsBodyShape shape);
 		HumanoidPhysicsBodyFactory humanoidBody();
 	}
 	public interface StaticPhysicsBodyFactory {
@@ -43,8 +49,11 @@ public interface IPhysicalWorld extends IUpdateable {
 		HumanoidPhysicsBodyFactory maxXSpeed(float speed);
 		HumanoidPhysicsBodyFactory maxYSpeed(float speed);
 		
-		HumanoidPhysicsBodyFactory maxSlope( float degree );
-		HumanoidPhysicsBodyFactory maxReach( float px );
+		HumanoidPhysicsBodyFactory maxSlope(float degree);
+		HumanoidPhysicsBodyFactory maxReach(float px);
+		
+		HumanoidPhysicsBodyFactory maxThrowSpeed(float speed);
+		HumanoidPhysicsBodyFactory maxLiftWeight(float weight);
 		
 		IHumanoidPhysicsBody create();
 	}

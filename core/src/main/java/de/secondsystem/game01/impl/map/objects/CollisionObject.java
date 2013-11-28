@@ -12,6 +12,7 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
 
 public class CollisionObject implements LayerObject {
 
@@ -69,7 +70,9 @@ public class CollisionObject implements LayerObject {
 				.dimension(width, height)
 				.rotation(rotation)
 				.type(type.handlerType)
-				.staticBody()
+				.friction(0.5f)						// TODO: make configurable
+				.restitution(0.f)					// TODO: make configurable
+				.staticBody(PhysicsBodyShape.BOX)	// TODO: make configurable
 				.create();
 		else
 			physicsBody = null;

@@ -2,6 +2,8 @@ package de.secondsystem.game01.impl.map.physics;
 
 import java.util.List;
 
+import org.jsfml.system.Vector2f;
+
 public interface IHumanoidPhysicsBody extends IDynamicPhysicsBody {
 
 	void setMaxThrowVelocity( float vel );
@@ -12,7 +14,8 @@ public interface IHumanoidPhysicsBody extends IDynamicPhysicsBody {
 	void stopClimbing();
 
 	boolean liftBody(IPhysicsBody other);
-	boolean throwLiftedBody(float strength);
+	boolean isLiftingSomething();
+	boolean throwLiftedBody(float strength, Vector2f direction);
 	
 	/**
 	 * @return all reachable bodies that are usable or liftable
@@ -22,6 +25,6 @@ public interface IHumanoidPhysicsBody extends IDynamicPhysicsBody {
 	/**
 	 * @return the nearest reachable body that is usable or liftable (or NULL)
 	 */
-	IPhysicsBody getNearestInteractiveBody();
+	IPhysicsBody getNearestInteractiveBody(Vector2f direction);
 	
 }

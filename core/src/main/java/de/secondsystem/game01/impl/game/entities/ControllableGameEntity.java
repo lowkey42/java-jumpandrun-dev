@@ -6,6 +6,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IAnimated;
@@ -50,10 +51,6 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 
-		this.physicsBody.setMaxVelocityX( attributes.getFloat("maxMoveSpeed",Float.MAX_VALUE) );
-		this.physicsBody.setMaxVelocityY( attributes.getFloat("maxJumpSpeed",Float.MAX_VALUE) );
-		this.physicsBody.setMaxThrowVelocity( attributes.getFloat("maxThrowSpeed",Float.MAX_VALUE) );
-		
 		this.moveAcceleration = attributes.getFloat("moveAcceleration");
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration");
 	}
@@ -73,7 +70,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( jumpTimer < 100L )
 			return;
 		
-		physicsBody.climb(false);
+		if( physicsBody instanceof IHumanoidPhysicsBody )
+			((IHumanoidPhysicsBody) physicsBody).stopClimbing();
+		
 		jump = true;
 		jumpTimer = 0L;
 	}
@@ -120,25 +119,24 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 
 	private void onLiftingEvent(float yMove) {
+		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
+			return;
+		
+		final IHumanoidPhysicsBody hBody = (IHumanoidPhysicsBody) physicsBody;
+		final float xMove = facingDirection==HDirection.RIGHT ? 1.f : -1.f;
+		
 		lifting = false;
 		pulling = false;
-		if( !physicsBody.isBound() ) {
-			IPhysicsBody touchingBody;
-			if( facingDirection == HDirection.RIGHT ) {
-				touchingBody = physicsBody.getTouchingBodyRight();
-			}
-			else
-				touchingBody = physicsBody.getTouchingBodyLeft();
+		if( !hBody.isLiftingSomething() ) {
+			IPhysicsBody touchingBody = hBody.getNearestInteractiveBody(new Vector2f(xMove, yMove));
 			
 			if( touchingBody != null ) {
-				lifting = physicsBody.bind(touchingBody, new Vector2f(physicsBody.getPosition().x, physicsBody.getPosition().y));
+				lifting = hBody.liftBody(hBody);
 				pulling = !lifting;
 			}
-		}
-		else 
-		{
-			final float xMove = facingDirection==HDirection.RIGHT ? 1.f : -1.f;
-			physicsBody.throwBoundBody(xMove*throwingPower, yMove*throwingPower);
+			
+		} else {
+			hBody.throwLiftedBody(throwingPower, new Vector2f(xMove, yMove));
 			throwingPower = 0.f;
 		}
 	}
@@ -160,18 +158,20 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	private void processClimbing(float frameTimeMs, float xMove, float yMove) {
-		if( yMove == -1 && !incThrowingPowerEvent ) 
-			physicsBody.climb(true);
+		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
+			return;
+		
+		if( yMove == -1 && !incThrowingPowerEvent )
+			((IHumanoidPhysicsBody) physicsBody).tryClimbing();
 			
-		if( physicsBody.isClimbing() )
-		{
+		if( ((IHumanoidPhysicsBody) physicsBody).isClimbing() ) {
 			physicsBody.move(0.f, moveAcceleration*frameTimeMs * yMove );
 			physicsBody.resetVelocity(false, true, false);
 		}
 	}
 	
 	private void onIncThrowingPowerEvent(long frameTimeMs) {
-		if( physicsBody.isBound() )
+		if( physicsBody instanceof IHumanoidPhysicsBody && ((IHumanoidPhysicsBody) physicsBody).isLiftingSomething() )
 			throwingPower += THROWING_POWER_INC*frameTimeMs/1000.f;
 	}
 	
@@ -190,5 +190,4 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		incThrowingPowerEvent = true;
 	}
 	
-
 }
