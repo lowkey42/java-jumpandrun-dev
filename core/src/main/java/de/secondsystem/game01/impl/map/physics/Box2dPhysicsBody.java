@@ -22,17 +22,13 @@ class Box2dPhysicsBody implements IPhysicsBody {
 	private static final float BOX2D_SCALE_FACTOR = 0.01f;
 
 	final Body body;
-	private final CollisionHandlerType type;
-	private int gameWorldId;
+	protected final CollisionHandlerType type;
+	protected int gameWorldId;
 	private ContactListener contactListener;
-	private float maxXVel = Float.MAX_VALUE;
-	private float maxYVel = Float.MAX_VALUE;
-	private float maxThrowVel = Float.MAX_VALUE;
 	
-	int numFootContacts = 0;
+	protected int numFootContacts = 0;
 	private boolean climbing;
 	private boolean collisionWithLadder = false;
-	private boolean collisionWithOneWayPlatform = false;
 	private final Set<Contact> activeContacts = new HashSet<>();
 	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
 	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
@@ -45,12 +41,9 @@ class Box2dPhysicsBody implements IPhysicsBody {
 	private final float width;
 	private final boolean isStatic;
 	
-	// if the testFixture is colliding in the other world then don't allow switching the world
-	private int collisionsWithTestFixture;
-	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
 			float y, float width, float height, float rotation,
-			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture) {
+			boolean isStatic, CollisionHandlerType type) {
 		this.gameWorldId = gameWorldId;
 		this.type = type;
 		physicsWorld = world;
@@ -187,10 +180,6 @@ class Box2dPhysicsBody implements IPhysicsBody {
 			}
 	}
 	
-	public void setCollisionWithOneWayPlatform(boolean collision) {
-		collisionWithOneWayPlatform = collision;
-	}
-	
 	@Override
 	public void setContactListener(ContactListener contactListener) {
 		this.contactListener = contactListener;
@@ -241,10 +230,6 @@ class Box2dPhysicsBody implements IPhysicsBody {
 		
 		return false;
 	}
-	
-	public void addCollisionsWithTestFixture(int num) {
-		collisionsWithTestFixture += num;
-	}
 
 	public boolean endContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 		if( activeContacts.remove(contact) ) {
@@ -287,36 +272,11 @@ class Box2dPhysicsBody implements IPhysicsBody {
 		return type;
 	}
 
-	@Override
-	public boolean isStable() {
-		return numFootContacts > 0 && !collisionWithOneWayPlatform;
-	}
-
 //	@Override
 //	public boolean isClimbing() {
 //		return climbing;
 //	}
 
-	@Override
-	public byte move(float x, float y) {
-		x = limit(body.getLinearVelocity().x, x, maxXVel);
-		y = limit(body.getLinearVelocity().y, y, maxYVel);
-
-		body.applyForce(new Vec2(x, y), body.getWorldCenter());
-		//body.applyLinearImpulse(new Vec2(x/15, y/65), body.getWorldCenter());
-
-		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
-	}
-
-	private static float limit(float current, float mod, float max) {
-		return mod < 0 ? Math.max(mod, -max - current) : Math.min(mod, max
-				- current);
-	}
-
-	@Override
-	public void rotate(float angle) {
-		body.applyAngularImpulse((float) Math.toRadians(angle));
-	}
 
 	@Override
 	public void setPosition(Vector2f pos) {
@@ -329,29 +289,6 @@ class Box2dPhysicsBody implements IPhysicsBody {
 		body.setTransform(body.getPosition(), (float) Math.toRadians(angle));
 	}
 
-	@Override
-	public void resetVelocity(boolean x, boolean y, boolean rotation) {
-		body.setLinearVelocity(new Vec2(x ? 0 : body.getLinearVelocity().x,
-				y ? 0 : body.getLinearVelocity().y));
-
-		if (rotation)
-			body.setAngularVelocity(0);
-	}
-
-	@Override
-	public void setMaxVelocityX(float x) {
-		maxXVel = x;
-	}
-
-	@Override
-	public void setMaxVelocityY(float y) {
-		maxYVel = y;
-	}
-
-	@Override
-	public Vector2f getVelocity() {
-		return new Vector2f(body.getPosition().x, body.getPosition().y);
-	}
 
 //	@Override
 //	public void climb(boolean use) {

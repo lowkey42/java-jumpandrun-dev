@@ -3,8 +3,13 @@ package de.secondsystem.game01.impl.map.physics;
 import java.util.List;
 
 
-class Box2dHumanoidPhysicsBody extends Box2dPhysicsBody implements
+class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		IHumanoidPhysicsBody {
+	
+	// if the testFixture is colliding in the other world then don't allow switching the world
+	private int collisionsWithTestFixture;
+	
+	private float maxThrowVel = Float.MAX_VALUE;
 
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId,
 			float x, float y, float width, float height, float rotation,
@@ -15,6 +20,11 @@ class Box2dHumanoidPhysicsBody extends Box2dPhysicsBody implements
 		// TODO Auto-generated constructor stub
 	}
 
+	
+	public void addCollisionsWithTestFixture(int num) {
+		collisionsWithTestFixture += num;
+	}
+	
 	@Override
 	public boolean isClimbing() {
 		// TODO Auto-generated method stub
@@ -33,11 +43,6 @@ class Box2dHumanoidPhysicsBody extends Box2dPhysicsBody implements
 		return false;
 	}
 
-	@Override
-	public boolean isWorldSwitchPossible() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public List<IPhysicsBody> listInteractiveBodies() {

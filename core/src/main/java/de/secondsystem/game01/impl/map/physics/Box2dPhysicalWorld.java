@@ -109,29 +109,39 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 
 
 	private class Box2dPhysicsBodyFactory implements PhysicsBodyFactory {
+		int worldMask;
+		float x;
+		float y;
+		float rotation;
+		float width;
+		float height;
+		CollisionHandlerType type = CollisionHandlerType.SOLID;
+		
 		@Override public PhysicsBodyFactory inWorld(int worldId) {
-			// TODO Auto-generated method stub
-			return null;
+			worldMask |= worldId;
+			return this;
 		}
 	
 		@Override public PhysicsBodyFactory position(float x, float y) {
-			// TODO Auto-generated method stub
-			return null;
+			this.x = x;
+			this.y = y;
+			return this;
 		}
 	
 		@Override public PhysicsBodyFactory rotation(float rotation) {
-			// TODO Auto-generated method stub
-			return null;
+			this.rotation = rotation;
+			return this;
 		}
 	
 		@Override public PhysicsBodyFactory dimension(float width, float height) {
-			// TODO Auto-generated method stub
-			return null;
+			this.width = width;
+			this.height = height;
+			return this;
 		}
 	
 		@Override public PhysicsBodyFactory type(CollisionHandlerType type) {
-			// TODO Auto-generated method stub
-			return null;
+			this.type = type;
+			return this;
 		}
 	
 		@Override public StaticPhysicsBodyFactory staticBody() {
@@ -145,74 +155,79 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		@Override public HumanoidPhysicsBodyFactory humanoidBody() {
 			return new Box2dHumanoidPhysicsBodyFactory();
 		}
-	}
 	
-	class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
-		@Override public IPhysicsBody create() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
 	
-	class Box2dDynamicPhysicsBodyFactory extends Box2dStaticPhysicsBodyFactory implements DynamicPhysicsBodyFactory {
-		@Override public IDynamicPhysicsBody create() {
-			// TODO Auto-generated method stub
-			return null;
+		class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
+			@Override public IPhysicsBody create() {
+				return new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, x, y, width, height, rotation, true, type);
+			}
 		}
-
-		@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override public DynamicPhysicsBodyFactory worldSwitch(boolean allowed) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override public DynamicPhysicsBodyFactory maxXSpeed(float speed) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override public DynamicPhysicsBodyFactory maxYSpeed(float speed) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	}
+		
+		class Box2dDynamicPhysicsBodyFactory extends Box2dStaticPhysicsBodyFactory implements DynamicPhysicsBodyFactory {
+			boolean stableCheck = false;
+			boolean worldSwitchAllowed = false;
+			float maxXSpeed = Float.MAX_VALUE;
+			float maxYSpeed = Float.MAX_VALUE;
+			
+			@Override public IDynamicPhysicsBody create() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 	
-	class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
-		@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
-			// TODO Auto-generated method stub
-			return null;
+			@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
+				stableCheck = enable;
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory worldSwitch(boolean allowed) {
+				worldSwitchAllowed = allowed;
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory maxXSpeed(float speed) {
+				maxXSpeed = speed;
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory maxYSpeed(float speed) {
+				maxYSpeed = speed;
+				return this;
+			}
 		}
-
-		@Override public DynamicPhysicsBodyFactory worldSwitch(boolean allowed) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override public HumanoidPhysicsBodyFactory maxXSpeed(float speed) {
-			return (HumanoidPhysicsBodyFactory) super.maxXSpeed(speed);
-		}
-
-		@Override public HumanoidPhysicsBodyFactory maxYSpeed(float speed) {
-			return (HumanoidPhysicsBodyFactory) super.maxYSpeed(speed);
-		}
-
-		@Override public HumanoidPhysicsBodyFactory maxSlope(float degree) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override public HumanoidPhysicsBodyFactory maxReach(float px) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override public IHumanoidPhysicsBody create() {
-			// TODO Auto-generated method stub
-			return null;
+		
+		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
+			@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
+				// TODO Auto-generated method stub
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory worldSwitch(boolean allowed) {
+				// TODO Auto-generated method stub
+				return this;
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxXSpeed(float speed) {
+				return (HumanoidPhysicsBodyFactory) super.maxXSpeed(speed);
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxYSpeed(float speed) {
+				return (HumanoidPhysicsBodyFactory) super.maxYSpeed(speed);
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxSlope(float degree) {
+				// TODO Auto-generated method stub
+				return this;
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxReach(float px) {
+				// TODO Auto-generated method stub
+				return this;
+			}
+	
+			@Override public IHumanoidPhysicsBody create() {
+				// TODO Auto-generated method stub
+				return null;
+			}
 		}
 	}
 	
