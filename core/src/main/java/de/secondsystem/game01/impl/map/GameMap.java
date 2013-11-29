@@ -15,6 +15,7 @@ import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicalWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment.ScriptType;
+import de.secondsystem.game01.impl.timer.TimerManager;
 import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class GameMap implements IGameMap {
@@ -58,6 +59,7 @@ public class GameMap implements IGameMap {
 	
 	final ScriptEnvironment scripts; 
 	
+	private final TimerManager timerManager;
 	
 	public GameMap(String mapId, Tileset tileset) {
 		this(mapId, tileset, true, true);
@@ -82,6 +84,8 @@ public class GameMap implements IGameMap {
 		entityManager = new GameEntityManager(this);
 
 		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), new Attribute("map", this), new Attribute("entities", entityManager) );
+		
+		timerManager = new TimerManager(scripts);
 	}
 		
 	/* (non-Javadoc)
@@ -178,6 +182,7 @@ public class GameMap implements IGameMap {
 			System.out.println("pTime-Peak: "+(System.currentTimeMillis()-ps));
 		}
 			
+		timerManager.update(frameTimeMs);
 	}
 	
 	
@@ -273,6 +278,11 @@ public class GameMap implements IGameMap {
 	@Override
 	public ScriptEnvironment getScriptEnv() {
 		return scripts;
+	}
+
+	@Override
+	public TimerManager getTimerManager() {
+		return timerManager;
 	}
 	
 }

@@ -51,8 +51,8 @@ final class GameEntityHelper {
 			HashMap<String, String> events = (HashMap<String, String>) eventsObj;
 			for( String eventType : events.keySet() ) {
 				ScriptEntityEventHandler event = null;
-				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.getById(eventType), events.get(eventType));
-				eventHandler.addEntityEventHandler(EntityEventType.getById(eventType), event);
+				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.valueOf(eventType), events.get(eventType));
+				eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
 			}
 			
 			return eventHandler;

@@ -12,73 +12,52 @@ public interface EntityEventHandler {
 		 * ARGS: other:IPhysicsBody, force:Vector2f
 		 * RETURN: unused 
 		 */
-		TOUCHED("TOUCHED"),
+		TOUCHED,
 		
 		/**
 		 * The entity is no longer touched by another one.
 		 * ARGS: other:IGameEntity
 		 * RETURN: unused 
 		 */
-		UNTOUCHED("UNTOUCHED"),
+		UNTOUCHED,
 		
 		/**
 		 * The player is trying to use this entity
 		 * ARGS: unused
 		 * RETURN: unused 
 		 */
-		USED("USED"),
+		USED,
 
 		/**
 		 * The player has drag-used this entity (e.g. a lever)
 		 * ARGS: force:float
 		 * RETURN: animationDiff:float 
 		 */
-		USED_DRAGED("USED_DRAGED"),
+		USED_DRAGED,
 		
 		/**
 		 * ARGS: IGameEntity lifting entity
 		 */
-		LIFTED("LIFTED"),
+		LIFTED,
 		/**
 		 * ARGS: IGameEntity lifting entity
 		 */
-		UNLIFTED("UNLIFTED"),
+		UNLIFTED,
 		
 		/**
 		 * The entity just appeared on the screen
 		 * ARGS: unused
 		 * RETURN: unused 
 		 */
-		VIEWED("VIEWED"),
+		VIEWED,
 		
 		/**
 		 * The entity just left the screen
 		 * ARGS: unused
 		 * RETURN: unused 
 		 */
-		UNVIEWED("UNVIEWED"),
-		
-		/**
-		 * The internal timer of the entity just ticked.
-		 * ARGS: timer:Timer
-		 * RETURN: unused 
-		 */
-		TIMER_TICK("TIMER_TICK");
-		
-		public final String id;
-		
-		private EntityEventType(String id) {
-				this.id = id;
-			}
-		
-		public static EntityEventType getById(String id) {
-				for( EntityEventType type : values() )
-					if( type.id.equals(id) )
-						return type;
-				
-				return null;
-			}
-		}
+		UNVIEWED;
+	}
 	
 	Object handle( EntityEventType type, IGameEntity owner, Object... args );
 	

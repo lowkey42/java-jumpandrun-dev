@@ -4,8 +4,6 @@ import java.util.UUID;
 
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.model.IDrawable;
-import de.secondsystem.game01.model.IEventDriven;
-import de.secondsystem.game01.model.ITimed;
 import de.secondsystem.game01.model.IUpdateable;
 
 /**
@@ -13,11 +11,17 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, ITimed, IEventDriven {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController {
 
 	UUID uuid();
 	
 	int getWorldId();
 	void setWorldId(int newWorldId);
-	
+
+	void onUsed();
+	float onUsedDraged(float force);
+	void onLifted(IGameEntity liftingEntity);
+	void onUnlifted(IGameEntity unliftingEntity);
+	void onViewed();
+	void onUnviewed();
 }
