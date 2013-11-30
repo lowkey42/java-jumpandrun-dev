@@ -1,11 +1,13 @@
 package de.secondsystem.game01.impl.map.physics;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
@@ -15,8 +17,13 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		IHumanoidPhysicsBody {
 	
 	private final float maxSlope;
+	private final float maxReach;
+	private final ObjectDetector leftObjects = new ObjectDetector();
+	private final ObjectDetector rightObjects = new ObjectDetector();
+	
 	
 	private float maxThrowVel;
+	private float maxLiftWeight;
 	private Body liftingBody = null;
 
 	private final Set<Contact> activeContacts = new HashSet<>();
@@ -32,13 +39,15 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
-			float width, float height, CollisionHandlerType type, 
+			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
 			float maxXVel, float maxYVel,
 			float maxThrowVel, float maxLiftWeight, float maxSlope, float maxReach) {
-		super(world, gameWorldId, width, height, type, true, true, maxXVel, maxYVel);
+		super(world, gameWorldId, width, height, interactive, liftable, type, true, true, maxXVel, maxYVel);
 		this.maxThrowVel = maxThrowVel;
+		this.maxLiftWeight = maxLiftWeight;
 		
 		this.maxSlope = maxSlope;
+		this.maxReach = maxReach;
 	}
 
 	@Override
@@ -66,16 +75,38 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		baseBody.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		body.createFixture(baseBody);
 		
+		FixtureDef leftObjSensor = new FixtureDef();
+		leftObjSensor.shape = createShape(PhysicsBodyShape.BOX, getWidth()/2+maxReach, getHeight(), -maxReach-getWidth()/4, 0, 0 );
+		leftObjSensor.isSensor = true;
+		leftObjSensor.userData = new Box2dContactListener.FixtureData(false, leftObjects);
+		body.createFixture(leftObjSensor);
+		
+		FixtureDef rightObjSensor = new FixtureDef();
+		rightObjSensor.shape = createShape(PhysicsBodyShape.BOX, getWidth()/2 +maxReach, getHeight(), maxReach+getWidth()/4, 0, 0 );
+		rightObjSensor.isSensor = true;
+		rightObjSensor.userData = new Box2dContactListener.FixtureData(false, rightObjects);
+		body.createFixture(rightObjSensor);
 	}
 	
-	@Override
-	public boolean isClimbing() {
-		// TODO Auto-generated method stub
-		return false;
+	private static final class ObjectDetector implements Box2dContactListener.FixtureContactListener {
+		public final Set<IPhysicsBody> bodies = new HashSet<>();
+		
+		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			bodies.add(other);
+		}
+
+		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			bodies.remove(other);
+		}
 	}
 
 	@Override
 	public boolean liftBody(IPhysicsBody other) {
+		if( other.getWeight()>maxLiftWeight )
+			return false;
+		
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -89,20 +120,60 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	@Override
 	public List<IPhysicsBody> listInteractiveBodies() {
-		// TODO Auto-generated method stub
-		return null;
+		List<IPhysicsBody> bodies = new ArrayList<>(leftObjects.bodies.size() + rightObjects.bodies.size());
+	
+		for( IPhysicsBody body : leftObjects.bodies )
+			if( body.isInteractive() || body.isLiftable() )
+				bodies.add(body);
+		
+		for( IPhysicsBody body : rightObjects.bodies )
+			if( body.isInteractive() || body.isLiftable() )
+				bodies.add(body);
+		
+		return bodies;
 	}
 
 	@Override
 	public IPhysicsBody getNearestInteractiveBody(Vector2f direction) {
-		// TODO Auto-generated method stub
-		return null;
+		final boolean leftFirst = direction.x<0;
+		final float x = getPosition().x;
+		final float y = getPosition().y;
+		
+		double nearestDist = Float.MAX_VALUE;
+		IPhysicsBody nearestBody = null;
+		
+		Collection<IPhysicsBody> bodies = leftFirst ? leftObjects.bodies : rightObjects.bodies;
+		for( IPhysicsBody body : bodies ) {
+			if( body.isInteractive() || body.isLiftable() ) {
+				double dist = Math.pow(x-body.getPosition().x, 2) + Math.pow(y-body.getPosition().y, 2);
+				if( dist<=nearestDist ) {
+					nearestDist = dist;
+					nearestBody = body;
+				}
+			}
+		}
+		
+		if( nearestDist>Math.pow(getWidth()/2, 2) ) {
+			nearestDist-=maxReach;
+			
+			bodies = !leftFirst ? leftObjects.bodies : rightObjects.bodies;
+			for( IPhysicsBody body : bodies ) {
+				if( body.isInteractive() || body.isLiftable() ) {
+					double dist = Math.pow(x-body.getPosition().x, 2) + Math.pow(y-body.getPosition().y, 2);
+					if( dist<=nearestDist ) {
+						nearestDist = dist;
+						nearestBody = body;
+					}
+				}
+			}
+		}
+		
+		return nearestBody;
 	}
 
 	@Override
 	public void setMaxThrowVelocity(float vel) {
-		// TODO Auto-generated method stub
-		
+		maxThrowVel = vel;
 	}
 
 	@Override
@@ -121,6 +192,12 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	public void stopClimbing() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public boolean isClimbing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override

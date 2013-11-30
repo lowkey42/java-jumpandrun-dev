@@ -116,6 +116,8 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		Float fixedWeight;
 		float friction = 0.5f;
 		float restitution = 0.f;
+		boolean interactive = false;
+		boolean liftable = false;
 		CollisionHandlerType type = CollisionHandlerType.SOLID;
 		PhysicsBodyShape shape = null;
 		
@@ -171,6 +173,16 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			this.type = type;
 			return this;
 		}
+
+		@Override public PhysicsBodyFactory interactive(boolean interactive) {
+			this.interactive = interactive;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory liftable(boolean liftable) {
+			this.liftable = liftable;
+			return this;
+		}
 	
 		@Override public StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape) {
 			this.shape = shape;
@@ -189,7 +201,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	
 		class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
 			@Override public IPhysicsBody create() {
-				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type);
+				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type);
 				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
 				return b;
 			}
@@ -202,7 +214,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			float maxYSpeed = Float.MAX_VALUE;
 			
 			@Override public IDynamicPhysicsBody create() {
-				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
+				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
 				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
 				return b;
 			}
@@ -263,7 +275,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			}
 	
 			@Override public IHumanoidPhysicsBody create() {
-				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type, maxXSpeed, maxYSpeed, 
+				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, maxXSpeed, maxYSpeed, 
 						maxThrowSpeed, maxLiftWeight, maxSlope, maxReach);
 				b.initBody(x, y, rotation, null, friction, restitution, density, fixedWeight);
 				return b;

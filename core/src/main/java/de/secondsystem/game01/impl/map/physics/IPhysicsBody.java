@@ -17,6 +17,8 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 	boolean isStatic();
 	
 	float getWeight();
+	boolean isInteractive();
+	boolean isLiftable();
 
 	/**
 	 * Binds to the other's body. Binds the body on top of the binding body if the mass is not too high.

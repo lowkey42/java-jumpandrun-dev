@@ -28,6 +28,9 @@ public interface IPhysicsWorld extends IUpdateable {
 		
 		PhysicsBodyFactory friction(float friction);
 		PhysicsBodyFactory restitution(float restitution); ///< elasticity [0,1]
+		
+		PhysicsBodyFactory interactive(boolean interactive);
+		PhysicsBodyFactory liftable(boolean liftable);
 
 		PhysicsBodyFactory type(CollisionHandlerType type);
 		

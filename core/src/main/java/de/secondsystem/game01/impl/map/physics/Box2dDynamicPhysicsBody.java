@@ -22,9 +22,9 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	private final Set<Contact> footSensorContacts = new HashSet<>();
 	
 	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
-			float width, float height, CollisionHandlerType type, 
+			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
 			boolean stableCheck, boolean worldSwitchAllowed, float maxXVel, float maxYVel) {
-		super(world, gameWorldId, width, height, type);
+		super(world, gameWorldId, width, height, interactive, liftable, type);
 
 		this.worldSwitchAllowed = worldSwitchAllowed;
 		this.complexStableCheck = stableCheck;

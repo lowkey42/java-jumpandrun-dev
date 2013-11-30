@@ -34,6 +34,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	private final Box2dPhysicalWorld parent;
 	private final CollisionHandlerType type;
 	private final float height, width;
+	private final boolean interactive, liftable;
 	private Body body;
 	
 	private int worldIdMask;
@@ -43,12 +44,14 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 
 	private final Map<IPhysicsBody, Joint> boundBodies = new HashMap<>();
 	
-	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, CollisionHandlerType type ) {
+	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type ) {
 		this.worldIdMask = worldIdMask;
 		this.type = type;
 		this.parent = world;
 		this.height = height;
 		this.width  = width;
+		this.interactive = interactive;
+		this.liftable = liftable;
 	}
 	
 	@Override
@@ -294,6 +297,14 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	@Override
 	public float getWidth() {
 		return width;
+	}
+	@Override
+	public boolean isInteractive() {
+		return interactive;
+	}
+	@Override
+	public boolean isLiftable() {
+		return liftable;
 	}
 	
 }
