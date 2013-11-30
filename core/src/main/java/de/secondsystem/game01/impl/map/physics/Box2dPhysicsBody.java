@@ -7,6 +7,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -176,6 +177,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		}
 	}
 
+	// FIXME: doesn't work for complex objects
 	public boolean isAbove(Box2dPhysicsBody body) {
 		Transform t = body.body.getTransform();
 		
