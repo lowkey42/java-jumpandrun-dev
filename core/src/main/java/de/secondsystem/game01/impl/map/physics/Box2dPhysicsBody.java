@@ -106,9 +106,11 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 				return box;
 				
 			case CIRCLE:
-				assert( Math.abs(height/2-width/2)<0.00001 );
+				assert( Math.abs(height-width)<0.00001 );
 				CircleShape circle = new CircleShape();
-				circle.setRadius(height/2 * BOX2D_SCALE_FACTOR);
+				circle.setRadius(height * BOX2D_SCALE_FACTOR);
+				circle.m_p.x = x*BOX2D_SCALE_FACTOR;
+				circle.m_p.y = y*BOX2D_SCALE_FACTOR;
 				return circle;
 				
 			default:

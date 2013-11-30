@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
 
 class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		IHumanoidPhysicsBody {
+	
+	private final float maxSlope;
 	
 	private float maxThrowVel;
 	private Body liftingBody = null;
@@ -34,6 +37,8 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			float maxThrowVel, float maxLiftWeight, float maxSlope, float maxReach) {
 		super(world, gameWorldId, width, height, type, true, true, maxXVel, maxYVel);
 		this.maxThrowVel = maxThrowVel;
+		
+		this.maxSlope = maxSlope;
 	}
 
 	@Override
@@ -42,7 +47,25 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	}
 	@Override
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
-		// TODO
+		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
+		
+		final float baseRad = (float) Math.floor(getWidth()*.9f /2 +0.5);
+		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2);
+		
+		FixtureDef mainBody = new FixtureDef();
+		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
+		mainBody.friction = 0.f;
+		mainBody.restitution = 0.01f;
+		mainBody.density = 1.0f;
+		body.createFixture(mainBody);
+		
+		FixtureDef baseBody = new FixtureDef();
+		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
+		baseBody.friction = 1.0f;
+		baseBody.density = 1.0f;
+		baseBody.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
+		body.createFixture(baseBody);
+		
 	}
 	
 	@Override

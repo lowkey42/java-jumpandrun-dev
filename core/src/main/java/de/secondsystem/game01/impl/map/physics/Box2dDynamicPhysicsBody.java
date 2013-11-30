@@ -36,23 +36,13 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	public boolean isStatic() {
 		return false;
 	}
-	@Override
-	protected boolean isBodyRotationFixed() {
-		// TODO Auto-generated method stub
-		return true;
-	}
 	
 	@Override
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		super.createFixtures(body, shape, friction, restitution, density, fixedWeight);
 		
 		if( worldSwitchAllowed ) {
-			FixtureDef fd = new FixtureDef();
-			fd.shape = createShape(PhysicsBodyShape.BOX, Math.max(1, getWidth()-10), Math.max(1, getHeight()-10) );
-			fd.isSensor = true;
-			fd.userData = new Box2dContactListener.FixtureData(true, new WorldSwitchCheckFCL());
-			
-			body.createFixture(fd);
+			createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		}
 		
 		if( complexStableCheck ) {
@@ -64,8 +54,16 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 			body.createFixture(fd);
 		}
 	}
+	protected void createWorldSwitchFixture(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+		FixtureDef fd = new FixtureDef();
+		fd.shape = createShape(PhysicsBodyShape.BOX, Math.max(1, getWidth()-10), Math.max(1, getHeight()-10) );
+		fd.isSensor = true;
+		fd.userData = new Box2dContactListener.FixtureData(true, new WorldSwitchCheckFCL());
+		
+		body.createFixture(fd);
+	}
 	
-	private final class StableCheckFCL implements Box2dContactListener.FixtureContactListener {
+	protected final class StableCheckFCL implements Box2dContactListener.FixtureContactListener {
 		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
 			footSensorContacts.remove(contact);
