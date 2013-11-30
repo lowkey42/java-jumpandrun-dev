@@ -110,8 +110,10 @@ public final class MainMenuState extends GameState {
 				}
 				break;
 			case TEXT_ENTERED:
-				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 33)
-				System.out.println("TEXT ENTERED: " + event.asTextEvent().unicode);
+				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 33){
+					System.out.println("TEXT ENTERED: " + event.asTextEvent().unicode);
+					testtext.newKey(event);
+				}
 				break;
 			case KEY_RELEASED:
 				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE) {

@@ -10,6 +10,7 @@ import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
+import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.ResourceManager;
 
@@ -26,9 +27,11 @@ public class InputText {
 	
 	private final Vector2f myPos;
 	
+	String myStringFile = "";
+	
 	String fonttype = "FreeSansBold.otf";
 	
-	Text myText;
+	private Text myText;
 	
 	
 	// Constructors
@@ -67,7 +70,9 @@ public class InputText {
 		rt.draw(this.linie_x1); rt.draw(this.linie_x2); rt.draw(this.linie_y1); rt.draw(this.linie_y2); rt.draw(myText);		
 	}
 	
-	
+	public void newKey(Event event){
+		this.myText.setString(this.myText.getString() + event.asTextEvent().character);
+	}
 	
 	
 }
