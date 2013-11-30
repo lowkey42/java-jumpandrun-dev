@@ -58,7 +58,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
-		final float baseRad = (float) Math.floor(getWidth()*.9f /2 +0.5);
+		final float baseRad = (float) Math.floor(getWidth()/2 -1);
 		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2);
 		
 		FixtureDef mainBody = new FixtureDef();
