@@ -10,6 +10,26 @@ import de.secondsystem.game01.model.IUpdateable;
 
 public interface IGameMap extends IDrawable, IUpdateable {
 
+	public static enum WorldId {
+		MAIN(1), OTHER(2);
+		
+		public final int id;
+		final int arrayIndex;
+		private WorldId(int id) {
+			this.id = id;
+			this.arrayIndex = id-1;
+		}
+		
+		public static WorldId byId(int id) {
+			for( WorldId w : values() )
+				if( w.id==id )
+					return w;
+			
+			return null;
+		}
+	}
+	
+	
 	String getMapId();
 
 	void setMapId(String mapId);
@@ -22,11 +42,11 @@ public interface IGameMap extends IDrawable, IUpdateable {
 
 	void switchWorlds();
 	
-	void setActiveWorldId(int worldId);
+	void setActiveWorldId(WorldId worldId);
 
-	int getActiveWorldId();
+	WorldId getActiveWorldId();
 
-	void addNode(int worldId, LayerType layer, LayerObject sprite);
+	void addNode(WorldId worldId, LayerType layer, LayerObject sprite);
 
 	void addNode(LayerType layer, LayerObject sprite);
 	
@@ -48,7 +68,7 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	ScriptEnvironment getScriptEnv();
 	
 	public interface IWorldSwitchListener {
-		void onWorldSwitch( int newWorldId );
+		void onWorldSwitch( WorldId newWorldId );
 	}
 
 }

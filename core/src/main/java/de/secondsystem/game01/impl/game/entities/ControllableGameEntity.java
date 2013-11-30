@@ -6,6 +6,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
@@ -48,7 +49,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
 			Attributes attributes) {
-		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
+		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 
 		this.moveAcceleration = attributes.getFloat("moveAcceleration");
@@ -182,7 +183,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	@Override
 	public void switchWorlds() {
-		setWorldId(getWorldId()==0 ? 1 : 0);
+		setWorld(getWorldId()==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN);
 	}
 	
 	@Override

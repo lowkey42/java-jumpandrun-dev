@@ -1,8 +1,12 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
 
@@ -12,11 +16,23 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	private float maxThrowVel;
 	private Body liftingBody = null;
 
+	private final Set<Contact> activeContacts = new HashSet<>();
+
+	protected int numFootContacts = 0;
+	private boolean climbing;
+	private boolean collisionWithLadder = false;
+	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
+	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
+
+	@Deprecated
+	private boolean collisionWithOneWayPlatform = false;
+
+	
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
 			float width, float height, CollisionHandlerType type, 
-			boolean createFoot, boolean createTestFixture, float maxXVel, float maxYVel,
+			float maxXVel, float maxYVel,
 			float maxThrowVel, float maxLiftWeight, float maxSlope, float maxReach) {
-		super(world, gameWorldId, width, height, type, createFoot, createTestFixture, maxXVel, maxYVel);
+		super(world, gameWorldId, width, height, type, true, true, maxXVel, maxYVel);
 		this.maxThrowVel = maxThrowVel;
 	}
 
@@ -25,9 +41,8 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		return true;
 	}
 	@Override
-	protected Body createBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		// TODO
-		return null;
 	}
 	
 	@Override

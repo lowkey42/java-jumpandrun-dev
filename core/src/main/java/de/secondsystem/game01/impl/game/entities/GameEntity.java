@@ -8,7 +8,8 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.physics.ContactListener;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
@@ -16,13 +17,13 @@ import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
-class GameEntity implements IGameEntity, ContactListener {
+class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	private final UUID uuid;
 	
 	protected final GameEntityManager em;
 	
-	protected int gameWorldId;
+	protected int worldMask;
 	
 	protected IDynamicPhysicsBody physicsBody;
 	
@@ -35,14 +36,14 @@ class GameEntity implements IGameEntity, ContactListener {
 	public GameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
 			Attributes attributes) {
-		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId()), 
+		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int gameWorldId, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, EntityEventHandler eventHandler) {
+	public GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, EntityEventHandler eventHandler) {
 		this.uuid = uuid;
 		this.em = em;
-		this.gameWorldId = gameWorldId;
+		this.worldMask = worldMask;
 		this.representation = representation;
 		this.physicsBody = physicsBody;
 		this.map = map;
@@ -78,20 +79,6 @@ class GameEntity implements IGameEntity, ContactListener {
 	}
 
 	@Override
-	public int getWorldId() {
-		return gameWorldId;
-	}
-
-	@Override
-	public void setWorldId(int newWorldId) {
-		if( physicsBody==null || physicsBody.tryWorldSwitch(newWorldId) )
-			gameWorldId = newWorldId;
-			
-		else
-			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
-	}
-
-	@Override
 	public void beginContact(IPhysicsBody other) {
 		if( eventHandler!=null && !other.isStatic() && eventHandler.isHandled(EntityEventType.TOUCHED) ) {
 			eventHandler.handle(EntityEventType.TOUCHED, this, other);
@@ -103,6 +90,35 @@ class GameEntity implements IGameEntity, ContactListener {
 		if( eventHandler!=null && !other.isStatic() && eventHandler.isHandled(EntityEventType.UNTOUCHED) ) {
 			eventHandler.handle(EntityEventType.UNTOUCHED, this, other);
 		}
+	}
+
+	@Override
+	public int getWorldMask() {
+		return worldMask;
+	}
+
+	@Override
+	public boolean isInWorld(WorldId worldId) {
+		return (worldMask|worldId.id) !=0;
+	}
+
+	@Override
+	public void setWorldMask(int newWorldMask) {
+		if( physicsBody==null || physicsBody.tryWorldSwitch(newWorldMask) )
+			this.worldMask = newWorldMask;
+
+		else
+			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
+	}
+
+	@Override
+	public WorldId getWorldId() {
+		return WorldId.byId(worldMask);
+	}
+
+	@Override
+	public void setWorld(WorldId worldId) {
+		setWorldMask(worldId.id);
 	}
 
 }

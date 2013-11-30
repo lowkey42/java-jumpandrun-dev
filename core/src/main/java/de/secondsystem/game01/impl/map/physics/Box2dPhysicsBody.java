@@ -1,5 +1,8 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -12,15 +15,19 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jsfml.system.Vector2f;
 
-class Box2dPhysicsBody implements IPhysicsBody {
+import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureContactListener;
+
+
+class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	protected static final float BOX2D_SCALE_FACTOR = 0.01f;
 	
-	protected final Vec2 toBox2dCS( float x, float y ) {
+	protected static final Vec2 toBox2dCS( float x, float y ) {
 		return new Vec2(x, y).mul(BOX2D_SCALE_FACTOR);
 	}
-	protected final Vector2f fromBox2dCS( float x, float y ) {
+	protected static final Vector2f fromBox2dCS( float x, float y ) {
 		return Vector2f.div(new Vector2f(x, y), BOX2D_SCALE_FACTOR);
 	}
 
@@ -32,9 +39,9 @@ class Box2dPhysicsBody implements IPhysicsBody {
 	private int worldIdMask;
 	private Object owner;
 	
-	private ContactListener contactListener;
+	private PhysicsContactListener contactListener;
 
-//	private RevoluteJoint revoluteJoint = null;
+	private final Map<IPhysicsBody, Joint> boundBodies = new HashMap<>();
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, CollisionHandlerType type ) {
 		this.worldIdMask = worldIdMask;
@@ -53,17 +60,24 @@ class Box2dPhysicsBody implements IPhysicsBody {
 	}
 
 	final void initBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
-		body = createBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+		body = createBody(x, y, rotation);
+		createFixtures(body, shape, friction, restitution, density, fixedWeight);
 	}
-	protected Body createBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+	protected final Body createBody(float x, float y, float rotation) {
 		BodyDef bd = new BodyDef();
 		bd.position.set(toBox2dCS(x, y));
 		bd.angle = (float) Math.toRadians(rotation);
 		bd.type = isStatic() ? BodyType.STATIC : BodyType.DYNAMIC;
 		bd.fixedRotation = isBodyRotationFixed();
 
+		Body body = parent.physicsWorld.createBody(bd);
+		body.setUserData(this);
+		
+		return body;
+	}
+	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		FixtureDef fd = new FixtureDef();
-		fd.shape = createShape(shape, height, width);
+		fd.shape = createShape(shape, width, height);
 		if (CollisionHandlerType.NO_GRAV == type)
 			fd.isSensor = true;
 		
@@ -77,24 +91,24 @@ class Box2dPhysicsBody implements IPhysicsBody {
 			density = fixedWeight/md.mass;
 		}
 		fd.density = density;
+		fd.userData = null;
 		
-		Body body = parent.physicsWorld.createBody(bd);
 		body.createFixture(fd);
-		body.setUserData(this);
-		
-		return body;
 	}
-	protected static Shape createShape(PhysicsBodyShape shape, float height, float width) {
+	protected static Shape createShape(PhysicsBodyShape shape, float width, float height) {
+		return createShape(shape, width, height, 0, 0, 0);
+	}
+	protected static Shape createShape(PhysicsBodyShape shape, float width, float height, float x, float y, float rotation) {
 		switch( shape ) {
 			case BOX:
 				PolygonShape box = new PolygonShape();
-				box.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR);
+				box.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR, toBox2dCS(x,y), rotation);
 				return box;
 				
 			case CIRCLE:
 				assert( Math.abs(height/2-width/2)<0.00001 );
 				CircleShape circle = new CircleShape();
-				circle.setRadius(height/2);
+				circle.setRadius(height/2 * BOX2D_SCALE_FACTOR);
 				return circle;
 				
 			default:
@@ -120,7 +134,7 @@ class Box2dPhysicsBody implements IPhysicsBody {
 	}
 		
 	@Override
-	public final void setContactListener(ContactListener contactListener) {
+	public final void setContactListener(PhysicsContactListener contactListener) {
 		this.contactListener = contactListener;
 	}
 
@@ -135,10 +149,12 @@ class Box2dPhysicsBody implements IPhysicsBody {
 		return (float) (a < 0 ? 360 + a : a);
 	}
 
+	@Override
 	public void onBeginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 		if( contactListener!=null )
 			contactListener.beginContact(other);
 	}
+	@Override
 	public void onEndContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 		if( contactListener!=null )
 			contactListener.endContact(other);
@@ -160,14 +176,14 @@ class Box2dPhysicsBody implements IPhysicsBody {
 		
 		Vec2 pos = body.body.getLocalCenter();
 		// top-left and top-right points of the one-way platform
-		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f));
-		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f));
+		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
+		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 
-		t = /*TODO isBound(null) ? revoluteJoint.getBodyA().getTransform() :*/ this.body.getTransform();
-		pos = /*TODO isBound(null) ? revoluteJoint.getBodyA().getLocalCenter() :*/ this.body.getLocalCenter();
+		t = /*isBound() ? revoluteJoint.getBodyA().getTransform() :*/ this.body.getTransform();
+		pos = /*isBound() ? revoluteJoint.getBodyA().getLocalCenter() :*/ this.body.getLocalCenter();
 		// bottom-left and bottom-right points of the entity/player
-		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f));
-		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f));
+		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
+		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
 		
 		if( p1.x < v1.x && v1.y < v2.y)
 			return p1.y <= v1.y && p1.y <= v2.y;
@@ -198,6 +214,22 @@ class Box2dPhysicsBody implements IPhysicsBody {
 
 	@Override
 	public boolean bind(IPhysicsBody other, Vector2f anchor) {
+		if( !boundBodies.containsKey(other) ) {
+			final Box2dPhysicsBody otherBody = (Box2dPhysicsBody) other;
+			
+			Joint joint = parent.createRevoluteJoint(body, otherBody.getBody(), new Vec2(anchor.x, anchor.y));
+			
+			if( joint==null )
+				return false;
+			
+			boundBodies.put(other, joint);
+			otherBody.boundBodies.put(other, joint);
+			
+			return true;
+		}
+		
+		return false;
+		
 //		if( !other.isStatic() )
 //		{
 //			boolean isLiftingPossible = false;
@@ -214,24 +246,24 @@ class Box2dPhysicsBody implements IPhysicsBody {
 //			
 //			return isLiftingPossible;
 //		}
-//		
-		return false;
 	}
 
 	@Override
 	public void unbind(IPhysicsBody other) {
-//		if( revoluteJoint != null )
-//		{
-//			parent.destroyJoint(revoluteJoint);
-//			((Box2dPhysicsBody)revoluteJoint.getBodyB().getUserData()).revoluteJoint = null;
-//			revoluteJoint = null;
-//		}
+		Joint joint = boundBodies.get(other);
+		if( joint==null )
+			joint = ((Box2dPhysicsBody)other).boundBodies.get(this);
+		
+		if( joint!=null )
+			parent.destroyJoint(joint);
+
+		((Box2dPhysicsBody)other).boundBodies.remove(this);
+		boundBodies.remove(other);
 	}
 
 	@Override
 	public boolean isBound(IPhysicsBody other) {
-//		return revoluteJoint != null;
-		return false;
+		return other==null ? !boundBodies.isEmpty() : boundBodies.containsKey(other);
 	}
 	
 	@Override
@@ -252,6 +284,14 @@ class Box2dPhysicsBody implements IPhysicsBody {
 	@Override
 	public float getWeight() {
 		return body.m_mass;
+	}
+	@Override
+	public float getHeight() {
+		return height;
+	}
+	@Override
+	public float getWidth() {
+		return width;
 	}
 	
 }

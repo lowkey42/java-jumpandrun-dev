@@ -44,7 +44,7 @@ public class GameMap implements IGameMap {
 	
 	private Tileset tileset;
 	
-	private int activeWorldId;
+	private WorldId activeWorldId;
 	
 	public final boolean editable;
 	
@@ -71,7 +71,7 @@ public class GameMap implements IGameMap {
 		this.tileset = tileset;
 		this.editable = editable;
 		this.playable = playable;
-		this.activeWorldId = 0;
+		this.activeWorldId = WorldId.MAIN;
 
 		if( playable ) {
 			physicalWorld = new Box2dPhysicalWorld();
@@ -124,7 +124,7 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public void switchWorlds() {
-		activeWorldId = activeWorldId==0 ? 1 : 0;
+		activeWorldId = activeWorldId==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN;
 		
 		for( IWorldSwitchListener listener : worldSwitchListeners )
 			listener.onWorldSwitch(activeWorldId);
@@ -137,10 +137,10 @@ public class GameMap implements IGameMap {
 	public void draw(RenderTarget rt) {
 		final ConstView cView = rt.getView();
 		
-		rt.clear(gameWorld[activeWorldId].backgroundColor);
+		rt.clear(gameWorld[activeWorldId.arrayIndex].backgroundColor);
 		
 		for( LayerType l : LayerType.values() ) {
-			Layer layer = gameWorld[activeWorldId].graphicLayer[l.layerIndex];
+			Layer layer = gameWorld[activeWorldId.arrayIndex].graphicLayer[l.layerIndex];
 			
 			if( layer.show ) {
 				if( l.parallax!=1.f )
@@ -185,12 +185,12 @@ public class GameMap implements IGameMap {
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getActiveWorldId()
 	 */
 	@Override
-	public int getActiveWorldId() {
+	public WorldId getActiveWorldId() {
 		return activeWorldId;
 	}
 
 	@Override
-	public void setActiveWorldId(int worldId) {
+	public void setActiveWorldId(WorldId worldId) {
 		this.activeWorldId = worldId;
 	}
 
@@ -198,8 +198,8 @@ public class GameMap implements IGameMap {
 	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(int, de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */
 	@Override
-	public void addNode( int worldId, LayerType layer, LayerObject sprite ) {
-		gameWorld[worldId].graphicLayer[layer.layerIndex].addNode(sprite);
+	public void addNode( WorldId worldId, LayerType layer, LayerObject sprite ) {
+		gameWorld[worldId.arrayIndex].graphicLayer[layer.layerIndex].addNode(sprite);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
@@ -213,14 +213,14 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public LayerObject findNode( LayerType layer, Vector2f point ) {
-		return gameWorld[activeWorldId].graphicLayer[layer.layerIndex].findNode(point);
+		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].findNode(point);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#remove(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */
 	@Override
 	public void remove( LayerType layer, LayerObject s ) {
-		gameWorld[activeWorldId].graphicLayer[layer.layerIndex].remove(s);
+		gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].remove(s);
 	}
 		
 	/* (non-Javadoc)
@@ -228,7 +228,7 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public boolean flipShowLayer( LayerType layer ) {
-		return gameWorld[activeWorldId].graphicLayer[layer.layerIndex].show = !gameWorld[activeWorldId].graphicLayer[layer.layerIndex].show;
+		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].show = !gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].show;
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getShownLayer()
@@ -237,7 +237,7 @@ public class GameMap implements IGameMap {
 	public boolean[] getShownLayer() {
 		boolean[] s = new boolean[LayerType.LAYER_COUNT];
 		for( int i=0; i<LayerType.LAYER_COUNT; ++i )
-			s[i] = gameWorld[activeWorldId].graphicLayer[i].show;
+			s[i] = gameWorld[activeWorldId.arrayIndex].graphicLayer[i].show;
 		
 		return s;
 	}

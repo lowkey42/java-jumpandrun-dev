@@ -28,10 +28,9 @@ final class GameEntityHelper {
 	public static IDynamicPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 
 			canPickUpObjects, boolean createTestFixture, Attributes attributes ) {
 		PhysicsBodyFactory factory = map.getPhysicalWorld().factory()
-				.inWorld(attributes.getInteger("worldId", map.getActiveWorldId()))
+				.worldMask(attributes.getInteger("worldId", map.getActiveWorldId().id))
 				.position(attributes.getFloat("x"), attributes.getFloat("y"))
 				.dimension(attributes.getFloat("width"), attributes.getFloat("height"));
-		
 		
 		Float rotation = attributes.getFloat("rotation");
 		if( rotation!=null )

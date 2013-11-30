@@ -2,15 +2,16 @@ package de.secondsystem.game01.impl.map.physics;
 
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IMoveable;
 
-public interface IPhysicsBody extends IMoveable {
+public interface IPhysicsBody extends IMoveable, IDimensioned {
 
 	Object getOwner();
 	void setOwner( Object owner );
 	IPhysicsWorld getParent();
 	
-	void setContactListener( ContactListener contactListener );
+	void setContactListener( PhysicsContactListener contactListener );
 	
 	CollisionHandlerType getCollisionHandlerType();
 	boolean isStatic();

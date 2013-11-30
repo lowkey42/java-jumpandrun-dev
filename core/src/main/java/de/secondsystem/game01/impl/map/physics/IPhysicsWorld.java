@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.map.physics;
 
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.IUpdateable;
 
 public interface IPhysicsWorld extends IUpdateable {
@@ -15,7 +16,8 @@ public interface IPhysicsWorld extends IUpdateable {
 	
 	
 	public interface PhysicsBodyFactory {
-		PhysicsBodyFactory inWorld(int worldId);
+		PhysicsBodyFactory inWorld(WorldId worldId);
+		PhysicsBodyFactory worldMask(int worldMask);
 
 		PhysicsBodyFactory position(float x, float y);
 		PhysicsBodyFactory rotation(float rotation);

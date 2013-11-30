@@ -19,6 +19,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import de.secondsystem.game01.impl.map.GameMap.GameWorld;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 
 
@@ -63,8 +64,8 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			Tileset tileset = new Tileset((String)obj.get("tileset"));
 			
 			GameMap map = new GameMap(mapId, tileset, playable, editable);
-			for( int i=0; i<=1; ++i )
-				deserializeGameWorld(map, i, worlds.get(i));
+			for( WorldId worldId : WorldId.values() )
+				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			
 			Object scriptsObj = obj.get("scripts");
 			if( scriptsObj instanceof JSONArray ) {
@@ -121,20 +122,20 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		return obj;
 	}
 
-	private void deserializeGameWorld(GameMap map, int worldId, JSONObject obj) {
-		map.gameWorld[worldId].backgroundColor = decodeColor((String)obj.get("backgroundColor"));
+	private void deserializeGameWorld(GameMap map, WorldId worldId, JSONObject obj) {
+		map.gameWorld[worldId.arrayIndex].backgroundColor = decodeColor((String)obj.get("backgroundColor"));
 		
 		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}
 	@SuppressWarnings("unchecked")
-	private void deserializeLayers( IGameMap map, int worldId, JSONArray layerArray) {
+	private void deserializeLayers( IGameMap map, WorldId worldId, JSONArray layerArray) {
 		for( JSONObject l : (Iterable<JSONObject>) layerArray )
 			for( Object obj : ((JSONArray) l.get("objects")) )
 				map.addNode(worldId, LayerType.valueOf((String)l.get("layerType")), deserializeLayerObject(map, worldId, (JSONObject) obj));
 	}
 
 	@SuppressWarnings("unchecked")
-	private LayerObject deserializeLayerObject(IGameMap map, int worldId, JSONObject obj) {
+	private LayerObject deserializeLayerObject(IGameMap map, WorldId worldId, JSONObject obj) {
 		final LayerObjectType type = LayerObjectType.getByShortId((String) obj.get("$type"));
 		
 		if( type==null )

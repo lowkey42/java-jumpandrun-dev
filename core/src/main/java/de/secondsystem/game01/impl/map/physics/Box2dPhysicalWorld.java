@@ -9,6 +9,8 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+
 public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	
 	private static final float FIXED_STEP = 1/60f/2;
@@ -24,7 +26,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	public void init(Vector2f gravity) {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
-		physicsWorld.setContactListener(new PhysicsContactListener());
+		physicsWorld.setContactListener(new Box2dContactListener());
 	//	physicsWorld.setAutoClearForces(true);
 	}
 
@@ -117,8 +119,14 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		CollisionHandlerType type = CollisionHandlerType.SOLID;
 		PhysicsBodyShape shape = null;
 		
-		@Override public PhysicsBodyFactory inWorld(int worldId) {
-			worldMask |= worldId;
+		@Override public PhysicsBodyFactory inWorld(WorldId worldId) {
+			worldMask |= worldId.id;
+			return this;
+		}
+
+		@Override
+		public PhysicsBodyFactory worldMask(int worldMask) {
+			this.worldMask = worldMask;
 			return this;
 		}
 	
@@ -255,7 +263,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			}
 	
 			@Override public IHumanoidPhysicsBody create() {
-				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed, 
+				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, type, maxXSpeed, maxYSpeed, 
 						maxThrowSpeed, maxLiftWeight, maxSlope, maxReach);
 				b.initBody(x, y, rotation, null, friction, restitution, density, fixedWeight);
 				return b;

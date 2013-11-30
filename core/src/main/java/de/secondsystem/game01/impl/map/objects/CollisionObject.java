@@ -9,6 +9,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
@@ -49,7 +50,7 @@ public class CollisionObject implements LayerObject {
 	
 	private CollisionType type;
 
-	public CollisionObject(IGameMap map, int gameWorldID, CollisionType type, float x, float y, float width, float height, float rotation) {
+	public CollisionObject(IGameMap map, WorldId worldID, CollisionType type, float x, float y, float width, float height, float rotation) {
 		this.type = type;
 		
 		if( map.isEditable() ) {
@@ -65,7 +66,7 @@ public class CollisionObject implements LayerObject {
 		
 		if( map.getPhysicalWorld()!=null )
 			physicsBody = map.getPhysicalWorld().factory()
-				.inWorld(gameWorldID)
+				.inWorld(worldID)
 				.position(x, y)
 				.dimension(width, height)
 				.rotation(rotation)
@@ -155,7 +156,7 @@ public class CollisionObject implements LayerObject {
 		return map;
 	}
 	
-	public static CollisionObject create(IGameMap map, int worldId, Map<String, Object> attributes) {
+	public static CollisionObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
 		try {
 			return new CollisionObject(
 					map,

@@ -1,39 +1,33 @@
 package de.secondsystem.game01.impl.map.physics;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
 class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		IDynamicPhysicsBody {
 
+	private final boolean worldSwitchAllowed;
+	private final boolean complexStableCheck;
 	private float maxXVel;
 	private float maxYVel;
-
-	private boolean collisionWithOneWayPlatform = false;
-
-	// if the testFixture is colliding in the other world then don't allow switching the world
-	private int collisionsWithTestFixture;
-
-	private final Set<Contact> activeContacts = new HashSet<>();
-
-	protected int numFootContacts = 0;
-	private boolean climbing;
-	private boolean collisionWithLadder = false;
-	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
-	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
+	
+	private final Set<Contact> worldSwitchSensorContacts = new HashSet<>();
+	private final Set<Contact> footSensorContacts = new HashSet<>();
 	
 	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
 			float width, float height, CollisionHandlerType type, 
-			boolean createFoot, boolean createTestFixture, float maxXVel, float maxYVel) {
+			boolean stableCheck, boolean worldSwitchAllowed, float maxXVel, float maxYVel) {
 		super(world, gameWorldId, width, height, type);
-		
+
+		this.worldSwitchAllowed = worldSwitchAllowed;
+		this.complexStableCheck = stableCheck;
 		this.maxXVel = maxXVel;
 		this.maxYVel = maxYVel;
 	}
@@ -43,18 +37,64 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		return false;
 	}
 	@Override
-	protected Body createBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
-		return super.createBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
-	}
-
-	public void addCollisionsWithTestFixture(int num) {
-		collisionsWithTestFixture += num;
+	protected boolean isBodyRotationFixed() {
+		// TODO Auto-generated method stub
+		return true;
 	}
 	
+	@Override
+	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+		super.createFixtures(body, shape, friction, restitution, density, fixedWeight);
+		
+		if( worldSwitchAllowed ) {
+			FixtureDef fd = new FixtureDef();
+			fd.shape = createShape(PhysicsBodyShape.BOX, Math.max(1, getWidth()-10), Math.max(1, getHeight()-10) );
+			fd.isSensor = true;
+			fd.userData = new Box2dContactListener.FixtureData(true, new WorldSwitchCheckFCL());
+			
+			body.createFixture(fd);
+		}
+		
+		if( complexStableCheck ) {
+			FixtureDef fd = new FixtureDef();
+			fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, 1f, 0, getHeight()/2, 0);
+			fd.isSensor = true;
+			fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
+			
+			body.createFixture(fd);
+		}
+	}
+	
+	private final class StableCheckFCL implements Box2dContactListener.FixtureContactListener {
+		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			footSensorContacts.remove(contact);
+		}
+		
+		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			if( other.getCollisionHandlerType()==CollisionHandlerType.SOLID || other.getCollisionHandlerType()==CollisionHandlerType.ONE_WAY ) {
+				footSensorContacts.add(contact);
+			}
+		}
+	}
+	
+	private final class WorldSwitchCheckFCL implements Box2dContactListener.FixtureContactListener {
+		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			worldSwitchSensorContacts.remove(contact);
+		}
+		
+		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			if( other.getCollisionHandlerType()==CollisionHandlerType.SOLID )
+				worldSwitchSensorContacts.add(contact);
+		}
+	}
 
 	@Override
 	public boolean isStable() {
-		return numFootContacts > 0 && !collisionWithOneWayPlatform;
+		return !complexStableCheck ? getBody().m_contactList!=null && getBody().m_contactList.contact!=null && getVelocity().y==0 : footSensorContacts.size()>0;
 	}
 
 	@Override
@@ -62,8 +102,8 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		x = limit(getBody().getLinearVelocity().x, x, maxXVel);
 		y = limit(getBody().getLinearVelocity().y, y, maxYVel);
 
-		getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
-		//body.applyLinearImpulse(new Vec2(x/15, y/65), body.getWorldCenter());
+		//getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
+		getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
 
 		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
 	}
@@ -105,14 +145,14 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	
 	@Override
 	public boolean tryWorldSwitch(int id) {
-		// TODO Auto-generated method stub
+		if( worldSwitchAllowed && worldSwitchSensorContacts.isEmpty() ) {
+			setWorldIdMask(id);
+			return true;
+		}
+		
 		return false;
 	}
-	
-	public void setCollisionWithOneWayPlatform(boolean collision) {
-		collisionWithOneWayPlatform = collision;
-	}
-	
+		
 //	public boolean beginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 //		if( activeContacts.add(contact) ) {
 //			if (contactListener != null)
