@@ -9,7 +9,9 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jsfml.system.Vector2f;
 
-public final class Box2dPhysicalWorld implements IPhysicalWorld {
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+
+public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	
 	private static final float FIXED_STEP = 1/60f/2;
 	private static final int maxSteps = 5;
@@ -24,7 +26,7 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 	public void init(Vector2f gravity) {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
-		physicsWorld.setContactListener(new PhysicsContactListener());
+		physicsWorld.setContactListener(new Box2dContactListener());
 	//	physicsWorld.setAutoClearForces(true);
 	}
 
@@ -73,20 +75,212 @@ public final class Box2dPhysicalWorld implements IPhysicalWorld {
 		physicsWorld.destroyJoint(joint);
 	}
 
-	@Override
-	public IPhysicsBody createStaticBody(int gameWorldIdMask, float x, float y,
-			float width, float height, float rotation, CollisionHandlerType type) {
-		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, true, type, false, false, false);
-	}
+//	@Override
+//	public IPhysicsBody createStaticBody(int gameWorldIdMask, float x, float y,
+//			float width, float height, float rotation, CollisionHandlerType type) {
+//		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, true, type, false, false, false);
+//	}
+//
+//	@Override
+//	public IPhysicsBody createDynamicBody(int gameWorldIdMask, float x,
+//			float y, float width, float height, float rotation,
+//			CollisionHandlerType type, int features) {
+//		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, false, type, 
+//				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.STABLE_CHECK), 
+//				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.SIDE_CONTACT_CHECK),
+//				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
+//	}
+//
+//	@Override
+//	public IHumanoidPhysicsBody createHumanoidBody(int worldIdMask, float x,
+//			float y, float width, float height, float maxSlope, float maxReach,
+//			float rotation, int features) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
-	public IPhysicsBody createDynamicBody(int gameWorldIdMask, float x,
-			float y, float width, float height, float rotation,
-			CollisionHandlerType type, int features) {
-		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, false, type, 
-				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.STABLE_CHECK), 
-				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.SIDE_CONTACT_CHECK),
-				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
+	public PhysicsBodyFactory factory() {
+		return new Box2dPhysicsBodyFactory();
 	}
 
+
+	private class Box2dPhysicsBodyFactory implements PhysicsBodyFactory {
+		int worldMask;
+		float x;
+		float y;
+		float rotation;
+		float width;
+		float height;
+		float density = 1.f;
+		Float fixedWeight;
+		float friction = 0.5f;
+		float restitution = 0.f;
+		boolean interactive = false;
+		boolean liftable = false;
+		CollisionHandlerType type = CollisionHandlerType.SOLID;
+		PhysicsBodyShape shape = null;
+		
+		@Override public PhysicsBodyFactory inWorld(WorldId worldId) {
+			worldMask |= worldId.id;
+			return this;
+		}
+
+		@Override
+		public PhysicsBodyFactory worldMask(int worldMask) {
+			this.worldMask = worldMask;
+			return this;
+		}
+	
+		@Override public PhysicsBodyFactory position(float x, float y) {
+			this.x = x;
+			this.y = y;
+			return this;
+		}
+	
+		@Override public PhysicsBodyFactory rotation(float rotation) {
+			this.rotation = rotation;
+			return this;
+		}
+	
+		@Override public PhysicsBodyFactory dimension(float width, float height) {
+			this.width = width;
+			this.height = height;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory weight(float weight) {
+			fixedWeight = weight;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory density(float weightPerPx) {
+			density = weightPerPx;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory friction(float friction) {
+			this.friction = friction;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory restitution(float restitution) {
+			this.restitution = restitution;
+			return this;
+		}
+	
+		@Override public PhysicsBodyFactory type(CollisionHandlerType type) {
+			this.type = type;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory interactive(boolean interactive) {
+			this.interactive = interactive;
+			return this;
+		}
+
+		@Override public PhysicsBodyFactory liftable(boolean liftable) {
+			this.liftable = liftable;
+			return this;
+		}
+	
+		@Override public StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape) {
+			this.shape = shape;
+			return new Box2dStaticPhysicsBodyFactory();
+		}
+	
+		@Override public DynamicPhysicsBodyFactory dynamicBody(PhysicsBodyShape shape) {
+			this.shape = shape;
+			return new Box2dDynamicPhysicsBodyFactory();
+		}
+	
+		@Override public HumanoidPhysicsBodyFactory humanoidBody() {
+			return new Box2dHumanoidPhysicsBodyFactory();
+		}
+	
+	
+		class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
+			@Override public IPhysicsBody create() {
+				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type);
+				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+				return b;
+			}
+		}
+		
+		class Box2dDynamicPhysicsBodyFactory extends Box2dStaticPhysicsBodyFactory implements DynamicPhysicsBodyFactory {
+			boolean stableCheck = false;
+			boolean worldSwitchAllowed = false;
+			float maxXSpeed = Float.MAX_VALUE;
+			float maxYSpeed = Float.MAX_VALUE;
+			
+			@Override public IDynamicPhysicsBody create() {
+				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
+				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+				return b;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
+				stableCheck = enable;
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory worldSwitch(boolean allowed) {
+				worldSwitchAllowed = allowed;
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory maxXSpeed(float speed) {
+				maxXSpeed = speed;
+				return this;
+			}
+	
+			@Override public DynamicPhysicsBodyFactory maxYSpeed(float speed) {
+				maxYSpeed = speed;
+				return this;
+			}
+		}
+		
+		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
+			float maxSlope = 45;
+			float maxReach = 10;
+			float maxThrowSpeed = Float.MAX_VALUE;
+			float maxLiftWeight = Float.MAX_VALUE;
+			
+			@Override public HumanoidPhysicsBodyFactory maxXSpeed(float speed) {
+				return (HumanoidPhysicsBodyFactory) super.maxXSpeed(speed);
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxYSpeed(float speed) {
+				return (HumanoidPhysicsBodyFactory) super.maxYSpeed(speed);
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxSlope(float degree) {
+				maxSlope = degree;
+				return this;
+			}
+	
+			@Override public HumanoidPhysicsBodyFactory maxReach(float px) {
+				maxReach = px;
+				return this;
+			}
+
+			@Override public HumanoidPhysicsBodyFactory maxThrowSpeed(float speed) {
+				maxThrowSpeed = speed;
+				return this;
+			}
+
+			@Override public HumanoidPhysicsBodyFactory maxLiftWeight(float weight) {
+				maxLiftWeight = weight;
+				return this;
+			}
+	
+			@Override public IHumanoidPhysicsBody create() {
+				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, maxXSpeed, maxYSpeed, 
+						maxThrowSpeed, maxLiftWeight, maxSlope, maxReach);
+				b.initBody(x, y, rotation, null, friction, restitution, density, fixedWeight);
+				return b;
+			}
+		}
+	}
+	
 }

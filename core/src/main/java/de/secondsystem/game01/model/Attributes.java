@@ -29,6 +29,11 @@ public class Attributes extends HashMap<String, Object> {
 				putAll(map);
 		}
 	}
+
+	public Boolean getBoolean(String key) {
+		Object val = get(key);
+		return val!=null ? Boolean.valueOf(val.toString()) : null;
+	}
 	
 	public Float getFloat(String key) {
 		Object val = get(key);

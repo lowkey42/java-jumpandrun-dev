@@ -5,13 +5,14 @@ import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.ICameraController;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.IUpdateable;
 
 public class Camera implements IUpdateable {
 	
 	private float x;
 	private float y;
-	private int worldId;
+	private WorldId worldId;
 	
 	private ICameraController cameraController;
 	
@@ -92,7 +93,7 @@ public class Camera implements IUpdateable {
 		return new View(new Vector2f(x, y), base.getSize());
 	}
 	
-	public int getWorldId() {
+	public WorldId getWorldId() {
 		return worldId;
 	}
 	

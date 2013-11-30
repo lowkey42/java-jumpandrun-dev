@@ -1,11 +1,12 @@
 package de.secondsystem.game01.impl.map.physics;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -14,153 +15,168 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
-import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.dynamics.joints.RevoluteJoint;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jsfml.system.Vector2f;
 
-final class Box2dPhysicsBody implements IPhysicsBody {
-	private static final float BOX2D_SCALE_FACTOR = 0.01f;
+import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureContactListener;
 
-	final Body body;
-	private final CollisionHandlerType type;
-	private int gameWorldId;
-	private ContactListener contactListener;
-	private float maxXVel = Float.MAX_VALUE;
-	private float maxYVel = Float.MAX_VALUE;
-	private float maxThrowVel = Float.MAX_VALUE;
+
+class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
+	protected static final float BOX2D_SCALE_FACTOR = 0.01f;
 	
-	int numFootContacts = 0;
-	private boolean climbing;
-	private boolean collisionWithLadder = false;
-	private boolean collisionWithOneWayPlatform = false;
-	private final Set<Contact> activeContacts = new HashSet<>();
-	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
-	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
-	private Box2dPhysicalWorld physicsWorld;
-	private RevoluteJoint revoluteJoint = null;
-	private Body liftingBody = null;
+	protected static final Vec2 toBox2dCS( float x, float y ) {
+		return new Vec2(x, y).mul(BOX2D_SCALE_FACTOR);
+	}
+	protected static final Vector2f fromBox2dCS( float x, float y ) {
+		return Vector2f.div(new Vector2f(x, y), BOX2D_SCALE_FACTOR);
+	}
+
+	private final Box2dPhysicalWorld parent;
+	private final CollisionHandlerType type;
+	private final float height, width;
+	private final boolean interactive, liftable;
+	private Body body;
+	
+	private int worldIdMask;
 	private Object owner;
 	
-	private final float height;
-	private final float width;
-	private final boolean isStatic;
+	private PhysicsContactListener contactListener;
+
+	private final Map<IPhysicsBody, Joint> boundBodies = new HashMap<>();
 	
-	// if the testFixture is colliding in the other world then don't allow switching the world
-	private int collisionsWithTestFixture;
-	
-	Box2dPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, float x,
-			float y, float width, float height, float rotation,
-			boolean isStatic, CollisionHandlerType type, boolean createFoot, boolean createHand, boolean createTestFixture) {
-		this.gameWorldId = gameWorldId;
+	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type ) {
+		this.worldIdMask = worldIdMask;
 		this.type = type;
-		physicsWorld = world;
+		this.parent = world;
 		this.height = height;
 		this.width  = width;
-		this.isStatic = isStatic;
-		
-		// body definition
-		BodyDef bd = new BodyDef();
-		bd.position.set(new Vec2(x, y).mul(BOX2D_SCALE_FACTOR));
-		bd.angle = (float) Math.toRadians(rotation);
-		bd.type = isStatic ? BodyType.STATIC : BodyType.DYNAMIC;
-
-		// define shape of the body
-		PolygonShape s = new PolygonShape();
-
-		// input half extents
-		s.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR);
-
-		// create the body
-		body = world.createBody(bd);
-
-		FixtureDef fd = new FixtureDef();
-		fd.shape = s;
-		if (CollisionHandlerType.NO_GRAV == type)
-			fd.isSensor = true;
-
-		if (!isStatic) {
-			// fixture definition
-
-			fd.density = 1.f;
-			fd.friction = 0.2f;
-			fd.restitution = 0.0f;
-
-			// add fixture to body
-			body.createFixture(fd);
-			
-			if ( createTestFixture ) {
-				s.setAsBox(width / 2.1f * BOX2D_SCALE_FACTOR, height / 2.1f * BOX2D_SCALE_FACTOR);
-				fd.isSensor = true;
-				fd.density = 0.f;
-				Fixture testFixture = body.createFixture(fd);
-				testFixture.setUserData(new String("testFixture"));
-			}
-				
-			if (createFoot) {
-				s.setAsBox(width / 3.f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(0.f, height / 2.f * BOX2D_SCALE_FACTOR), rotation);
-				fd.density = 1.f;
-				fd.isSensor = true;
-				Fixture footFixture = body.createFixture(fd);
-				footFixture.setUserData(new String("foot")); 
-				body.setFixedRotation(true);
-			}
-			
-			if (createHand) {
-				// right hand
-				s.setAsBox(width / 4f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(width / 2f * BOX2D_SCALE_FACTOR, 0.f), rotation);
-				fd.isSensor = true;
-				fd.density = 0.f;
-				Fixture handFixture = body.createFixture(fd);
-				handFixture.setUserData(new String("rightHand"));
-				
-				// left hand
-				s.setAsBox(width / 4f * BOX2D_SCALE_FACTOR, 0.1f, new Vec2(-width / 2f * BOX2D_SCALE_FACTOR, 0.f), rotation);
-				handFixture = body.createFixture(fd);
-				handFixture.setUserData(new String("leftHand"));
-			}
-
-		} else
-			body.createFixture(fd);
-
-		body.setUserData(this);
+		this.interactive = interactive;
+		this.liftable = liftable;
 	}
 	
-	public Body getBody() {
+	@Override
+	public boolean isStatic() {
+		return true;
+	}
+	protected boolean isBodyRotationFixed() {
+		return false;
+	}
+
+	final void initBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+		body = createBody(x, y, rotation);
+		createFixtures(body, shape, friction, restitution, density, fixedWeight);
+	}
+	protected final Body createBody(float x, float y, float rotation) {
+		BodyDef bd = new BodyDef();
+		bd.position.set(toBox2dCS(x, y));
+		bd.angle = (float) Math.toRadians(rotation);
+		bd.type = isStatic() ? BodyType.STATIC : BodyType.DYNAMIC;
+		bd.fixedRotation = isBodyRotationFixed();
+
+		Body body = parent.physicsWorld.createBody(bd);
+		body.setUserData(this);
+		
+		return body;
+	}
+	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+		FixtureDef fd = new FixtureDef();
+		fd.shape = createShape(shape, width, height);
+		if (CollisionHandlerType.NO_GRAV == type)
+			fd.isSensor = true;
+		
+		fd.friction = friction;
+		fd.restitution = restitution;
+		
+		// calculate the required density to reach the fixed mass 
+		if( fixedWeight!=null ) {
+			MassData md = new MassData();
+			fd.shape.computeMass(md, 1.0f);
+			density = fixedWeight/md.mass;
+		}
+		fd.density = density;
+		fd.userData = null;
+		
+		body.createFixture(fd);
+	}
+	protected static Shape createShape(PhysicsBodyShape shape, float width, float height) {
+		return createShape(shape, width, height, 0, 0, 0);
+	}
+	protected static Shape createShape(PhysicsBodyShape shape, float width, float height, float x, float y, float rotation) {
+		switch( shape ) {
+			case BOX:
+				PolygonShape box = new PolygonShape();
+				box.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR, toBox2dCS(x,y), rotation);
+				return box;
+				
+			case CIRCLE:
+				assert( Math.abs(height-width)<0.00001 );
+				CircleShape circle = new CircleShape();
+				circle.setRadius(height * BOX2D_SCALE_FACTOR);
+				circle.m_p.x = x*BOX2D_SCALE_FACTOR;
+				circle.m_p.y = y*BOX2D_SCALE_FACTOR;
+				return circle;
+				
+			default:
+				throw new RuntimeException("Unsupported Shape-Type: "+shape);
+		}
+	}
+	
+	public final Body getBody() {
 		return body;
 	}
 
-	public void setGameWorldId(int id) {
-		gameWorldId = id;
+	protected final int getWorldIdMask() {
+		return worldIdMask;
+	}
+	protected final void setWorldIdMask(int worldIdMask) {
+		this.worldIdMask = worldIdMask;
+	}
+	public final boolean isInWorld( int worldId ) {
+		return (worldIdMask&worldId) != 0;
+	}
+	public final void addToWorld(int worldId) {
+		worldIdMask|= worldId;
+	}
 		
-		// could/should be done much less hackish
-		boolean gravContact = false;
-		
-		for( ContactEdge c=body.getContactList(); c!=null;  c=c.next ) {
-			Box2dPhysicsBody body1 = (Box2dPhysicsBody) c.contact.getFixtureA().getBody().getUserData();
-			Box2dPhysicsBody body2 = (Box2dPhysicsBody) c.contact.getFixtureB().getBody().getUserData();
-			
-			
-			
-			if( (body1.getGameWorldId() == body2.getGameWorldId()) && (body1.getCollisionHandlerType()==CollisionHandlerType.NO_GRAV || body2.getCollisionHandlerType()==CollisionHandlerType.NO_GRAV) ) {
-				gravContact = true;
-				break;
-			}
-		}
-		
-		if( !gravContact ) {
-			collisionWithLadder = false;
-			body.setGravityScale(1.f);
-			climbing = false;
-		} else {
-			collisionWithLadder = true;
+	@Override
+	public final void setContactListener(PhysicsContactListener contactListener) {
+		this.contactListener = contactListener;
+	}
+
+	@Override
+	public final Vector2f getPosition() {
+		return fromBox2dCS(body.getPosition().x, body.getPosition().y);
+	}
+
+	@Override
+	public final float getRotation() {
+		double a = Math.toDegrees(body.getAngle()) % 360;
+		return (float) (a < 0 ? 360 + a : a);
+	}
+
+	@Override
+	public void onBeginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
+		if( contactListener!=null )
+			contactListener.beginContact(other);
+	}
+	@Override
+	public void onEndContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
+		if( contactListener!=null )
+			contactListener.endContact(other);
+	}
+	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
+		switch (type) {
+			case ONE_WAY:
+				return !other.isAbove(this);
+	
+			case NO_GRAV:
+			case SOLID:
+			default:
+				return false;
 		}
 	}
 
-	public int getGameWorldId() {
-		return gameWorldId;
-	}
-	
-	
+	// FIXME: doesn't work for complex objects
 	public boolean isAbove(Box2dPhysicsBody body) {
 		Transform t = body.body.getTransform();
 		
@@ -169,8 +185,8 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 
-		t = isBound() ? revoluteJoint.getBodyA().getTransform() : this.body.getTransform();
-		pos = isBound() ? revoluteJoint.getBodyA().getLocalCenter() : this.body.getLocalCenter();
+		t = /*isBound() ? revoluteJoint.getBodyA().getTransform() :*/ this.body.getTransform();
+		pos = /*isBound() ? revoluteJoint.getBodyA().getLocalCenter() :*/ this.body.getLocalCenter();
 		// bottom-left and bottom-right points of the entity/player
 		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
@@ -187,238 +203,75 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 			}
 	}
 	
-	public void setCollisionWithOneWayPlatform(boolean collision) {
-		collisionWithOneWayPlatform = collision;
-	}
-	
-	@Override
-	public void setContactListener(ContactListener contactListener) {
-		this.contactListener = contactListener;
-	}
-
-	@Override
-	public Vector2f getPosition() {
-		return Vector2f.div(
-				new Vector2f(body.getPosition().x, body.getPosition().y),
-				BOX2D_SCALE_FACTOR);
-	}
-
-	@Override
-	public float getRotation() {
-		double a = Math.toDegrees(body.getAngle()) % 360;
-		return (float) (a < 0 ? 360 + a : a);
-	}
-
-	public boolean beginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
-		if( activeContacts.add(contact) ) {
-			if (contactListener != null)
-				contactListener.beginContact(other);
-			
-			Object fixtureUD = fixture.getUserData();
-			boolean isRightHand = fixtureUD != null && ((String)fixtureUD).compareTo("rightHand") == 0 ? true : false;
-			boolean isLeftHand = fixtureUD != null && ((String)fixtureUD).compareTo("leftHand") == 0 ? true : false;
-			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
-
-			if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-				numFootContacts++;
-			else
-				if( isRightHand && other.getCollisionHandlerType() == CollisionHandlerType.SOLID )
-					touchingBodiesRight.add(other);
-				else
-					if( isLeftHand && other.getCollisionHandlerType() == CollisionHandlerType.SOLID )
-						touchingBodiesLeft.add(other);
-					else {
-						if (other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand)
-							collisionWithLadder = true;
-						else {
-							climbing = false;
-							body.setGravityScale(1.f);
-						}
-					}
-			
-			if( owner instanceof ContactListener )
-				((ContactListener) owner).beginContact(other);
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public void addCollisionsWithTestFixture(int num) {
-		collisionsWithTestFixture += num;
-	}
-
-	public boolean endContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
-		if( activeContacts.remove(contact) ) {
-			if (contactListener != null)
-				contactListener.endContact(other);
-	
-			Object fixtureUD = fixture.getUserData();
-			boolean isRightHand = fixtureUD != null && ((String)fixtureUD).compareTo("rightHand") == 0 ? true : false;
-			boolean isLeftHand = fixtureUD != null && ((String)fixtureUD).compareTo("leftHand") == 0 ? true : false;
-			boolean isFoot = fixtureUD != null && ((String)fixtureUD).compareTo("foot") == 0 ? true : false;
-
-				if( isFoot && other.getCollisionHandlerType() != CollisionHandlerType.NO_GRAV )
-					numFootContacts--;
-				else
-					if( isRightHand )
-						touchingBodiesRight.remove(other);
-					else
-						if( isLeftHand )
-							touchingBodiesLeft.remove(other);
-						else {
-							if ( other.getCollisionHandlerType() == CollisionHandlerType.NO_GRAV && !isRightHand && !isLeftHand ) {
-								collisionWithLadder = false;
-								body.setGravityScale(1.f);
-								climbing = false;
-							}
-						}
-				
-			if( owner instanceof ContactListener )
-				((ContactListener) owner).beginContact(other);
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	Body getLiftingBody() {
-		return liftingBody;
-	}
-	
 	@Override
 	public CollisionHandlerType getCollisionHandlerType() {
 		return type;
 	}
 
 	@Override
-	public boolean isStable() {
-		return numFootContacts > 0 && !collisionWithOneWayPlatform;
+	public void setPosition(Vector2f pos) {
+		body.setTransform(toBox2dCS(pos.x, pos.y), body.getAngle());
 	}
 
 	@Override
-	public boolean isClimbing() {
-		return climbing;
-	}
-
-	@Override
-	public byte move(float x, float y) {
-		x = limit(body.getLinearVelocity().x, x, maxXVel);
-		y = limit(body.getLinearVelocity().y, y, maxYVel);
-
-		body.applyForce(new Vec2(x, y), body.getWorldCenter());
-		//body.applyLinearImpulse(new Vec2(x/15, y/65), body.getWorldCenter());
-
-		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
-	}
-
-	private static float limit(float current, float mod, float max) {
-		return mod < 0 ? Math.max(mod, -max - current) : Math.min(mod, max
-				- current);
-	}
-
-	@Override
-	public void rotate(float angle) {
-		body.applyAngularImpulse((float) Math.toRadians(angle));
-	}
-
-	@Override
-	public void forcePosition(float x, float y) {
-		body.setTransform(new Vec2(x, y).mul(BOX2D_SCALE_FACTOR),
-				body.getAngle());
-	}
-
-	@Override
-	public void forceRotation(float angle) {
+	public void setRotation(float angle) {
 		body.setTransform(body.getPosition(), (float) Math.toRadians(angle));
 	}
 
 	@Override
-	public void resetVelocity(boolean x, boolean y, boolean rotation) {
-		body.setLinearVelocity(new Vec2(x ? 0 : body.getLinearVelocity().x,
-				y ? 0 : body.getLinearVelocity().y));
-
-		if (rotation)
-			body.setAngularVelocity(0);
-	}
-
-	@Override
-	public void setMaxVelocityX(float x) {
-		maxXVel = x;
-	}
-
-	@Override
-	public void setMaxVelocityY(float y) {
-		maxYVel = y;
-	}
-
-	@Override
-	public Vector2f getVelocity() {
-		return new Vector2f(body.getPosition().x, body.getPosition().y);
-	}
-
-	@Override
-	public void climb(boolean use) {
-		if (use) {
-			if (collisionWithLadder) {
-				body.setGravityScale(0.f);
-				climbing = true;
-			}
-		} else {
-			body.setGravityScale(1.f);
-			climbing = false;
-		}
-	}
-
-	@Override
 	public boolean bind(IPhysicsBody other, Vector2f anchor) {
-		if( !other.isStatic() )
-		{
-			boolean isLiftingPossible = false;
+		if( !boundBodies.containsKey(other) ) {
+			final Box2dPhysicsBody otherBody = (Box2dPhysicsBody) other;
 			
-			Box2dPhysicsBody b = (Box2dPhysicsBody) other;
-			//if( b.body.getMass() <= maxTestValue ) // lifting is possible {
-			other.forcePosition(getPosition().x, (getPosition().y-height/2.f-b.height/2.f));
-			// isLiftingPossible = true;
-			// }
+			Joint joint = parent.createRevoluteJoint(body, otherBody.getBody(), new Vec2(anchor.x, anchor.y));
 			
-			revoluteJoint = physicsWorld.createRevoluteJoint(body, b.getBody(), new Vec2(anchor.x, anchor.y));
-			b.revoluteJoint = revoluteJoint;
-			liftingBody = b.body;
+			if( joint==null )
+				return false;
 			
-			return isLiftingPossible;
+			boundBodies.put(other, joint);
+			otherBody.boundBodies.put(other, joint);
+			
+			return true;
 		}
 		
 		return false;
+		
+//		if( !other.isStatic() )
+//		{
+//			boolean isLiftingPossible = false;
+//			
+//			Box2dPhysicsBody b = (Box2dPhysicsBody) other;
+//			//if( b.body.getMass() <= maxTestValue ) // lifting is possible {
+//			other.setPosition(new Vector2f(getPosition().x, (getPosition().y-height/2.f-b.height/2.f)));
+//			// isLiftingPossible = true;
+//			// }
+//			
+//			revoluteJoint = parent.createRevoluteJoint(body, b.getBody(), new Vec2(anchor.x, anchor.y));
+//			b.revoluteJoint = revoluteJoint;
+//			liftingBody = b.body;
+//			
+//			return isLiftingPossible;
+//		}
 	}
 
 	@Override
-	public void unbind() {
-		if( revoluteJoint != null )
-		{
-			physicsWorld.destroyJoint(revoluteJoint);
-			((Box2dPhysicsBody)revoluteJoint.getBodyB().getUserData()).revoluteJoint = null;
-			revoluteJoint = null;
-		}
+	public void unbind(IPhysicsBody other) {
+		Joint joint = boundBodies.get(other);
+		if( joint==null )
+			joint = ((Box2dPhysicsBody)other).boundBodies.get(this);
+		
+		if( joint!=null )
+			parent.destroyJoint(joint);
+
+		((Box2dPhysicsBody)other).boundBodies.remove(this);
+		boundBodies.remove(other);
 	}
 
 	@Override
-	public boolean isBound() {
-		return revoluteJoint != null;
+	public boolean isBound(IPhysicsBody other) {
+		return other==null ? !boundBodies.isEmpty() : boundBodies.containsKey(other);
 	}
-
-	@Override
-	public boolean isStatic() {
-		return isStatic;
-	}
-
-	@Override
-	public boolean isWorldSwitchPossible() {
-		return collisionsWithTestFixture > 0;
-	}
-
+	
 	@Override
 	public Object getOwner() {
 		return owner;
@@ -428,38 +281,31 @@ final class Box2dPhysicsBody implements IPhysicsBody {
 	public void setOwner(Object owner) {
 		this.owner = owner;
 	}
-	
+
 	@Override
-	public void throwBoundBody(float x, float y) {
-		Body body = revoluteJoint.getBodyB();
-		unbind();
-		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
-		y = y < 0 ? Math.max(y, -maxThrowVel) : Math.min(y, maxThrowVel);
-		Box2dPhysicsBody b = ((Box2dPhysicsBody)body.getUserData());
-		float newX = x > 0 ? b.getPosition().x+width/2.f+20f : b.getPosition().x-width/2.f-20f;
-		if( y > 0) 
-			b.forcePosition(newX, b.getPosition().y);
-		
-		if( Math.abs(x) < 1.f ) {
-			b.forcePosition(newX, b.getPosition().y + b.height/2.f);
-		}
-		else
-			body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
+	public IPhysicsWorld getParent() {
+		return parent;
 	}
 
 	@Override
-	public void setMaxThrowVelocity(float vel) {
-		maxThrowVel = vel;
+	public float getWeight() {
+		return body.m_mass;
 	}
-	
 	@Override
-	public IPhysicsBody getTouchingBodyRight() {
-		return touchingBodiesRight.size() > 0 ? touchingBodiesRight.get(0) : null;
+	public float getHeight() {
+		return height;
 	}
-
 	@Override
-	public IPhysicsBody getTouchingBodyLeft() {
-		return touchingBodiesLeft.size() > 0 ? touchingBodiesLeft.get(0) : null;
+	public float getWidth() {
+		return width;
+	}
+	@Override
+	public boolean isInteractive() {
+		return interactive;
+	}
+	@Override
+	public boolean isLiftable() {
+		return liftable;
 	}
 	
 }

@@ -9,9 +9,11 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
 
 public class CollisionObject implements LayerObject {
 
@@ -48,7 +50,7 @@ public class CollisionObject implements LayerObject {
 	
 	private CollisionType type;
 
-	public CollisionObject(IGameMap map, int gameWorldID, CollisionType type, float x, float y, float width, float height, float rotation) {
+	public CollisionObject(IGameMap map, WorldId worldID, CollisionType type, float x, float y, float width, float height, float rotation) {
 		this.type = type;
 		
 		if( map.isEditable() ) {
@@ -63,7 +65,16 @@ public class CollisionObject implements LayerObject {
 			shape = null;
 		
 		if( map.getPhysicalWorld()!=null )
-			physicsBody = map.getPhysicalWorld().createStaticBody(gameWorldID, x, y, width, height, rotation, type.handlerType);
+			physicsBody = map.getPhysicalWorld().factory()
+				.inWorld(worldID)
+				.position(x, y)
+				.dimension(width, height)
+				.rotation(rotation)
+				.type(type.handlerType)
+				.friction(0.5f)						// TODO: make configurable
+				.restitution(0.f)					// TODO: make configurable
+				.staticBody(PhysicsBodyShape.BOX)	// TODO: make configurable
+				.create();
 		else
 			physicsBody = null;
 	}
@@ -145,7 +156,7 @@ public class CollisionObject implements LayerObject {
 		return map;
 	}
 	
-	public static CollisionObject create(IGameMap map, int worldId, Map<String, Object> attributes) {
+	public static CollisionObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
 		try {
 			return new CollisionObject(
 					map,

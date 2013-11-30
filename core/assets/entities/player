@@ -1,2 +1,2 @@
 {"moveAcceleration":2, "jumpAcceleration":10, "maxMoveSpeed":4, "maxJumpSpeed":130, "maxThrowSpeed":2,
-"width":50, "height":50}
+"width":50, "height":55, "shape":"HUMANOID"}

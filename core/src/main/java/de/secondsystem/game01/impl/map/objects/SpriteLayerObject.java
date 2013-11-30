@@ -8,6 +8,7 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.LayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
 
@@ -113,7 +114,7 @@ public class SpriteLayerObject implements LayerObject {
 		return map;
 	}
 	
-	public static SpriteLayerObject create(IGameMap map, int worldId, Map<String, Object> attributes) {
+	public static SpriteLayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
 		try {
 			return new SpriteLayerObject(
 					map.getTileset(),
