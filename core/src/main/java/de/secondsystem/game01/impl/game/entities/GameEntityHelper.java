@@ -122,6 +122,6 @@ final class GameEntityHelper {
 		
 		return null;
 	}
-		
+	
 	private GameEntityHelper() {}
 }
