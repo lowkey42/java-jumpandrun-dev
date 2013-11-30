@@ -1,10 +1,10 @@
 package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.FinalizeState;
@@ -25,34 +25,38 @@ public final class MainMenuState extends GameState {
 	
 	private final Sprite backdrop = new Sprite();
 
-	private final MenuButton newGameBt = new MenuButton("NEW GAME", 500, 40, new MenuButton.IOnClickListener() {
+	
+	// --> TODO Abfragen der Fensterbreite bereits beim Erschaffen des Buttons um diesen richtig zu positionieren
+	private final MenuButton newGameBt = new MenuButton("NEW GAME", 515, 40, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new MainGameState("test01"));
 		}
 	});
-	private final MenuButton loadGameBt = new MenuButton("LOAD GAME", 500, 190, new MenuButton.IOnClickListener() {
+	private final MenuButton loadGameBt = new MenuButton("LOAD GAME", 515, 190, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
-			System.out.println("LOAD GAME..... NOT");
+			setNextState(new MainGameState("test01"));
 		}
 	});
-	private final MenuButton editorBt = new MenuButton("EDITOR", 500, 340, new MenuButton.IOnClickListener() {
+	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 340, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new EditorGameState(MainMenuState.this,
 					new JsonGameMapSerializer().deserialize("test01",
 							true, true)));
 		}
 	});
-	private final MenuButton settingsBt = new MenuButton("SETTINGS", 500, 490, new MenuButton.IOnClickListener() {
+	private final MenuButton settingsBt = new MenuButton("SETTINGS", 515, 490, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new SettingsMenuState(MainMenuState.this, playGameState,
 					backdrop));
 		}
 	});
-	private final MenuButton exitGameBt = new MenuButton("EXIT GAME", 500, 640, new MenuButton.IOnClickListener() {
+	private final MenuButton exitGameBt = new MenuButton("EXIT GAME", 515, 640, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new FinalizeState());
 		}
 	});
+	
+	InputText testtext = new InputText(200, 200, 200, "ABABAB");
 
 	public MainMenuState() {
 		this.playGameState = null;
@@ -70,7 +74,7 @@ public final class MainMenuState extends GameState {
 		if (backdrop.getTexture() == null) {
 			Texture backdropBuffer = new Texture();
 			// Creating Backdrop Texture via monitor screenshot of the stage
-			// before rendered on every frame
+			// before, rendered on every frame
 			try {
 				backdropBuffer.create(ctx.settings.width, ctx.settings.height);
 			} catch (TextureCreationException e) {
@@ -105,7 +109,10 @@ public final class MainMenuState extends GameState {
 					exitGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 				}
 				break;
-				
+			case TEXT_ENTERED:
+				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 33)
+				System.out.println("TEXT ENTERED: " + event.asTextEvent().unicode);
+				break;
 			case KEY_RELEASED:
 				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE) {
 					setNextState(playGameState);
@@ -122,5 +129,7 @@ public final class MainMenuState extends GameState {
 		loadGameBt.draw(ctx.window);
 		exitGameBt.draw(ctx.window);
 
+		testtext.draw(ctx.window);
+		
 	}
 }

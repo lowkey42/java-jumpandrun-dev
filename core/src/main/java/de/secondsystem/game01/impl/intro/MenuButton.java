@@ -2,10 +2,6 @@ package de.secondsystem.game01.impl.intro;
 
 import java.io.IOException;
 
-
-
-
-
 /*import org.jsfml.audio.Sound;
 import org.jsfml.audio.SoundBuffer;*/
 import org.jsfml.graphics.Color;
@@ -20,7 +16,6 @@ import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -95,6 +90,10 @@ public final class MenuButton implements IDrawable, IUpdateable {
 
 	// Methods
 	// Draw a sprite
+	public double getSize(){
+		return this.width;
+	}
+	
 	@Override
 	public void draw(RenderTarget rt){
 		if( rt instanceof Window )
