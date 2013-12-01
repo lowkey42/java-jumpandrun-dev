@@ -28,6 +28,7 @@ public class InputText {
 	private final Vector2f myPos;
 	
 	String myStringFile = "";
+	String fullString = "";
 	
 	String fonttype = "FreeSansBold.otf";
 	
@@ -72,6 +73,19 @@ public class InputText {
 	
 	public void newKey(Event event){
 		this.myText.setString(this.myText.getString() + event.asTextEvent().character);
+		String xy = myText.getString();
+		char ab = (xy.charAt(xy.length() - 1));
+		System.out.println(ab);
+		
+		String newString = "";
+		for(int i = 1; i < xy.length(); i++){
+			newString += xy.charAt(i);
+		}
+		
+		if (newString.length()-1 > 0)
+		fullString += newString.charAt(newString.length()-1);
+		myText.setString(newString);
+		System.out.println(fullString);
 	}
 	
 	
