@@ -5,6 +5,7 @@ import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.FinalizeState;
@@ -22,7 +23,6 @@ public final class MainMenuState extends GameState {
 
 	private final GameState playGameState;
 
-	
 	private final Sprite backdrop = new Sprite();
 
 	
@@ -32,32 +32,33 @@ public final class MainMenuState extends GameState {
 			setNextState(new MainGameState("test01"));
 		}
 	});
-	private final MenuButton loadGameBt = new MenuButton("LOAD GAME", 515, 190, new MenuButton.IOnClickListener() {
-		@Override public void onClick() {
-			System.out.println("Loading game....... NOT");
-		}
-	});
-	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 340, new MenuButton.IOnClickListener() {
+	
+	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 190, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new EditorGameState(MainMenuState.this,
 					new JsonGameMapSerializer().deserialize("test01",
 							true, true)));
 		}
 	});
-	private final MenuButton settingsBt = new MenuButton("SETTINGS", 515, 490, new MenuButton.IOnClickListener() {
+	
+	private final MenuButton loadGameBt = new MenuButton("GUI TEST SITE", 515, 340, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
-			setNextState(new SettingsMenuState(MainMenuState.this, playGameState,
-					backdrop));
+			setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
 		}
 	});
+	
+	private final MenuButton settingsBt = new MenuButton("SETTINGS", 515, 490, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
+		}
+	});
+	
 	private final MenuButton exitGameBt = new MenuButton("EXIT GAME", 515, 640, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new FinalizeState());
 		}
 	});
 	
-	InputText testtext = new InputText(200, 200, 200, "");
-
 	public MainMenuState() {
 		this.playGameState = null;
 	}
@@ -69,7 +70,6 @@ public final class MainMenuState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
-		// TODO
 
 		if (backdrop.getTexture() == null) {
 			Texture backdropBuffer = new Texture();
@@ -108,21 +108,9 @@ public final class MainMenuState extends GameState {
 					exitGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 				}
 				break;
-			case TEXT_ENTERED:
-				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
-					//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
-					testtext.newKey(event);
-				} else if (event.asTextEvent().unicode == 8){
-					testtext.removeKey();
-				} else if (event.asTextEvent().unicode == 13){
-					System.out.println("Sent Text: " + testtext.finalizeInput());
-				}
-				break;
 			case KEY_RELEASED:
-				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE) {
+				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
 					setNextState(playGameState);
-				}
-
 			}
 		}
 
@@ -134,7 +122,5 @@ public final class MainMenuState extends GameState {
 		loadGameBt.draw(ctx.window);
 		exitGameBt.draw(ctx.window);
 
-		testtext.draw(ctx.window);
-		
 	}
 }
