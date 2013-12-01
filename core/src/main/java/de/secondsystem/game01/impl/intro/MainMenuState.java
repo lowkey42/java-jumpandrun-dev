@@ -93,8 +93,6 @@ public final class MainMenuState extends GameState {
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		// TODO Preparing the following code to be able to be used with more
-		// than 1 button --> outsourcing into button class
 
 		for (Event event : ctx.window.pollEvents()) {
 			switch (event.type) {
@@ -111,11 +109,12 @@ public final class MainMenuState extends GameState {
 				break;
 			case TEXT_ENTERED:
 				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
-					System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
+					//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
 					testtext.newKey(event);
 				} else if (event.asTextEvent().unicode == 8){
-					System.out.println("BACKSPACE PUSHED");
-					testtext.removeKey(event);
+					testtext.removeKey();
+				} else if (event.asTextEvent().unicode == 13){
+					System.out.println("Sent Text: " + testtext.finalizeInput());
 				}
 				break;
 			case KEY_RELEASED:

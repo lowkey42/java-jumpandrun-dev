@@ -21,7 +21,8 @@ import de.secondsystem.game01.impl.ResourceManager;
 public class InputText {
 
 	// Attributes
-	private int width, height = 25, pos_x, pos_y;
+	private double width;
+	private int height = 25, pos_x, pos_y;
 	
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
 	
@@ -74,28 +75,28 @@ public class InputText {
 	public void newKey(Event event){
 		this.myText.setString(this.myText.getString() + event.asTextEvent().character);
 		
-		if(myText.getString().length() > 16){
+		// Checking if the text inside the box exceeds width (12.5pixel per char --> Monospace) 
+		if(myText.getString().length() > (this.width/12.5)){
 			prevString += myText.getString().charAt(0);
-			for(int i = 1; i < 17; i++)
+			for(int i = 1; i < (this.width/12); i++)
 				newString += myText.getString().charAt(i);
 			myText.setString(newString);
+			// setting newString free for next text interaction
 			newString = "";
-		}
-		
-		System.out.println("Previous input String contains: " + prevString);
-		
+		}		
 		
 		
 	}
 	
-	public void removeKey(Event event){
+	public void removeKey(){
 		
+		// Checking if Textbox contains text BUT prevString is empty 
 		if(myText.getString().length() > 0 && prevString.length() == 0){
 			for(int i = 0; i < myText.getString().length() - 1; i++)
 				newString += myText.getString().charAt(i);
 			myText.setString(newString);
-			System.out.println("removed!");
 			newString = "";
+		// Checking if Textbox contains text AND prevString contains something
 		} else if(myText.getString().length() > 0 && prevString.length() > 0){
 			for(int i = 0; i < myText.getString().length() - 1; i++)
 				newString += myText.getString().charAt(i);
@@ -106,8 +107,12 @@ public class InputText {
 			prevString = newString;
 			newString = "";
 		}
-
-		
+	}
+	
+	public String finalizeInput(){
+		String toSend = prevString + myText.getString();
+		prevString = ""; myText.setString("");
+		return toSend;		
 	}
 	
 }
