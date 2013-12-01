@@ -8,11 +8,7 @@ function touchFunc(entity, other) {
 	entity.jump();
 }
 
-for( var i=0; i<40; i++ ) {
-	for( var j=0; j<2; j++ ) {
-		entities.createControllable( "enemy", {"x": 450+i*80, "y": j*-200 } );
-	}
-}
+
     
 function timerFunc(timer, entity, args) {  
 	entity.jump();

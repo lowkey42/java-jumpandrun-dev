@@ -58,6 +58,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
+		// this fixture construction leads to bugs ( player gets stuck on edges under certain circumstances, annoying bouncing on slopes, stairs )
 		final float baseRad = (float) Math.floor(getWidth()/2 -1);
 		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2);
 		
@@ -72,6 +73,8 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
 		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
+		// this is a bad check, jump doesn't work sometimes since the body bounces
+		// + jump works on ~80° slopes
 		baseBody.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		body.createFixture(baseBody);
 		

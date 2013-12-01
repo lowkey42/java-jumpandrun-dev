@@ -103,7 +103,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		//getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
 		getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
 
-		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
+		return (byte) ((x != 0 ? 2 : 0) | (y != 0 ? 1 : 0));
 	}
 
 	private static float limit(float current, float mod, float max) {

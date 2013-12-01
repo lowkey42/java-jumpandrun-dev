@@ -268,8 +268,13 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 
 	@Override
+	public boolean isBound() {
+		return !boundBodies.isEmpty();
+	}
+	
+	@Override
 	public boolean isBound(IPhysicsBody other) {
-		return other==null ? !boundBodies.isEmpty() : boundBodies.containsKey(other);
+		return boundBodies.containsKey(other);
 	}
 	
 	@Override
