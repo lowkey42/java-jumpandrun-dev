@@ -25,17 +25,11 @@ public class InputText {
 	private int height = 25, pos_x, pos_y;
 	
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
-	
 	private final Vector2f myPos;
-	
-	String prevString = "";
-	String newString = "";
-	
-	String fonttype = "VeraMono.ttf";
-	
 	private Text myText;
 	
-	
+	String prevString = ""; String newString = "";
+		
 	// Constructors
 	InputText(int pos_x, int pos_y, int width, String inhalt){
 		this.width = width;
@@ -52,18 +46,15 @@ public class InputText {
 		linie_y1.setPosition(pos_x, pos_y); linie_y2.setPosition(linie_y1.getPosition().x + width, pos_y);
 		
 		myPos = new Vector2f(pos_x, pos_y);
-		
 			
 		try {
 			// Loading standard Font
-			ConstFont myFont = ResourceManager.font.get(fonttype);
+			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
 			myText = new Text(inhalt, myFont, (height - 5));
 			myText.setPosition(myPos.x + 5, myPos.y);
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
-		
-		
 	}
 	
 	
@@ -75,7 +66,7 @@ public class InputText {
 	public void newKey(Event event){
 		this.myText.setString(this.myText.getString() + event.asTextEvent().character);
 		
-		// Checking if the text inside the box exceeds width (12.5pixel per char --> Monospace) 
+		// Checking if the text inside the box exceeds width (12.5 pixel per char --> Monospace VeraMono) 
 		if(myText.getString().length() > (this.width/12.5)){
 			prevString += myText.getString().charAt(0);
 			for(int i = 1; i < (this.width/12); i++)
@@ -83,13 +74,10 @@ public class InputText {
 			myText.setString(newString);
 			// setting newString free for next text interaction
 			newString = "";
-		}		
-		
-		
+		}	
 	}
 	
 	public void removeKey(){
-		
 		// Checking if Textbox contains text BUT prevString is empty 
 		if(myText.getString().length() > 0 && prevString.length() == 0){
 			for(int i = 0; i < myText.getString().length() - 1; i++)

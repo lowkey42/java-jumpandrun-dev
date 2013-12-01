@@ -34,7 +34,7 @@ public final class MainMenuState extends GameState {
 	});
 	private final MenuButton loadGameBt = new MenuButton("LOAD GAME", 515, 190, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
-			setNextState(new MainGameState("test01"));
+			System.out.println("Loading game....... NOT");
 		}
 	});
 	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 340, new MenuButton.IOnClickListener() {
@@ -102,6 +102,7 @@ public final class MainMenuState extends GameState {
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
 					newGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					loadGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					editorBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					settingsBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					exitGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
