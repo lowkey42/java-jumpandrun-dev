@@ -111,8 +111,11 @@ public final class MainMenuState extends GameState {
 				break;
 			case TEXT_ENTERED:
 				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
-					//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
+					System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
 					testtext.newKey(event);
+				} else if (event.asTextEvent().unicode == 8){
+					System.out.println("BACKSPACE PUSHED");
+					testtext.removeKey(event);
 				}
 				break;
 			case KEY_RELEASED:

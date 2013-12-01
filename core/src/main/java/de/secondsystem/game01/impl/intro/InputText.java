@@ -82,7 +82,7 @@ public class InputText {
 			newString = "";
 		}
 		
-		System.out.println(prevString);
+		System.out.println("Previous input String contains: " + prevString);
 		
 		
 		
@@ -90,7 +90,23 @@ public class InputText {
 	
 	public void removeKey(Event event){
 		
-		
+		if(myText.getString().length() > 0 && prevString.length() == 0){
+			for(int i = 0; i < myText.getString().length() - 1; i++)
+				newString += myText.getString().charAt(i);
+			myText.setString(newString);
+			System.out.println("removed!");
+			newString = "";
+		} else if(myText.getString().length() > 0 && prevString.length() > 0){
+			for(int i = 0; i < myText.getString().length() - 1; i++)
+				newString += myText.getString().charAt(i);
+			myText.setString((prevString.charAt(prevString.length()-1)) + newString);
+			newString = "";
+			for(int i = 0; i < prevString.length()-1; i++)
+				newString += prevString.charAt(i);
+			prevString = newString;
+			newString = "";
+		}
+
 		
 	}
 	
