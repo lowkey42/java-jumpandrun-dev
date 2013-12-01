@@ -56,7 +56,7 @@ public final class MainMenuState extends GameState {
 		}
 	});
 	
-	InputText testtext = new InputText(200, 200, 200, "Test");
+	InputText testtext = new InputText(200, 200, 200, "");
 
 	public MainMenuState() {
 		this.playGameState = null;
@@ -111,7 +111,7 @@ public final class MainMenuState extends GameState {
 				break;
 			case TEXT_ENTERED:
 				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
-					System.out.println("TEXT ENTERED: " + event.asTextEvent().unicode);
+					//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
 					testtext.newKey(event);
 				}
 				break;

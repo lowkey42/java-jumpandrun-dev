@@ -27,10 +27,10 @@ public class InputText {
 	
 	private final Vector2f myPos;
 	
-	String myStringFile = "";
-	String fullString = "";
+	String prevString = "";
+	String newString = "";
 	
-	String fonttype = "FreeSansBold.otf";
+	String fonttype = "VeraMono.ttf";
 	
 	private Text myText;
 	
@@ -57,7 +57,7 @@ public class InputText {
 			// Loading standard Font
 			ConstFont myFont = ResourceManager.font.get(fonttype);
 			myText = new Text(inhalt, myFont, (height - 5));
-			myText.setPosition(myPos);
+			myText.setPosition(myPos.x + 5, myPos.y);
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
@@ -73,20 +73,25 @@ public class InputText {
 	
 	public void newKey(Event event){
 		this.myText.setString(this.myText.getString() + event.asTextEvent().character);
-		String xy = myText.getString();
-		char ab = (xy.charAt(xy.length() - 1));
-		System.out.println(ab);
 		
-		String newString = "";
-		for(int i = 1; i < xy.length(); i++){
-			newString += xy.charAt(i);
+		if(myText.getString().length() > 16){
+			prevString += myText.getString().charAt(0);
+			for(int i = 1; i < 17; i++)
+				newString += myText.getString().charAt(i);
+			myText.setString(newString);
+			newString = "";
 		}
 		
-		if (newString.length()-1 > 0)
-		fullString += newString.charAt(newString.length()-1);
-		myText.setString(newString);
-		System.out.println(fullString);
+		System.out.println(prevString);
+		
+		
+		
 	}
 	
+	public void removeKey(Event event){
+		
+		
+		
+	}
 	
 }
