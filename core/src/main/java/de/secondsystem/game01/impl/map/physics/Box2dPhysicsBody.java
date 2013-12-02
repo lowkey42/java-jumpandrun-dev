@@ -180,7 +180,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		}
 	}
 
-	// FIXME: doesn't work for complex objects
+	// FIXME: doesn't work for complex objects (temporary workaround: pos.y + height/2.f -10)
 	public boolean isAbove(Box2dPhysicsBody body) {
 		Transform t = body.body.getTransform();
 		
@@ -192,8 +192,8 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		t = /*isBound() ? revoluteJoint.getBodyA().getTransform() :*/ this.body.getTransform();
 		pos = /*isBound() ? revoluteJoint.getBodyA().getLocalCenter() :*/ this.body.getLocalCenter();
 		// bottom-left and bottom-right points of the entity/player
-		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
-		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f).mul(BOX2D_SCALE_FACTOR));
+		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f -10).mul(BOX2D_SCALE_FACTOR));
+		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f -10).mul(BOX2D_SCALE_FACTOR));
 		
 		if( p1.x < v1.x && v1.y < v2.y)
 			return p1.y <= v1.y && p1.y <= v2.y;

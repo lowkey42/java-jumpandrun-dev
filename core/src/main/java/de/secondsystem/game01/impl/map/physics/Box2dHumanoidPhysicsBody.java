@@ -12,6 +12,8 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.physics.Box2dDynamicPhysicsBody.StableCheckFCL;
+
 
 class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		IHumanoidPhysicsBody {
@@ -58,14 +60,12 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
-		// this fixture construction leads to bugs ( player gets stuck on edges under certain circumstances, annoying bouncing on slopes, stairs )
-		final float baseRad = (float) Math.floor(getWidth()/2 -1);
-		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2);
-		
+		final float baseRad = (float) Math.floor(getWidth()/2 );
+		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(45)) * getWidth()/2), baseRad*2);
 		FixtureDef mainBody = new FixtureDef();
 		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
 		mainBody.friction = 0.f;
-		mainBody.restitution = 0.01f;
+		mainBody.restitution = 0.03f;
 		mainBody.density = 1.0f;
 		body.createFixture(mainBody);
 		
@@ -73,10 +73,14 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
 		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
-		// this is a bad check, jump doesn't work sometimes since the body bounces
-		// + jump works on ~80° slopes
-		baseBody.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		body.createFixture(baseBody);
+		
+		FixtureDef fd = new FixtureDef();
+		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 3f, 1f, 0, getHeight()/2, 0);
+		fd.isSensor = true;
+		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
+		
+		body.createFixture(fd);
 		
 		FixtureDef leftObjSensor = new FixtureDef();
 		leftObjSensor.shape = createShape(PhysicsBodyShape.BOX, getWidth()/2+maxReach, getHeight(), -maxReach-getWidth()/4, 0, 0 );
