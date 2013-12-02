@@ -35,7 +35,7 @@ public class MainGameState extends GameState {
 	//	map.getEntityManager().createControllable( "enemy", new Attributes(new Attribute("x",400), new Attribute("y",100)) );
 		
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
-		
+
 		camera = new Camera(player);
 	}
 	

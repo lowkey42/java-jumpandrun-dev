@@ -30,7 +30,9 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	protected static final Vector2f fromBox2dCS( float x, float y ) {
 		return Vector2f.div(new Vector2f(x, y), BOX2D_SCALE_FACTOR);
 	}
-
+	
+	private final boolean kinematic;
+	
 	private final Box2dPhysicalWorld parent;
 	private final CollisionHandlerType type;
 	private final float height, width;
@@ -44,7 +46,8 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 
 	private final Map<IPhysicsBody, Joint> boundBodies = new HashMap<>();
 	
-	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type ) {
+	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, 
+			CollisionHandlerType type, boolean kinematic ) {
 		this.worldIdMask = worldIdMask;
 		this.type = type;
 		this.parent = world;
@@ -52,6 +55,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		this.width  = width;
 		this.interactive = interactive;
 		this.liftable = liftable;
+		this.kinematic = kinematic;
 	}
 	
 	@Override
@@ -70,7 +74,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		BodyDef bd = new BodyDef();
 		bd.position.set(toBox2dCS(x, y));
 		bd.angle = (float) Math.toRadians(rotation);
-		bd.type = isStatic() ? BodyType.STATIC : BodyType.DYNAMIC;
+		bd.type = isStatic() ? BodyType.STATIC : kinematic ? BodyType.KINEMATIC : BodyType.DYNAMIC;
 		bd.fixedRotation = isBodyRotationFixed();
 
 		Body body = parent.physicsWorld.createBody(bd);

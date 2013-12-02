@@ -31,7 +31,8 @@ public interface IPhysicsWorld extends IUpdateable {
 		
 		PhysicsBodyFactory interactive(boolean interactive);
 		PhysicsBodyFactory liftable(boolean liftable);
-
+		PhysicsBodyFactory kinematic(boolean kinematic);
+		
 		PhysicsBodyFactory type(CollisionHandlerType type);
 		
 		StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape);
@@ -49,6 +50,7 @@ public interface IPhysicsWorld extends IUpdateable {
 		
 		DynamicPhysicsBodyFactory stableCheck(boolean enable);
 		DynamicPhysicsBodyFactory worldSwitch(boolean allowed);
+	
 	}
 	public interface HumanoidPhysicsBodyFactory extends DynamicPhysicsBodyFactory {
 		HumanoidPhysicsBodyFactory maxXSpeed(float speed);

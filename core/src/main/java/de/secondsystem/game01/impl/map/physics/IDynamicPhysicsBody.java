@@ -19,6 +19,7 @@ public interface IDynamicPhysicsBody extends IPhysicsBody {
 	void setMaxVelocityY( float y );
 	
 	byte move( float x, float y );
+	void setLinearVelocity( float x, float y);
 	void rotate( float angle );
 	
 	void resetVelocity( boolean x, boolean y, boolean rotation );

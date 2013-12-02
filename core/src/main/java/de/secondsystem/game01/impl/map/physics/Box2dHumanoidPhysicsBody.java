@@ -42,7 +42,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
 			float maxXVel, float maxYVel,
 			float maxThrowVel, float maxLiftWeight, float maxSlope, float maxReach) {
-		super(world, gameWorldId, width, height, interactive, liftable, type, true, true, maxXVel, maxYVel);
+		super(world, gameWorldId, width, height, interactive, liftable, type, false, true, true, maxXVel, maxYVel);
 		this.maxThrowVel = maxThrowVel;
 		this.maxLiftWeight = maxLiftWeight;
 		
