@@ -1,6 +1,8 @@
 package de.secondsystem.game01.impl.timer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
@@ -14,7 +16,7 @@ public class Timer implements Comparable<Timer>{
 	private final IGameEntity target;
 	private final long intervalMs;
 	private final boolean repeated;	
-	private final List<Object> args = new ArrayList<Object>();
+	private final List<Object> args;
 	private long startTimeMs;
 	
 	public Timer(ScriptEnvironment scriptEnv, long intervalMs, boolean repeated, String funcName, IGameEntity target, Object... args) {
@@ -25,18 +27,19 @@ public class Timer implements Comparable<Timer>{
 		this.target = target;
 		startTimeMs = System.currentTimeMillis();
 
-		for(Object arg : args)
-			this.args.add(arg);
+		this.args = Collections.unmodifiableList( Arrays.asList(args) );
 	}
 	
 	
 	public boolean onTick() {
 		tickCount++;
 		
-		if( target != null )
-			env.exec(funcName, this, target, args.toArray());
-		else
-			env.exec(funcName, this, args.toArray());
+		final List<Object> argArray = new ArrayList<>();
+		argArray.add(this);
+		argArray.add(target);
+		argArray.addAll(args);
+		
+		env.exec(funcName, argArray.toArray());
 		
 		return repeated && enabled;
 	}

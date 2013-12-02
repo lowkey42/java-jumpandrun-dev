@@ -14,9 +14,9 @@ for( var i=0; i<40; i++ ) {
 	}
 }
     
-function timerFunc(timer, entity, args) {  
+function timerFunc(timer, entity, arg1, arg2) {  
 	entity.jump();
-	println("Works like a charm. " + timer.getTickCount() + args[0] + args[1]); // is there a better solution than args[0], args[1]... ?
+	println("Works like a charm. " + timer.getTickCount() + arg1 + arg2);
 	
 	// disable the timer after 5 onTick() calls
 	if( timer.getTickCount() == 5 ) {
