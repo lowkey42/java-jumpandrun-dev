@@ -61,7 +61,7 @@ public final class MemoText {
 			myText = new Text[((int)(this.height/21))];
 				for(int i = 0; i < ((int)(this.height/21)); i++){
 					myText[i] = new Text("", myFont, 20);
-					myText[i].setPosition(pos_x, pos_y + i*21);
+					myText[i].setPosition(pos_x + 5, pos_y + i*21);
 					System.out.println(myText[i].getString());
 				}
 			} catch( IOException e ) {
@@ -69,7 +69,7 @@ public final class MemoText {
 			}
 		
 		System.out.println("MEMO --> Possible Lines with standard fonts " + this.height / 21);
-		System.out.println("MEMO --> Possible Chars in each line with std font: " + this.width / 12.5);
+		System.out.println("MEMO --> Possible Chars in each line with std font: " + this.width / 13);
 		
 	}
 	
@@ -88,7 +88,7 @@ public final class MemoText {
 	
 	public void newKey(Event event){
 		if(this.isActive)
-			if(this.myText[linePointer].getString().length() <= this.width / 12.5){
+			if(this.myText[linePointer].getString().length() <= this.width / 13){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
 			} else {
 				linePointer += 1;
