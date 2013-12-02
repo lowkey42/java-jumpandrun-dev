@@ -5,6 +5,7 @@ import java.util.UUID;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
 /**
@@ -12,7 +13,7 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable {
 
 	UUID uuid();
 	

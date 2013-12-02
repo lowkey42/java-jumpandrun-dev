@@ -10,8 +10,8 @@ public interface IControllable {
 		UP, DOWN;
 	}
 	
-	void moveHorizontally(HDirection direction);
-	void moveVertically(VDirection direction);
+	void moveHorizontally(HDirection direction, float factor);
+	void moveVertically(VDirection direction, float factor);
 	
 	void jump();
 	

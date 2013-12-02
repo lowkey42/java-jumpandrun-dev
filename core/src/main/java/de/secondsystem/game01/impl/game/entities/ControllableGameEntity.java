@@ -22,13 +22,19 @@ import de.secondsystem.game01.model.IUpdateable;
 class ControllableGameEntity extends GameEntity implements IControllableGameEntity {
 	private final float THROWING_POWER_INC = 2.f;
 	
+	private IGameEntityController controller; 
+	
 	private float moveAcceleration;
 	
 	private float jumpAcceleration;
 	
 	protected HDirection hDirection;
 	
+	protected float hFactor;
+	
 	protected VDirection vDirection;
+	
+	protected float vFactor;
 	
 	protected boolean jump = false;
 	private long jumpTimer = 0L;
@@ -47,24 +53,29 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean pulling;
 	
+	private boolean vMovementAllowed = false;
+	
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 
-		this.moveAcceleration = attributes.getFloat("moveAcceleration");
-		this.jumpAcceleration = attributes.getFloat("jumpAcceleration");
+		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
+		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
+		this.vMovementAllowed = attributes.getBoolean("verticalMovementAllowed", false);
 	}
 
 	@Override
-	public void moveHorizontally(HDirection direction) {
+	public void moveHorizontally(HDirection direction, float factor) {
 		hDirection = direction;
+		hFactor = factor;
 	}
 
 	@Override
-	public void moveVertically(VDirection direction) {
+	public void moveVertically(VDirection direction, float factor) {
 		vDirection = direction;
+		vFactor = factor;
 	}
 
 	@Override
@@ -81,10 +92,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	@Override
 	public void update(long frameTimeMs) {
+		if( controller instanceof IUpdateable )
+			((IUpdateable) controller).update(frameTimeMs);
+		
 		jumpTimer += frameTimeMs;
 			
-		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -1 : 1;
-		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -1 : 1;
+		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -hFactor : hFactor;
+		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -vFactor : vFactor;
 			
 		processMovement(frameTimeMs, xMove, yMove);
 		
@@ -108,7 +122,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
 		facingDirection = xMove == 1 ? HDirection.RIGHT : xMove == -1 ? HDirection.LEFT : facingDirection;
 		
-		physicsBody.move(moveAcceleration*frameTimeMs * xMove, jump && physicsBody.isStable() ? -jumpAcceleration*frameTimeMs : 0 );
+		final float effectiveYMove = vMovementAllowed ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
+		
+		physicsBody.move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
 	    
 	    if( hDirection!=null )
 	    	moved = true;
@@ -166,12 +182,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			return;
 		
 		if( yMove == -1 && !incThrowingPowerEvent )
-			((IHumanoidPhysicsBody) physicsBody).tryClimbing();
-			
-		if( ((IHumanoidPhysicsBody) physicsBody).isClimbing() ) {
-			physicsBody.move(0.f, moveAcceleration*frameTimeMs * yMove );
-			physicsBody.resetVelocity(false, true, false);
-		}
+			vMovementAllowed = ((IHumanoidPhysicsBody) physicsBody).tryClimbing();
 	}
 	
 	private void onIncThrowingPowerEvent(long frameTimeMs) {
@@ -192,6 +203,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void incThrowingPower() {
 		incThrowingPowerEvent = true;
+	}
+
+	@Override
+	public void setController(IGameEntityController controller) {
+		this.controller = controller;
 	}
 	
 }

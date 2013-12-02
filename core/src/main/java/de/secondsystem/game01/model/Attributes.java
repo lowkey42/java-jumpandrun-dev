@@ -34,6 +34,10 @@ public class Attributes extends HashMap<String, Object> {
 		Object val = get(key);
 		return val!=null ? Boolean.valueOf(val.toString()) : null;
 	}
+	public boolean getBoolean(String key, boolean def) {
+		Object val = get(key);
+		return val!=null ? Boolean.valueOf(val.toString()) : def;
+	}
 	
 	public Float getFloat(String key) {
 		Object val = get(key);

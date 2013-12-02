@@ -151,8 +151,7 @@ public class GameMap implements IGameMap {
 					rt.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
 				else
 					rt.setView(cView);
-				
-				for(int i=0; i<10; i++) 
+				 
 				layer.draw(rt);
 			}
 			

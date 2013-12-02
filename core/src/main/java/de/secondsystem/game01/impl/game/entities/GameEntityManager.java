@@ -21,6 +21,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 
@@ -43,22 +44,6 @@ public final class GameEntityManager implements IGameEntityManager {
 			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
 			
 			ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this, map, GameEntityHelper.createEventHandler(this, attributes), attributes );
-			entities.put(e.uuid(), e);
-			
-			return e;
-			
-		} catch (ExecutionException e) {
-			throw new Error(e.getMessage(), e);
-		}
-	}
-	
-	@Override
-	public MovingPlatform createMovingPlatform(String type,
-			Map<String, Object> args) {
-		try {
-			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
-			
-			MovingPlatform e = new MovingPlatform(UUID.randomUUID(), this, map, GameEntityHelper.createEventHandler(this, attributes), attributes );
 			entities.put(e.uuid(), e);
 			
 			return e;

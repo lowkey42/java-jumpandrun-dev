@@ -164,4 +164,25 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		setWorldMask(worldId.id);
 	}
 
+	@Override
+	public void setPosition(Vector2f pos) {
+		if( physicsBody!=null ) {
+			physicsBody.setPosition(pos);
+			physicsBody.resetVelocity(true, true, false);
+		}
+	}
+
+	@Override
+	public void setRotation(float degree) {
+		if( physicsBody!=null ) {
+			physicsBody.setRotation(degree);
+			physicsBody.resetVelocity(false, false, true);
+		}
+	}
+
+	@Override
+	public float getRotation() {
+		return physicsBody!=null ? physicsBody.getRotation() : 0;
+	}
+
 }

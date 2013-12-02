@@ -3,7 +3,7 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractGameEntityController {
+public abstract class AbstractGameEntityController implements IGameEntityController {
 
 	protected final Set<IControllableGameEntity> ges = new HashSet<>(); 
 	
@@ -11,10 +11,12 @@ public abstract class AbstractGameEntityController {
 	
 	public final void addGE( IControllableGameEntity ge ) {
 		ges.add(ge);
+		ge.setController(this);
 	}
 	
 	public final void removeGE( IControllableGameEntity ge ) {
 		ges.remove(ge);
+		ge.setController(null);
 	}
 	
 	private final class ControllableProxy implements IControllable {
@@ -24,14 +26,14 @@ public abstract class AbstractGameEntityController {
 				ge.jump();
 		}
 
-		@Override public void moveHorizontally(HDirection direction) {
+		@Override public void moveHorizontally(HDirection direction, float factor) {
 			for( IControllableGameEntity ge : ges )
-				ge.moveHorizontally(direction);
+				ge.moveHorizontally(direction, factor);
 		}
 
-		@Override public void moveVertically(VDirection direction) {
+		@Override public void moveVertically(VDirection direction, float factor) {
 			for( IControllableGameEntity ge : ges )
-				ge.moveVertically(direction);
+				ge.moveVertically(direction, factor);
 		}
 
 		@Override

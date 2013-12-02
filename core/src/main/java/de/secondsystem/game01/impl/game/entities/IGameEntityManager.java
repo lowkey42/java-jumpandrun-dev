@@ -9,7 +9,6 @@ import de.secondsystem.game01.model.IUpdateable;
 public interface IGameEntityManager extends IDrawable, IUpdateable {
 
 	IControllableGameEntity createControllable( String type, Map<String, Object> args );
-	MovingPlatform createMovingPlatform( String type, Map<String, Object> args );
 	
 	void destroy(UUID eId);
 

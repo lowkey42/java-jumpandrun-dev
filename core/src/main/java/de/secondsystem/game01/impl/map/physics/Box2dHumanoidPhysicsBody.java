@@ -72,7 +72,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		
 		FixtureDef baseBody = new FixtureDef();
 		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
-		baseBody.friction = 0.0f;
+		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
 		body.createFixture(baseBody);
 		
