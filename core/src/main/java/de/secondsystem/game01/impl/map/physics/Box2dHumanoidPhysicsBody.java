@@ -23,6 +23,8 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	private final ObjectDetector leftObjects = new ObjectDetector();
 	private final ObjectDetector rightObjects = new ObjectDetector();
 	
+	private Fixture baseFixture;
+	
 	
 	private float maxThrowVel;
 	private float maxLiftWeight;
@@ -66,7 +68,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		FixtureDef mainBody = new FixtureDef();
 		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
 		mainBody.friction = 0.f;
-		mainBody.restitution = 1.03f; // causes unwanted behavior (annoying bouncing)
+		mainBody.restitution = 1.0f; // causes unwanted behavior (annoying bouncing) 
 		mainBody.density = 1.0f;
 		body.createFixture(mainBody);
 		
@@ -74,13 +76,14 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
 		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
-		body.createFixture(baseBody);
+		baseFixture = body.createFixture(baseBody);
 		
 		FixtureDef fd = new FixtureDef();
 		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 3f, 1f, 0, getHeight()/2, 0);
 		fd.isSensor = true;
 		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		
+		body.setLinearDamping(1.0f);
 		body.createFixture(fd);
 		
 		FixtureDef leftObjSensor = new FixtureDef();
@@ -109,7 +112,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			bodies.remove(other);
 		}
 	}
-
+	
 	@Override
 	public boolean liftBody(IPhysicsBody other) {
 		if( other.getWeight()>maxLiftWeight )

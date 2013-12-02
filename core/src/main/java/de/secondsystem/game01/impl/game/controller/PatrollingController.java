@@ -64,8 +64,6 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	
 	@Override
 	public void update(long frameTimeMs) {
-	//	physicsBody.setLinearVelocity(0, 0);
-		
 		if( targetPoint != null ) {
 			Vector2f pos = controlledEntity.getPosition();
 			
@@ -87,7 +85,6 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 				if( repeated )
 					targetPoints.add(p);		
 				computeDirection();
-				System.out.println(pos);
 			}		
 		}
 	}

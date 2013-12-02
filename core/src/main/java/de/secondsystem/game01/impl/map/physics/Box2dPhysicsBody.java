@@ -85,7 +85,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		FixtureDef fd = new FixtureDef();
 		fd.shape = createShape(shape, width, height);
-		if (CollisionHandlerType.NO_GRAV == type)
+		if (CollisionHandlerType.CLIMBABLE == type)
 			fd.isSensor = true;
 		
 		fd.friction = friction;
@@ -173,7 +173,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 			case ONE_WAY:
 				return !other.isAbove(this);
 	
-			case NO_GRAV:
+			case CLIMBABLE:
 			case SOLID:
 			default:
 				return false;

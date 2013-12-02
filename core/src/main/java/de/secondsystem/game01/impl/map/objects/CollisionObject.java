@@ -22,7 +22,7 @@ public class CollisionObject implements ILayerObject {
 	public static enum CollisionType {
 		NORMAL	(CollisionHandlerType.SOLID, new Color(255, 100, 100, 150)), 
 		ONE_WAY	(CollisionHandlerType.ONE_WAY, new Color(180, 180, 180, 150)), 
-		NO_GRAV	(CollisionHandlerType.NO_GRAV, new Color(100, 100, 255, 150));
+		NO_GRAV	(CollisionHandlerType.CLIMBABLE, new Color(100, 100, 255, 150));
 
 		final CollisionHandlerType handlerType;
 		final Color fillColor;
