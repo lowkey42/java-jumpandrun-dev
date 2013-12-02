@@ -32,7 +32,7 @@ public final class GUITestState extends GameState {
 	
 	// Object creation
 	InputText testText = new InputText(50, 50, 200, "Test Text");
-	MemoText testMemo = new MemoText(50, 250, 260, 150, "This is a Test Memo");
+	MemoText testMemo = new MemoText(50, 250, 250, 160, "This is a Test Memo");
 	
 	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
 		@Override

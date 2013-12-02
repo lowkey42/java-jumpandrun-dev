@@ -26,12 +26,11 @@ public final class MemoText {
 	
 	private boolean isActive = false;
 	
-	private int currentLine, maxLines, maxChars;
+	private int currentLine, maxLines, maxChars, linePointer = 0;
 	private final Vector2f myPos;
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
 	
-	private Text myText;
-	private Text arrayText[];
+	private Text myText[];
 	private String newString = "", prevString = "", content;
 	
 	// Constructors
@@ -57,20 +56,19 @@ public final class MemoText {
 		linie_y1.setPosition(pos_x, pos_y); linie_y2.setPosition(pos_x + width, pos_y);
 		
 		try {
-			// Loading standard Font (12.5 pixel width & 25 pixel height per char --> Monospace VeraMono
+			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono
 			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
-			myText = new Text(content, myFont, 20);
-			myText.setPosition(myPos.x + 5, myPos.y);
-			arrayText = new Text[((int)(this.width/12.5))];
-				for(int i = 1; i < ((int)(this.width/12.5)); i++){
-					arrayText[i] = new Text("Hallo" + i, myFont, 20);
-					System.out.println(arrayText[i].getString());
+			myText = new Text[((int)(this.height/21))];
+				for(int i = 0; i < ((int)(this.height/21)); i++){
+					myText[i] = new Text("", myFont, 20);
+					myText[i].setPosition(pos_x, pos_y + i*21);
+					System.out.println(myText[i].getString());
 				}
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
 		
-		System.out.println("MEMO --> Possible Lines with standard fonts " + this.height / 25);
+		System.out.println("MEMO --> Possible Lines with standard fonts " + this.height / 21);
 		System.out.println("MEMO --> Possible Chars in each line with std font: " + this.width / 12.5);
 		
 	}
@@ -81,16 +79,21 @@ public final class MemoText {
 	// Methods
 	
 	public void draw(RenderTarget rt){
-		rt.draw(linie_x1); rt.draw(linie_x2); rt.draw(linie_y1); rt.draw(linie_y2); rt.draw(myText);
+		rt.draw(linie_x1); rt.draw(linie_x2); rt.draw(linie_y1); rt.draw(linie_y2);
+		for(int i = 0; i < myText.length; i++){
+			rt.draw(myText[i]);
+		}
 	}
 	
 	
 	public void newKey(Event event){
 		if(this.isActive)
-			if(this.myText.getString().length() <= this.width / 12.5)
-				this.myText.setString(this.myText.getString() + event.asTextEvent().character);
-			else
-				this.myText.setPosition(myText.getPosition().x, myText.getPosition().y+25);
+			if(this.myText[linePointer].getString().length() <= this.width / 12.5){
+				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
+			} else {
+				linePointer += 1;
+				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
+			}
 		
 	}
 	
