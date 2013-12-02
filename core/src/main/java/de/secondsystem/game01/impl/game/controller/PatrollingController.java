@@ -69,22 +69,18 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 		if( targetPoint != null ) {
 			Vector2f pos = controlledEntity.getPosition();
 			
-			// move to target point
-			// physicsBody.setLinearVelocity(dir.x*moveSpeed*frameTimeMs, dir.y*moveSpeed*frameTimeMs);
-			
 			// check if the target point is reached
 			boolean reachedX = nearEqual(dir.x, 0) ? true : (dir.x<0 ? (pos.x <= targetPoint.x) : (pos.x >= targetPoint.x));
 			boolean reachedY = nearEqual(dir.y, 0) ? true : (dir.y<0 ? (pos.y <= targetPoint.y) : (pos.y >= targetPoint.y));
 			
+			// if not reached move to target point
 			if( !reachedX )
 				controlledEntity.moveHorizontally( dir.x<0 ? HDirection.LEFT : HDirection.RIGHT, Math.abs(dir.x) );
 			
 			if( !reachedY )
 				controlledEntity.moveVertically( dir.y<0 ? VDirection.UP : VDirection.DOWN, Math.abs(dir.y) );
 			
-			// boolean reachedX = nearEqual(pos.x, targetPoint.x) ? true : dir.x > 0 ?  pos.x > targetPoint.x : pos.x < targetPoint.x; 
-			// boolean reachedY = nearEqual(pos.y, targetPoint.y) ? true : dir.y > 0 ?  pos.y > targetPoint.y : pos.y < targetPoint.y;
-			
+			// if reached move to the next target
 			if( reachedX && reachedY ) {
 				controlledEntity.setPosition(targetPoint);
 				Vector2f p = targetPoints.poll();
