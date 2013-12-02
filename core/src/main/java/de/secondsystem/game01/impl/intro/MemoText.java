@@ -31,6 +31,7 @@ public final class MemoText {
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
 	
 	private Text myText;
+	private Text arrayText[];
 	private String newString = "", prevString = "", content;
 	
 	// Constructors
@@ -42,6 +43,9 @@ public final class MemoText {
 		this.content = content;
 		
 		myPos = new Vector2f(pos_x, pos_y);
+		
+		int a = (int)(this.width/12.5);
+		
 		
 		Vector2f myVec_x = new Vector2f(width, 1);
 		Vector2f myVec_y = new Vector2f(1, height);
@@ -57,6 +61,11 @@ public final class MemoText {
 			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
 			myText = new Text(content, myFont, 20);
 			myText.setPosition(myPos.x + 5, myPos.y);
+			arrayText = new Text[((int)(this.width/12.5))];
+				for(int i = 1; i < ((int)(this.width/12.5)); i++){
+					arrayText[i] = new Text("Hallo" + i, myFont, 20);
+					System.out.println(arrayText[i].getString());
+				}
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
