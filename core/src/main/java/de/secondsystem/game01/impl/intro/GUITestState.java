@@ -29,16 +29,22 @@ public final class GUITestState extends GameState {
 	
 	private final Text infoInputText;
 	
+	// Object Creations
 	InputText testtext = new InputText(50, 50, 200, "");
 	
 	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
-		
 		@Override
 		public void onClick() {
 			System.out.println("Test Button works!");
 		}
 	});
 
+	MenuButton backButton = new MenuButton("BACK", 1000, 655, new MenuButton.IOnClickListener(){
+		@Override
+		public void onClick() {
+			setNextState(MainMenu);
+		}
+	});
 		
 	public GUITestState(GameState MainMenu, GameState playGameState,
 			Sprite backdrop) {
@@ -94,6 +100,7 @@ public final class GUITestState extends GameState {
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
 					testButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					backButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					if(Mouse.getPosition(ctx.window).x >= testtext.pos_x && Mouse.getPosition(ctx.window).x <= testtext.pos_x + testtext.width  && 
 							   Mouse.getPosition(ctx.window).y >= testtext.pos_y && Mouse.getPosition(ctx.window).y <= testtext.pos_y + testtext.height){
 								testtext.setActive();
@@ -121,8 +128,10 @@ public final class GUITestState extends GameState {
 		}
 
 		ctx.window.draw(infoInputText);
+		
 		testtext.draw(ctx.window);
 		testButton.draw(ctx.window);
+		backButton.draw(ctx.window);
 		
 	}	
 	

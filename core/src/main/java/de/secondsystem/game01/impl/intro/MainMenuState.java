@@ -59,6 +59,7 @@ public final class MainMenuState extends GameState {
 		}
 	});
 	
+	// Constructors
 	public MainMenuState() {
 		this.playGameState = null;
 	}

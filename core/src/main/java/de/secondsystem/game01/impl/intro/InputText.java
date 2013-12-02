@@ -121,4 +121,7 @@ public class InputText {
 		this.isActive = false;
 	}
 	
+	public String getText(){
+		return prevString + myText.getString();
+	}
 }
