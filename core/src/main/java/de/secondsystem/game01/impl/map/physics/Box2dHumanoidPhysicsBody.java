@@ -63,12 +63,12 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
 		final float baseRad = (float) Math.floor(getWidth()/2 );
-		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(45)) * getWidth()/2), baseRad*2);
+		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(45)) * getWidth()/2), baseRad*2); // causes glitches (entity gets stuck on edges)
 		
 		FixtureDef mainBody = new FixtureDef();
 		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
 		mainBody.friction = 0.f;
-		mainBody.restitution = 1.0f;
+		mainBody.restitution = 1.0f; // causes unwanted behavior (annoying bouncing)
 		mainBody.density = 1.0f;
 		body.createFixture(mainBody);
 		
