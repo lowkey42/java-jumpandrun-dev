@@ -9,12 +9,12 @@ import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 
-public class CSprite implements IDrawable, IMoveable, IDimensioned {
+public class SpriteWrappper implements IDrawable, IMoveable, IDimensioned {
 	protected final Sprite  sprite;
 	protected final float width;
 	protected final float height;
 	
-	public CSprite(float width, float height) {
+	public SpriteWrappper(float width, float height) {
 		sprite = new Sprite();	
 		
 		this.width  = width;

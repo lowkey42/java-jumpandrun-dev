@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
@@ -29,18 +29,18 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected IDrawable representation;
 	
-	protected EntityEventHandler eventHandler;
+	protected IEntityEventHandler eventHandler;
 	
 	protected final IGameMap map;
 	
 	public GameEntity(UUID uuid,
-			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
+			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, EntityEventHandler eventHandler) {
+	public GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, IEntityEventHandler eventHandler) {
 		this.uuid = uuid;
 		this.em = em;
 		this.worldMask = worldMask;

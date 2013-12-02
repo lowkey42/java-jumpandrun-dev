@@ -10,12 +10,12 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
-import de.secondsystem.game01.impl.map.LayerObject;
+import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
 
-public class CollisionObject implements LayerObject {
+public class CollisionObject implements ILayerObject {
 
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(CollisionObject.class);
 	

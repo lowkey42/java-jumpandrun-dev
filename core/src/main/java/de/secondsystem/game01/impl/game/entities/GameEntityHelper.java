@@ -9,11 +9,11 @@ import org.jsfml.graphics.Texture;
 
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
-import de.secondsystem.game01.impl.graphic.CSprite;
+import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.DynamicPhysicsBodyFactory;
@@ -44,12 +44,12 @@ final class GameEntityHelper {
 				repr = new AnimatedSprite(ResourceManager.animation.get(filename), width, height);
 				break;
 			case TEXTURE:
-				repr = new CSprite(width, height);
-				((CSprite) repr).setTexture(ResourceManager.texture.get(filename));
+				repr = new SpriteWrappper(width, height);
+				((SpriteWrappper) repr).setTexture(ResourceManager.texture.get(filename));
 				break;
 			case TILE:
-				repr = new CSprite(width, height);
-				((CSprite) repr).setTexture(ResourceManager.texture_tiles.get(filename));
+				repr = new SpriteWrappper(width, height);
+				((SpriteWrappper) repr).setTexture(ResourceManager.texture_tiles.get(filename));
 				break;
 			default:
 				System.out.println("Representation unknown.");
@@ -139,7 +139,7 @@ final class GameEntityHelper {
 		return bodyFactory.create();
 	}
 	
-	public static EntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {		
+	public static IEntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {		
 		Object eventsObj = attributes.getObject("events");
 		
 		if( eventsObj instanceof Map ) {

@@ -5,7 +5,7 @@ import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IUpdateable;
 
 
-public class AnimatedSprite extends CSprite implements IAnimated, IUpdateable {
+public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdateable {
 	
 	private final AnimationTexture animationTexture;
 	

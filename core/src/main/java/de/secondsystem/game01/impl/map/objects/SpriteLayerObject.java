@@ -9,7 +9,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
-import de.secondsystem.game01.impl.map.LayerObject;
+import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
 
 /**
@@ -17,7 +17,7 @@ import de.secondsystem.game01.impl.map.Tileset;
  * @author lowkey
  *
  */
-public class SpriteLayerObject implements LayerObject {
+public class SpriteLayerObject implements ILayerObject {
 
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(SpriteLayerObject.class);
 	

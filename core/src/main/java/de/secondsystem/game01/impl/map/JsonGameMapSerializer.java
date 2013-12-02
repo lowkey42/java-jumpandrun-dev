@@ -101,7 +101,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			layer.put("layerType", l.type.name());
 			
 			JSONArray layerObjs = new JSONArray();
-			for( LayerObject obj : l.objects )
+			for( ILayerObject obj : l.objects )
 				layerObjs.add(serializeLayerObject(obj));
 			
 			layer.put("objects", layerObjs);
@@ -113,7 +113,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private JSONObject serializeLayerObject(LayerObject objects) {
+	private JSONObject serializeLayerObject(ILayerObject objects) {
 		JSONObject obj = new JSONObject();
 		
 		obj.put("$type", objects.typeUuid().shortId);
@@ -135,7 +135,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private LayerObject deserializeLayerObject(IGameMap map, WorldId worldId, JSONObject obj) {
+	private ILayerObject deserializeLayerObject(IGameMap map, WorldId worldId, JSONObject obj) {
 		final LayerObjectType type = LayerObjectType.getByShortId((String) obj.get("$type"));
 		
 		if( type==null )

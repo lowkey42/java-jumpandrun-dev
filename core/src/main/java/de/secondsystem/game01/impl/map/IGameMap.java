@@ -49,13 +49,13 @@ public interface IGameMap extends IDrawable, IUpdateable {
 
 	WorldId getActiveWorldId();
 
-	void addNode(WorldId worldId, LayerType layer, LayerObject sprite);
+	void addNode(WorldId worldId, LayerType layer, ILayerObject sprite);
 
-	void addNode(LayerType layer, LayerObject sprite);
+	void addNode(LayerType layer, ILayerObject sprite);
 	
-	LayerObject findNode(LayerType layer, Vector2f point);
+	ILayerObject findNode(LayerType layer, Vector2f point);
 
-	void remove(LayerType layer, LayerObject s);
+	void remove(LayerType layer, ILayerObject s);
 
 	boolean flipShowLayer(LayerType layer);
 

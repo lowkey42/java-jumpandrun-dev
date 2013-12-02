@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
@@ -48,7 +48,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private boolean pulling;
 	
 	public ControllableGameEntity(UUID uuid,
-			GameEntityManager em, IGameMap map, EntityEventHandler eventHandler,
+			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);

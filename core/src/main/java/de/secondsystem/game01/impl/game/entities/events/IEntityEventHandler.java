@@ -4,7 +4,7 @@ import java.util.Set;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
-public interface EntityEventHandler {
+public interface IEntityEventHandler {
 
 	public enum EntityEventType {
 		/**

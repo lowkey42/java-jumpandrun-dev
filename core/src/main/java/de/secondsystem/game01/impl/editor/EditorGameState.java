@@ -24,7 +24,7 @@ import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
-import de.secondsystem.game01.impl.map.LayerObject;
+import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
 import de.secondsystem.game01.impl.map.objects.CollisionObject;
@@ -54,7 +54,7 @@ public final class EditorGameState extends GameState {
 
 	private final Text editorHint;
 	private final Text layerHint;
-	private LayerObject mouseTile;
+	private ILayerObject mouseTile;
 
 	private float x, y, zoom = 1.f;
 	private int currentTile = 0;
@@ -63,7 +63,7 @@ public final class EditorGameState extends GameState {
 	private float currentTileHeight = 1;
 	private float currentTileWidth = 1;
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
-	private LayerObject selectedObject;
+	private ILayerObject selectedObject;
 	private RectangleShape selectedObjectMarker;
 	private RectangleShape tileScaleWidthMarker;
 	private RectangleShape tileScaleHeightMarker;
@@ -210,7 +210,7 @@ public final class EditorGameState extends GameState {
 				new Vector2i(getMouseX(), getMouseY()), rt.getView());
 
 		Vector2i newPos = new Vector2i(getMouseX(), getMouseY());
-		LayerObject currentLayerObject = selectedObject != null ? selectedObject
+		ILayerObject currentLayerObject = selectedObject != null ? selectedObject
 				: mouseTile;
 		currentLayerObject.setRotation(currentTileRotation);
 		currentLayerObject.setDimensions(currentTileWidth * currentTileZoom,

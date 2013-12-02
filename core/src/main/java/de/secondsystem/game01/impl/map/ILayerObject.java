@@ -7,7 +7,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.model.IDrawable;
 
-public interface LayerObject extends IDrawable {
+public interface ILayerObject extends IDrawable {
 	
 	boolean inside(Vector2f point);
 	void setPosition(Vector2f pos);

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
-public abstract class SingleEntityEventHandler implements EntityEventHandler {
+public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 
 	private final EntityEventType eventType;
 	

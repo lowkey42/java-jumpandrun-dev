@@ -31,10 +31,10 @@ public class GameMap implements IGameMap {
 			
 			backgroundColor = Color.BLACK;
 		}
-		void addNode( LayerType layer, LayerObject sprite ) {
+		void addNode( LayerType layer, ILayerObject sprite ) {
 			addNode(layer.layerIndex, sprite);
 		}
-		void addNode( int layerIndex, LayerObject sprite ) {
+		void addNode( int layerIndex, ILayerObject sprite ) {
 			graphicLayer[layerIndex].addNode(sprite);
 		}
 	}
@@ -77,7 +77,7 @@ public class GameMap implements IGameMap {
 
 		if( playable ) {
 			physicalWorld = new Box2dPhysicalWorld();
-			physicalWorld.init(new Vector2f(0, 11.f));
+			physicalWorld.init(new Vector2f(0, 15.f));
 		} else
 			physicalWorld = null;
 		
@@ -152,6 +152,7 @@ public class GameMap implements IGameMap {
 				else
 					rt.setView(cView);
 				
+				for(int i=0; i<10; i++) 
 				layer.draw(rt);
 			}
 			
@@ -203,28 +204,28 @@ public class GameMap implements IGameMap {
 	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(int, de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */
 	@Override
-	public void addNode( WorldId worldId, LayerType layer, LayerObject sprite ) {
+	public void addNode( WorldId worldId, LayerType layer, ILayerObject sprite ) {
 		gameWorld[worldId.arrayIndex].graphicLayer[layer.layerIndex].addNode(sprite);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */
 	@Override
-	public void addNode( LayerType layer, LayerObject sprite ) {
+	public void addNode( LayerType layer, ILayerObject sprite ) {
 		addNode(activeWorldId, layer, sprite);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#findNode(de.secondsystem.game01.impl.map.LayerType, org.jsfml.system.Vector2f)
 	 */
 	@Override
-	public LayerObject findNode( LayerType layer, Vector2f point ) {
+	public ILayerObject findNode( LayerType layer, Vector2f point ) {
 		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].findNode(point);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#remove(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */
 	@Override
-	public void remove( LayerType layer, LayerObject s ) {
+	public void remove( LayerType layer, ILayerObject s ) {
 		gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].remove(s);
 	}
 		

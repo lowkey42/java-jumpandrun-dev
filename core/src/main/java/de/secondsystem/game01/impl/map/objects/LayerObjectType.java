@@ -6,7 +6,7 @@ import java.util.Map;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
-import de.secondsystem.game01.impl.map.LayerObject;
+import de.secondsystem.game01.impl.map.ILayerObject;
 
 public enum LayerObjectType {
 
@@ -19,12 +19,12 @@ public enum LayerObjectType {
 	public final String shortId;
 	
 	/** Reference to the concrete class, implementing this LO-Type */
-	private final Class<? extends LayerObject> clazz;
+	private final Class<? extends ILayerObject> clazz;
 	
 	/** Reference to the create-Method of the implementation */
 	private final Method constructMethod;
 	
-	private LayerObjectType(String shortId, Class<? extends LayerObject> clazz) {
+	private LayerObjectType(String shortId, Class<? extends ILayerObject> clazz) {
 		this.shortId = shortId;
 		this.clazz = clazz;
 		
@@ -44,7 +44,7 @@ public enum LayerObjectType {
 		return null;
 	}
 	
-	public static LayerObjectType getByType(Class<? extends LayerObject> clazz) {
+	public static LayerObjectType getByType(Class<? extends ILayerObject> clazz) {
 		for( LayerObjectType lot : values() )
 			if( lot.clazz.equals(clazz) )
 				return lot;
@@ -52,9 +52,9 @@ public enum LayerObjectType {
 		return null;
 	}
 	
-	public LayerObject create( IGameMap map, WorldId world, Map<String, Object> attributes ) {
+	public ILayerObject create( IGameMap map, WorldId world, Map<String, Object> attributes ) {
 		try {
-			return (LayerObject) constructMethod.invoke(null, map, world, attributes);
+			return (ILayerObject) constructMethod.invoke(null, map, world, attributes);
 			
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {

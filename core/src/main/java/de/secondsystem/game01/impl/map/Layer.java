@@ -10,7 +10,7 @@ import de.secondsystem.game01.model.IUpdateable;
 
 final class Layer {
 	
-	List<LayerObject> objects = new ArrayList<>();
+	List<ILayerObject> objects = new ArrayList<>();
 	final LayerType type;
 	boolean show;
 	
@@ -21,25 +21,25 @@ final class Layer {
 	
 	public void draw(RenderTarget rt) {
 		if( show )
-			for( LayerObject s : objects )
+			for( ILayerObject s : objects )
 				s.draw(rt);
 	}
-	public void addNode( LayerObject obj ) {
+	public void addNode( ILayerObject obj ) {
 		objects.add(obj);
 	}
-	public LayerObject findNode( Vector2f point ) {
-		for( LayerObject o : objects )
+	public ILayerObject findNode( Vector2f point ) {
+		for( ILayerObject o : objects )
 			if( o.inside(point) )
 				return o;
 		
 		return null;
 	}
-	public void remove( LayerObject s ) {
+	public void remove( ILayerObject s ) {
 		objects.remove(s);
 	}
 	
 	public void update(long frameTimeMs) {
-		for( LayerObject s : objects )
+		for( ILayerObject s : objects )
 			if( s instanceof IUpdateable )
 				((IUpdateable)s).update(frameTimeMs);
 	}

@@ -6,18 +6,18 @@ import java.util.Set;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
-public class CollectionEntityEventHandler implements EntityEventHandler {
+public class CollectionEntityEventHandler implements IEntityEventHandler {
 
-	private final Map<EntityEventType, EntityEventHandler> handlers = new HashMap<>();
+	private final Map<EntityEventType, IEntityEventHandler> handlers = new HashMap<>();
 	
-	public void addEntityEventHandler(EntityEventType type, EntityEventHandler handler) {
+	public void addEntityEventHandler(EntityEventType type, IEntityEventHandler handler) {
 		handlers.put(type, handler);
 	}
 	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner,
 			Object... args) {
-		EntityEventHandler handler = handlers.get(type);
+		IEntityEventHandler handler = handlers.get(type);
 		
 		return handler!=null ? handler.handle(type, owner, args) : null;
 	}

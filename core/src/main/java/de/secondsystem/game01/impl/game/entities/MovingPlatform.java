@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 
@@ -40,7 +40,7 @@ public class MovingPlatform extends GameEntity {
 	}
 	
 	public MovingPlatform(UUID uuid, GameEntityManager em, IGameMap map,
-			EntityEventHandler eventHandler, Attributes attributes) {
+			IEntityEventHandler eventHandler, Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, false, false, false, attributes), map, eventHandler);
 		
