@@ -21,7 +21,7 @@ import de.secondsystem.game01.impl.ResourceManager;
 public class InputText {
 
 	// Attributes
-    double width;
+    int width;
 	int height = 25, pos_x, pos_y;
 	
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
@@ -33,7 +33,7 @@ public class InputText {
 	private String prevString = ""; String newString = "";
 		
 	// Constructors
-	InputText(int pos_x, int pos_y, int width, String inhalt){
+	InputText(int pos_x, int pos_y, int width, String content){
 		this.width = width;
 		this.pos_x = pos_x;
 		this.pos_y = pos_y;		
@@ -52,7 +52,7 @@ public class InputText {
 		try {
 			// Loading standard Font
 			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
-			myText = new Text(inhalt, myFont, (height - 5));
+			myText = new Text(content, myFont, (height - 5));
 			myText.setPosition(myPos.x + 5, myPos.y);
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
@@ -72,7 +72,7 @@ public class InputText {
 			// Checking if the text inside the box exceeds width (12.5 pixel per char --> Monospace VeraMono) 
 			if(myText.getString().length() > (this.width/12.5)){
 				prevString += myText.getString().charAt(0);
-				for(int i = 1; i < (this.width/12); i++)
+				for(int i = 1; i <= (this.width/12.5); i++)
 					newString += myText.getString().charAt(i);
 				myText.setString(newString);
 				// setting newString free for next text interaction

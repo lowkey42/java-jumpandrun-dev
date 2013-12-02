@@ -28,9 +28,11 @@ public final class GUITestState extends GameState {
 	private Sprite backdrop = new Sprite();
 	
 	private final Text infoInputText;
+	private final Text infoMemoText;
 	
-	// Object Creations
-	InputText testtext = new InputText(50, 50, 200, "");
+	// Object creation
+	InputText testText = new InputText(50, 50, 200, "Test Text");
+	MemoText testMemo = new MemoText(50, 250, 260, 150, "This is a Test Memo");
 	
 	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
 		@Override
@@ -56,6 +58,7 @@ public final class GUITestState extends GameState {
 			// Loading standard Font
 			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
 			infoInputText = new Text("Input Text", myFont, 20);
+			infoMemoText = new Text("Memo Editor", myFont, 20);
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
@@ -78,7 +81,8 @@ public final class GUITestState extends GameState {
 			backdrop.setTexture(backdropBuffer);
 		}
 		
-		infoInputText.setPosition(testtext.pos_x, testtext.pos_y - 25);
+		infoInputText.setPosition(testText.pos_x, testText.pos_y - 25);
+		infoMemoText.setPosition(testMemo.pos_x, testMemo.pos_y - 25);
 	}
 
 	@Override
@@ -101,36 +105,43 @@ public final class GUITestState extends GameState {
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
 					testButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					backButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					if(Mouse.getPosition(ctx.window).x >= testtext.pos_x && Mouse.getPosition(ctx.window).x <= testtext.pos_x + testtext.width  && 
-							   Mouse.getPosition(ctx.window).y >= testtext.pos_y && Mouse.getPosition(ctx.window).y <= testtext.pos_y + testtext.height){
-								testtext.setActive();
-					} else { testtext.setInactive();}					
+					if(Mouse.getPosition(ctx.window).x >= testText.pos_x && Mouse.getPosition(ctx.window).x <= testText.pos_x + testText.width  && 
+							   Mouse.getPosition(ctx.window).y >= testText.pos_y && Mouse.getPosition(ctx.window).y <= testText.pos_y + testText.height){
+								testText.setActive();
+					} else { testText.setInactive();}
+					if(Mouse.getPosition(ctx.window).x >= testMemo.pos_x && Mouse.getPosition(ctx.window).x <= testMemo.pos_x + testMemo.width  && 
+							   Mouse.getPosition(ctx.window).y >= testMemo.pos_y && Mouse.getPosition(ctx.window).y <= testMemo.pos_y + testMemo.height){
+								testMemo.setActive();
+					} else { testMemo.setInactive();}
 				}
 				break;
 			case TEXT_ENTERED:
 				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
 					//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
-					testtext.newKey(event);
+					testText.newKey(event);
+					testMemo.newKey(event);
 				// Backspace pushed
 				} else if (event.asTextEvent().unicode == 8){
-					testtext.removeKey();
+					testText.removeKey();
 				// Return pushed
 				} else if (event.asTextEvent().unicode == 13){
-					System.out.println("Sent Text: " + testtext.finalizeInput());
+					System.out.println("Sent Text: " + testText.finalizeInput());
 				}
 				break;
 			case KEY_RELEASED:
 				if (event.asKeyEvent().key == Key.ESCAPE)
-					testtext.setInactive();
+					testText.setInactive();
 				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
 					setNextState(playGameState);
 			}
 		}
 
 		ctx.window.draw(infoInputText);
+		ctx.window.draw(infoMemoText);
 		
-		testtext.draw(ctx.window);
+		testText.draw(ctx.window);
 		testButton.draw(ctx.window);
+		testMemo.draw(ctx.window);
 		backButton.draw(ctx.window);
 		
 	}	
