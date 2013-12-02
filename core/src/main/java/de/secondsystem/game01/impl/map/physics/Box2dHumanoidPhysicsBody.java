@@ -68,7 +68,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		FixtureDef mainBody = new FixtureDef();
 		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
 		mainBody.friction = 0.f;
-		mainBody.restitution = 1.0f; // causes unwanted behavior (annoying bouncing)
+		mainBody.restitution = 1.0f; // causes unwanted behavior (annoying bouncing) 
 		mainBody.density = 1.0f;
 		body.createFixture(mainBody);
 		
