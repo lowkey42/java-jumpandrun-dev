@@ -51,6 +51,11 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		
 		if( physicsBody!=null )
 			physicsBody.setOwner(this);
+		
+		if( physicsBody!=null && representation instanceof IMoveable ) {
+			((IMoveable) representation).setPosition( physicsBody.getPosition() );
+			((IMoveable) representation).setRotation( physicsBody.getRotation() );
+		}
 	}
 	
 	@Override

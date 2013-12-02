@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Texture;
+
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
+import de.secondsystem.game01.impl.graphic.CSprite;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.DynamicPhysicsBodyFactory;
@@ -20,16 +24,44 @@ import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 
 final class GameEntityHelper {
-
+	
+	public static enum RepresentationType {
+		ANIMATION, 
+		TEXTURE, 
+		TILE;
+	}
+	
 	public static IDrawable createRepresentation( Attributes attributes ) { // TODO
-		AnimatedSprite repr;
+		IDrawable repr = null;
 		try {
-			repr = new AnimatedSprite(ResourceManager.animation.get("dude.anim"), 50.f, 55.f);
+			RepresentationType type = RepresentationType.valueOf(attributes.getString("representationType"));
+			float width = attributes.getFloat("width");
+			float height = attributes.getFloat("height");
+			String filename = attributes.getString("representation");
+			
+			switch( type ) {
+			case ANIMATION:
+				repr = new AnimatedSprite(ResourceManager.animation.get(filename), width, height);
+				break;
+			case TEXTURE:
+				repr = new CSprite(width, height);
+				((CSprite) repr).setTexture(ResourceManager.texture.get(filename));
+				break;
+			case TILE:
+				repr = new CSprite(width, height);
+				((CSprite) repr).setTexture(ResourceManager.texture_tiles.get(filename));
+				break;
+			default:
+				System.out.println("Representation unknown.");
+				break;
+			}
+			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		return repr;
 	}
+	
 	public static IDynamicPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 
 			canPickUpObjects, boolean createTestFixture, Attributes attributes ) {
 		PhysicsBodyFactory factory = map.getPhysicalWorld().factory()
@@ -56,6 +88,10 @@ final class GameEntityHelper {
 		Float restitution = attributes.getFloat("restitution");
 		if( restitution!=null )
 			factory.restitution(restitution);
+		
+		Boolean kinematic = attributes.getBoolean("kinematic");
+		if( kinematic!=null )
+			factory.kinematic(kinematic);
 
 		PhysicsBodyShape shape = PhysicsBodyShape.valueOf(attributes.getString("shape"));
 		final DynamicPhysicsBodyFactory bodyFactory;
@@ -99,7 +135,6 @@ final class GameEntityHelper {
 		Float maxJumpSpeed = attributes.getFloat("maxJumpSpeed");
 		if( maxJumpSpeed!=null )
 			bodyFactory.maxYSpeed(maxJumpSpeed);
-		
 		
 		return bodyFactory.create();
 	}

@@ -21,19 +21,17 @@ import de.secondsystem.game01.impl.ResourceManager;
 public class InputText {
 
 	// Attributes
-	private int width, height = 25, pos_x, pos_y;
+    double width;
+	int height = 25, pos_x, pos_y;
 	
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
-	
 	private final Vector2f myPos;
-	
-	String myStringFile = "";
-	
-	String fonttype = "FreeSansBold.otf";
-	
 	private Text myText;
 	
+	private boolean isActive = false;
 	
+	private String prevString = ""; String newString = "";
+		
 	// Constructors
 	InputText(int pos_x, int pos_y, int width, String inhalt){
 		this.width = width;
@@ -50,18 +48,15 @@ public class InputText {
 		linie_y1.setPosition(pos_x, pos_y); linie_y2.setPosition(linie_y1.getPosition().x + width, pos_y);
 		
 		myPos = new Vector2f(pos_x, pos_y);
-		
 			
 		try {
 			// Loading standard Font
-			ConstFont myFont = ResourceManager.font.get(fonttype);
+			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
 			myText = new Text(inhalt, myFont, (height - 5));
-			myText.setPosition(myPos);
+			myText.setPosition(myPos.x + 5, myPos.y);
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
-		
-		
 	}
 	
 	
@@ -71,8 +66,59 @@ public class InputText {
 	}
 	
 	public void newKey(Event event){
-		this.myText.setString(this.myText.getString() + event.asTextEvent().character);
+		if(this.isActive){
+			this.myText.setString(this.myText.getString() + event.asTextEvent().character);
+			
+			// Checking if the text inside the box exceeds width (12.5 pixel per char --> Monospace VeraMono) 
+			if(myText.getString().length() > (this.width/12.5)){
+				prevString += myText.getString().charAt(0);
+				for(int i = 1; i < (this.width/12); i++)
+					newString += myText.getString().charAt(i);
+				myText.setString(newString);
+				// setting newString free for next text interaction
+				newString = "";
+			}
+		}
+		
 	}
 	
+	public void removeKey(){
+		if(this.isActive){
+			// Checking if Textbox contains text BUT prevString is empty 
+			if(myText.getString().length() > 0 && prevString.length() == 0){
+				for(int i = 0; i < myText.getString().length() - 1; i++)
+					newString += myText.getString().charAt(i);
+				myText.setString(newString);
+				newString = "";
+				// Checking if Textbox contains text AND prevString contains something
+			} else if(myText.getString().length() > 0 && prevString.length() > 0){
+				for(int i = 0; i < myText.getString().length() - 1; i++)
+					newString += myText.getString().charAt(i);
+				myText.setString((prevString.charAt(prevString.length()-1)) + newString);
+				newString = "";
+				for(int i = 0; i < prevString.length()-1; i++)
+					newString += prevString.charAt(i);
+				prevString = newString;
+				newString = "";
+			}
+		}
+	}
+	
+	public String finalizeInput(){
+		if(this.isActive){
+			String toSend = prevString + myText.getString();
+			prevString = ""; myText.setString("");
+			return toSend;	
+		}
+		return null;
+	}
+	
+	public void setActive(){
+		this.isActive = true;
+	}
+	
+	public void setInactive(){
+		this.isActive = false;
+	}
 	
 }

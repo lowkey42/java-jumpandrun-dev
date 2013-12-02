@@ -1,20 +1,12 @@
 package de.secondsystem.game01.impl.graphic;
 
-import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
-import org.jsfml.system.Vector2f;
-
 import de.secondsystem.game01.impl.graphic.AnimationTexture.AnimationData;
 import de.secondsystem.game01.model.IAnimated;
-import de.secondsystem.game01.model.IDimensioned;
-import de.secondsystem.game01.model.IDrawable;
-import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
 
-public class AnimatedSprite implements IDrawable, IMoveable, IAnimated, IUpdateable, IDimensioned {
+public class AnimatedSprite extends CSprite implements IAnimated, IUpdateable {
 	
-	private final Sprite  sprite = new Sprite();
 	private final AnimationTexture animationTexture;
 	
 	private boolean repeated = false;
@@ -23,55 +15,16 @@ public class AnimatedSprite implements IDrawable, IMoveable, IAnimated, IUpdatea
 	private AnimationType currentAnimationType;
 	private float   currentFrame;
 	private float animationSpeed;
-	private final float width;
-	private final float height;
 	
 	public AnimatedSprite(AnimationTexture animationTexture, float width, float height) {
+		super(width, height);
+		
 		this.animationTexture = animationTexture;
-		this.width  = width;
-		this.height = height;
 	}
 	
 	private void setDimensions(float width, float height) {
 		float widthScale = width/currentAnimationData.frameWidth;
 		sprite.setScale(sprite.getScale().x < 0 ? widthScale*(-1) : widthScale, height/currentAnimationData.frameHeight);
-	}
-
-	@Override
-	public void draw(RenderTarget renderTarget) {
-    	renderTarget.draw(sprite);
-	}
-
-	@Override
-	public void setPosition(Vector2f pos) {
-		sprite.setPosition(pos);	
-	}
-
-	@Override
-	public void setRotation(float degree) {
-		sprite.setRotation(degree);
-	}
-
-	@Override
-	public float getRotation() {
-		return sprite.getRotation();
-	}
-
-	@Override
-	public Vector2f getPosition() {
-		return sprite.getPosition();
-	}
-
-
-	@Override
-	public float getHeight() {
-		return currentAnimationData.frameHeight;
-	}
-
-
-	@Override
-	public float getWidth() {
-		return currentAnimationData.frameWidth;
 	}
 
 

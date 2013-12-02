@@ -117,7 +117,8 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		float friction = 0.5f;
 		float restitution = 0.f;
 		boolean interactive = false;
-		boolean liftable = false;
+		boolean liftable = false;	
+		boolean kinematic = false;
 		CollisionHandlerType type = CollisionHandlerType.SOLID;
 		PhysicsBodyShape shape = null;
 		
@@ -183,6 +184,12 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			this.liftable = liftable;
 			return this;
 		}
+		
+		@Override
+		public PhysicsBodyFactory kinematic(boolean kinematic) {
+			this.kinematic = kinematic;
+			return this;
+		}
 	
 		@Override public StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape) {
 			this.shape = shape;
@@ -197,11 +204,10 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		@Override public HumanoidPhysicsBodyFactory humanoidBody() {
 			return new Box2dHumanoidPhysicsBodyFactory();
 		}
-	
-	
+
 		class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
 			@Override public IPhysicsBody create() {
-				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type);
+				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, kinematic);
 				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
 				return b;
 			}
@@ -214,7 +220,8 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			float maxYSpeed = Float.MAX_VALUE;
 			
 			@Override public IDynamicPhysicsBody create() {
-				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
+				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, 
+						type, kinematic, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
 				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
 				return b;
 			}
@@ -238,6 +245,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 				maxYSpeed = speed;
 				return this;
 			}
+
 		}
 		
 		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
@@ -281,6 +289,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 				return b;
 			}
 		}
+
 	}
 	
 }

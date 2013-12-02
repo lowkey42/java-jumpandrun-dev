@@ -11,8 +11,8 @@ import de.secondsystem.game01.impl.GameState;
 
 public final class SettingsMenuState extends GameState {
 
-	GameState playGameState;
-	GameState MainMenu;
+	private final GameState playGameState;
+	private GameState MainMenu;
 
 	MenuButton changeRes = new MenuButton("Change Resolution", 200, 120);
 	MenuButton vSync = new MenuButton("VSync", 200, 320);

@@ -27,4 +27,5 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 	boolean bind(IPhysicsBody other, Vector2f anchor);
 	void unbind(IPhysicsBody other);
 	boolean isBound(IPhysicsBody other);
+	boolean isBound();
 }

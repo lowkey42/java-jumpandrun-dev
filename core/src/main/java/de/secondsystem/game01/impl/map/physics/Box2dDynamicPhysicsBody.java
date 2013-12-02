@@ -12,7 +12,7 @@ import org.jsfml.system.Vector2f;
 
 class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		IDynamicPhysicsBody {
-
+	
 	private final boolean worldSwitchAllowed;
 	private final boolean complexStableCheck;
 	private float maxXVel;
@@ -22,9 +22,9 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	private final Set<Contact> footSensorContacts = new HashSet<>();
 	
 	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
-			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
+			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, boolean kinematic,
 			boolean stableCheck, boolean worldSwitchAllowed, float maxXVel, float maxYVel) {
-		super(world, gameWorldId, width, height, interactive, liftable, type);
+		super(world, gameWorldId, width, height, interactive, liftable, type, kinematic);
 
 		this.worldSwitchAllowed = worldSwitchAllowed;
 		this.complexStableCheck = stableCheck;
@@ -103,7 +103,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		//getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
 		getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
 
-		return (byte) ((x != 0 ? 2 : 0) & (y != 0 ? 1 : 0));
+		return (byte) ((x != 0 ? 2 : 0) | (y != 0 ? 1 : 0));
 	}
 
 	private static float limit(float current, float mod, float max) {
@@ -149,6 +149,11 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		}
 		
 		return false;
+	}
+
+	@Override
+	public void setLinearVelocity(float x, float y) {
+		getBody().setLinearVelocity(new Vec2(x, y));
 	}
 		
 //	public boolean beginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {

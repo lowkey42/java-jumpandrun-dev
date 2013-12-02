@@ -5,6 +5,7 @@ import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.window.Keyboard.Key;
+import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.FinalizeState;
@@ -22,7 +23,6 @@ public final class MainMenuState extends GameState {
 
 	private final GameState playGameState;
 
-	
 	private final Sprite backdrop = new Sprite();
 
 	
@@ -32,32 +32,33 @@ public final class MainMenuState extends GameState {
 			setNextState(new MainGameState("test01"));
 		}
 	});
-	private final MenuButton loadGameBt = new MenuButton("LOAD GAME", 515, 190, new MenuButton.IOnClickListener() {
-		@Override public void onClick() {
-			setNextState(new MainGameState("test01"));
-		}
-	});
-	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 340, new MenuButton.IOnClickListener() {
+	
+	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 190, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new EditorGameState(MainMenuState.this,
 					new JsonGameMapSerializer().deserialize("test01",
 							true, true)));
 		}
 	});
-	private final MenuButton settingsBt = new MenuButton("SETTINGS", 515, 490, new MenuButton.IOnClickListener() {
+	
+	private final MenuButton loadGameBt = new MenuButton("GUI TEST SITE", 515, 340, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
-			setNextState(new SettingsMenuState(MainMenuState.this, playGameState,
-					backdrop));
+			setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
 		}
 	});
+	
+	private final MenuButton settingsBt = new MenuButton("SETTINGS", 515, 490, new MenuButton.IOnClickListener() {
+		@Override public void onClick() {
+			setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
+		}
+	});
+	
 	private final MenuButton exitGameBt = new MenuButton("EXIT GAME", 515, 640, new MenuButton.IOnClickListener() {
 		@Override public void onClick() {
 			setNextState(new FinalizeState());
 		}
 	});
 	
-	InputText testtext = new InputText(200, 200, 200, "ABABAB");
-
 	public MainMenuState() {
 		this.playGameState = null;
 	}
@@ -69,7 +70,6 @@ public final class MainMenuState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
-		// TODO
 
 		if (backdrop.getTexture() == null) {
 			Texture backdropBuffer = new Texture();
@@ -93,8 +93,6 @@ public final class MainMenuState extends GameState {
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		// TODO Preparing the following code to be able to be used with more
-		// than 1 button --> outsourcing into button class
 
 		for (Event event : ctx.window.pollEvents()) {
 			switch (event.type) {
@@ -104,22 +102,15 @@ public final class MainMenuState extends GameState {
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
 					newGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					loadGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					editorBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					settingsBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					exitGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 				}
 				break;
-			case TEXT_ENTERED:
-				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 33){
-					System.out.println("TEXT ENTERED: " + event.asTextEvent().unicode);
-					testtext.newKey(event);
-				}
-				break;
 			case KEY_RELEASED:
-				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE) {
+				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
 					setNextState(playGameState);
-				}
-
 			}
 		}
 
@@ -131,7 +122,5 @@ public final class MainMenuState extends GameState {
 		loadGameBt.draw(ctx.window);
 		exitGameBt.draw(ctx.window);
 
-		testtext.draw(ctx.window);
-		
 	}
 }
