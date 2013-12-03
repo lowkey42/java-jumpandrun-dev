@@ -15,23 +15,24 @@ import org.jsfml.window.event.Event;
 import de.secondsystem.game01.impl.ResourceManager;
 
 /**
+ * This class provides a multiline Text Box
  * @author Sebastian
+ *
  *
  */
 public final class MemoText {
 
 	// Attributes
-	int width, height;
-	int pos_x, pos_y;
+	int pos_x, pos_y, width, height;
 	
-	private boolean isActive = false;
-	
-	private int currentLine, maxLines, maxChars, linePointer = 0;
+	private int maxLines, maxChars, linePointer = 0;
 	private final Vector2f myPos;
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
 	
 	private Text myText[];
 	private String newString = "", prevString = "", content;
+	
+	private boolean isActive = false;
 	
 	// Constructors
 	MemoText(int pos_x, int pos_y, int width, int height, String content){
@@ -41,25 +42,27 @@ public final class MemoText {
 		this.height = height;
 		this.content = content;
 		
+		maxLines = (int)(this.height / 21);
+		maxChars = (int)(this.width / 13);
+		
 		myPos = new Vector2f(pos_x, pos_y);
-		
-		int a = (int)(this.width/12.5);
-		
-		
+						
 		Vector2f myVec_x = new Vector2f(width, 1);
 		Vector2f myVec_y = new Vector2f(1, height);
 		
+		// Creating the surrounding MEMO Container
 		linie_x1 = new RectangleShape(myVec_x); linie_x2 = new RectangleShape(myVec_x);
 		linie_y1 = new RectangleShape(myVec_y); linie_y2 = new RectangleShape(myVec_y);		
-		
+		// Position the MEMO Container
 		linie_x1.setPosition(pos_x, pos_y); linie_x2.setPosition(pos_x, pos_y + height);
 		linie_y1.setPosition(pos_x, pos_y); linie_y2.setPosition(pos_x + width, pos_y);
 		
 		try {
-			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono
+			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
 			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
-			myText = new Text[((int)(this.height/21))];
-				for(int i = 0; i < ((int)(this.height/21)); i++){
+			// Creating Text array (array maximum = maxLines)
+			myText = new Text[maxLines];
+				for(int i = 0; i < maxLines; i++){
 					myText[i] = new Text("", myFont, 20);
 					myText[i].setPosition(pos_x + 5, pos_y + i*21);
 					System.out.println(myText[i].getString());
@@ -68,11 +71,10 @@ public final class MemoText {
 				throw new Error(e.getMessage(), e);
 			}
 		
-		System.out.println("MEMO --> Possible Lines with standard fonts " + this.height / 21);
-		System.out.println("MEMO --> Possible Chars in each line with std font: " + this.width / 13);
+		System.out.println("MEMO --> Possible Lines with standard fonts " + maxLines);
+		System.out.println("MEMO --> Possible Chars in each line with std font: " + maxChars);
 		
 	}
-	
 	
 	
 	
@@ -88,7 +90,7 @@ public final class MemoText {
 	
 	public void newKey(Event event){
 		if(this.isActive)
-			if(this.myText[linePointer].getString().length() <= this.width / 13){
+			if(this.myText[linePointer].getString().length() <= maxChars){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
 			} else {
 				linePointer += 1;
@@ -96,7 +98,13 @@ public final class MemoText {
 			}
 		
 	}
+
 	
+	public void removeKey(){
+		
+		
+		
+	}
 	
 	public void setActive(){
 		this.isActive = true;

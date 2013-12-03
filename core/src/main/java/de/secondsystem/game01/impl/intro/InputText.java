@@ -15,6 +15,7 @@ import org.jsfml.window.event.Event;
 import de.secondsystem.game01.impl.ResourceManager;
 
 /**
+ * This class provides an InputText Box with 1 input line
  * @author Sebastian
  *
  */
