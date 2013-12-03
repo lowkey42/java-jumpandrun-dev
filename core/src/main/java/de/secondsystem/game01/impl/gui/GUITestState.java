@@ -126,7 +126,8 @@ public final class GUITestState extends GameState {
 					testMemo.removeKey();
 				// Return pushed
 				} else if (event.asTextEvent().unicode == 13){
-					System.out.println("Sent Text: " + testText.finalizeInput());
+					System.out.println("Sent Input Text: " + testText.finalizeInput());
+					System.out.println("Sent Memo Text: " + testMemo.finalizeInput());
 				}
 				break;
 			case KEY_RELEASED:

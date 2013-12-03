@@ -30,7 +30,7 @@ public final class MemoText {
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
 	
 	private Text myText[];
-	private String newString = "", prevString = "", content;
+	private String newString = "", prevString = "", content, fullString;
 	
 	private boolean isActive = false;
 	
@@ -65,7 +65,7 @@ public final class MemoText {
 				for(int i = 0; i < maxLines; i++){
 					myText[i] = new Text("", myFont, 20);
 					myText[i].setPosition(pos_x + 5, pos_y + i*21);
-					myText[i].setString("TEST_TEST_TEST_TEST");
+					myText[i].setString("");
 					System.out.println(myText[i].getString());
 				}
 			} catch( IOException e ) {
@@ -119,8 +119,8 @@ public final class MemoText {
 					newString += myText[myText.length-1].getString().charAt(i);
 				newString += event.asTextEvent().character; 
 				myText[myText.length-1].setString(newString);	
-			}
 			
+			}
 		}
 		
 	}
@@ -137,6 +137,19 @@ public final class MemoText {
 			}
 			this.myText[linePointer].setString(newString);
 		}
+	}
+	
+	public String finalizeInput(){
+		if(this.isActive){
+			fullString = prevString;
+			for(int i = 0; i < myText.length-1; i++)
+				fullString += myText[i].getString();
+			prevString = "";
+			for(int i = 0; i < myText.length-1; i++)
+				myText[i].setString("");
+			return prevString + fullString;
+		}
+		return "";
 	}
 	
 	public void setActive(){

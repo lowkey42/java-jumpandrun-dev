@@ -111,7 +111,7 @@ public class InputText {
 			prevString = ""; myText.setString("");
 			return toSend;	
 		}
-		return null;
+		return "";
 	}
 	
 	public void setActive(){
