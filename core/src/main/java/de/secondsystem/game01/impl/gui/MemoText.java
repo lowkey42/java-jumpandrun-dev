@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.secondsystem.game01.impl.intro;
+package de.secondsystem.game01.impl.gui;
 
 import java.io.IOException;
 
@@ -89,21 +89,42 @@ public final class MemoText {
 	
 	
 	public void newKey(Event event){
-		if(this.isActive)
+		if(this.isActive){
 			if(this.myText[linePointer].getString().length() <= maxChars){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
-			} else {
+			} else if(linePointer < maxLines-1){
+				System.out.println(linePointer);
 				linePointer += 1;
-				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
+				this.newKey(event);
+			} else  {
+				prevString += this.myText[0].getString().charAt(0);
+				newString = "";
+				for(int i = 1, j = 0; i < myText[linePointer].getString().length(); i++){
+					if(i == myText[linePointer].getString().length()-1){
+						j++;
+					}
+					newString += myText[j].getString().charAt(i);
+				}
+				myText[0].setString(newString);
+				System.out.println("Prev String: " + prevString + " ");
 			}
+			
+		}
 		
 	}
 
 	
 	public void removeKey(){
-		
-		
-		
+		if(this.isActive){
+			if(this.myText[linePointer].getString().length()-1 < 0 && linePointer != 0){
+				linePointer -= 1;
+			}
+			newString = "";
+			for(int i = 0; i < myText[linePointer].getString().length()-1; i++){			
+				newString += myText[linePointer].getString().charAt(i);
+			}
+			this.myText[linePointer].setString(newString);
+		}
 	}
 	
 	public void setActive(){

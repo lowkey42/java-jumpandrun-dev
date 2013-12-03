@@ -8,6 +8,8 @@ import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.gui.MenuButton;
+import de.secondsystem.game01.impl.gui.SlideButton;
 
 public final class SettingsMenuState extends GameState {
 

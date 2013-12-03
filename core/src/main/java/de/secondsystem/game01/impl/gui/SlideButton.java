@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.intro;
+package de.secondsystem.game01.impl.gui;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import org.jsfml.window.event.Event;
 import org.jsfml.window.event.Event.Type;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.intro.MenuButton.IOnClickListener;
+import de.secondsystem.game01.impl.gui.MenuButton.IOnClickListener;
 import de.secondsystem.game01.model.Settings;
 	
 	/**
@@ -42,7 +42,7 @@ public final class SlideButton {
 	
 	// Constructors
 	
-	SlideButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
+	public SlideButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this.pos_x = pos_x;
 		this.pos_y = pos_y;
 		this.text = text;
@@ -71,17 +71,17 @@ public final class SlideButton {
 	}
 		
 	
-	SlideButton(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
+	public SlideButton(String text, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this(text, "VolumeButton.png", "FreeSansBold.otf", pos_x, pos_y, clickListener);
 	}
 	
 	
-	SlideButton(String text, int pos_x, int pos_y) {
+	public SlideButton(String text, int pos_x, int pos_y) {
 		this(text, "VolumeButton.png", "FreeSansBold.otf", pos_x, pos_y, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 	
 	
-	void mouseover(Window window, Event event){
+	public void mouseover(Window window, Event event){
 		
 		// TODO --> test if there is an alternative:    
 		//if(foregroundSprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
@@ -101,7 +101,7 @@ public final class SlideButton {
 		
 	}
 	
-	void draw(RenderTarget rt) {
+	public void draw(RenderTarget rt) {
 		rt.draw(backgroundSprite);
 		rt.draw(foregroundSprite);				
 	}

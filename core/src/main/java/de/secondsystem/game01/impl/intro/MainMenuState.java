@@ -13,6 +13,8 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
+import de.secondsystem.game01.impl.gui.GUITestState;
+import de.secondsystem.game01.impl.gui.MenuButton;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 
 /**

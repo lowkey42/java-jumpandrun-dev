@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.intro;
+package de.secondsystem.game01.impl.gui;
 
 import java.io.IOException;
 

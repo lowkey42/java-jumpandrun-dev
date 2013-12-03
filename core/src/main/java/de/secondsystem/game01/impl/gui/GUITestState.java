@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.secondsystem.game01.impl.intro;
+package de.secondsystem.game01.impl.gui;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ public final class GUITestState extends GameState {
 	
 	// Object creation
 	InputText testText = new InputText(50, 50, 200, "Test Text");
-	MemoText testMemo = new MemoText(50, 250, 250, 160, "This is a Test Memo");
+	MemoText testMemo = new MemoText(50, 250, 250, 60, "This is a Test Memo");
 	
 	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
 		@Override
@@ -123,6 +123,7 @@ public final class GUITestState extends GameState {
 				// Backspace pushed
 				} else if (event.asTextEvent().unicode == 8){
 					testText.removeKey();
+					testMemo.removeKey();
 				// Return pushed
 				} else if (event.asTextEvent().unicode == 13){
 					System.out.println("Sent Text: " + testText.finalizeInput());
