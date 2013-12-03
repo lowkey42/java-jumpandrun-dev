@@ -92,16 +92,19 @@ public final class MemoText {
 	
 	public void newKey(Event event){
 		if(this.isActive){
+			// Enoug space for characters left --> just write them into linePointer marked arrays
 			if(this.myText[linePointer].getString().length() <= maxChars){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
+			// End of line is reached --> set linePointer to the next Text array field
 			} else if(linePointer < maxLines - 1){
 				linePointer += 1;
 				this.newKey(event);
-			} else  {
-				
-				// Shift all Arrays except the last one (Last array's new key has to be the user input)
+			// End of all lines reached --> all Text lines are filled with characters
+			} else {			
+				// Constructing PreString containing left outshifted text
 				prevString += myText[0].getString().charAt(0);
 				
+				// Shift all Arrays except the last one (Last array's new key has to be the user input)
 				for(int i = 0; i < myText.length - 1; i++){
 					newString = "";
 					for(int j = 1; j < myText[i].getString().length(); j++){
@@ -109,17 +112,13 @@ public final class MemoText {
 					}
 					newString += myText[i+1].getString().charAt(0);
 					myText[i].setString(newString);					
-				}
-				
+				}				
+				// Refreshing last array's content with user input
 				newString = "";
 				for(int i = 1; i < myText[myText.length-1].getString().length(); i++)
 					newString += myText[myText.length-1].getString().charAt(i);
 				newString += event.asTextEvent().character; 
-				myText[myText.length-1].setString(newString);
-				
-				 
-				
-				
+				myText[myText.length-1].setString(newString);	
 			}
 			
 		}
