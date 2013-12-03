@@ -65,11 +65,13 @@ public final class MemoText {
 				for(int i = 0; i < maxLines; i++){
 					myText[i] = new Text("", myFont, 20);
 					myText[i].setPosition(pos_x + 5, pos_y + i*21);
+					myText[i].setString("TEST_TEST_TEST_TEST");
 					System.out.println(myText[i].getString());
 				}
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
+		
 		
 		System.out.println("MEMO --> Possible Lines with standard fonts " + maxLines);
 		System.out.println("MEMO --> Possible Chars in each line with std font: " + maxChars);
@@ -92,21 +94,32 @@ public final class MemoText {
 		if(this.isActive){
 			if(this.myText[linePointer].getString().length() <= maxChars){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
-			} else if(linePointer < maxLines-1){
-				System.out.println(linePointer);
+			} else if(linePointer < maxLines - 1){
 				linePointer += 1;
 				this.newKey(event);
 			} else  {
-				prevString += this.myText[0].getString().charAt(0);
-				newString = "";
-				for(int i = 1, j = 0; i < myText[linePointer].getString().length(); i++){
-					if(i == myText[linePointer].getString().length()-1){
-						j++;
+				
+				// Shift all Arrays except the last one (Last array's new key has to be the user input)
+				prevString += myText[0].getString().charAt(0);
+				
+				for(int i = 0; i < myText.length - 1; i++){
+					newString = "";
+					for(int j = 1; j < myText[i].getString().length(); j++){
+						newString += myText[i].getString().charAt(j);						
 					}
-					newString += myText[j].getString().charAt(i);
+					newString += myText[i+1].getString().charAt(0);
+					myText[i].setString(newString);					
 				}
-				myText[0].setString(newString);
-				System.out.println("Prev String: " + prevString + " ");
+				
+				newString = "";
+				for(int i = 1; i < myText[myText.length-1].getString().length(); i++)
+					newString += myText[myText.length-1].getString().charAt(i);
+				newString += event.asTextEvent().character; 
+				myText[myText.length-1].setString(newString);
+				
+				 
+				
+				
 			}
 			
 		}
