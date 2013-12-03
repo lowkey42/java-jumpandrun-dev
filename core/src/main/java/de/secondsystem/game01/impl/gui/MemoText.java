@@ -145,8 +145,9 @@ public final class MemoText {
 			for(int i = 0; i < myText.length-1; i++)
 				fullString += myText[i].getString();
 			prevString = "";
-			for(int i = 0; i < myText.length-1; i++)
+			for(int i = 0; i < myText.length; i++)
 				myText[i].setString("");
+			linePointer = 0;
 			return prevString + fullString;
 		}
 		return "";
