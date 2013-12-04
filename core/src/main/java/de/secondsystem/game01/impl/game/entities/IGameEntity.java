@@ -28,5 +28,6 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	boolean isInWorld(WorldId worldId);
 	void setWorld(WorldId worldId);
 	void setWorldMask(int newWorldMask);
+	boolean isUsed();
 	
 }

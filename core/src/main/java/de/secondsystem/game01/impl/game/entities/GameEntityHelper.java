@@ -93,6 +93,14 @@ final class GameEntityHelper {
 		if( kinematic!=null )
 			factory.kinematic(kinematic);
 
+		Boolean interactive = attributes.getBoolean("interactive");
+		if( interactive!=null )
+			factory.interactive(interactive);
+		
+		Boolean liftable = attributes.getBoolean("liftable");
+		if( liftable!=null )
+			factory.liftable(liftable);
+		
 		PhysicsBodyShape shape = PhysicsBodyShape.valueOf(attributes.getString("shape"));
 		final DynamicPhysicsBodyFactory bodyFactory;
 		

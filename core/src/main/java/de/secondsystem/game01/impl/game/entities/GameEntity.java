@@ -9,13 +9,15 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
-import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 class GameEntity implements IGameEntity, PhysicsContactListener {
 
@@ -32,6 +34,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	protected IEntityEventHandler eventHandler;
 	
 	protected final IGameMap map;
+	
+	protected boolean used = false;
 	
 	public GameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
@@ -56,6 +60,9 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 			((IMoveable) representation).setPosition( physicsBody.getPosition() );
 			((IMoveable) representation).setRotation( physicsBody.getRotation() );
 		}
+		
+		if( representation instanceof IAnimated )
+			((IAnimated) representation).play(AnimationType.IDLE, 1.f, false, true, false);
 	}
 	
 	@Override
@@ -100,8 +107,15 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	@Override
 	public void onUsed() {
+		used = !used;
 		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.USED) ) 
 			eventHandler.handle(EntityEventType.USED, this);
+		
+		if( representation instanceof IAnimated )
+			if( used )
+				((IAnimated) representation).play(AnimationType.USED, 1.f, true, true, false);
+			else
+				((IAnimated) representation).play(AnimationType.IDLE, 1.f, true, true, false);
 	}
 
 	@Override
@@ -183,6 +197,11 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	@Override
 	public float getRotation() {
 		return physicsBody!=null ? physicsBody.getRotation() : 0;
+	}
+
+	@Override
+	public boolean isUsed() {
+		return used;
 	}
 
 }

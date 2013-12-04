@@ -19,7 +19,7 @@ import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 public final class AnimationTexture {
-	private final Map<AnimationType, AnimationData> map;
+	private final Map<AnimationType, AnimationData> animations;
 	
 	public AnimationTexture(Path path) throws IOException {
 		final JSONParser parser = new JSONParser();
@@ -39,7 +39,7 @@ public final class AnimationTexture {
 				tMap.put(at, new AnimationData(animAttr));
 			}
 			
-			map = Collections.unmodifiableMap(tMap); 
+			animations = Collections.unmodifiableMap(tMap); 
 			
 		} catch (IOException | ParseException e) {
 			throw new IOException("Loading animation texture failed '"+path+"': "+e.getMessage(), e);
@@ -47,7 +47,7 @@ public final class AnimationTexture {
 	}
 	
 	public AnimationData get(AnimationType type) {
-		return map.get(type);
+		return animations.get(type);
 	}
 	
 	
