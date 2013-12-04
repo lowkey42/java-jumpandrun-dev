@@ -216,6 +216,12 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	@Override
+	public void setIdle(boolean idle) {
+		this.idle = idle;
+		//baseFixture.m_friction = idle ? 100.f : 0.1f;
+	}
 
 //	public void setGameWorldId(int id) {
 //		worldIdMask = id;

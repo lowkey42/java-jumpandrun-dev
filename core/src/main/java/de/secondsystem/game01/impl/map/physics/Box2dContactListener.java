@@ -68,8 +68,8 @@ class Box2dContactListener implements ContactListener {
 		
         contact.setEnabled(
         		isWorldShared(bodyA, bodyB, contact.m_fixtureA, contact.m_fixtureB)
-        		&& !bodyA.isContactFiltered(contact, bodyB, contact.m_fixtureA)
-        		&& !bodyB.isContactFiltered(contact, bodyA, contact.m_fixtureB)
+        		&& !bodyA.isContactFiltered(contact, bodyB, contact.m_fixtureA, contact.m_fixtureB)
+        		&& !bodyB.isContactFiltered(contact, bodyA, contact.m_fixtureB, contact.m_fixtureA)
         );   
 	}
 	

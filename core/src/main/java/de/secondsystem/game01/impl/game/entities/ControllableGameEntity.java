@@ -133,6 +133,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    	moved = false;
 	    }
 	    
+	    physicsBody.setIdle(!moved);
+	    
 	    animateMovement(xMove, yMove);
 	}
 

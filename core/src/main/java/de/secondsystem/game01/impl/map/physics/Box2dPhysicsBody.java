@@ -7,6 +7,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -32,12 +33,13 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 	
 	private final boolean kinematic;
+	protected boolean idle;
 	
 	private final Box2dPhysicalWorld parent;
 	private final CollisionHandlerType type;
 	private final float height, width;
 	private final boolean interactive, liftable;
-	private Body body;
+	protected Body body;
 	
 	private int worldIdMask;
 	private Object owner;
@@ -168,43 +170,66 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		if( contactListener!=null )
 			contactListener.endContact(other);
 	}
-	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
+	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture ownFixture, Fixture otherFixture) {
 		switch (type) {
 			case ONE_WAY:
-				return !other.isAbove(this);
-	
+				return !other.isAbove(this, otherFixture);
+				
 			case CLIMBABLE:
 			case SOLID:
 			default:
 				return false;
 		}
 	}
-
-	// FIXME: doesn't work for complex objects (temporary workaround: pos.y + height/2.f -10)
-	public boolean isAbove(Box2dPhysicsBody body) {
+	
+	private boolean isPointAbove(Vec2 v1, Vec2 v2, Vec2 checkPoint) {
+		return ((v2.x - v1.x)*(checkPoint.y - v1.y) - (v2.y - v1.y)*(checkPoint.x - v1.x)) <= 0;
+	}
+	
+	public boolean isAbove(Box2dPhysicsBody body, Fixture otherFixture) {
+		// compute top-left and top-right points of the one-way platform
 		Transform t = body.body.getTransform();
-		
 		Vec2 pos = body.body.getLocalCenter();
-		// top-left and top-right points of the one-way platform
-		Vec2 v1 = Transform.mul(t, new Vec2(pos.x - body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
-		Vec2 v2 = Transform.mul(t, new Vec2(pos.x + body.width/2.f, pos.y - body.height/2.f).mul(BOX2D_SCALE_FACTOR));
-
-		t = /*isBound() ? revoluteJoint.getBodyA().getTransform() :*/ this.body.getTransform();
-		pos = /*isBound() ? revoluteJoint.getBodyA().getLocalCenter() :*/ this.body.getLocalCenter();
+		Vec2 v1 = Transform.mul(t, new Vec2( pos.x-body.width/2.f, pos.y-body.height/2.f).mul(BOX2D_SCALE_FACTOR));
+		Vec2 v2 = Transform.mul(t, new Vec2( pos.x+body.width/2.f, pos.y-body.height/2.f).mul(BOX2D_SCALE_FACTOR));
+		
+		if( otherFixture.getType() == ShapeType.CIRCLE ) {
+			CircleShape shape = (CircleShape) otherFixture.m_shape;
+			pos = Transform.mul(this.body.getTransform(), shape.m_p);
+			
+			if( isPointAbove(v1, v2, pos) ) {
+				
+				float r = shape.m_radius;
+			
+				// compute the shortest distance between the point and the line(v1 -> v2)
+				Vec2 n = new Vec2(v1.x-v2.x, v1.y-v2.y); 
+				n.normalize(); // line unit vector
+				Vec2 c1 = v1.sub(pos);
+				Vec2 c2 = n.mul(Vec2.dot(c1, n));
+				
+				// special case at corners
+//				if(  (this.body.m_linearVelocity.y > .0) && ( (pos.x < v1.x && v1.y <= v2.y) || ( pos.x > v2.x && v2.y <= v1.y ) ) )
+//					return c1.sub(c2).length() >= r-0.1f;
+					
+				return c1.sub(c2).length() >= r-0.01f; // -0.01f because of inaccuracy reasons
+			}
+		}
+	
 		// bottom-left and bottom-right points of the entity/player
-		Vec2 p1 = Transform.mul(t, new Vec2(pos.x - width/2.f, pos.y + height/2.f -10).mul(BOX2D_SCALE_FACTOR));
-		Vec2 p2 = Transform.mul(t, new Vec2(pos.x + width/2.f, pos.y + height/2.f -10).mul(BOX2D_SCALE_FACTOR));
+		t   = this.body.getTransform();
+		pos = this.body.getLocalCenter();
+		Vec2 p1 = Transform.mul(t, new Vec2( pos.x-width/2.f, pos.y+height/2.f ).mul(BOX2D_SCALE_FACTOR));
+		Vec2 p2 = Transform.mul(t, new Vec2( pos.x+width/2.f, pos.y+height/2.f ).mul(BOX2D_SCALE_FACTOR));
 		
 		if( p1.x < v1.x && v1.y < v2.y)
 			return p1.y <= v1.y && p1.y <= v2.y;
-		else
-			if( p2.x > v2.x && v2.y < v1.y)
-				return p1.y <= v1.y && p1.y <= v2.y;
-			else { 
-				// the cross product of 2 vectors tells us whether the second vector is on the left(cp<0), right(cp>0) side of the first vector or above(cp=0)
-				// we construct 2 vectors using 3 points(v1,v2,p1 and v1,v2,p2) and check the sign of the cross product
-				return ((v2.x - v1.x)*(p1.y - v1.y) - (v2.y - v1.y)*(p1.x - v1.x)) <= 0 && ((v2.x - v1.x)*(p2.y - v1.y) - (v2.y - v1.y)*(p2.x - v1.x)) <= 0;
-			}
+
+		if( p2.x > v2.x && v2.y < v1.y)
+			return p1.y <= v1.y && p1.y <= v2.y;
+		
+		// the cross product of 2 vectors tells us whether the second vector is on the left(cp<0), right(cp>0) side of the first vector or above(cp=0)
+		// we construct 2 vectors using 3 points(v1,v2,p1 and v1,v2,p2) and check the sign of the cross product
+		return isPointAbove(v1, v2, p1) && isPointAbove(v1, v2, p2);
 	}
 	
 	@Override
@@ -315,6 +340,10 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	@Override
 	public boolean isLiftable() {
 		return liftable;
+	}
+	@Override
+	public void setIdle(boolean idle) {
+		this.idle = idle;
 	}
 	
 }
