@@ -30,7 +30,8 @@ public final class MemoText {
 	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
 	
 	private Text myText[];
-	private String newString = "", prevString = "", content, fullString;
+	private String prevString = "", content, fullString;
+	private StringBuffer newString = new StringBuffer("");
 	
 	private boolean isActive = false;
 	
@@ -43,7 +44,7 @@ public final class MemoText {
 		this.content = content;
 		
 		maxLines = (int)(this.height / 21);
-		maxChars = (int)(this.width / 13);
+		maxChars = (int)(this.width / 12.6);
 		
 		myPos = new Vector2f(pos_x, pos_y);
 						
@@ -106,38 +107,43 @@ public final class MemoText {
 				
 				// Shift all Arrays except the last one (Last array's new key has to be the user input)
 				for(int i = 0; i < myText.length - 1; i++){
-					newString = "";
+					newString.delete(0, newString.length());
 					for(int j = 1; j < myText[i].getString().length(); j++){
-						newString += myText[i].getString().charAt(j);						
+						newString.append(myText[i].getString().charAt(j));						
 					}
-					newString += myText[i+1].getString().charAt(0);
-					myText[i].setString(newString);					
+					newString.append(myText[i+1].getString().charAt(0));
+					myText[i].setString(newString.toString());					
 				}				
 				// Refreshing last array's content with user input
-				newString = "";
+				newString.delete(0, newString.length());
 				for(int i = 1; i < myText[myText.length-1].getString().length(); i++)
-					newString += myText[myText.length-1].getString().charAt(i);
-				newString += event.asTextEvent().character; 
-				myText[myText.length-1].setString(newString);	
+					newString.append(myText[myText.length-1].getString().charAt(i));
+				newString.append(event.asTextEvent().character); 
+				myText[myText.length-1].setString(newString.toString());	
 			
 			}
 		}
-		
 	}
 
 	
 	public void removeKey(){
 		if(this.isActive){
-			if(this.myText[linePointer].getString().length()-1 < 0 && linePointer != 0){
+			/*if(prevString != ""){
+				
+				
+				
+			} else */if(this.myText[linePointer].getString().length()-1 < 0 && linePointer != 0){
 				linePointer -= 1;
+			} else {
+				newString.delete(0, newString.length());
+				for(int i = 0; i < myText[linePointer].getString().length()-1; i++){			
+					newString.append(myText[linePointer].getString().charAt(i));
+				}
+			this.myText[linePointer].setString(newString.toString());
 			}
-			newString = "";
-			for(int i = 0; i < myText[linePointer].getString().length()-1; i++){			
-				newString += myText[linePointer].getString().charAt(i);
-			}
-			this.myText[linePointer].setString(newString);
 		}
 	}
+	
 	
 	public String finalizeInput(){
 		if(this.isActive){
@@ -153,9 +159,11 @@ public final class MemoText {
 		return "";
 	}
 	
+	
 	public void setActive(){
 		this.isActive = true;
 	}
+	
 	
 	public void setInactive(){
 		this.isActive = false;
