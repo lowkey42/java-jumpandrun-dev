@@ -105,7 +105,7 @@ public final class MemoText {
 				// Constructing PreString containing left outshifted text
 				prevString += myText[0].getString().charAt(0);
 				
-				// Shift all Arrays except the last one (Last array's new key has to be the user input)
+				// Shift all Arrays backward except the last one (Last array's new key has to be the user input)
 				for(int i = 0; i < myText.length - 1; i++){
 					newString.delete(0, newString.length());
 					for(int j = 1; j < myText[i].getString().length(); j++){
@@ -128,11 +128,27 @@ public final class MemoText {
 	
 	public void removeKey(){
 		if(this.isActive){
-			/*if(prevString != ""){
+			// Shift all Arrays forward except the first one where the last Char of prevString has to be placed in
+			if(prevString != "" && prevString.length() - 1 > 0){
+				for(int i = myText.length - 1; i > 0; i--){
+					newString.delete(0, newString.length());
+					// Adding last Char of previous String to the first position of the StringBuffer newString
+					newString.append(myText[i-1].getString().charAt(myText[i-i].getString().length()-1));
+					for(int j = 0; j < myText[i].getString().length() - 1; j++){
+						newString.append(myText[i].getString().charAt(j));						
+					}
+					myText[i].setString(newString.toString());					
+				}	
+				// Refreshing first array's content with last char of the prevString
+				newString.delete(0, newString.length());
+				newString.append(prevString.charAt(prevString.length()-1));
+				for(int i = 0; i < myText[0].getString().length() - 1; i++){
+					newString.append(myText[0].getString().charAt(i));
+				}
+				prevString = prevString.substring(0, prevString.length()-1);
+				myText[0].setString(newString.toString());
 				
-				
-				
-			} else */if(this.myText[linePointer].getString().length()-1 < 0 && linePointer != 0){
+			} else if(this.myText[linePointer].getString().length()-1 < 0 && linePointer != 0){
 				linePointer -= 1;
 			} else {
 				newString.delete(0, newString.length());
