@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
@@ -57,10 +56,10 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean useEvent = false;
 	
-	public ControllableGameEntity(UUID uuid,
+	public ControllableGameEntity(UUID uuid, String archetype,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
+		super(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
 				GameEntityHelper.createEventHandler(em, attributes) );
 
@@ -234,5 +233,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public void use() {
 		useEvent = true;
 	}
-	
+
+	@Override
+	public Attributes serialize() {
+		final Attributes attributes = super.serialize();
+		
+		// TODO
+		
+		return attributes;
+	}
 }

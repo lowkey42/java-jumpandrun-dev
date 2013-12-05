@@ -23,6 +23,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	private final UUID uuid;
 	
+	private final String archetype;
+	
 	protected final GameEntityManager em;
 	
 	protected int worldMask;
@@ -37,16 +39,17 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected boolean used = false;
 	
-	public GameEntity(UUID uuid,
+	public GameEntity(UUID uuid, String archetype,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
+		this(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
 				GameEntityHelper.createEventHandler(em, attributes) );
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, IEntityEventHandler eventHandler) {
+	public GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, IEntityEventHandler eventHandler) {
 		this.uuid = uuid;
+		this.archetype = archetype;
 		this.em = em;
 		this.worldMask = worldMask;
 		this.representation = representation;
@@ -207,14 +210,16 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	@Override
 	public String getArchetype() {
-		// TODO Auto-generated method stub
-		return null;
+		return archetype;
 	}
 
 	@Override
 	public Attributes serialize() {
-		// TODO Auto-generated method stub
-		return null;
+		final Attributes attributes = new Attributes();
+		
+		// TODO
+		
+		return attributes;
 	}
 
 }
