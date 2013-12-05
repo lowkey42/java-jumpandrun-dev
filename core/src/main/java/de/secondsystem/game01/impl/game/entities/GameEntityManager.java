@@ -145,7 +145,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		public synchronized EntityArchetype load(String key) throws Exception {
 			try ( Reader reader = Files.newBufferedReader(ARCHETYPE_PATH.resolve(key), StandardCharsets.UTF_8) ){
 				JSONObject obj = (JSONObject) parser.parse(reader);
-					
+				
 				return new EntityArchetype(Collections.unmodifiableMap(obj));
 				
 			} catch (IOException | ParseException e) {
@@ -163,7 +163,6 @@ public final class GameEntityManager implements IGameEntityManager {
 			SerializedEntity se = iter.next();
 			create(se.uuid(), se.archetype(), se.attributes());
 		}
-		
 	}
 
 	@Override
