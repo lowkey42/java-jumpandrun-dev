@@ -13,49 +13,30 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IUpdateable;
 
 /**
  * This class provides an InputText Box with 1 input line
  * @author Sebastian
  *
  */
-public class InputText {
+public class InputText extends GUIText{
 
 	// Attributes
-    int width;
-	int height = 25, pos_x, pos_y;
-	
-	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
-	private final Vector2f myPos;
-	private Text myText;
-	
-	private boolean isActive = false;
-	
+
 	private String prevString = ""; 
 	private StringBuffer newString = new StringBuffer("");
 		
 	// Constructors
 	InputText(int pos_x, int pos_y, int width, String content){
-		this.width = width;
-		this.pos_x = pos_x;
-		this.pos_y = pos_y;		
+		super(pos_x, pos_y, width, 25, content);
 		
-		Vector2f myVec_x = new Vector2f(width, 1);
-		Vector2f myVec_y = new Vector2f(1, height);
-		
-		linie_x1 = new RectangleShape(myVec_x); linie_x2 = new RectangleShape(myVec_x);
-		linie_y1 = new RectangleShape(myVec_y); linie_y2 = new RectangleShape(myVec_y);
-		
-		linie_x1.setPosition(pos_x, pos_y); linie_x2.setPosition(pos_x, linie_x1.getPosition().y + height);
-		linie_y1.setPosition(pos_x, pos_y); linie_y2.setPosition(linie_y1.getPosition().x + width, pos_y);
-		
-		myPos = new Vector2f(pos_x, pos_y);
-			
 		try {
 			// Loading standard Font
 			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
 			myText = new Text(content, myFont, (height - 5));
-			myText.setPosition(myPos.x + 5, myPos.y);
+			myText.setPosition(getPos().x + 5, getPos().y);
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
@@ -63,9 +44,6 @@ public class InputText {
 	
 	
 	// Methods
-	public void draw(RenderTarget rt){
-		rt.draw(this.linie_x1); rt.draw(this.linie_x2); rt.draw(this.linie_y1); rt.draw(this.linie_y2); rt.draw(myText);		
-	}
 	
 	
 	public void newKey(Event event){
@@ -116,12 +94,9 @@ public class InputText {
 		return "";
 	}
 	
-	public void setActive(){
-		this.isActive = true;
-	}
-	
-	public void setInactive(){
-		this.isActive = false;
+	@Override
+	public void update(long frameTimeMs) {
+		
 	}
 	
 	public String getText(){

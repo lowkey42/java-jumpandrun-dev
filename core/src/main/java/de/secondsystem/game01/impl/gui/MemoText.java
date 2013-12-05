@@ -20,43 +20,22 @@ import de.secondsystem.game01.impl.ResourceManager;
  *
  *
  */
-public final class MemoText {
+public final class MemoText extends GUIText {
 
 	// Attributes
-	int pos_x, pos_y, width, height;
 	
 	private int maxLines, maxChars, linePointer = 0;
-	private final Vector2f myPos;
-	private final RectangleShape linie_x1, linie_x2, linie_y1, linie_y2;
-	
 	private Text myText[];
+	
 	private String prevString = "", content, fullString;
 	private StringBuffer newString = new StringBuffer("");
 	
-	private boolean isActive = false;
-	
 	// Constructors
 	MemoText(int pos_x, int pos_y, int width, int height, String content){
-		this.pos_x = pos_x;
-		this.pos_y = pos_y;
-		this.width = width;
-		this.height = height;
-		this.content = content;
+		super(pos_x, pos_y, width, height, content);
 		
 		maxLines = (int)(this.height / 21);
 		maxChars = (int)(this.width / 12.6);
-		
-		myPos = new Vector2f(pos_x, pos_y);
-						
-		Vector2f myVec_x = new Vector2f(width, 1);
-		Vector2f myVec_y = new Vector2f(1, height);
-		
-		// Creating the surrounding MEMO Container
-		linie_x1 = new RectangleShape(myVec_x); linie_x2 = new RectangleShape(myVec_x);
-		linie_y1 = new RectangleShape(myVec_y); linie_y2 = new RectangleShape(myVec_y);		
-		// Position the MEMO Container
-		linie_x1.setPosition(pos_x, pos_y); linie_x2.setPosition(pos_x, pos_y + height);
-		linie_y1.setPosition(pos_x, pos_y); linie_y2.setPosition(pos_x + width, pos_y);
 		
 		try {
 			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
@@ -83,8 +62,9 @@ public final class MemoText {
 	
 	// Methods
 	
+	@Override
 	public void draw(RenderTarget rt){
-		rt.draw(linie_x1); rt.draw(linie_x2); rt.draw(linie_y1); rt.draw(linie_y2);
+		rt.draw(myBox);
 		for(int i = 0; i < myText.length; i++){
 			rt.draw(myText[i]);
 		}
@@ -93,6 +73,7 @@ public final class MemoText {
 	
 	public void newKey(Event event){
 		if(this.isActive){
+			System.out.print("Eingabe erfolgt!");
 			// Enoug space for characters left --> just write them into linePointer marked arrays
 			if(this.myText[linePointer].getString().length() <= maxChars){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
@@ -176,13 +157,20 @@ public final class MemoText {
 	}
 	
 	
-	public void setActive(){
-		this.isActive = true;
+	public void scrollText(Event event){
+		
+		System.out.println("Mouse wheel moved " + (event.asMouseWheelEvent().delta == 1 ? "up" : "down"));
+		if(event.asMouseWheelEvent().delta == 1 && prevString.length()/(maxChars+1) >= 1){
+			
+			System.out.println("Mindestens eine ganze Line im prev!");
+			System.out.println(prevString.length()/(maxChars+1));
+			System.out.println("MaxChars per Line: " + maxChars + "  Length of prevString: " + prevString.length());
+			
+		}
 	}
 	
-	
-	public void setInactive(){
-		this.isActive = false;
+	@Override
+	public void update(long frameTimeMs) {
+		
 	}
-	
 }
