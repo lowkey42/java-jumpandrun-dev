@@ -81,8 +81,8 @@ public final class GUITestState extends GameState {
 			backdrop.setTexture(backdropBuffer);
 		}
 		
-		infoInputText.setPosition(testText.pos_x, testText.pos_y - 25);
-		infoMemoText.setPosition(testMemo.pos_x, testMemo.pos_y - 25);
+		infoInputText.setPosition(testText.getPos().x, testText.getPos().y - 25);
+		infoMemoText.setPosition(testMemo.getPos().x, testMemo.getPos().y - 25);
 	}
 
 	@Override
@@ -101,16 +101,19 @@ public final class GUITestState extends GameState {
 			case CLOSED:
 				ctx.window.close();
 				break;
+			case MOUSE_WHEEL_MOVED:
+				testMemo.scrollText(event);
+				break;
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
 					testButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
 					backButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					if(Mouse.getPosition(ctx.window).x >= testText.pos_x && Mouse.getPosition(ctx.window).x <= testText.pos_x + testText.width  && 
-							   Mouse.getPosition(ctx.window).y >= testText.pos_y && Mouse.getPosition(ctx.window).y <= testText.pos_y + testText.height){
+					if(Mouse.getPosition(ctx.window).x >= testText.getPos().x && Mouse.getPosition(ctx.window).x <= testText.getPos().x + testText.width  && 
+							   Mouse.getPosition(ctx.window).y >= testText.getPos().y && Mouse.getPosition(ctx.window).y <= testText.getPos().y + testText.height){
 								testText.setActive();
 					} else { testText.setInactive();}
-					if(Mouse.getPosition(ctx.window).x >= testMemo.pos_x && Mouse.getPosition(ctx.window).x <= testMemo.pos_x + testMemo.width  && 
-							   Mouse.getPosition(ctx.window).y >= testMemo.pos_y && Mouse.getPosition(ctx.window).y <= testMemo.pos_y + testMemo.height){
+					if(Mouse.getPosition(ctx.window).x >= testMemo.getPos().x && Mouse.getPosition(ctx.window).x <= testMemo.getPos().x + testMemo.width  && 
+							   Mouse.getPosition(ctx.window).y >= testMemo.getPos().y && Mouse.getPosition(ctx.window).y <= testMemo.getPos().y + testMemo.height){
 								testMemo.setActive();
 					} else { testMemo.setInactive();}
 				}

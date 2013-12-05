@@ -26,7 +26,7 @@ import de.secondsystem.game01.model.Settings;
 public final class SlideButton {
 
 	// Attributes
-	String text;
+	String myText;
 	short value = 0;
 	int pos_x, pos_y;
 	
@@ -45,7 +45,7 @@ public final class SlideButton {
 	public SlideButton(String text, String file, String fonttype, int pos_x, int pos_y, IOnClickListener clickListener) {
 		this.pos_x = pos_x;
 		this.pos_y = pos_y;
-		this.text = text;
+		this.myText = text;
 		this.clickListener = clickListener;
 	
 		try {
@@ -91,7 +91,7 @@ public final class SlideButton {
 			this.foregroundSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.foregroundSprite.getPosition().x)), height));
 			// Transforming Coordinates into a value (MousePosX - LeftUpCornerSprite - 10 pixels for Border / 4.8 (--> (500pixel - 20) / 100 (max))
 			value = (short)((Mouse.getPosition(window).x - this.foregroundSprite.getPosition().x - 10)/4.8);
-			System.out.println(this.text + ": current value: " + value);
+			System.out.println(this.myText + ": current value: " + value);
 			}
 		}
 	}
