@@ -58,10 +58,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private boolean useEvent = false;
 	
 	public ControllableGameEntity(UUID uuid,
-			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
+			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
+				GameEntityHelper.createEventHandler(em, attributes) );
 
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);

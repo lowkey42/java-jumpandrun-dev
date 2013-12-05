@@ -2,14 +2,19 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -23,15 +28,16 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 
 public final class GameEntityManager implements IGameEntityManager {
 
+	private static final Path ARCHETYPE_PATH = Paths.get("assets", "entities");
+
 	private final Map<UUID, IGameEntity> entities = new HashMap<>();
 	
-	private static final LoadingCache<String, Map<String, Object>> ARCHETYPE_CACHE = 
+	private static final LoadingCache<String, EntityArchetype> ARCHETYPE_CACHE = 
 			CacheBuilder.newBuilder().concurrencyLevel(3).maximumSize(100).build(new ArchetypeLoader());
 	
 	final IGameMap map;
@@ -41,26 +47,30 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	@Override
-	public IControllableGameEntity createControllable( String type, Map<String, Object> args ) {
-		try {
-			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
-			
-			ControllableGameEntity e = new ControllableGameEntity(UUID.randomUUID(), this, map, GameEntityHelper.createEventHandler(this, attributes), attributes );
-			entities.put(e.uuid(), e);
-			
-			return e;
-			
-		} catch (ExecutionException e) {
-			throw new Error(e.getMessage(), e);
-		}
+	public Set<String> listArchetypes() {
+		return Collections.unmodifiableSet( new HashSet<String>(Arrays.asList(ARCHETYPE_PATH.toFile().list())) );
 	}
 	
 	@Override
-	public IGameEntity createEntity(String type, Map<String, Object> args) {
+	public IControllableGameEntity createControllable( String type, Map<String, Object> args ) {
+		return (IControllableGameEntity) create(type, args);
+	}
+
+	@Override
+	public IGameEntity create(String type, Map<String, Object> attr) {
+		return create(UUID.randomUUID(), type, attr);
+	}
+	
+	@Override
+	public IGameEntity create(UUID uuid, String type, Map<String, Object> attr) {
 		try {
-			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
+			EntityArchetype at = ARCHETYPE_CACHE.get(type);
 			
-			GameEntity e = new GameEntity(UUID.randomUUID(), this, map, GameEntityHelper.createEventHandler(this, attributes), attributes );
+			if( at==null )
+				throw new EntityCreationException("Unknown archetype '"+type+"' for entity: "+uuid);
+			
+			IGameEntity e = at.create(uuid, this, attr);
+			
 			entities.put(e.uuid(), e);
 			
 			return e;
@@ -93,19 +103,50 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	
-	private static final class ArchetypeLoader extends CacheLoader<String, Map<String, Object>> {
-
-		private final Path BASE_PATH = Paths.get("assets", "entities");
+	private static final class EntityArchetype {
+		public final Constructor<? extends IGameEntity> constructor;
+		public final Map<String, Object> attributes;
+		
+		public EntityArchetype(Map<String, Object> attributes) throws EntityCreationException {
+			this.attributes = attributes;
+			String className = (String) attributes.get("class");
+			if(className==null)
+				className = GameEntity.class.getCanonicalName();
+			
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends IGameEntity> clazz = (Class<? extends IGameEntity>) getClass().getClassLoader().loadClass(className);
+				constructor = clazz.getConstructor( UUID.class , GameEntityManager.class, IGameMap.class, Attributes.class );
+				
+			} catch (ClassNotFoundException | NoSuchMethodException e) {
+				throw new EntityCreationException("Unable to load GameEntity-Class with required constructor: "+e.getMessage(), e);
+			} catch (SecurityException e) {
+				throw new Error(e.getMessage(), e);
+			}
+		}
+		
+		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
+			try {
+				return constructor.newInstance(uuid, em, em.map, new Attributes( attributes, attr) );
+				
+			} catch (InstantiationException | IllegalAccessException
+					| IllegalArgumentException | InvocationTargetException e) {
+				throw new EntityCreationException("Unable to create instance of "+constructor.getDeclaringClass()+": "+e.getMessage(), e);
+			}
+		}
+	}
+	
+	private static final class ArchetypeLoader extends CacheLoader<String, EntityArchetype> {
 		
 		private JSONParser parser = new JSONParser();
 		
 		@SuppressWarnings("unchecked")
 		@Override
-		public synchronized Map<String, Object> load(String key) throws Exception {
-			try ( Reader reader = Files.newBufferedReader(BASE_PATH.resolve(key), StandardCharsets.UTF_8) ){
+		public synchronized EntityArchetype load(String key) throws Exception {
+			try ( Reader reader = Files.newBufferedReader(ARCHETYPE_PATH.resolve(key), StandardCharsets.UTF_8) ){
 				JSONObject obj = (JSONObject) parser.parse(reader);
 					
-				return Collections.unmodifiableMap(obj);
+				return new EntityArchetype(Collections.unmodifiableMap(obj));
 				
 			} catch (IOException | ParseException e) {
 				System.err.println("Unable to load entity archetype: "+e.getMessage());
@@ -114,19 +155,6 @@ public final class GameEntityManager implements IGameEntityManager {
 			}
 		}
 		
-	}
-
-	@Override
-	public IGameEntity create(String type, Map<String, Object> attributes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IGameEntity create(UUID uuid, String type,
-			Map<String, Object> attributes) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

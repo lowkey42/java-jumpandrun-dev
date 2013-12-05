@@ -42,6 +42,6 @@ function used(entity) {
 		println("door closed")
 }
 
-entities.createEntity( "lever", {"x": 210, "y": 270, "events": {"USED": "used"} })
+entities.create( "lever", {"x": 210, "y": 270, "events": {"USED": "used"} })
 
 
