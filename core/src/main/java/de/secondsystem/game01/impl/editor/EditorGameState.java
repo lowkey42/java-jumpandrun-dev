@@ -245,10 +245,10 @@ public final class EditorGameState extends GameState {
 				rt.draw(tileScaleWidthMarker);
 
 			if (tileScaleWidth)
-				currentTileWidth += 0.45f * (lastMousePos.x - getMouseX());
+				currentTileWidth  += (lastMousePos.x - getMouseX()) * 2.f / zoom;
 
 			if (tileScaleHeight)
-				currentTileHeight += 0.45f * (lastMousePos.y - getMouseY());
+				currentTileHeight += (lastMousePos.y - getMouseY()) * 2.f / zoom;
 
 		} else {
 			mouseTile.setPosition(rt.mapPixelToCoords(newPos));

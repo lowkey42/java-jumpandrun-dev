@@ -56,6 +56,21 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	@Override
+	public IGameEntity createEntity(String type, Map<String, Object> args) {
+		try {
+			Attributes attributes = new Attributes( ARCHETYPE_CACHE.get(type), args );
+			
+			GameEntity e = new GameEntity(UUID.randomUUID(), this, map, GameEntityHelper.createEventHandler(this, attributes), attributes );
+			entities.put(e.uuid(), e);
+			
+			return e;
+			
+		} catch (ExecutionException e) {
+			throw new Error(e.getMessage(), e);
+		}
+	}
+	
+	@Override
 	public void destroy( UUID eId ) {
 		entities.remove(eId);
 	}

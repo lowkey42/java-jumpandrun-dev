@@ -32,7 +32,7 @@ public final class GUITestState extends GameState {
 	
 	// Object creation
 	InputText testText = new InputText(50, 50, 200, "Test Text");
-	MemoText testMemo = new MemoText(50, 250, 250, 60, "This is a Test Memo");
+	MemoText testMemo = new MemoText(50, 250, 250, 90, "This is a Test Memo");
 	
 	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
 		@Override
@@ -126,7 +126,8 @@ public final class GUITestState extends GameState {
 					testMemo.removeKey();
 				// Return pushed
 				} else if (event.asTextEvent().unicode == 13){
-					System.out.println("Sent Text: " + testText.finalizeInput());
+					System.out.println("Sent Input Text: " + testText.finalizeInput());
+					System.out.println("Sent Memo Text: " + testMemo.finalizeInput());
 				}
 				break;
 			case KEY_RELEASED:

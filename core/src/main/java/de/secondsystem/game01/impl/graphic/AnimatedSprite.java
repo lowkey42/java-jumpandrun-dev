@@ -49,7 +49,6 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 			currentAnimationData = animationTexture.get(animation);
 			sprite.setTexture(currentAnimationData.texture);
 			sprite.setOrigin(currentAnimationData.frameWidth/2.f, currentAnimationData.frameHeight/2.f);
-			assert( currentAnimationData != null );
 			currentAnimationType = animation;
 			currentFrame = currentAnimationData.frameStart;
 			setDimensions(width, height);

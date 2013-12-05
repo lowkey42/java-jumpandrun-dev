@@ -53,6 +53,12 @@ public abstract class AbstractGameEntityController implements IGameEntityControl
 			for( IControllableGameEntity ge : ges )
 				ge.incThrowingPower();	
 		}
+
+		@Override
+		public void use() {
+			for( IControllableGameEntity ge : ges )
+				ge.use();	
+		}
 		
 	}
 	

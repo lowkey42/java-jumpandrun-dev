@@ -13,6 +13,7 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 	IGameEntity create(UUID uuid, String type, Map<String, Object> attributes);
 	
 	IControllableGameEntity createControllable( String type, Map<String, Object> args );
+	IGameEntity createEntity( String type, Map<String, Object> args );
 	
 	void destroy(UUID eId);
 

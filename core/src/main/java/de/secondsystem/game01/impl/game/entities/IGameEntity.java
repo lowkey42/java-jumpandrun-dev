@@ -33,4 +33,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	String getArchetype();
 	Attributes serialize();
 	
+	@Deprecated
+	boolean isUsed();
+	
 }

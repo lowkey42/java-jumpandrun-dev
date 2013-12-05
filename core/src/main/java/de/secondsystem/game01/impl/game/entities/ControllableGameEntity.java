@@ -55,6 +55,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean vMovementAllowed = false;
 	
+	private boolean useEvent = false;
+	
 	public ControllableGameEntity(UUID uuid,
 			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
 			Attributes attributes) {
@@ -110,6 +112,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    if( incThrowingPowerEvent )
 	    	onIncThrowingPowerEvent(frameTimeMs);
 	    
+	    if( useEvent )
+	    	onUseEvent(xMove, yMove);
+	    
 		super.update(frameTimeMs);
 		
 		hDirection = null;
@@ -117,10 +122,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		vDirection = null;
 		liftingEvent = false;
 		incThrowingPowerEvent = false;
+		useEvent = false;
 	}
 	
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
-		facingDirection = xMove == 1 ? HDirection.RIGHT : xMove == -1 ? HDirection.LEFT : facingDirection;
+		facingDirection = xMove > 0 ? HDirection.RIGHT : xMove < 0 ? HDirection.LEFT : facingDirection;
 		
 		final float effectiveYMove = vMovementAllowed ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
 		
@@ -132,6 +138,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    	physicsBody.resetVelocity(true, false, false);
 	    	moved = false;
 	    }
+	    
+	    physicsBody.setIdle(!moved);
 	    
 	    animateMovement(xMove, yMove);
 	}
@@ -190,6 +198,17 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			throwingPower += THROWING_POWER_INC*frameTimeMs/1000.f;
 	}
 	
+	private void onUseEvent(float xMove, float yMove) {
+		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
+			return;
+		
+		IPhysicsBody nearestBody = ( (IHumanoidPhysicsBody) physicsBody ).getNearestInteractiveBody( new Vector2f(xMove, yMove) );
+		if( nearestBody != null ) {
+			IGameEntity ge = (IGameEntity) nearestBody.getOwner();
+			ge.onUsed();
+		}
+	}
+	
 	@Override
 	public void liftObject() {
 		liftingEvent = true;
@@ -208,6 +227,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void setController(IGameEntityController controller) {
 		this.controller = controller;
+	}
+
+	@Override
+	public void use() {
+		useEvent = true;
 	}
 	
 }
