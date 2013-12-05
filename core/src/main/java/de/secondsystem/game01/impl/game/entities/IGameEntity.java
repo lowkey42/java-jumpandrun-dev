@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
@@ -28,5 +29,8 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	boolean isInWorld(WorldId worldId);
 	void setWorld(WorldId worldId);
 	void setWorldMask(int newWorldMask);
+
+	String getArchetype();
+	Attributes serialize();
 	
 }

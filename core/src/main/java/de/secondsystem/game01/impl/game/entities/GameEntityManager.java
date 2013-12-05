@@ -8,7 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -95,6 +97,101 @@ public final class GameEntityManager implements IGameEntityManager {
 				e.printStackTrace();
 				return null;
 			}
+		}
+		
+	}
+
+	@Override
+	public IGameEntity create(String type, Map<String, Object> attributes) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IGameEntity create(UUID uuid, String type,
+			Map<String, Object> attributes) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deserialize(Iterator<SerializedEntity> iter) {
+		while( iter.hasNext() ) {
+			SerializedEntity se = iter.next();
+			create(se.uuid(), se.archetype(), se.attributes());
+		}
+		
+	}
+
+	@Override
+	public Iterable<SerializedEntity> serialize() {
+		return new SEIterable();
+	}
+
+	private static final class SerializedEntityImpl implements SerializedEntity {
+
+		private final UUID uuid;
+		private final String archetype;
+		private final Map<String, Object> attributes;
+		
+		public SerializedEntityImpl(UUID uuid, String archetype, Map<String, Object> attributes) {
+			this.uuid = uuid;
+			this.archetype = archetype;
+			this.attributes = attributes;
+		}
+		
+		@Override
+		public UUID uuid() {
+			return uuid;
+		}
+
+		@Override
+		public String archetype() {
+			return archetype;
+		}
+
+		@Override
+		public Map<String, Object> attributes() {
+			return attributes;
+		}
+		
+	}
+	
+	private final class SEIterable implements Iterable<SerializedEntity> {
+		@Override public Iterator<SerializedEntity> iterator() {
+			return new SEIterator(entities);
+		}
+	}
+	private static final class SEIterator implements Iterator<SerializedEntity> {
+
+		private final Iterator<Entry<UUID, IGameEntity>> iter;
+		
+		public SEIterator(Map<UUID, IGameEntity> entities) {
+			iter = Collections.unmodifiableMap(entities).entrySet().iterator();
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return iter.hasNext();
+		}
+
+		@Override
+		public SerializedEntity next() {
+			Entry<UUID, IGameEntity> entity = iter.next();
+			
+			entity.getValue().getArchetype();
+			// TODO
+			
+			UUID uuid = entity.getKey();
+			String archetype = null;
+			Map<String, Object> attributes = null;
+			 
+			return new SerializedEntityImpl(uuid, archetype, attributes);
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("remove is not allowed");
 		}
 		
 	}
