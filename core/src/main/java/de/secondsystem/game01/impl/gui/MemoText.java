@@ -27,12 +27,13 @@ public final class MemoText extends GUIText {
 	private int maxLines, maxChars, linePointer = 0;
 	private Text myText[];
 	
-	private String prevString = "", content, fullString;
+	private String prevString = "", fullString;
 	private StringBuffer newString = new StringBuffer("");
 	
 	// Constructors
-	MemoText(int pos_x, int pos_y, int width, int height, String content){
-		super(pos_x, pos_y, width, height, content);
+	
+	MemoText(int pos_x, int pos_y, int width, int height){
+		super(pos_x, pos_y, width, height);
 		
 		maxLines = (int)(this.height / 21);
 		maxChars = (int)(this.width / 12.6);
@@ -51,13 +52,9 @@ public final class MemoText extends GUIText {
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
-		
-		
 		System.out.println("MEMO --> Possible Lines with standard fonts " + maxLines);
 		System.out.println("MEMO --> Possible Chars in each line with std font: " + maxChars);
-		
 	}
-	
 	
 	
 	// Methods
@@ -73,7 +70,6 @@ public final class MemoText extends GUIText {
 	
 	public void newKey(Event event){
 		if(this.isActive){
-			System.out.print("Eingabe erfolgt!");
 			// Enoug space for characters left --> just write them into linePointer marked arrays
 			if(this.myText[linePointer].getString().length() <= maxChars){
 				this.myText[linePointer].setString(this.myText[linePointer].getString() + event.asTextEvent().character);
@@ -100,8 +96,7 @@ public final class MemoText extends GUIText {
 				for(int i = 1; i < myText[myText.length-1].getString().length(); i++)
 					newString.append(myText[myText.length-1].getString().charAt(i));
 				newString.append(event.asTextEvent().character); 
-				myText[myText.length-1].setString(newString.toString());	
-			
+				myText[myText.length-1].setString(newString.toString());		
 			}
 		}
 	}
@@ -168,6 +163,7 @@ public final class MemoText extends GUIText {
 			
 		}
 	}
+	
 	
 	@Override
 	public void update(long frameTimeMs) {

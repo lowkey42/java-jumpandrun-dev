@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
-
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
@@ -147,23 +144,21 @@ final class GameEntityHelper {
 		return bodyFactory.create();
 	}
 	
-	public static IEntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {		
-		Object eventsObj = attributes.getObject("events");
+	public static IEntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {
+		CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
+		Object eventsObj = attributes.getObject("events");		
 		
-		if( eventsObj instanceof Map ) {
-			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
+		if( eventsObj instanceof Map ) {	
 			@SuppressWarnings("unchecked")
 			HashMap<String, String> events = (HashMap<String, String>) eventsObj;
 			for( String eventType : events.keySet() ) {
-				ScriptEntityEventHandler event = null;
+				ScriptEntityEventHandler event;
 				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.valueOf(eventType), events.get(eventType));
 				eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
 			}
-			
-			return eventHandler;
 		}
 		
-		return null;
+		return eventHandler;
 	}
 	
 	private GameEntityHelper() {}

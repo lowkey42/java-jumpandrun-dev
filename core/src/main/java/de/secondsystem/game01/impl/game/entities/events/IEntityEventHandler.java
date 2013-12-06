@@ -61,6 +61,8 @@ public interface IEntityEventHandler {
 	
 	Object handle( EntityEventType type, IGameEntity owner, Object... args );
 	
+	Object handle( EntityEventType type, Object... args);
+	
 	boolean isHandled( EntityEventType type );
 	
 	Set<EntityEventType> getHandled();

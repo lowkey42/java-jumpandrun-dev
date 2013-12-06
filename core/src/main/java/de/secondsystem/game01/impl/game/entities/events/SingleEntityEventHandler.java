@@ -7,7 +7,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
 public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 
-	private final EntityEventType eventType;
+	protected final EntityEventType eventType;
 	
 	public SingleEntityEventHandler(EntityEventType eventType) {
 		this.eventType = eventType;
@@ -16,6 +16,9 @@ public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 	@Override
 	public abstract Object handle(EntityEventType type, IGameEntity owner, Object... args);
 
+	@Override
+	public abstract Object handle(EntityEventType type, Object... args);
+	
 	@Override
 	public final boolean isHandled(EntityEventType type) {
 		return eventType==type;

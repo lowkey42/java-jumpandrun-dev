@@ -23,6 +23,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	private final UUID uuid;
 	
+	private final String archetype;
+	
 	protected final GameEntityManager em;
 	
 	protected int worldMask;
@@ -37,15 +39,17 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected boolean used = false;
 	
-	public GameEntity(UUID uuid,
-			GameEntityManager em, IGameMap map, IEntityEventHandler eventHandler,
+	public GameEntity(UUID uuid, String archetype,
+			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, eventHandler);
+		this(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
+				GameEntityHelper.createEventHandler(em, attributes) );
 	}
 	
-	public GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, IEntityEventHandler eventHandler) {
+	public GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, IEntityEventHandler eventHandler) {
 		this.uuid = uuid;
+		this.archetype = archetype;
 		this.em = em;
 		this.worldMask = worldMask;
 		this.representation = representation;
@@ -62,7 +66,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		}
 		
 		if( representation instanceof IAnimated )
-			((IAnimated) representation).play(AnimationType.IDLE, 1.f, false, true, false);
+			((IAnimated) representation).play(AnimationType.IDLE, 1.f, true, true, false);
 	}
 	
 	@Override
@@ -107,15 +111,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	@Override
 	public void onUsed() {
-		used = !used;
 		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.USED) ) 
 			eventHandler.handle(EntityEventType.USED, this);
-		
-		if( representation instanceof IAnimated )
-			if( used )
-				((IAnimated) representation).play(AnimationType.USED, 1.f, true, true, false);
-			else
-				((IAnimated) representation).play(AnimationType.IDLE, 1.f, true, true, false);
 	}
 
 	@Override
@@ -200,20 +197,27 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	}
 
 	@Override
-	public boolean isUsed() {
-		return used;
-	}
-
-	@Override
 	public String getArchetype() {
-		// TODO Auto-generated method stub
-		return null;
+		return archetype;
 	}
 
 	@Override
 	public Attributes serialize() {
-		// TODO Auto-generated method stub
-		return null;
+		final Attributes attributes = new Attributes();
+		
+		// TODO
+		
+		return attributes;
+	}
+
+	@Override
+	public IEntityEventHandler getEventHandler() {
+		return eventHandler;
+	}
+
+	@Override
+	public IDrawable getRepresentation() {
+		return representation;
 	}
 
 }

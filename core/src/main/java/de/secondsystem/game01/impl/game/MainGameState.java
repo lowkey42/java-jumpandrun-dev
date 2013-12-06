@@ -9,6 +9,13 @@ import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
+import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.impl.SequencedEntity;
+import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
+import de.secondsystem.game01.impl.game.entities.events.impl.Toggle.ToggleInputOption;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -37,6 +44,23 @@ public class MainGameState extends GameState {
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
 		camera = new Camera(player);
+		
+		
+		// something like this will be implemented in the editor
+		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
+		IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
+		IGameEntity fire1 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",200)) );
+		IGameEntity fire2 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",250)) );
+		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
+		if( entity.getEventHandler() instanceof CollectionEntityEventHandler ) {
+			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
+			Toggle toggle = new Toggle(ToggleInputOption.TOGGLE, entity);
+			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, toggle);
+			handler.addTarget(new SequencedEntity(fire1));
+			handler.addTarget(new SequencedEntity(fire2));
+			handler.addTarget(new SequencedEntity(fire3));
+			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);
+		}
 	}
 	
 	@Override

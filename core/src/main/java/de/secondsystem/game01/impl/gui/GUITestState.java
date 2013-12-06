@@ -30,9 +30,9 @@ public final class GUITestState extends GameState {
 	private final Text infoInputText;
 	private final Text infoMemoText;
 	
-	// Object creation
-	InputText testText = new InputText(50, 50, 200, "Test Text");
-	MemoText testMemo = new MemoText(50, 250, 250, 90, "This is a Test Memo");
+	// Object creations
+	InputText testText = new InputText(50, 50, 200);
+	MemoText testMemo = new MemoText(50, 250, 250, 90);
 	
 	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
 		@Override
@@ -48,6 +48,7 @@ public final class GUITestState extends GameState {
 		}
 	});
 		
+	
 	public GUITestState(GameState MainMenu, GameState playGameState,
 			Sprite backdrop) {
 		// Transfering last State into playGameState
@@ -85,6 +86,7 @@ public final class GUITestState extends GameState {
 		infoMemoText.setPosition(testMemo.getPos().x, testMemo.getPos().y - 25);
 	}
 
+	
 	@Override
 	protected void onStop(GameContext ctx) {
 		// TODO
@@ -150,9 +152,5 @@ public final class GUITestState extends GameState {
 		backButton.draw(ctx.window);
 		
 	}	
-	
-	
-	
-	
 	
 }

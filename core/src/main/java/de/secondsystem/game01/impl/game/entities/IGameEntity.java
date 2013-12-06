@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
@@ -18,22 +19,22 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 
 	UUID uuid();
 	
-	void onUsed();
+	void  onUsed();
 	float onUsedDraged(float force);
-	void onLifted(IGameEntity liftingEntity);
-	void onUnlifted(IGameEntity unliftingEntity);
-	void onViewed();
-	void onUnviewed();
+	void  onLifted(IGameEntity liftingEntity);
+	void  onUnlifted(IGameEntity unliftingEntity);
+	void  onViewed();
+	void  onUnviewed();
 	
 	int getWorldMask();
 	boolean isInWorld(WorldId worldId);
 	void setWorld(WorldId worldId);
 	void setWorldMask(int newWorldMask);
 
+	IEntityEventHandler getEventHandler();
+	IDrawable getRepresentation();
+	
 	String getArchetype();
 	Attributes serialize();
-	
-	@Deprecated
-	boolean isUsed();
 	
 }

@@ -21,4 +21,9 @@ public class ScriptEntityEventHandler extends SingleEntityEventHandler {
 		return env.exec(handlerFuncName, owner, args);
 	}
 
+	@Override
+	public Object handle(EntityEventType type, Object... args) {
+		return env.exec(handlerFuncName, args);
+	}
+
 }

@@ -80,4 +80,9 @@ public class Attributes extends HashMap<String, Object> {
 		Object val = get(key);
 		return val!=null ? new Attributes((Map<String, Object>)val ) : null;
 	}
+	
+	@Override
+	public Attributes clone() {
+		return new Attributes((Map<?,?>) super.clone());
+	}
 }

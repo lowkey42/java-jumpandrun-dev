@@ -34,14 +34,3 @@ movingPlatformCon.addTargetPoint(300, 100);
 movingPlatformCon.addTargetPoint(150, 100);
 movingPlatformCon.addTargetPoint(150, -100);
 movingPlatformCon.addTargetPoint(150, 100);*/
-
-function used(entity) {
-	if( entity.isUsed() )
-		println("door opened");
-	else
-		println("door closed")
-}
-
-entities.createEntity( "lever", {"x": 210, "y": 270, "events": {"USED": "used"} })
-
-

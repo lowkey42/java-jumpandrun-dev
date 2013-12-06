@@ -33,8 +33,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 		if( playing )
 		{
 			currentFrame = currentAnimationData.calculateNextFrame(currentFrame, frameTimeMs*animationSpeed, repeated);
-			if( currentFrame<0 )
-				play(AnimationType.IDLE, 1.f, true, false, isFlipped());
+			if( currentFrame < 0 )
+				return;
 			
 			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 		}
@@ -46,15 +46,20 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 			boolean repeated, boolean cancelCurrentAnimation,
 			boolean flipTexture) {
 		if (currentAnimationType != animation || cancelCurrentAnimation) {
-			currentAnimationData = animationTexture.get(animation);
+			AnimationData animData = animationTexture.get(animation);
+			
+			if( animData == null )
+				return;
+			
+			currentAnimationData = animData;
 			sprite.setTexture(currentAnimationData.texture);
 			sprite.setOrigin(currentAnimationData.frameWidth/2.f, currentAnimationData.frameHeight/2.f);
 			currentAnimationType = animation;
 			currentFrame = currentAnimationData.frameStart;
+			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 			setDimensions(width, height);
 			if( flipTexture )
-				flip();
-			
+				flip();			
 		}
 
 		animationSpeed = speedFactor;

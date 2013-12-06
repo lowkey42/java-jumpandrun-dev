@@ -1,0 +1,2 @@
+ { "IDLE":{"texture": "explosion.png", "frameWidth": 128, "frameHeight":128, "numRowFrames": 8, "frameStart": 34, "frameEnd":35, "fps": 50},
+ "USED":{"texture": "explosion.png", "frameWidth": 128, "frameHeight":128, "numRowFrames": 8, "frameStart": 0, "frameEnd":40, "fps": 50}}
