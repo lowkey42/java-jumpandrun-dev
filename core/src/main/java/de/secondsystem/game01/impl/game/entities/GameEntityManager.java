@@ -104,10 +104,12 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	
 	private static final class EntityArchetype {
+		public final String archetype;
 		public final Constructor<? extends IGameEntity> constructor;
 		public final Map<String, Object> attributes;
 		
-		public EntityArchetype(Map<String, Object> attributes) throws EntityCreationException {
+		public EntityArchetype(String archetype, Map<String, Object> attributes) throws EntityCreationException {
+			this.archetype = archetype;
 			this.attributes = attributes;
 			String className = (String) attributes.get("class");
 			if(className==null)
@@ -116,7 +118,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends IGameEntity> clazz = (Class<? extends IGameEntity>) getClass().getClassLoader().loadClass(className);
-				constructor = clazz.getConstructor( UUID.class , GameEntityManager.class, IGameMap.class, Attributes.class );
+				constructor = clazz.getConstructor( UUID.class, String.class, GameEntityManager.class, IGameMap.class, Attributes.class );
 				
 			} catch (ClassNotFoundException | NoSuchMethodException e) {
 				throw new EntityCreationException("Unable to load GameEntity-Class with required constructor: "+e.getMessage(), e);
@@ -127,7 +129,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
 			try {
-				return constructor.newInstance(uuid, em, em.map, new Attributes( attributes, attr) );
+				return constructor.newInstance(uuid, archetype, em, em.map, new Attributes( attributes, attr) );
 				
 			} catch (InstantiationException | IllegalAccessException
 					| IllegalArgumentException | InvocationTargetException e) {
@@ -146,7 +148,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			try ( Reader reader = Files.newBufferedReader(ARCHETYPE_PATH.resolve(key), StandardCharsets.UTF_8) ){
 				JSONObject obj = (JSONObject) parser.parse(reader);
 				
-				return new EntityArchetype(Collections.unmodifiableMap(obj));
+				return new EntityArchetype(key, Collections.unmodifiableMap(obj));
 				
 			} catch (IOException | ParseException e) {
 				System.err.println("Unable to load entity archetype: "+e.getMessage());
@@ -204,7 +206,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			return new SEIterator(entities);
 		}
 	}
-	private static final class SEIterator implements Iterator<SerializedEntity> {
+	private final class SEIterator implements Iterator<SerializedEntity> {
 
 		private final Iterator<Entry<UUID, IGameEntity>> iter;
 		
@@ -220,15 +222,23 @@ public final class GameEntityManager implements IGameEntityManager {
 		@Override
 		public SerializedEntity next() {
 			Entry<UUID, IGameEntity> entity = iter.next();
+
+			Map<String, Object> attributes = entity.getValue().serialize().clone();
 			
-			entity.getValue().getArchetype();
-			// TODO
+			try {
+				EntityArchetype at = ARCHETYPE_CACHE.get(entity.getValue().getArchetype());
+				
+				if( at!=null ) {
+					for( Entry<String, Object> e : at.attributes.entrySet() )
+						if( e.getValue().equals(attributes.get(e.getKey())) )
+								attributes.remove(e.getKey());
+				}
+				
+			} catch (ExecutionException e) {
+				throw new Error(e.getMessage(), e);
+			}
 			
-			UUID uuid = entity.getKey();
-			String archetype = null;
-			Map<String, Object> attributes = null;
-			 
-			return new SerializedEntityImpl(uuid, archetype, attributes);
+			return new SerializedEntityImpl(entity.getKey(), entity.getValue().getArchetype(), attributes);
 		}
 
 		@Override
