@@ -29,22 +29,13 @@ public class InputText extends GUIText{
 	private StringBuffer newString = new StringBuffer("");
 		
 	// Constructors
-	InputText(int pos_x, int pos_y, int width, String content){
-		super(pos_x, pos_y, width, 25, content);
-		
-		try {
-			// Loading standard Font
-			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
-			myText = new Text(content, myFont, (height - 5));
-			myText.setPosition(getPos().x + 5, getPos().y);
-			} catch( IOException e ) {
-				throw new Error(e.getMessage(), e);
-			}
+	
+	InputText(int pos_x, int pos_y, int width){
+		super(pos_x, pos_y, width);
 	}
 	
 	
-	// Methods
-	
+	// Methods	
 	
 	public void newKey(Event event){
 		if(this.isActive){
@@ -85,6 +76,7 @@ public class InputText extends GUIText{
 		}
 	}
 	
+	
 	public String finalizeInput(){
 		if(this.isActive){
 			String toSend = prevString + myText.getString();
@@ -93,13 +85,15 @@ public class InputText extends GUIText{
 		}
 		return "";
 	}
+
+	
+	public String getText(){
+		return prevString + myText.getString();
+	}
+	
 	
 	@Override
 	public void update(long frameTimeMs) {
 		
-	}
-	
-	public String getText(){
-		return prevString + myText.getString();
 	}
 }

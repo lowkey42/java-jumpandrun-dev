@@ -18,8 +18,6 @@ public abstract class GUIText extends GUIElement{
 	
 	// shared Attributes
 	
-	protected Text myText;
-	
 	protected RectangleShape myBox;
 	
 	protected boolean isActive = false;
@@ -27,14 +25,20 @@ public abstract class GUIText extends GUIElement{
 	
 	// Constructors
 	
-	GUIText(int pos_x, int pos_y, int width, int height, String myText){
+	GUIText(int pos_x, int pos_y, int width, int height, Text myText){
 		super(pos_x, pos_y, width, height, myText);
 		myBox = new RectangleShape(new Vector2f(width, height));
 		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
 	}
 	
-	GUIText(int pos_x, int pos_y, int width, String myText){
+	GUIText(int pos_x, int pos_y, int width, Text myText){
 		super(pos_x, pos_y, width, 25, myText);
+		myBox = new RectangleShape(new Vector2f(width, height));
+		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
+	}
+	
+	GUIText(int pos_x, int pos_y, int width, int height){
+		super(pos_x, pos_y, width, height, "");
 		myBox = new RectangleShape(new Vector2f(width, height));
 		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
 	}
@@ -49,7 +53,8 @@ public abstract class GUIText extends GUIElement{
 	// shared Methods
 	
 	public void draw(RenderTarget rt){
-		rt.draw(myBox); rt.draw(myText);
+		rt.draw(myBox); 
+		rt.draw(myText);
 	}
 	
 	public void setActive(){
