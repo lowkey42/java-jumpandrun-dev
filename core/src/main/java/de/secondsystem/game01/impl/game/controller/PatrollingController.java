@@ -1,7 +1,7 @@
 package de.secondsystem.game01.impl.game.controller;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jsfml.system.Vector2f;
 
@@ -16,17 +16,20 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	private final IControllableGameEntity controlledEntity;
 	private final boolean repeated;
 	
+	private List<Vector2f> targetPoints = new ArrayList<Vector2f>();
+	
+	private Vector2f targetPoint;
+	private Vector2f dir;
+	
+	private int tpIndex = 0;
+	private boolean reverse = false;
+	private boolean play = false;
+	
 	public PatrollingController( IControllableGameEntity controlledEntity, boolean repeated ) {
 		this.controlledEntity = controlledEntity;
 		this.repeated = repeated;
 		controlledEntity.setController(this);
 	}
-
-	
-	private Queue<Vector2f> targetPoints = new LinkedList<Vector2f>();
-	
-	private Vector2f targetPoint;
-	private Vector2f dir;
 	
 	static public float vectorLength(float x, float y) {
 		return (float) Math.sqrt(x*x + y*y);
@@ -57,14 +60,40 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 		computeDirection();
 	}
 	
+	public void removeTargetPoint(int index) {
+		if( index < 0 || index >= targetPoints.size() )
+			return;
+		targetPoints.remove(index);
+	}
+	
 	private void computeDirection() {
-		targetPoint = targetPoints.peek();
+		if( tpIndex < 0 || tpIndex >= targetPoints.size() )
+			return;
+		targetPoint = targetPoints.get(tpIndex);
 		dir = targetPoint != null ? normalizedVector(targetPoint.x-controlledEntity.getPosition().x, targetPoint.y-controlledEntity.getPosition().y) : new Vector2f(0,0);
+	}
+	
+	public void reverse() {
+		reverse = !reverse;
+		tpIndex = reverse ? tpIndex-1 : tpIndex+1;
+	}
+	
+	public void stop() {
+		tpIndex = reverse ? targetPoints.size()-1 : 0;
+		play = false;
+	}
+	
+	public void pause() {
+		play = false;
+	}
+	
+	public void play() {
+		play = true;
 	}
 	
 	@Override
 	public void update(long frameTimeMs) {
-		if( targetPoint != null ) {
+		if( targetPoints.size() > tpIndex && play ) {
 			Vector2f pos = controlledEntity.getPosition();
 			
 			// check if the target point is reached
@@ -79,11 +108,15 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 				controlledEntity.moveVertically( dir.y<0 ? VDirection.UP : VDirection.DOWN, Math.abs(dir.y) );
 			
 			// if reached move to the next target
-			if( reachedX && reachedY ) {
+			if( reachedX && reachedY ) {		
 				controlledEntity.setPosition(targetPoint);
-				Vector2f p = targetPoints.poll();
+				
 				if( repeated )
-					targetPoints.add(p);		
+					if( (reverse && tpIndex == 0) || (!reverse && tpIndex == targetPoints.size()-1) )
+						reverse = !reverse;
+							
+				tpIndex = reverse ? tpIndex-1 : tpIndex+1;
+				
 				computeDirection();
 			}		
 		}

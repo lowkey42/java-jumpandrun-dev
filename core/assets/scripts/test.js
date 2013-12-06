@@ -5,7 +5,7 @@ importPackage(Packages.de.secondsystem.game01.impl.game.entities);
 importPackage(Packages.de.secondsystem.game01.impl.timer)
 println("Ich bin ein Script für die map "+mapId);
 
-/*function touchFunc(entity, other) {
+function touchFunc(entity, other) {
 	entity.jump();
 }
 
@@ -33,4 +33,4 @@ var movingPlatformCon = new PatrollingController(movingPlatform, true);
 movingPlatformCon.addTargetPoint(300, 100);
 movingPlatformCon.addTargetPoint(150, 100);
 movingPlatformCon.addTargetPoint(150, -100);
-movingPlatformCon.addTargetPoint(150, 100);*/
+movingPlatformCon.play();

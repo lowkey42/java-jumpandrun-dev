@@ -37,8 +37,6 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected final IGameMap map;
 	
-	protected boolean used = false;
-	
 	public GameEntity(UUID uuid, String archetype,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
