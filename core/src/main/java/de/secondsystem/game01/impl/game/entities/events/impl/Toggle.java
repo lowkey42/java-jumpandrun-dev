@@ -15,11 +15,11 @@ public class Toggle implements ISequencedObject {
 	}
 	
 	private final ToggleInputOption inputOption;
-	private final ISequencedEntity owner;;
+	private final ISequencedEntity owner;
 	
-	public Toggle(ToggleInputOption inputOption, IGameEntity owner) {
+	public Toggle(ToggleInputOption inputOption, ISequencedEntity owner) {
 		this.inputOption = inputOption;	
-		this.owner = new SequencedEntity(owner);
+		this.owner = owner;
 	}
 
 	@Override

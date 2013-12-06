@@ -13,6 +13,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle.ToggleInputOption;
@@ -54,11 +55,12 @@ public class MainGameState extends GameState {
 		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
 		if( entity.getEventHandler() instanceof CollectionEntityEventHandler ) {
 			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
-			Toggle toggle = new Toggle(ToggleInputOption.TOGGLE, entity);
+			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity, null);
+			Toggle toggle = new Toggle(ToggleInputOption.TOGGLE, animSequencedEntity);
 			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, toggle);
-			handler.addTarget(new SequencedEntity(fire1));
-			handler.addTarget(new SequencedEntity(fire2));
-			handler.addTarget(new SequencedEntity(fire3));
+			handler.addTarget(new AnimatedSequencedEntity(fire1, null));
+			handler.addTarget(new AnimatedSequencedEntity(fire2, null));
+			handler.addTarget(new AnimatedSequencedEntity(fire3, null));
 			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);
 		}
 	}
