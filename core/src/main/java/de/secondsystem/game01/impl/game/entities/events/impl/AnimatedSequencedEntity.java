@@ -13,7 +13,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlaybac
 		this(owner, null, null);
 	}
 	
-	public AnimatedSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity) {
+	public AnimatedSequencedEntity(IGameEntity owner, SequencedEntity linkedEntity) {
 		this(owner, linkedEntity, null);
 	}
 	
@@ -21,7 +21,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlaybac
 		this(owner, null, animationType);
 	}
 	
-	public AnimatedSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity, AnimationType animationType) {
+	public AnimatedSequencedEntity(IGameEntity owner, SequencedEntity linkedEntity, AnimationType animationType) {
 		this.linkedEntity = linkedEntity;
 		
 		animatedEntity = ((IAnimated) owner.getRepresentation());

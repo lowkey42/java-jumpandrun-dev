@@ -1,11 +1,9 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
-import de.secondsystem.game01.impl.game.entities.IGameEntity;
-
-public class SequencedEntity implements ISequencedEntity {
+public class SequencedEntity implements IToggle {
 	
 	protected boolean on = false;
-	protected ISequencedEntity linkedEntity = null;
+	protected SequencedEntity linkedEntity = null;
 	
 	@Override
 	public void onTurnOn() {

@@ -7,7 +7,7 @@ public class ControllableSequencedEntity extends SequencedEntity implements IPla
 	
 	private PatrollingController controller;
 	
-	public ControllableSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity, PatrollingController controller) {
+	public ControllableSequencedEntity(IGameEntity owner, SequencedEntity linkedEntity, PatrollingController controller) {
 		this.linkedEntity = linkedEntity;
 		
 		this.controller = controller;

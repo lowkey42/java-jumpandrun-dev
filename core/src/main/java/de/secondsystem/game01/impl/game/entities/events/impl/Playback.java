@@ -9,11 +9,11 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.Enti
 public class Playback extends SequencedObject {
 	
 	public class PlaybackInputOption {
-		public final List<ISequencedEntity> play     = new ArrayList<>();
-		public final List<ISequencedEntity> reverse  = new ArrayList<>();
-		public final List<ISequencedEntity> stop     = new ArrayList<>();
-		public final List<ISequencedEntity> pause    = new ArrayList<>();
-		public final List<ISequencedEntity> resume   = new ArrayList<>();
+		public final List<SequencedEntity> play     = new ArrayList<>();
+		public final List<SequencedEntity> reverse  = new ArrayList<>();
+		public final List<SequencedEntity> stop     = new ArrayList<>();
+		public final List<SequencedEntity> pause    = new ArrayList<>();
+		public final List<SequencedEntity> resume   = new ArrayList<>();
 	}
 	
 	public final PlaybackInputOption inputOption = new PlaybackInputOption();
@@ -22,33 +22,33 @@ public class Playback extends SequencedObject {
 	public Object handle(EntityEventType type, IGameEntity owner) {
 		super.handle(type, owner);
 		
-		for( ISequencedEntity entity : inputOption.play ) {
+		for( SequencedEntity entity : inputOption.play ) {
 			((IPlayback) entity).onPlay();
-			for( ISequencedEntity target : targets )
+			for( SequencedEntity target : targets )
 				((IPlayback) target).onPlay();
 		}
 		
-		for( ISequencedEntity entity : inputOption.reverse ) {
+		for( SequencedEntity entity : inputOption.reverse ) {
 			((IPlayback) entity).onReverse();
-			for( ISequencedEntity target : targets )
+			for( SequencedEntity target : targets )
 				((IPlayback) target).onReverse();
 		}
 		
-		for( ISequencedEntity entity : inputOption.stop ) {
+		for( SequencedEntity entity : inputOption.stop ) {
 			((IPlayback) entity).onStop();
-			for( ISequencedEntity target : targets )
+			for( SequencedEntity target : targets )
 				((IPlayback) target).onStop();
 		}
 		
-		for( ISequencedEntity entity : inputOption.pause ) {
+		for( SequencedEntity entity : inputOption.pause ) {
 			((IPlayback) entity).onPause();
-			for( ISequencedEntity target : targets )
+			for( SequencedEntity target : targets )
 				((IPlayback) target).onPause();
 		}
 		
-		for( ISequencedEntity entity : inputOption.resume ) {
+		for( SequencedEntity entity : inputOption.resume ) {
 			((IPlayback) entity).onResume();
-			for( ISequencedEntity target : targets )
+			for( SequencedEntity target : targets )
 				((IPlayback) target).onResume();
 		}
 		
