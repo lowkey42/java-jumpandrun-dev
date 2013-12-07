@@ -2,18 +2,41 @@ package de.secondsystem.game01.impl.game.entities.events.impl;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
-public abstract class SequencedEntity implements ISequencedEntity {
+public class SequencedEntity implements ISequencedEntity {
 	
 	protected boolean on = false;
 	protected IGameEntity owner = null;
 	protected ISequencedEntity parent = null;
 	
-	@Override
-	public abstract void onTurnOn();
+	public SequencedEntity(IGameEntity owner, ISequencedEntity parent) {
+		this.parent = parent;
+		this.owner  = owner;
+	}
 	
 	@Override
-	public abstract void onTurnOff();
-	
+	public void onTurnOn() {
+		on = true;
+		if( parent != null )
+			parent.onTurnOn();
+	}
+
 	@Override
-	public abstract void onToggle();
+	public void onTurnOff() {
+		on = false;
+		if( parent != null )
+			parent.onTurnOff();
+	}
+
+	@Override
+	public void onToggle() {
+		if( !on )
+			onTurnOn();
+		else
+			onTurnOff();
+	}
+
+	@Override
+	public void setOwner(IGameEntity owner) {
+		this.owner = owner;
+	}
 }

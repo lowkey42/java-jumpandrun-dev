@@ -4,7 +4,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 
-public class AnimatedSequencedEntity extends BaseSequencedEntity {
+public class AnimatedSequencedEntity extends SequencedEntity {
 
 	public AnimatedSequencedEntity(IGameEntity owner, ISequencedEntity parent) {
 		super(owner, parent);

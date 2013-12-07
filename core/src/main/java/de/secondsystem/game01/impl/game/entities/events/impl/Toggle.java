@@ -10,9 +10,9 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.Enti
 public class Toggle extends SequencedObject {
 	
 	public class ToggleInputOption {
-		public List<ISequencedEntity> on     = new ArrayList<>();
-		public List<ISequencedEntity> off    = new ArrayList<>(); 
-		public List<ISequencedEntity> toggle = new ArrayList<>();
+		public final List<ISequencedEntity> on     = new ArrayList<>();
+		public final List<ISequencedEntity> off    = new ArrayList<>(); 
+		public final List<ISequencedEntity> toggle = new ArrayList<>();
 	}
 	
 	public final ToggleInputOption inputOption = new ToggleInputOption();
