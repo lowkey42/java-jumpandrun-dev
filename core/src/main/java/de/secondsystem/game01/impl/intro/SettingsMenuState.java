@@ -8,6 +8,7 @@ import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.gui.IOnClickListener;
 import de.secondsystem.game01.impl.gui.MenuButton;
 import de.secondsystem.game01.impl.gui.SlideButton;
 
@@ -16,11 +17,12 @@ public final class SettingsMenuState extends GameState {
 	private final GameState playGameState;
 	private GameState MainMenu;
 
-	MenuButton changeRes = new MenuButton("Change Resolution", 200, 120);
-	MenuButton vSync = new MenuButton("VSync", 200, 320);
-	MenuButton antiA = new MenuButton("Antialiasing", 200, 520);
-	MenuButton apply = new MenuButton("APPLY", 540, 520);
-	MenuButton back = new MenuButton("BACK", 870, 520, new MenuButton.IOnClickListener() {
+	MenuButton changeRes = new MenuButton(200, 120, "Change Resolution");
+	MenuButton vSync = new MenuButton(200, 320, "VSync");
+	MenuButton antiA = new MenuButton(200, 520, "Antialiasing");
+	MenuButton apply = new MenuButton(540, 520, "APPLY");
+	MenuButton back = new MenuButton(870, 520, "BACK", new IOnClickListener() {
+	
 		@Override public void onClick() {
 			setNextState(MainMenu);
 		}

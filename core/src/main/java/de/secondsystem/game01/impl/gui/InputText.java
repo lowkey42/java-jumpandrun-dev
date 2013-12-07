@@ -90,10 +90,4 @@ public class InputText extends GUIText{
 	public String getText(){
 		return prevString + myText.getString();
 	}
-	
-	
-	@Override
-	public void update(long frameTimeMs) {
-		
-	}
 }

@@ -163,10 +163,4 @@ public final class MemoText extends GUIText {
 			
 		}
 	}
-	
-	
-	@Override
-	public void update(long frameTimeMs) {
-		
-	}
 }

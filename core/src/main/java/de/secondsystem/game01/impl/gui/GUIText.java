@@ -25,28 +25,55 @@ public abstract class GUIText extends GUIElement{
 	
 	// Constructors
 	
-	GUIText(int pos_x, int pos_y, int width, int height, Text myText){
-		super(pos_x, pos_y, width, height, myText);
+	GUIText(int pos_x, int pos_y, int width, int height, String content, IOnClickListener clickListener){
+		super(pos_x, pos_y, width, height, content, clickListener);
+		myText.setPosition(getPos().x + 5, getPos().y);
 		myBox = new RectangleShape(new Vector2f(width, height));
 		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
 	}
 	
-	GUIText(int pos_x, int pos_y, int width, Text myText){
-		super(pos_x, pos_y, width, 25, myText);
+	
+	GUIText(int pos_x, int pos_y, int width, int height, Text myText, IOnClickListener clickListener){
+		super(pos_x, pos_y, width, height, myText, clickListener);
+		myText.setPosition(getPos().x + 5, getPos().y);
 		myBox = new RectangleShape(new Vector2f(width, height));
 		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
 	}
+	
 	
 	GUIText(int pos_x, int pos_y, int width, int height){
-		super(pos_x, pos_y, width, height, "");
-		myBox = new RectangleShape(new Vector2f(width, height));
-		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
+		this(pos_x, pos_y, width, height, "", new IOnClickListener() {
+			
+			@Override
+			public void onClick() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
+	
+	GUIText(int pos_x, int pos_y, int width, Text myText){
+		this(pos_x, pos_y, width, 25, myText, new IOnClickListener() {
+			
+			@Override
+			public void onClick() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+	}
+	
+	
 	GUIText(int pos_x, int pos_y, int width){
-		super(pos_x, pos_y, width, 25, "");
-		myBox = new RectangleShape(new Vector2f(width, height));
-		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
+		this(pos_x, pos_y, width, 25, "", new IOnClickListener() {
+			
+			@Override
+			public void onClick() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 		
 	

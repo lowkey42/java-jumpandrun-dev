@@ -1,11 +1,9 @@
 package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.FinalizeState;
@@ -14,6 +12,7 @@ import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.gui.GUITestState;
+import de.secondsystem.game01.impl.gui.IOnClickListener;
 import de.secondsystem.game01.impl.gui.MenuButton;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 
@@ -29,13 +28,15 @@ public final class MainMenuState extends GameState {
 
 	
 	// --> TODO Abfragen der Fensterbreite bereits beim Erschaffen des Buttons um diesen richtig zu positionieren
-	private final MenuButton newGameBt = new MenuButton("NEW GAME", 515, 40, new MenuButton.IOnClickListener() {
+	private final MenuButton newGameBt = new MenuButton(515, 40, "NEW GAME", new IOnClickListener() {
+		
 		@Override public void onClick() {
 			setNextState(new MainGameState("test01"));
 		}
 	});
 	
-	private final MenuButton editorBt = new MenuButton("EDITOR", 515, 190, new MenuButton.IOnClickListener() {
+	private final MenuButton editorBt = new MenuButton(515, 190, "EDITOR", new IOnClickListener() {
+		
 		@Override public void onClick() {
 			setNextState(new EditorGameState(MainMenuState.this,
 					new JsonGameMapSerializer().deserialize("test01",
@@ -43,19 +44,22 @@ public final class MainMenuState extends GameState {
 		}
 	});
 	
-	private final MenuButton loadGameBt = new MenuButton("GUI TEST SITE", 515, 340, new MenuButton.IOnClickListener() {
+	private final MenuButton loadGameBt = new MenuButton(515, 340, "GUI TEST SITE", new IOnClickListener() {
+		
 		@Override public void onClick() {
 			setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
 		}
 	});
 	
-	private final MenuButton settingsBt = new MenuButton("SETTINGS", 515, 490, new MenuButton.IOnClickListener() {
+	private final MenuButton settingsBt = new MenuButton(515, 490, "SETTINGS", new IOnClickListener() {
+		
 		@Override public void onClick() {
 			setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
 		}
 	});
 	
-	private final MenuButton exitGameBt = new MenuButton("EXIT GAME", 515, 640, new MenuButton.IOnClickListener() {
+	private final MenuButton exitGameBt = new MenuButton(515, 640, "EXIT GAME", new IOnClickListener() {
+		
 		@Override public void onClick() {
 			setNextState(new FinalizeState());
 		}

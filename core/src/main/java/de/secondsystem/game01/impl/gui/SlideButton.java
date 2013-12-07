@@ -15,7 +15,7 @@ import org.jsfml.window.event.Event;
 import org.jsfml.window.event.Event.Type;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.gui.MenuButton.IOnClickListener;
+import de.secondsystem.game01.impl.gui.IOnClickListener;
 import de.secondsystem.game01.model.Settings;
 	
 	/**
@@ -111,6 +111,4 @@ public final class SlideButton {
 		foregroundSprite.setTextureRect(new IntRect(0,height*1,width,height));
 		backgroundSprite.setTextureRect(new IntRect(0,height*0,width,height));
 	}
-	
-	
 }

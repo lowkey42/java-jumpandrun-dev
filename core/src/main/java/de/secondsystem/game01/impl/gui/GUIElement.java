@@ -11,46 +11,46 @@ import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.gui.MenuButton.IOnClickListener;
 import de.secondsystem.game01.model.IDrawable;
-import de.secondsystem.game01.model.IUpdateable;
 
 /**
  * @author Sebastian
  *
  */
-public abstract class GUIElement implements IDrawable, IUpdateable{
+public abstract class GUIElement implements IDrawable{
 
 	// shared Attributes
 	
 	final protected int width, height;
 	final protected Text myText;
+	private ConstFont myFont;
 	protected Vector2f myPos;
 	
-	IOnClickListener clickListener;
+	protected IOnClickListener clickListener;
 	
 	// Constructors
 	
 	
-	public GUIElement(int pos_x, int pos_y, int width, int height, Text myText){
+	public GUIElement(int pos_x, int pos_y, int width, int height, Text myText, IOnClickListener clickListener){
 		this.width = width;
 		this.height = height;
 		this.myText = myText;
 		this.myPos = new Vector2f(pos_x, pos_y);
+		this.clickListener = clickListener;
 	}
 		
 		
-	public GUIElement(int pos_x, int pos_y, int width, int height, String content){
+	public GUIElement(int pos_x, int pos_y, int width, int height, String content, IOnClickListener clickListener){
 		this.width = width;
 		this.height = height;
 		this.myPos = new Vector2f(pos_x, pos_y);
+		this.clickListener = clickListener;
 			
 			
 		try {
 			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
-			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
+			myFont = ResourceManager.font.get("VeraMono.ttf");
 			myText = new Text(content, myFont, (height - 5));
-			myText.setPosition(getPos().x + 5, getPos().y);
 			
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
@@ -61,13 +61,15 @@ public abstract class GUIElement implements IDrawable, IUpdateable{
 	// shared Methods
 	
 	public abstract void draw(RenderTarget rt);
-	public abstract void update(long frameTimeMs);
 	
+	public ConstFont getFont(){
+		return this.myFont;
+	}
+
 	public Vector2f getPos(){
 		return this.myPos;
 	}
 	public void setPos(Vector2f pos){
 		this.myPos = pos;
-	}		
-	
+	}
 }

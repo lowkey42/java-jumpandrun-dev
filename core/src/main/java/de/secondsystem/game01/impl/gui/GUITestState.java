@@ -24,6 +24,7 @@ import de.secondsystem.game01.impl.ResourceManager;
  */
 public final class GUITestState extends GameState {
 
+	
 	private final GameState playGameState, MainMenu;
 	private Sprite backdrop = new Sprite();
 	
@@ -34,14 +35,16 @@ public final class GUITestState extends GameState {
 	InputText testText = new InputText(50, 50, 200);
 	MemoText testMemo = new MemoText(50, 250, 250, 90);
 	
-	MenuButton testButton = new MenuButton("TEST BUTTON", 50, 100, new MenuButton.IOnClickListener(){
+	MenuButton testButton = new MenuButton(50, 100, "TEST Button", new IOnClickListener() {
+		
 		@Override
 		public void onClick() {
 			System.out.println("Test Button works!");
 		}
 	});
+	
 
-	MenuButton backButton = new MenuButton("BACK", 1000, 655, new MenuButton.IOnClickListener(){
+	MenuButton backButton = new MenuButton(1000, 655, "BACK", new IOnClickListener(){
 		@Override
 		public void onClick() {
 			setNextState(MainMenu);
