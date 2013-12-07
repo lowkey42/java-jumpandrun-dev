@@ -8,12 +8,14 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
+import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
+import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle.ToggleInputOption;
@@ -61,8 +63,15 @@ public class MainGameState extends GameState {
 			toggle.addTarget(new AnimatedSequencedEntity(fire1, null));
 			toggle.addTarget(new AnimatedSequencedEntity(fire2, null));
 			toggle.addTarget(new AnimatedSequencedEntity(fire3, null));
+			
+			IControllableGameEntity movingPlatform = map.getEntityManager().createControllable("moving platform", new Attributes(new Attribute("x",150), new Attribute("y",100)) );
+			PatrollingController movingPlatformCon = new PatrollingController(movingPlatform, false);
+			movingPlatformCon.addTargetPoint(300, 100);
+			movingPlatformCon.addTargetPoint(150, 100);
+			movingPlatformCon.addTargetPoint(150, -100);
+			toggle.addTarget(new ControllableSequencedEntity(movingPlatform, null, movingPlatformCon));
 			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, toggle);
-			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);
+			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);		
 		}
 	}
 	

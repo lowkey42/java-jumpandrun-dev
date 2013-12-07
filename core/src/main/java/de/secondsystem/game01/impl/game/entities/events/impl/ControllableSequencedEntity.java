@@ -1,22 +1,49 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
+import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
 public class ControllableSequencedEntity extends SequencedEntity {
-
-	public ControllableSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity) {
+	
+	private PatrollingController controller;
+	
+	public ControllableSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity, PatrollingController controller) {
 		super(owner, linkedEntity);
+		
+		this.controller = controller;
 	}
 
 	@Override
 	public void onTurnOn() {
 		super.onTurnOn();
-		// TODO
+		
+		controller.play();
 	}
 
 	@Override
 	public void onTurnOff() {
 		super.onTurnOff();
-		// TODO
+		
+		controller.reverse();
+	}
+	
+	@Override
+	public void onPlay() {
+		controller.play();
+	}
+
+	@Override
+	public void onReverse() {
+		controller.reverse();
+	}
+
+	@Override
+	public void onStop() {
+		controller.stop();
+	}
+
+	@Override
+	public void onPause() {
+		controller.pause();
 	}
 }

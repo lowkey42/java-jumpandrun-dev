@@ -74,8 +74,11 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	}
 	
 	public void reverse() {
-		reverse = !reverse;
+		play = true;
+		reverse = true;
 		tpIndex = reverse ? tpIndex-1 : tpIndex+1;
+		tpIndex = tpIndex < 0 ? 0 : tpIndex >= targetPoints.size() ? targetPoints.size()-1 : tpIndex;
+		computeDirection();
 	}
 	
 	public void stop() {
@@ -89,11 +92,15 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	
 	public void play() {
 		play = true;
+		reverse = false;
+		tpIndex = reverse ? tpIndex-1 : tpIndex+1;
+		tpIndex = tpIndex < 0 ? 0 : tpIndex >= targetPoints.size() ? targetPoints.size()-1 : tpIndex;
+		computeDirection();
 	}
 	
 	@Override
 	public void update(long frameTimeMs) {
-		if( targetPoints.size() > tpIndex && play ) {
+		if( play && targetPoints.size() > tpIndex && tpIndex >= 0 ) {
 			Vector2f pos = controlledEntity.getPosition();
 			
 			// check if the target point is reached
