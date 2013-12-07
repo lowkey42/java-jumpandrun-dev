@@ -42,19 +42,4 @@ public class CollectionEntityEventHandler implements IEntityEventHandler {
 		return handlers.keySet();
 	}
 
-	@Override
-	public Object handle(EntityEventType type, Object... args) {
-		Collection<IEntityEventHandler> handler = handlers.get(type);
-		
-		Object returnValue = null;
-		
-		for( IEntityEventHandler h : handler ) {
-			Object r = h.handle(type, args);
-			if( returnValue==null )
-				returnValue = r;
-		}
-		
-		return returnValue;
-	}
-
 }

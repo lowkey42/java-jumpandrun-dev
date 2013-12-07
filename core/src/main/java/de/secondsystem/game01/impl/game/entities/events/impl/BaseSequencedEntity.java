@@ -11,17 +11,15 @@ public class BaseSequencedEntity extends SequencedEntity {
 	
 	@Override
 	public void onTurnOn() {
-		if( parent == null )
-			on = true;
-		else
-			parent.onTurnOff();
+		on = true;
+		if( parent != null )
+			parent.onTurnOn();
 	}
 
 	@Override
 	public void onTurnOff() {
-		if( parent == null )
-			on = false;
-		else
+		on = false;
+		if( parent != null )
 			parent.onTurnOff();
 	}
 
@@ -31,5 +29,10 @@ public class BaseSequencedEntity extends SequencedEntity {
 			onTurnOn();
 		else
 			onTurnOff();
+	}
+
+	@Override
+	public void setOwner(IGameEntity owner) {
+		this.owner = owner;
 	}
 }

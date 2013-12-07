@@ -15,9 +15,6 @@ public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 
 	@Override
 	public abstract Object handle(EntityEventType type, IGameEntity owner, Object... args);
-
-	@Override
-	public abstract Object handle(EntityEventType type, Object... args);
 	
 	@Override
 	public final boolean isHandled(EntityEventType type) {

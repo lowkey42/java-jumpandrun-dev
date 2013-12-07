@@ -39,12 +39,7 @@ public class SequencedEntityEventHandler extends SingleEntityEventHandler {
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner,
 			Object... args) {
-		return sequencedObject.handle(type, targets, events);
-	}
-
-	@Override
-	public Object handle(EntityEventType type, Object... args) {
-		return sequencedObject.handle(type, targets, events);
+		return sequencedObject.handle(type, owner, targets, events);
 	}
 
 }

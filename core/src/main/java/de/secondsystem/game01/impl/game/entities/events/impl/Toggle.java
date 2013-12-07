@@ -1,49 +1,45 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 
-public class Toggle implements ISequencedObject {
+public class Toggle extends SequencedObject {
 	
-	public enum ToggleInputOption {
-		ON,
-		OFF,
-		TOGGLE
+	public class ToggleInputOption {
+		public List<ISequencedEntity> on     = new ArrayList<>();
+		public List<ISequencedEntity> off    = new ArrayList<>(); 
+		public List<ISequencedEntity> toggle = new ArrayList<>();
 	}
 	
-	private final ToggleInputOption inputOption;
-	private final ISequencedEntity owner;
+	public final ToggleInputOption inputOption = new ToggleInputOption();
 	
-	public Toggle(ToggleInputOption inputOption, ISequencedEntity owner) {
-		this.inputOption = inputOption;	
-		this.owner = owner;
-	}
-
 	@Override
-	public Object handle(EntityEventType type, List<ISequencedEntity> targets, List<IEntityEventHandler> events) {
-		for( IEntityEventHandler event : events )
-			if( event.isHandled(type) )
-				event.handle(type);
+	public Object handle(EntityEventType type, IGameEntity owner,  List<ISequencedEntity> targets, List<IEntityEventHandler> events) {
+		super.handle(type, owner, targets, events);
 		
-		switch( inputOption ) {
-		case ON:
-			owner.onTurnOn();
+		for( ISequencedEntity entity : inputOption.on ) {
+			entity.setOwner(owner);
+			entity.onTurnOn();
 			for( ISequencedEntity target : targets )
 				target.onTurnOn();
-			break;
-		case OFF:
-			owner.onTurnOff();
+		}
+		
+		for( ISequencedEntity entity : inputOption.off ) {
+			entity.setOwner(owner);
+			entity.onTurnOff();
 			for( ISequencedEntity target : targets )
 				target.onTurnOff();
-			break;
-		case TOGGLE:
-			owner.onToggle();
+		}
+		
+		for( ISequencedEntity entity : inputOption.toggle ) {
+			entity.setOwner(owner);
+			entity.onToggle();
 			for( ISequencedEntity target : targets )
 				target.onToggle();
-			break;
 		}
 		
 		return null;

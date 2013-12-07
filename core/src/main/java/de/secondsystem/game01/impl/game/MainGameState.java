@@ -49,14 +49,15 @@ public class MainGameState extends GameState {
 		
 		// something like this will be implemented in the editor
 		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
-		IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
+		//IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
 		IGameEntity fire1 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",200)) );
 		IGameEntity fire2 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",250)) );
 		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
 		if( entity.getEventHandler() instanceof CollectionEntityEventHandler ) {
 			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
 			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity, null);
-			Toggle toggle = new Toggle(ToggleInputOption.TOGGLE, animSequencedEntity);
+			Toggle toggle = new Toggle();
+			toggle.inputOption.toggle.add(animSequencedEntity);
 			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, toggle);
 			handler.addTarget(new AnimatedSequencedEntity(fire1, null));
 			handler.addTarget(new AnimatedSequencedEntity(fire2, null));
