@@ -4,8 +4,8 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
 public class ControllableSequencedEntity extends SequencedEntity {
 
-	public ControllableSequencedEntity(IGameEntity owner, ISequencedEntity parent) {
-		super(owner, parent);
+	public ControllableSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity) {
+		super(owner, linkedEntity);
 	}
 
 	@Override

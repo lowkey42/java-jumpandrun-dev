@@ -11,35 +11,16 @@ public class SequencedEntityEventHandler extends SingleEntityEventHandler {
 	
 	private final ISequencedObject sequencedObject;
 	
-	private final List<ISequencedEntity> targets   = new ArrayList<>();
-	private final List<IEntityEventHandler> events = new ArrayList<>(); 
-	
 	public SequencedEntityEventHandler(EntityEventType eventType, ISequencedObject sequencedObject) {
 		super(eventType);
 		
 		this.sequencedObject = sequencedObject;
 	}
-
-	public void addTarget(ISequencedEntity target) {
-		targets.add(target);
-	}	
-	
-	public void removeTarget(ISequencedEntity target) {
-		targets.remove(target);
-	}
-	
-	public void addEvent(IEntityEventHandler event) {
-		events.add(event);
-	}
-	
-	public void removeEvent(IEntityEventHandler event) {
-		events.remove(event);
-	}
 	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner,
 			Object... args) {
-		return sequencedObject.handle(type, owner, targets, events);
+		return sequencedObject.handle(type, owner);
 	}
 
 }

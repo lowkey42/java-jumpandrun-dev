@@ -18,8 +18,8 @@ public class Toggle extends SequencedObject {
 	public final ToggleInputOption inputOption = new ToggleInputOption();
 	
 	@Override
-	public Object handle(EntityEventType type, IGameEntity owner,  List<ISequencedEntity> targets, List<IEntityEventHandler> events) {
-		super.handle(type, owner, targets, events);
+	public Object handle(EntityEventType type, IGameEntity owner) {
+		super.handle(type, owner);
 		
 		for( ISequencedEntity entity : inputOption.on ) {
 			entity.setOwner(owner);

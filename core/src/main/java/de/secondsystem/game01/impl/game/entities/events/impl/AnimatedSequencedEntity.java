@@ -6,8 +6,8 @@ import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 public class AnimatedSequencedEntity extends SequencedEntity {
 
-	public AnimatedSequencedEntity(IGameEntity owner, ISequencedEntity parent) {
-		super(owner, parent);
+	public AnimatedSequencedEntity(IGameEntity owner, ISequencedEntity linkedEntity) {
+		super(owner, linkedEntity);
 	}
 
 	@Override

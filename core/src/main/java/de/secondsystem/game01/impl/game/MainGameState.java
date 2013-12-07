@@ -58,10 +58,10 @@ public class MainGameState extends GameState {
 			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity, null);
 			Toggle toggle = new Toggle();
 			toggle.inputOption.toggle.add(animSequencedEntity);
+			toggle.addTarget(new AnimatedSequencedEntity(fire1, null));
+			toggle.addTarget(new AnimatedSequencedEntity(fire2, null));
+			toggle.addTarget(new AnimatedSequencedEntity(fire3, null));
 			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, toggle);
-			handler.addTarget(new AnimatedSequencedEntity(fire1, null));
-			handler.addTarget(new AnimatedSequencedEntity(fire2, null));
-			handler.addTarget(new AnimatedSequencedEntity(fire3, null));
 			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);
 		}
 	}
