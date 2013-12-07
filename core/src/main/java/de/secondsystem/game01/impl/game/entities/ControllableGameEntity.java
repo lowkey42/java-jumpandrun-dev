@@ -52,7 +52,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean pulling;
 	
-	private boolean vMovementAllowed = false;
+	private boolean vMovementAlwaysAllowed = false;
 	
 	private boolean useEvent = false;
 	
@@ -65,7 +65,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
-		this.vMovementAllowed = attributes.getBoolean("verticalMovementAllowed", false);
+		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
 	}
 
 	@Override
@@ -99,12 +99,12 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		
 		jumpTimer += frameTimeMs;
 			
-		final float xMove = hDirection==null ? 0 : hDirection==HDirection.LEFT ? -hFactor : hFactor;
-		final float yMove = vDirection==null ? 0 : vDirection==VDirection.UP   ? -vFactor : vFactor;
-			
-		processMovement(frameTimeMs, xMove, yMove);
+		final float xMove = hDirection==null || incThrowingPowerEvent ? 0 : hDirection==HDirection.LEFT ? -hFactor : hFactor;
+		final float yMove = vDirection==null || incThrowingPowerEvent ? 0 : vDirection==VDirection.UP   ? -vFactor : vFactor;
 		
 		processClimbing(frameTimeMs, xMove, yMove);
+			
+		processMovement(frameTimeMs, xMove, yMove);
 		
 	    if( liftingEvent )
 	    	onLiftingEvent(yMove);
@@ -128,7 +128,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
 		facingDirection = xMove > 0 ? HDirection.RIGHT : xMove < 0 ? HDirection.LEFT : facingDirection;
 		
-		final float effectiveYMove = vMovementAllowed ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
+		final float effectiveYMove = isVerticalMovementAllowed() ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
 		
 		physicsBody.move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
 	    
@@ -185,12 +185,22 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		}
 	}
 	
+	private boolean isVerticalMovementAllowed() {
+		if( vMovementAlwaysAllowed )
+			return true;
+
+		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
+			return false;
+		
+		return ((IHumanoidPhysicsBody) physicsBody).isClimbing();
+	}
+	
 	private void processClimbing(float frameTimeMs, float xMove, float yMove) {
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
 			return;
 		
-		if( yMove == -1 && !incThrowingPowerEvent )
-			vMovementAllowed = ((IHumanoidPhysicsBody) physicsBody).tryClimbing();
+		if( yMove!=0 )
+			((IHumanoidPhysicsBody) physicsBody).tryClimbing();
 	}
 	
 	private void onIncThrowingPowerEvent(long frameTimeMs) {

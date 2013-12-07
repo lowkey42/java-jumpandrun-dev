@@ -15,20 +15,40 @@ class Box2dContactListener implements ContactListener {
 	public static class FixtureData {
 		final boolean multiverse; ///< collides with objects in any part of our complex multi-world map
 		final FixtureContactListener overrideListener;
+		final boolean cancelNormalHandlers;
 		FixtureData(){
-			multiverse = false;
-			overrideListener = null;}
+			this(false, false, null);
+		}
 		FixtureData(boolean multiverse, FixtureContactListener overrideListener){
+			this(multiverse, true, overrideListener);
+		}
+		FixtureData(boolean multiverse, boolean cancelNormalHandlers, FixtureContactListener overrideListener){
 			this.multiverse = multiverse;
 			this.overrideListener = overrideListener;
+			this.cancelNormalHandlers = cancelNormalHandlers;
 		}
 	}
 	
-	private static FixtureContactListener getListener(Fixture fixture, FixtureContactListener def) {
-		if( fixture.getUserData()!=null && ((FixtureData)fixture.getUserData()).overrideListener!=null )
-			return ((FixtureData)fixture.getUserData()).overrideListener;
-		else
-			return def;
+	private static void callBeginListener(Contact contact, Box2dPhysicsBody otherBody, Fixture fixture, FixtureContactListener def) {
+		if( fixture.getUserData()!=null && ((FixtureData)fixture.getUserData()).overrideListener!=null ) {
+			((FixtureData)fixture.getUserData()).overrideListener.onBeginContact(contact, otherBody, fixture);
+			
+			if( ((FixtureData)fixture.getUserData()).cancelNormalHandlers )
+				return;
+		}
+		
+		def.onBeginContact(contact, otherBody, fixture);
+	}
+	
+	private static void callEndListener(Contact contact, Box2dPhysicsBody otherBody, Fixture fixture, FixtureContactListener def) {
+		if( fixture.getUserData()!=null && ((FixtureData)fixture.getUserData()).overrideListener!=null ) {
+			((FixtureData)fixture.getUserData()).overrideListener.onEndContact(contact, otherBody, fixture);
+			
+			if( ((FixtureData)fixture.getUserData()).cancelNormalHandlers )
+				return;
+		}
+		
+		def.onEndContact(contact, otherBody, fixture);
 	}
 	
 	@Override
@@ -39,8 +59,8 @@ class Box2dContactListener implements ContactListener {
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) fixtureB.getBody().getUserData();
 		
 		if( contact.isEnabled() && isWorldShared(body1, body2, fixtureA, fixtureB) ) {
-			getListener(fixtureA, body1).onBeginContact(contact, body2, fixtureA);
-			getListener(fixtureB, body2).onBeginContact(contact, body1, fixtureB);
+			callBeginListener(contact, body2, fixtureA, body1);
+			callBeginListener(contact, body1, fixtureB, body2);
 		}
 	}
 
@@ -51,8 +71,8 @@ class Box2dContactListener implements ContactListener {
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
 		
-		getListener(fixtureA, body1).onEndContact(contact, body2, fixtureA);	
-		getListener(fixtureB, body2).onEndContact(contact, body1, fixtureB);
+		callEndListener(contact, body2, fixtureA, body1);
+		callEndListener(contact, body1, fixtureB, body2);
 	}
 
 	@Override

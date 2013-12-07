@@ -2,8 +2,10 @@ package de.secondsystem.game01.impl.map.physics;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jbox2d.dynamics.Body;
@@ -12,34 +14,22 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.map.physics.Box2dDynamicPhysicsBody.StableCheckFCL;
-
 
 class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		IHumanoidPhysicsBody {
 	
 	private final float maxSlope;
 	private final float maxReach;
+	private final ObjectDetector exactObjects = new ObjectDetector();
 	private final ObjectDetector leftObjects = new ObjectDetector();
 	private final ObjectDetector rightObjects = new ObjectDetector();
-	
-	private Fixture baseFixture;
-	
+		
 	
 	private float maxThrowVel;
 	private float maxLiftWeight;
 	private Body liftingBody = null;
 
-	private final Set<Contact> activeContacts = new HashSet<>();
-
-	protected int numFootContacts = 0;
-	private boolean climbing;
-	private boolean collisionWithLadder = false;
-	private final List<Box2dPhysicsBody> touchingBodiesRight = new ArrayList<>();
-	private final List<Box2dPhysicsBody> touchingBodiesLeft  = new ArrayList<>();
-
-	@Deprecated
-	private boolean collisionWithOneWayPlatform = false;
+	private IPhysicsBody currentClimbingLadder;
 
 	
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
@@ -63,23 +53,25 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
 		final float baseRad = (float) Math.floor(getWidth()/2 );
-		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(45)) * getWidth()/2), baseRad*2); // causes glitches (entity gets stuck on edges)
+		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2); // causes glitches (entity gets stuck on edges)
 		
 		FixtureDef mainBody = new FixtureDef();
 		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
 		mainBody.friction = 0.f;
-		mainBody.restitution = 1.0f; // causes unwanted behavior (annoying bouncing) 
+		mainBody.restitution = 0.3f;
 		mainBody.density = 1.0f;
+		mainBody.userData = new Box2dContactListener.FixtureData(false, false, exactObjects);
 		body.createFixture(mainBody);
 		
 		FixtureDef baseBody = new FixtureDef();
 		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
 		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
-		baseFixture = body.createFixture(baseBody);
+		baseBody.userData = new Box2dContactListener.FixtureData(false, false, exactObjects);
+		body.createFixture(baseBody);
 		
 		FixtureDef fd = new FixtureDef();
-		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 3f, 1f, 0, getHeight()/2, 0);
+		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, getHeight()/2, 0, getHeight()/2, 0);
 		fd.isSensor = true;
 		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		
@@ -101,6 +93,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	
 	private static final class ObjectDetector implements Box2dContactListener.FixtureContactListener {
 		public final Set<IPhysicsBody> bodies = new HashSet<>();
+		public final Map<IPhysicsBody, Runnable> callbacks = new HashMap<>();
 		
 		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
@@ -109,7 +102,11 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
-			bodies.remove(other);
+			if( bodies.remove(other) ) {
+				Runnable cb = callbacks.get(other);
+				if( cb!=null )
+					cb.run();
+			}
 		}
 	}
 	
@@ -195,22 +192,52 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	@Override
 	public boolean tryClimbing() {
-		// TODO Auto-generated method stub
+		if( isClimbing() )
+			return true;
+		
+		
+		for( IPhysicsBody otherBody : exactObjects.bodies ) {
+			if( otherBody.getCollisionHandlerType()==CollisionHandlerType.CLIMBABLE ) {
+				currentClimbingLadder = otherBody;
+
+				body.setGravityScale(0.f);
+				body.setLinearDamping(10.0f);
+				
+				exactObjects.callbacks.put(otherBody, new Runnable() {
+					
+					@Override
+					public void run() {
+						stopClimbing();
+					}
+				});
+				
+				return true;
+			}
+		}
+		
 		return false;
 	}
 
 	@Override
 	public void stopClimbing() {
-		// TODO Auto-generated method stub
-		
+		currentClimbingLadder = null;
+		body.setGravityScale(1.f);
+		body.setLinearDamping(1.0f);
 	}
 	
 	@Override
 	public boolean isClimbing() {
-		// TODO Auto-generated method stub
-		return false;
+		return currentClimbingLadder!=null;
 	}
 
+	@Override
+	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture ownFixture, Fixture otherFixture) {
+		if( isClimbing() && other.getCollisionHandlerType()==CollisionHandlerType.ONE_WAY )
+			return true;
+		
+		return false;
+	}
+	
 	@Override
 	public boolean isLiftingSomething() {
 		// TODO Auto-generated method stub
