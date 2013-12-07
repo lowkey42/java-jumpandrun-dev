@@ -17,7 +17,7 @@ public final class SettingsMenuState extends GameState {
 	private final GameState playGameState;
 	private GameState MainMenu;
 
-	MenuButton changeRes = new MenuButton(200, 120, "Change Resolution");
+	MenuButton changeRes = new MenuButton(200, 120, "Resolution");
 	MenuButton vSync = new MenuButton(200, 320, "VSync");
 	MenuButton antiA = new MenuButton(200, 520, "Antialiasing");
 	MenuButton apply = new MenuButton(540, 520, "APPLY");
