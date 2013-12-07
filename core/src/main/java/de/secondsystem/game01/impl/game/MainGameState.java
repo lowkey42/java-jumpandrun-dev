@@ -57,12 +57,12 @@ public class MainGameState extends GameState {
 		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
 		if( entity.getEventHandler() instanceof CollectionEntityEventHandler ) {
 			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
-			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity, null);
+			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity);
 			Toggle toggle = new Toggle();
 			toggle.inputOption.toggle.add(animSequencedEntity);
-			toggle.addTarget(new AnimatedSequencedEntity(fire1, null));
-			toggle.addTarget(new AnimatedSequencedEntity(fire2, null));
-			toggle.addTarget(new AnimatedSequencedEntity(fire3, null));
+			toggle.addTarget(new AnimatedSequencedEntity(fire1));
+			toggle.addTarget(new AnimatedSequencedEntity(fire2));
+			toggle.addTarget(new AnimatedSequencedEntity(fire3));
 			
 			IControllableGameEntity movingPlatform = map.getEntityManager().createControllable("moving platform", new Attributes(new Attribute("x",150), new Attribute("y",100)) );
 			PatrollingController movingPlatformCon = new PatrollingController(movingPlatform, false);

@@ -22,21 +22,18 @@ public class Toggle extends SequencedObject {
 		super.handle(type, owner);
 		
 		for( ISequencedEntity entity : inputOption.on ) {
-			entity.setOwner(owner);
 			entity.onTurnOn();
 			for( ISequencedEntity target : targets )
 				target.onTurnOn();
 		}
 		
 		for( ISequencedEntity entity : inputOption.off ) {
-			entity.setOwner(owner);
 			entity.onTurnOff();
 			for( ISequencedEntity target : targets )
 				target.onTurnOff();
 		}
 		
 		for( ISequencedEntity entity : inputOption.toggle ) {
-			entity.setOwner(owner);
 			entity.onToggle();
 			for( ISequencedEntity target : targets )
 				target.onToggle();

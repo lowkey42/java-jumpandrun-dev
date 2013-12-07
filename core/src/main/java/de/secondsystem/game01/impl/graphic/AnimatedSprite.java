@@ -11,6 +11,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	
 	private boolean repeated = false;
 	private boolean playing = false;
+	private boolean reverse = false;
 	private AnimationData currentAnimationData;
 	private AnimationType currentAnimationType;
 	private float   currentFrame;
@@ -32,7 +33,11 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	public void update(long frameTimeMs) {
 		if( playing )
 		{
-			currentFrame = currentAnimationData.calculateNextFrame(currentFrame, frameTimeMs*animationSpeed, repeated);
+			if( reverse )
+				currentFrame = currentAnimationData.calculateLastFrame(currentFrame, frameTimeMs*animationSpeed, repeated);
+			else
+				currentFrame = currentAnimationData.calculateNextFrame(currentFrame, frameTimeMs*animationSpeed, repeated);
+			
 			if( currentFrame < 0 )
 				return;
 			
@@ -51,6 +56,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 			if( animData == null )
 				return;
 			
+			reverse = false;
 			currentAnimationData = animData;
 			sprite.setTexture(currentAnimationData.texture);
 			sprite.setOrigin(currentAnimationData.frameWidth/2.f, currentAnimationData.frameHeight/2.f);
@@ -70,6 +76,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	@Override
 	public void stop() {	
 		playing = false;
+		currentFrame = currentAnimationData.frameStart;
 	}
 
 
@@ -95,6 +102,16 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	public boolean isFlipped() {
 		return sprite.getScale().x < 0;
 		
+	}
+
+	@Override
+	public void reverse() {
+		reverse = true;
+	}
+
+	@Override
+	public void pause() {
+		playing = false;
 	}
 	
 

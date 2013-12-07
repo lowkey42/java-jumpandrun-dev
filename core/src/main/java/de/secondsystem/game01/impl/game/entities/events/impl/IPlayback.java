@@ -4,5 +4,6 @@ public interface IPlayback {
 	void onPlay();
 	void onReverse();
 	void onStop();
+	void onResume();
 	void onPause();
 }

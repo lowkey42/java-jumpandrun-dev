@@ -10,9 +10,10 @@ public class Playback extends SequencedObject {
 	
 	public class PlaybackInputOption {
 		public final List<ISequencedEntity> play     = new ArrayList<>();
-		public final List<ISequencedEntity> reverse  = new ArrayList<>(); 
+		public final List<ISequencedEntity> reverse  = new ArrayList<>();
 		public final List<ISequencedEntity> stop     = new ArrayList<>();
 		public final List<ISequencedEntity> pause    = new ArrayList<>();
+		public final List<ISequencedEntity> resume   = new ArrayList<>();
 	}
 	
 	public final PlaybackInputOption inputOption = new PlaybackInputOption();
@@ -22,31 +23,33 @@ public class Playback extends SequencedObject {
 		super.handle(type, owner);
 		
 		for( ISequencedEntity entity : inputOption.play ) {
-			entity.setOwner(owner);
-			entity.onPlay();
+			((IPlayback) entity).onPlay();
 			for( ISequencedEntity target : targets )
-				target.onPlay();
+				((IPlayback) target).onPlay();
 		}
 		
 		for( ISequencedEntity entity : inputOption.reverse ) {
-			entity.setOwner(owner);
-			entity.onReverse();
+			((IPlayback) entity).onReverse();
 			for( ISequencedEntity target : targets )
-				target.onReverse();
+				((IPlayback) target).onReverse();
 		}
 		
 		for( ISequencedEntity entity : inputOption.stop ) {
-			entity.setOwner(owner);
-			entity.onStop();
+			((IPlayback) entity).onStop();
 			for( ISequencedEntity target : targets )
-				target.onStop();
+				((IPlayback) target).onStop();
 		}
 		
 		for( ISequencedEntity entity : inputOption.pause ) {
-			entity.setOwner(owner);
-			entity.onPause();
+			((IPlayback) entity).onPause();
 			for( ISequencedEntity target : targets )
-				target.onPause();
+				((IPlayback) target).onPause();
+		}
+		
+		for( ISequencedEntity entity : inputOption.resume ) {
+			((IPlayback) entity).onResume();
+			for( ISequencedEntity target : targets )
+				((IPlayback) target).onResume();
 		}
 		
 		return null;

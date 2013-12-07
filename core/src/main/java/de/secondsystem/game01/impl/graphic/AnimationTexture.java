@@ -94,6 +94,17 @@ public final class AnimationTexture {
 			return currentFrame;
 		}
 		
+		public final float calculateLastFrame(float currentFrame, float deltaTime, boolean repeated) {
+			currentFrame -= fps/1000.f * deltaTime;
+			
+			if( currentFrame < frameStart )
+			{
+				currentFrame = !repeated ? -1 : ((currentFrame-frameStart) % (frameEnd-frameStart)) + frameEnd;
+			}
+			
+			return currentFrame;
+		}
+		
 		public final IntRect calculateTextureFrame(float currentFrame) {
 	    	int column = (int) currentFrame % numRowFrames;
 	    	

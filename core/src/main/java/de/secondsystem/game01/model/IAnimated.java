@@ -8,7 +8,9 @@ public interface IAnimated {
 	 * @param speedFactor 1.0=normal speed; <1 slower; >1 faster
 	 */
 	void play( AnimationType animation, float speedFactor, boolean repeated, boolean cancelCurrentAnimation, boolean flipTexture );
+	void reverse();
 	void stop();
+	void pause();
 	void resume();
 	void flip();
 	boolean isFlipped();
