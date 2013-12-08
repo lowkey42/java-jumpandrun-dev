@@ -345,5 +345,9 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	public void setIdle(boolean idle) {
 		this.idle = idle;
 	}
+	@Override
+	public boolean isKinematic() {
+		return kinematic;
+	}
 	
 }

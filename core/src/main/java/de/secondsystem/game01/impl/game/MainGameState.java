@@ -15,10 +15,9 @@ import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHan
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
+import de.secondsystem.game01.impl.game.entities.events.impl.Comparison;
 import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.AbstractSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
-import de.secondsystem.game01.impl.game.entities.events.impl.Toggle.ToggleInputOption;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -59,7 +58,7 @@ public class MainGameState extends GameState {
 			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
 			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity);
 			Toggle toggle = new Toggle();
-			toggle.inputOption.toggleTrigger.put(entity, animSequencedEntity);
+			//toggle.inputOption.toggleTrigger.put(entity, animSequencedEntity);
 			toggle.addTarget(new AnimatedSequencedEntity(fire1));
 			toggle.addTarget(new AnimatedSequencedEntity(fire2));
 			toggle.addTarget(new AnimatedSequencedEntity(fire3));
@@ -69,9 +68,12 @@ public class MainGameState extends GameState {
 			movingPlatformCon.addTargetPoint(300, 100);
 			movingPlatformCon.addTargetPoint(150, 100);
 			movingPlatformCon.addTargetPoint(150, -100);
+			Comparison isOwnerKinematic = new Comparison();
+			isOwnerKinematic.inTrigger.put(entity, animSequencedEntity);
+			isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTrigger);
 			toggle.addTarget(new ControllableSequencedEntity(movingPlatform, null, movingPlatformCon));
-			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, toggle);
-			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);		
+			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, isOwnerKinematic);
+			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);	
 		}
 	}
 	

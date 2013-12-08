@@ -15,6 +15,7 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 	
 	CollisionHandlerType getCollisionHandlerType();
 	boolean isStatic();
+	boolean isKinematic();
 	
 	float getWeight();
 	boolean isInteractive();

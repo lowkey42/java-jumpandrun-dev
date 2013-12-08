@@ -218,4 +218,9 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		return representation;
 	}
 
+	@Override
+	public IPhysicsBody getPhysicsBody() {
+		return physicsBody;
+	}
+
 }

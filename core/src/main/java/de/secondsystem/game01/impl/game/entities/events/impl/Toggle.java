@@ -34,5 +34,4 @@ public class Toggle extends SequencedObject {
 		
 		return null;
 	}
-	
 }

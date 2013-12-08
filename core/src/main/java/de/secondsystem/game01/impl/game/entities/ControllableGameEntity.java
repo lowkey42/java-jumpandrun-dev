@@ -158,7 +158,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( !hBody.isLiftingSomething() ) {
 			IPhysicsBody touchingBody = hBody.getNearestInteractiveBody(new Vector2f(xMove, yMove));
 
-			if( touchingBody != null ) {
+			if( touchingBody != null && !touchingBody.isKinematic() ) {
 				lifting = hBody.liftBody(touchingBody);
 				pulling = !lifting;
 				if( lifting )
