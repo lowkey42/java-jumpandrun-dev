@@ -1,6 +1,6 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
-public interface IPlayback {
+public interface IPlayedBack {
 	void onPlay();
 	void onReverse();
 	void onStop();

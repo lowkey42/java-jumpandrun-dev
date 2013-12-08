@@ -9,7 +9,7 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.Enti
 
 public class SequencedObject implements ISequencedObject {
 	
-	protected final List<SequencedEntity> targets   = new ArrayList<>();
+	protected final List<AbstractSequencedEntity> targets   = new ArrayList<>();
 	protected final List<IEntityEventHandler> events = new ArrayList<>(); 
 	
 	@Override
@@ -21,11 +21,11 @@ public class SequencedObject implements ISequencedObject {
 		return null;
 	}
 	
-	public void addTarget(SequencedEntity target) {
+	public void addTarget(AbstractSequencedEntity target) {
 		targets.add(target);
 	}	
 	
-	public void removeTarget(SequencedEntity target) {
+	public void removeTarget(AbstractSequencedEntity target) {
 		targets.remove(target);
 	}
 	

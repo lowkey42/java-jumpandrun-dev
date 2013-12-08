@@ -16,7 +16,7 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.Enti
 import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequencedEntity;
+import de.secondsystem.game01.impl.game.entities.events.impl.AbstractSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle.ToggleInputOption;
 import de.secondsystem.game01.impl.intro.MainMenuState;

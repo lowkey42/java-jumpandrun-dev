@@ -3,11 +3,11 @@ package de.secondsystem.game01.impl.game.entities.events.impl;
 import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
-public class ControllableSequencedEntity extends SequencedEntity implements IPlayback {
+public class ControllableSequencedEntity extends AbstractSequencedEntity implements IPlayedBack {
 	
 	private PatrollingController controller;
 	
-	public ControllableSequencedEntity(IGameEntity owner, SequencedEntity linkedEntity, PatrollingController controller) {
+	public ControllableSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity, PatrollingController controller) {
 		this.linkedEntity = linkedEntity;
 		
 		this.controller = controller;

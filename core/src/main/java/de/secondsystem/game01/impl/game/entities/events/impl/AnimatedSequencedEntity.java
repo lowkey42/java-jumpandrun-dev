@@ -4,7 +4,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 
-public class AnimatedSequencedEntity extends SequencedEntity implements IPlayback {
+public class AnimatedSequencedEntity extends AbstractSequencedEntity implements IPlayedBack {
 	
 	private final IAnimated animatedEntity;
 	private AnimationType animationType;
@@ -13,7 +13,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlaybac
 		this(owner, null, null);
 	}
 	
-	public AnimatedSequencedEntity(IGameEntity owner, SequencedEntity linkedEntity) {
+	public AnimatedSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity) {
 		this(owner, linkedEntity, null);
 	}
 	
@@ -21,7 +21,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlaybac
 		this(owner, null, animationType);
 	}
 	
-	public AnimatedSequencedEntity(IGameEntity owner, SequencedEntity linkedEntity, AnimationType animationType) {
+	public AnimatedSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity, AnimationType animationType) {
 		this.linkedEntity = linkedEntity;
 		
 		animatedEntity = ((IAnimated) owner.getRepresentation());

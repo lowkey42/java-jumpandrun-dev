@@ -7,12 +7,12 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 
-public class Toggle extends SequencedObject {
+public class Toggle extends SequencedObject implements IToggled {
 	
 	public class ToggleInputOption {
-		public final List<SequencedEntity> on     = new ArrayList<>();
-		public final List<SequencedEntity> off    = new ArrayList<>(); 
-		public final List<SequencedEntity> toggle = new ArrayList<>();
+		public final List<IToggled> on     = new ArrayList<>();
+		public final List<IToggled> off    = new ArrayList<>(); 
+		public final List<IToggled> toggle = new ArrayList<>();
 	}
 	
 	public final ToggleInputOption inputOption = new ToggleInputOption();
@@ -21,25 +21,43 @@ public class Toggle extends SequencedObject {
 	public Object handle(EntityEventType type, IGameEntity owner) {
 		super.handle(type, owner);
 		
-		for( SequencedEntity entity : inputOption.on ) {
-			((IToggle) entity).onTurnOn();
-			for( SequencedEntity target : targets )
-				((IToggle) target).onTurnOn();
-		}
+		if( inputOption.on.size() > 0 )
+			onTurnOn();
 		
-		for( SequencedEntity entity : inputOption.off ) {
-			((IToggle) entity).onTurnOff();
-			for( SequencedEntity target : targets )
-				((IToggle) target).onTurnOff();
-		}
+		if( inputOption.off.size() > 0 )
+			onTurnOff();
 		
-		for( SequencedEntity entity : inputOption.toggle ) {
-			((IToggle) entity).onToggle();
-			for( SequencedEntity target : targets )
-				((IToggle) target).onToggle();
-		}
+		if( inputOption.toggle.size() > 0 )
+			onToggle();
 		
 		return null;
+	}
+
+	@Override
+	public void onTurnOn() {
+		for( IToggled toggled : inputOption.on ) 
+			toggled.onTurnOn();
+		
+		for( IToggled target : targets )
+			target.onTurnOn();
+	}
+
+	@Override
+	public void onTurnOff() {
+		for( IToggled toggled : inputOption.off )
+			toggled.onTurnOff();
+		
+		for( IToggled target : targets )
+			target.onTurnOff();
+	}
+
+	@Override
+	public void onToggle() {
+		for( IToggled toggled : inputOption.toggle ) 
+			toggled.onToggle();
+		
+		for( IToggled target : targets )
+			target.onToggle();
 	}
 	
 }
