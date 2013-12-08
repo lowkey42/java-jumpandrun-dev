@@ -42,7 +42,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 
 	private float throwingPower = 0.f;
 	
-	private HDirection facingDirection = HDirection.RIGHT;
+	private HDirection facingDirectionH = HDirection.RIGHT;
 	
 	private boolean liftingEvent = false;
 	
@@ -107,7 +107,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		processMovement(frameTimeMs, xMove, yMove);
 		
 	    if( liftingEvent )
-	    	onLiftingEvent(yMove);
+	    	onLiftingEvent();
 	    
 	    if( incThrowingPowerEvent )
 	    	onIncThrowingPowerEvent(frameTimeMs);
@@ -126,7 +126,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
-		facingDirection = xMove > 0 ? HDirection.RIGHT : xMove < 0 ? HDirection.LEFT : facingDirection;
+		facingDirectionH = xMove > 0 ? HDirection.RIGHT : xMove < 0 ? HDirection.LEFT : facingDirectionH;
 		
 		final float effectiveYMove = isVerticalMovementAllowed() ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
 		
@@ -144,20 +144,22 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    animateMovement(xMove, yMove);
 	}
 
-	private void onLiftingEvent(float yMove) {
+	private void onLiftingEvent() {
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
 			return;
 		
 		final IHumanoidPhysicsBody hBody = (IHumanoidPhysicsBody) physicsBody;
-		final float xMove = facingDirection==HDirection.RIGHT ? 1.f : -1.f;
+		final float xMove = facingDirectionH==HDirection.RIGHT ? 1.f : -1.f;
+		final float yMove = vDirection==VDirection.DOWN ? 1.f : -1.f;
+		
 		
 		lifting = false;
 		pulling = false;
 		if( !hBody.isLiftingSomething() ) {
 			IPhysicsBody touchingBody = hBody.getNearestInteractiveBody(new Vector2f(xMove, yMove));
-			
+
 			if( touchingBody != null ) {
-				lifting = hBody.liftBody(hBody);
+				lifting = hBody.liftBody(touchingBody);
 				pulling = !lifting;
 				if( lifting )
 					((IGameEntity) touchingBody.getOwner()).onLifted(this);

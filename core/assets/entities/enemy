@@ -1,2 +1,2 @@
 {"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", "moveAcceleration":2, "jumpAcceleration":10, "maxMoveSpeed":4, "maxJumpSpeed":120, "maxThrowSpeed":2,
-"width":39, "height":49, "shape":"HUMANOID"}
+"width":39, "height":49, "shape":"HUMANOID", "liftable":"true"}

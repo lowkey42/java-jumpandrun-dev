@@ -4,6 +4,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.DistanceJointDef;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
@@ -64,11 +65,21 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		return physicsWorld.createBody(def);
 	}
 
-	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
-		RevoluteJointDef jointDef = new RevoluteJointDef();
-		jointDef.initialize(body1, body2, anchor);
+	public Joint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
+		DistanceJointDef jointDef = new DistanceJointDef();
+		jointDef.initialize(body1, body2, new Vec2(anchor.x, -anchor.y), anchor);
+//		jointDef.length = 0.0001f;
+//		jointDef.frequencyHz = 1.0f;
+//		jointDef.dampingRatio = 0.8f;
 		
-		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
+		System.out.println("JOINT");
+		
+		return physicsWorld.createJoint(jointDef);
+		
+//		RevoluteJointDef jointDef = new RevoluteJointDef();
+//		jointDef.initialize(body1, body2, anchor);
+//		
+//		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
 	}
 
 	public void destroyJoint(Joint joint) {
@@ -249,7 +260,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		}
 		
 		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
-			float maxSlope = 45;
+			float maxSlope = 20;
 			float maxReach = 10;
 			float maxThrowSpeed = Float.MAX_VALUE;
 			float maxLiftWeight = Float.MAX_VALUE;

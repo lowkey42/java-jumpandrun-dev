@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jsfml.system.Vector2f;
 
 
@@ -21,16 +24,18 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	private final float maxSlope;
 	private final float maxReach;
 	private final ObjectDetector exactObjects = new ObjectDetector();
+	private final ObjectDetector baseObjects = new ObjectDetector();
 	private final ObjectDetector leftObjects = new ObjectDetector();
 	private final ObjectDetector rightObjects = new ObjectDetector();
 		
 	
 	private float maxThrowVel;
 	private float maxLiftWeight;
-	private Body liftingBody = null;
+	private IPhysicsBody liftingBody = null;
 
 	private IPhysicsBody currentClimbingLadder;
 
+	private Fixture baseFixture;
 	
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
 			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
@@ -56,9 +61,9 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2); // causes glitches (entity gets stuck on edges)
 		
 		FixtureDef mainBody = new FixtureDef();
-		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset/2, 0 );
+		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset, 0 );
 		mainBody.friction = 0.f;
-		mainBody.restitution = 0.3f;
+		mainBody.restitution = 0.2f;
 		mainBody.density = 1.0f;
 		mainBody.userData = new Box2dContactListener.FixtureData(false, false, exactObjects);
 		body.createFixture(mainBody);
@@ -67,11 +72,11 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
 		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
-		baseBody.userData = new Box2dContactListener.FixtureData(false, false, exactObjects);
-		body.createFixture(baseBody);
+		baseBody.userData = new Box2dContactListener.FixtureData(false, false, baseObjects);
+		baseFixture = body.createFixture(baseBody);
 		
 		FixtureDef fd = new FixtureDef();
-		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, getHeight()/2, 0, getHeight()/2, 0);
+		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, 2, 0, getHeight()/2, 0);
 		fd.isSensor = true;
 		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		
@@ -115,13 +120,26 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		if( other.getWeight()>maxLiftWeight )
 			return false;
 		
-		// TODO Auto-generated method stub
+		if( !leftObjects.bodies.contains(other) && !rightObjects.bodies.contains(other) )
+			return false;
+		
+		if( bind(other, new Vector2f(getWidth()/2*BOX2D_SCALE_FACTOR, other.getHeight()/1.9f*BOX2D_SCALE_FACTOR)) ) {
+			liftingBody = other;
+			
+			return true;
+		}
+		
 		return false;
 	}
 
 	@Override
 	public boolean throwLiftedBody(float strength, Vector2f direction) {
-		// TODO Auto-generated method stub
+		if( liftingBody!=null ) {
+			unbind(liftingBody);
+			((Box2dPhysicsBody)liftingBody).body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
+			
+			return true;
+		}
 		return false;
 	}
 
@@ -191,6 +209,11 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	}
 
 	@Override
+	public byte move(float x, float y) {
+		return super.move(!baseObjects.bodies.isEmpty() && isStable() ? x : x/20, y);
+	}
+	
+	@Override
 	public boolean tryClimbing() {
 		if( isClimbing() )
 			return true;
@@ -240,14 +263,24 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	
 	@Override
 	public boolean isLiftingSomething() {
-		// TODO Auto-generated method stub
-		return false;
+		return liftingBody!=null;
 	}
 	
 	@Override
 	public void setIdle(boolean idle) {
 		this.idle = idle;
-		//baseFixture.m_friction = idle ? 100.f : 0.1f;
+		float newFriction = idle && isStable() ? 100.f : 0.5f;
+		if( baseFixture.m_friction!=newFriction ) {
+			baseFixture.m_friction = newFriction;
+			ContactEdge contact = baseFixture.getBody().m_contactList;
+			while( contact!=null ) {
+				if( contact.contact.m_fixtureA==baseFixture || contact.contact.m_fixtureB==baseFixture ) {
+					contact.contact.m_friction = contact.contact.m_fixtureA.m_friction * contact.contact.m_fixtureB.m_friction;
+				}
+				
+				contact = contact.next;
+			}
+		}
 	}
 
 //	public void setGameWorldId(int id) {
