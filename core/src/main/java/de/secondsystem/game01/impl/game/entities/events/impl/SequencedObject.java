@@ -13,7 +13,7 @@ public class SequencedObject implements ISequencedObject {
 	protected final List<IEntityEventHandler> events = new ArrayList<>(); 
 	
 	@Override
-	public Object handle(EntityEventType type, IGameEntity owner) {
+	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
 		for( IEntityEventHandler event : events )
 			if( event.isHandled(type) )
 				event.handle(type, null);
@@ -24,6 +24,10 @@ public class SequencedObject implements ISequencedObject {
 	public void addTarget(AbstractSequencedEntity target) {
 		targets.add(target);
 	}	
+	
+	public void addTargets(List<AbstractSequencedEntity> targets) {
+		this.targets.addAll(targets);
+	}
 	
 	public void removeTarget(AbstractSequencedEntity target) {
 		targets.remove(target);

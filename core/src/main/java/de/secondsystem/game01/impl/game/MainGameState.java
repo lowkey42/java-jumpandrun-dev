@@ -59,7 +59,7 @@ public class MainGameState extends GameState {
 			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
 			AnimatedSequencedEntity animSequencedEntity = new AnimatedSequencedEntity(entity);
 			Toggle toggle = new Toggle();
-			toggle.inputOption.toggle.add(animSequencedEntity);
+			toggle.inputOption.toggle.put(entity, animSequencedEntity);
 			toggle.addTarget(new AnimatedSequencedEntity(fire1));
 			toggle.addTarget(new AnimatedSequencedEntity(fire2));
 			toggle.addTarget(new AnimatedSequencedEntity(fire3));
