@@ -10,8 +10,10 @@ import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
@@ -104,7 +106,8 @@ public abstract class GUIButton extends GUIElement {
 	
 	
 	public void mouseover(Window window){
-		if(this.mySprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
+		Vector2f mouse = ((RenderWindow) window).mapPixelToCoords(Mouse.getPosition(window));
+		if(this.mySprite.getGlobalBounds().contains(mouse.x, mouse.y)){
 			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); myText.setColor(Color.RED);
 			//System.out.println("  OVER  ");
 			//buttonOver.play();

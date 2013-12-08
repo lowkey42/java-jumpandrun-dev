@@ -5,7 +5,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.jsfml.graphics.RenderWindow;
+import org.jsfml.graphics.View;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.ContextSettings;
+import org.jsfml.window.Mouse;
 import org.jsfml.window.VideoMode;
 import org.jsfml.window.WindowStyle;
 
@@ -21,7 +24,11 @@ public class GameContext implements IContext {
 
 	private static final String WINDOW_TITLE = "GAME_01";
 	
+	private static final int VIEW_HEIGHT = 1080;
+	
 	public static final Path CONFIG_PATH = Paths.get("game-cfg.properties");
+	
+	private int viewWidth;
 	
 	public final RenderWindow window;
 	
@@ -49,6 +56,20 @@ public class GameContext implements IContext {
 		
 		window.create(new VideoMode(settings.width, settings.height), WINDOW_TITLE, style, ctxSettings);
 		window.setVerticalSyncEnabled(settings.verticalSync);
+		
+		viewWidth = (int) ((VIEW_HEIGHT/window.getView().getSize().y) * window.getView().getSize().x);
+		window.setView(new View(window.getView().getCenter(), new Vector2f(viewWidth, VIEW_HEIGHT)));
+	}
+	
+	public Vector2f getMousePosition() {
+		return window.mapPixelToCoords(Mouse.getPosition(window));
 	}
 
+	public int getViewHeight() {
+		return VIEW_HEIGHT;
+	}
+	public int getViewWidth() {
+		return viewWidth;
+	}
+	
 }

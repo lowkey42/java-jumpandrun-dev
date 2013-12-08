@@ -83,12 +83,12 @@ public final class MainMenuState extends GameState {
 			// Creating Backdrop Texture via monitor screenshot of the stage
 			// before, rendered on every frame
 			try {
-				backdropBuffer.create(ctx.settings.width, ctx.settings.height);
+				backdropBuffer.create(ctx.getViewWidth()*2, ctx.getViewHeight()*2);
 			} catch (TextureCreationException e) {
 				e.printStackTrace();
 			}
 			backdropBuffer.update(ctx.window);
-			backdrop.setTexture(backdropBuffer);
+			backdrop.setTexture(backdropBuffer, true);
 		}
 	}
 
@@ -108,11 +108,11 @@ public final class MainMenuState extends GameState {
 				break;
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					newGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					loadGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					editorBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					settingsBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					exitGameBt.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					newGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+					loadGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+					editorBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+					settingsBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+					exitGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
 				}
 				break;
 			case KEY_RELEASED:
