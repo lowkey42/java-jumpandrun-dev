@@ -8,9 +8,9 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.Enti
 public class Toggle extends SequencedObject {
 	
 	public class ToggleInputOption {
-		public final HashMap<IGameEntity, IToggled> on     = new HashMap<>();
-		public final HashMap<IGameEntity, IToggled> off    = new HashMap<>(); 
-		public final HashMap<IGameEntity, IToggled> toggle = new HashMap<>();
+		public final HashMap<IGameEntity, IToggled> onTrigger     = new HashMap<>();
+		public final HashMap<IGameEntity, IToggled> offTrigger    = new HashMap<>(); 
+		public final HashMap<IGameEntity, IToggled> toggleTrigger = new HashMap<>();
 	}
 	
 	public final ToggleInputOption inputOption = new ToggleInputOption();
@@ -20,26 +20,17 @@ public class Toggle extends SequencedObject {
 	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
 		super.handle(type, owner, args);
 		
-		if( inputOption.on.get(owner) != null ) {
-			inputOption.on.get(owner).onTurnOn();
-		
+		if( inputOption.onTrigger.get(owner) != null ) 
 			for( IToggled target : targets )
 				target.onTurnOn();
-		}
 		
-		if( inputOption.off.get(owner) != null ) {
-			inputOption.off.get(owner).onTurnOff();
-		
+		if( inputOption.offTrigger.get(owner) != null ) 
 			for( IToggled target : targets )
 				target.onTurnOff();
-		}
 		
-		if( inputOption.toggle.get(owner) != null ) {
-			inputOption.toggle.get(owner).onToggle();
-		
+		if( inputOption.toggleTrigger.get(owner) != null ) 
 			for( IToggled target : targets )
 				target.onToggle();
-		}
 		
 		return null;
 	}
