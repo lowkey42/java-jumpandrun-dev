@@ -210,7 +210,12 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	@Override
 	public byte move(float x, float y) {
-		return super.move(!baseObjects.bodies.isEmpty() && isStable() ? x : x/20, y);
+		if( isClimbing() ) {
+			resetVelocity(true, true, false);
+			return super.move(x/2, y);
+		}
+		
+		return super.move(!baseObjects.bodies.isEmpty() && isStable() ? x : x/10, y);
 	}
 	
 	@Override
@@ -224,7 +229,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 				currentClimbingLadder = otherBody;
 
 				body.setGravityScale(0.f);
-				body.setLinearDamping(10.0f);
+				body.setLinearDamping(1.0f);
 				
 				exactObjects.callbacks.put(otherBody, new Runnable() {
 					
@@ -269,18 +274,18 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	@Override
 	public void setIdle(boolean idle) {
 		this.idle = idle;
-		float newFriction = idle && isStable() ? 100.f : 0.5f;
-		if( baseFixture.m_friction!=newFriction ) {
-			baseFixture.m_friction = newFriction;
-			ContactEdge contact = baseFixture.getBody().m_contactList;
-			while( contact!=null ) {
-				if( contact.contact.m_fixtureA==baseFixture || contact.contact.m_fixtureB==baseFixture ) {
-					contact.contact.m_friction = contact.contact.m_fixtureA.m_friction * contact.contact.m_fixtureB.m_friction;
-				}
-				
-				contact = contact.next;
-			}
-		}
+//		float newFriction = idle && isStable() ? 100.f : 0.5f;
+//		if( baseFixture.m_friction!=newFriction ) {
+//			baseFixture.m_friction = newFriction;
+//			ContactEdge contact = baseFixture.getBody().m_contactList;
+//			while( contact!=null ) {
+//				if( contact.contact.m_fixtureA==baseFixture || contact.contact.m_fixtureB==baseFixture ) {
+//					contact.contact.m_friction = contact.contact.m_fixtureA.m_friction * contact.contact.m_fixtureB.m_friction;
+//				}
+//				
+//				contact = contact.next;
+//			}
+//		}
 	}
 
 //	public void setGameWorldId(int id) {

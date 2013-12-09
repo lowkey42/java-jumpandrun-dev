@@ -101,11 +101,11 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		x = limit(getBody().getLinearVelocity().x, x, maxXVel);
 		y = limit(getBody().getLinearVelocity().y, y, maxYVel);
 
-		if( getBody().getType()==BodyType.KINEMATIC ) {
+		//if( getBody().getType()==BodyType.KINEMATIC ) {
 			getBody().setLinearVelocity(new Vec2(x, y).add(getBody().getLinearVelocity()));
-		}else
+		//}else
 		//getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
-		getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
+		//getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
 
 		return (byte) ((x != 0 ? 2 : 0) | (y != 0 ? 1 : 0));
 	}

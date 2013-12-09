@@ -128,7 +128,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
 		facingDirectionH = xMove > 0 ? HDirection.RIGHT : xMove < 0 ? HDirection.LEFT : facingDirectionH;
 		
-		final float effectiveYMove = isVerticalMovementAllowed() ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
+		final float effectiveYMove = isVerticalMovementAllowed() ? moveAcceleration*yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
 		
 		physicsBody.move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
 	    
