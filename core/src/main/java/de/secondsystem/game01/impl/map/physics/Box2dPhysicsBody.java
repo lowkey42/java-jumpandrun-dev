@@ -8,6 +8,7 @@ import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -106,6 +107,17 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 	protected static Shape createShape(PhysicsBodyShape shape, float width, float height) {
 		return createShape(shape, width, height, 0, 0, 0);
+	}
+	protected static Shape createTrapeziumShape(float width, float height, float topDiff, float bottomDiff, float x, float y) {
+		PolygonShape trap = new PolygonShape();
+		trap.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR, toBox2dCS(x,y), 0);
+
+		trap.m_vertices[0].set(trap.m_vertices[0].x-topDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[0].y);
+		trap.m_vertices[1].set(trap.m_vertices[1].x+topDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[1].y);
+		trap.m_vertices[2].set(trap.m_vertices[2].x+bottomDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[2].y);
+		trap.m_vertices[3].set(trap.m_vertices[3].x-bottomDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[3].y);
+		
+		return trap;
 	}
 	protected static Shape createShape(PhysicsBodyShape shape, float width, float height, float x, float y, float rotation) {
 		switch( shape ) {

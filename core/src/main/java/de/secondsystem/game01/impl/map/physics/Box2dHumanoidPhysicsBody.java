@@ -60,8 +60,11 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		final float baseRad = (float) Math.floor(getWidth()/2 );
 		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2); // causes glitches (entity gets stuck on edges)
 		
+		final float sh = 15;
+		final float sb = sh/2;
+		
 		FixtureDef mainBody = new FixtureDef();
-		mainBody.shape = createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-baseYOffset, 0, -baseYOffset, 0 );
+		mainBody.shape = createTrapeziumShape(getWidth(), getHeight()-sh, 0, -2, 0, -sh/2);//createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-sh, 0, -sh/2, 0 );
 		mainBody.friction = 0.f;
 		mainBody.restitution = 0.2f;
 		mainBody.density = 1.0f;
@@ -69,14 +72,14 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		body.createFixture(mainBody);
 		
 		FixtureDef baseBody = new FixtureDef();
-		baseBody.shape = createShape(PhysicsBodyShape.CIRCLE, baseRad, baseRad, 0, getHeight()/2-baseRad, 0);
+		baseBody.shape = createTrapeziumShape(getWidth(), sh, -1, -sb, 0, getHeight()/2-sh/2);
 		baseBody.friction = 1.0f;
 		baseBody.density = 1.0f;
 		baseBody.userData = new Box2dContactListener.FixtureData(false, false, baseObjects);
 		baseFixture = body.createFixture(baseBody);
 		
 		FixtureDef fd = new FixtureDef();
-		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, 2, 0, getHeight()/2, 0);
+		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, 10, 0, getHeight()/2, 0);
 		fd.isSensor = true;
 		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		
@@ -215,7 +218,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			return super.move(x/2, y);
 		}
 		
-		return super.move(!baseObjects.bodies.isEmpty() && isStable() ? x : x/10, y);
+		return super.move(!baseObjects.bodies.isEmpty() && isStable() ? x : x/4, y);
 	}
 	
 	@Override
