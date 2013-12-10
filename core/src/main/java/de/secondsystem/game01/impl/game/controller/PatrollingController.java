@@ -2,21 +2,24 @@ package de.secondsystem.game01.impl.game.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
+import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.model.IUpdateable;
 
 public class PatrollingController implements IUpdateable, IGameEntityController {
 
-	private final IControllableGameEntity controlledEntity;
-	private final boolean repeated;
+	private IControllableGameEntity controlledEntity;
+	private boolean repeated;
 	
 	private List<Vector2f> targetPoints = new ArrayList<Vector2f>();
 	
@@ -26,6 +29,10 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	private int tpIndex = 0;
 	private boolean reverse = false;
 	private boolean play = false;
+	
+	public PatrollingController() {
+		
+	}
 	
 	public PatrollingController( IControllableGameEntity controlledEntity, boolean repeated ) {
 		this.controlledEntity = controlledEntity;
@@ -135,14 +142,41 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	public JSONObject serialize() {
 		JSONObject obj = new JSONObject();
 		obj.put("repeated", repeated);
-		obj.put("controlledEntity", controlledEntity.uuid());
+		obj.put("controlledEntity", controlledEntity.uuid().toString());
 		
-		JSONArray jArray = new JSONArray();
-		for(Vector2f t : targetPoints) 
-			jArray.add(t);
+		JSONObject o = new JSONObject();
+		int i = 0;
+		for(Vector2f t : targetPoints)  {	
+			JSONArray  a = new JSONArray();
+			a.add(t.x);
+			a.add(t.y);
+			o.put(i, a);
+			i++;
+		}
 		
-		obj.put("targetPoints", jArray);
+		obj.put("targetPoints", o);
 		
 		return obj;
+	}
+	
+	public void deserialize(JSONObject obj, IGameEntityManager entityManager) {
+		repeated = (boolean) obj.get("repeated");
+		UUID uuid = UUID.fromString( (String) obj.get("controlledEntity") );;
+		controlledEntity = (IControllableGameEntity) entityManager.get(uuid);
+		
+		JSONObject targetPoints = (JSONObject) obj.get("targetPoints");
+		
+		if( targetPoints == null )
+			return;
+		
+		int i = 0;
+		for(@SuppressWarnings("unused") Object o : targetPoints.keySet()) {
+			JSONArray a = ((JSONArray) targetPoints.get(i));
+			float x = (float) a.get(0);
+			float y = (float) a.get(1);
+			
+			addTargetPoint(x, y);
+			i++;
+		}
 	}
 }

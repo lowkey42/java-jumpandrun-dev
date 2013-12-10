@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.game.entities.events.impl;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
@@ -11,14 +10,18 @@ import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 
 public class Toggle extends SequencedObject {
-	
+
 	public class ToggleInputOption {
 		public final HashMap<IGameEntity, IToggled> onTriggers     = new HashMap<>();
 		public final HashMap<IGameEntity, IToggled> offTriggers    = new HashMap<>(); 
 		public final HashMap<IGameEntity, IToggled> toggleTriggers = new HashMap<>();
 	}
 	
-	public final ToggleInputOption inputOption = new ToggleInputOption();
+	public final ToggleInputOption inputOption = new ToggleInputOption();	
+	
+	public Toggle(UUID uuid) {
+		super(uuid);
+	}
 	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
@@ -52,11 +55,15 @@ public class Toggle extends SequencedObject {
 	}
 	
 	@Override
-	public void deserialize(JSONObject obj, IGameEntityManager entityManager) {
-		super.deserialize(obj, entityManager);
+	public ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+		ISequencedObject seqObj = super.deserialize(obj, entityManager, sequenceManager);
+		if( seqObj != null )
+			return seqObj;
 		
-		deserializeTriggers(inputOption.onTriggers, obj, entityManager, "onTriggers");
-		deserializeTriggers(inputOption.offTriggers, obj, entityManager, "offTriggers");
-		deserializeTriggers(inputOption.toggleTriggers, obj, entityManager, "toggleTriggers");
+		deserializeTriggers(inputOption.onTriggers, obj, entityManager, "onTriggers", sequenceManager);
+		deserializeTriggers(inputOption.offTriggers, obj, entityManager, "offTriggers", sequenceManager);
+		deserializeTriggers(inputOption.toggleTriggers, obj, entityManager, "toggleTriggers", sequenceManager);
+		
+		return null;
 	}
 }

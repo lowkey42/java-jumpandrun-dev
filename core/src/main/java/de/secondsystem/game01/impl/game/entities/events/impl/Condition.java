@@ -15,7 +15,7 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.Enti
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 
-public class Condition implements ISequencedObject {
+public class Condition extends SequencedObject {
 	public class ComparisonOutputOption {
 		public final List<ISequencedObject> isOtherHumanoid  = new ArrayList<>();
 		public final List<ISequencedObject> isOtherStatic    = new ArrayList<>();
@@ -28,6 +28,10 @@ public class Condition implements ISequencedObject {
 	
 	public final ComparisonOutputOption outputOption = new ComparisonOutputOption();
 	public final HashMap<IGameEntity, SequencedEntity> inTriggers = new HashMap<>();
+	
+	public Condition(UUID uuid) {
+		super(uuid);
+	}
 	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
@@ -74,6 +78,7 @@ public class Condition implements ISequencedObject {
 	@Override
 	public JSONObject serialize() {
 		JSONObject obj = new JSONObject();
+		obj.put("uuid", uuid.toString());
 		
 		JSONObject inTriggers = new JSONObject();
 		for( IGameEntity entity : this.inTriggers.keySet() )
@@ -94,34 +99,44 @@ public class Condition implements ISequencedObject {
 	}
 
 	@Override
-	public void deserialize(JSONObject obj, IGameEntityManager entityManager) {
-		JSONObject inTriggers = (JSONObject) obj.get("inTriggers");
-		for(Object o : inTriggers.keySet()) {
-			IGameEntity entity = entityManager.get((UUID) o);
-			SequencedEntity seqEntity = new SequencedEntity();
-			seqEntity.deserialize((JSONObject)inTriggers.get(o));
-			this.inTriggers.put(entity, seqEntity);
-		}
+	public ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+		UUID uuid = UUID.fromString( (String) obj.get("uuid") );
+		ISequencedObject seqObj = sequenceManager.getSequencedObject(uuid);
+		if( seqObj != null )
+			return seqObj;
 		
-		deserializeOutputOptionLinks("isOtherHumanoid", outputOption.isOtherHumanoid, obj, entityManager);
-		deserializeOutputOptionLinks("isOtherKinematic", outputOption.isOtherKinematic, obj, entityManager);
-		deserializeOutputOptionLinks("isOtherStatic", outputOption.isOtherStatic, obj, entityManager);
+		this.uuid = uuid;
+		deserializeTriggers(this.inTriggers, obj, entityManager, "inTriggers", sequenceManager);
 		
-		deserializeOutputOptionLinks("isOwnerHumanoid", outputOption.isOwnerHumanoid, obj, entityManager);
-		deserializeOutputOptionLinks("isOwnerKinematic", outputOption.isOwnerKinematic, obj, entityManager);
-		deserializeOutputOptionLinks("isOwnerStatic", outputOption.isOwnerStatic, obj, entityManager);
+		deserializeOutputOptionLinks("isOtherHumanoid", outputOption.isOtherHumanoid, obj, entityManager, sequenceManager);
+		deserializeOutputOptionLinks("isOtherKinematic", outputOption.isOtherKinematic, obj, entityManager, sequenceManager);
+		deserializeOutputOptionLinks("isOtherStatic", outputOption.isOtherStatic, obj, entityManager, sequenceManager);
+		
+		deserializeOutputOptionLinks("isOwnerHumanoid", outputOption.isOwnerHumanoid, obj, entityManager, sequenceManager);
+		deserializeOutputOptionLinks("isOwnerKinematic", outputOption.isOwnerKinematic, obj, entityManager, sequenceManager);
+		deserializeOutputOptionLinks("isOwnerStatic", outputOption.isOwnerStatic, obj, entityManager, sequenceManager);
+		
+		return null;
 	}
 	
 	private void deserializeOutputOptionLinks(String outputOption, List<ISequencedObject> outputOptionLinks, 
-			JSONObject obj, IGameEntityManager entityManager) {
+			JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
 		
 		JSONArray jArray = (JSONArray) obj.get(outputOption);
 		
+		if( jArray == null )
+			return;
+		
 		for(Object e : jArray) {
-			ISequencedObject linkedOutputObject = new SequencedObject();
-			linkedOutputObject.deserialize((JSONObject) e, entityManager);
-			outputOptionLinks.add(linkedOutputObject);
+			ISequencedObject linkedOutputObject = new SequencedObject(null);
+			ISequencedObject lo = linkedOutputObject.deserialize((JSONObject) e, entityManager, sequenceManager);
+			outputOptionLinks.add(lo != null ? lo : linkedOutputObject);
 		}
+	}
+
+	@Override
+	public UUID uuid() {
+		return uuid;
 	}
 	
 }

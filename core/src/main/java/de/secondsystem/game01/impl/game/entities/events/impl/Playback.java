@@ -1,8 +1,8 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
 import java.util.HashMap;
+import java.util.UUID;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
@@ -10,7 +10,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 
 public class Playback extends SequencedObject {
-	
+
 	public class PlaybackInputOption {
 		public final HashMap<IGameEntity, IPlayedBack> playTriggers     = new HashMap<>();
 		public final HashMap<IGameEntity, IPlayedBack> reverseTriggers  = new HashMap<>();
@@ -20,6 +20,10 @@ public class Playback extends SequencedObject {
 	}
 	
 	public final PlaybackInputOption inputOption = new PlaybackInputOption();
+	
+	public Playback(UUID uuid) {
+		super(uuid);
+	}
 	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
@@ -64,14 +68,18 @@ public class Playback extends SequencedObject {
 	}
 	
 	@Override
-	public void deserialize(JSONObject obj, IGameEntityManager entityManager) {
-		super.deserialize(obj, entityManager);
+	public ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+		ISequencedObject seqObj = super.deserialize(obj, entityManager, sequenceManager);
+		if( seqObj != null )
+			return seqObj;
 		
-		deserializeTriggers(inputOption.playTriggers, obj, entityManager, "playTriggers");
-		deserializeTriggers(inputOption.reverseTriggers, obj, entityManager, "reverseTriggers");
-		deserializeTriggers(inputOption.stopTriggers, obj, entityManager, "stopTriggers");
-		deserializeTriggers(inputOption.pauseTriggers, obj, entityManager, "pauseTriggers");
-		deserializeTriggers(inputOption.resumeTriggers, obj, entityManager, "resumeTriggers");
+		deserializeTriggers(inputOption.playTriggers, obj, entityManager, "playTriggers", sequenceManager);
+		deserializeTriggers(inputOption.reverseTriggers, obj, entityManager, "reverseTriggers", sequenceManager);
+		deserializeTriggers(inputOption.stopTriggers, obj, entityManager, "stopTriggers", sequenceManager);
+		deserializeTriggers(inputOption.pauseTriggers, obj, entityManager, "pauseTriggers", sequenceManager);
+		deserializeTriggers(inputOption.resumeTriggers, obj, entityManager, "resumeTriggers", sequenceManager);
+		
+		return null;
 	}
 
 }

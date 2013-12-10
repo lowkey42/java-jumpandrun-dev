@@ -1,15 +1,20 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
+import java.util.UUID;
+
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 
 public class ControllableSequencedEntity extends SequencedEntity implements IPlayedBack {
 	
 	private PatrollingController controller;
 	
-	public ControllableSequencedEntity(IGameEntity owner, PatrollingController controller) {	
+	public ControllableSequencedEntity(UUID uuid, IGameEntity owner, PatrollingController controller) {	
+		super(uuid);
+		
 		this.controller = controller;
 	}
 
@@ -60,4 +65,17 @@ public class ControllableSequencedEntity extends SequencedEntity implements IPla
 		
 		return obj;
 	}
+	
+	@Override
+	public SequencedEntity deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+		SequencedEntity seqEntity = super.deserialize(obj, entityManager, sequenceManager);
+		if( seqEntity != null )
+			return seqEntity;
+		
+		PatrollingController controller = new PatrollingController();
+		controller.deserialize(obj, entityManager);
+		this.controller = controller;
+		
+		return null;
+	} 
 }
