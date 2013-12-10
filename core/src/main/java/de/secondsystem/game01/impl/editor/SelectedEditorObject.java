@@ -109,6 +109,7 @@ public class SelectedEditorObject extends EditorObject {
 	
 	public void removeFromMap(GameMap map, LayerType currentLayer) {
 		map.remove(currentLayer, layerObject);
+		layerObject = null;
 	}
 	
 	public void setLastMousePos(Vector2f pos) {
