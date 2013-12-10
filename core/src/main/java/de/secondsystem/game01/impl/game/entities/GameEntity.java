@@ -48,6 +48,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		this(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
 				GameEntityHelper.createCollectionEntityEventHandler(em, attributes) );
+		
+		this.attributes = attributes;
 	}
 	
 	protected GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, 
