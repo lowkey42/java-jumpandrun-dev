@@ -19,14 +19,16 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 	void destroy(UUID eId);
 
 	IGameEntity get(UUID eId);
-
-	void deserialize( Iterator<SerializedEntity> iter );
-	Iterable<SerializedEntity> serialize();
 	
-	public interface SerializedEntity {
-		UUID uuid();
-		String archetype();
-		Map<String, Object> attributes();
-	}
+	void deserialize();
+	void serialize();
+//	void deserialize( Iterator<SerializedEntity> iter );
+//	Iterable<SerializedEntity> serialize();
+	
+//	public interface SerializedEntity {
+//		UUID uuid();
+//		String archetype();
+//		Map<String, Object> attributes();
+//	}
 	
 }

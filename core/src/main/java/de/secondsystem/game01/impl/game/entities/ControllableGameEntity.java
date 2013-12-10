@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
+import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -61,8 +62,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			Attributes attributes) {
 		super(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
-				GameEntityHelper.createEventHandler(em, attributes) );
-
+				GameEntityHelper.createCollectionEntityEventHandler(em, attributes) );
+		this.attributes = attributes;
+		
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
 		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
@@ -244,14 +246,5 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void use() {
 		useEvent = true;
-	}
-
-	@Override
-	public Attributes serialize() {
-		final Attributes attributes = super.serialize();
-		
-		// TODO
-		
-		return attributes;
 	}
 }

@@ -94,8 +94,8 @@ public final class SequenceManager {
 		for(SequencedEntity seqObj : sequencedEntities.values()) 
 			seqEntities.add(seqObj.serialize());
 		
-			obj.put("sequencedObjects", seqObjects);
-			obj.put("sequencedEntities", seqEntities);
+		obj.put("sequencedObjects", seqObjects);
+		obj.put("sequencedEntities", seqEntities);
 		
 		try ( Writer writer = Files.newBufferedWriter(SEQUENCE_PATH, StandardCharsets.UTF_8) ){
 			obj.writeJSONString(writer);

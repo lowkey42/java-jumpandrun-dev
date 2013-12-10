@@ -41,9 +41,7 @@ public class MainGameState extends GameState {
 	public MainGameState( String mapId ) {
 		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
 		
-		map = /*new GameMap("test01", new Tileset("test01"));//*/mapSerializer.deserialize(mapId, true, true);
-		
-	//	map.getEntityManager().createControllable( "enemy", new Attributes(new Attribute("x",400), new Attribute("y",100)) );
+		map = mapSerializer.deserialize(mapId, true, true);
 		
 		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
@@ -51,40 +49,41 @@ public class MainGameState extends GameState {
 		
 		sequenceManager = new SequenceManager();
 		
-		// something like this will be implemented in the editor
-		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
-		//IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
-		IGameEntity fire1 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",200)) );
-		IGameEntity fire2 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",250)) );
-		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
-		if( entity.getEventHandler() instanceof CollectionEntityEventHandler ) {
-			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
-			AnimatedSequencedEntity animSequencedEntity = sequenceManager.createAnimatedSequencedEntity(entity);
-			Toggle toggle = sequenceManager.createToggle();
-			//toggle.inputOption.toggleTrigger.put(entity, animSequencedEntity);
-			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire1));
-			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire2));
-			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire3));
-			toggle.addTarget(animSequencedEntity);
-			IControllableGameEntity movingPlatform = map.getEntityManager().createControllable("moving platform", new Attributes(new Attribute("x",150), new Attribute("y",100)) );
-			PatrollingController movingPlatformCon = new PatrollingController(movingPlatform, false);
-			movingPlatformCon.addTargetPoint(300, 100);
-			movingPlatformCon.addTargetPoint(150, 100);
-			movingPlatformCon.addTargetPoint(150, -100);
-			Condition isOwnerKinematic = sequenceManager.createCondition();
-			isOwnerKinematic.inTriggers.put(entity, animSequencedEntity);
-			isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTriggers);
-			toggle.addTarget(sequenceManager.createControllableSequencedEntity(movingPlatform, movingPlatformCon));
-			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, isOwnerKinematic);
-			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);	
-			
-			//isOwnerKinematic.serialize();
-			
-		}
+//		// something like this will be implemented in the editor
+//		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
+//		//IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
+//		IGameEntity fire1 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",200)) );
+//		IGameEntity fire2 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",250)) );
+//		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
+//		if( entity.getEventHandler() instanceof CollectionEntityEventHandler ) {
+//			CollectionEntityEventHandler eventHandler = (CollectionEntityEventHandler) entity.getEventHandler();
+//			AnimatedSequencedEntity animSequencedEntity = sequenceManager.createAnimatedSequencedEntity(entity);
+//			Toggle toggle = sequenceManager.createToggle();
+//			//toggle.inputOption.toggleTrigger.put(entity, animSequencedEntity);
+//			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire1));
+//			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire2));
+//			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire3));
+//			toggle.addTarget(animSequencedEntity);
+//			IControllableGameEntity movingPlatform = map.getEntityManager().createControllable("moving platform", new Attributes(new Attribute("x",150), new Attribute("y",100)) );
+//			PatrollingController movingPlatformCon = new PatrollingController(movingPlatform, false);
+//			movingPlatformCon.addTargetPoint(300, 100);
+//			movingPlatformCon.addTargetPoint(150, 100);
+//			movingPlatformCon.addTargetPoint(150, -100);
+//			Condition isOwnerKinematic = sequenceManager.createCondition();
+//			isOwnerKinematic.inTriggers.put(entity, animSequencedEntity);
+//			isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTriggers);
+//			toggle.addTarget(sequenceManager.createControllableSequencedEntity(movingPlatform, movingPlatformCon));
+//			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, isOwnerKinematic);
+//			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);	
+//			
+//			//isOwnerKinematic.serialize();
+//			
+//		}
 		
-		sequenceManager.serialize();
-		
-//		sequenceManager.deserialize(map.getEntityManager());
+//		map.getEntityManager().serialize();
+//		sequenceManager.serialize();
+		map.getEntityManager().deserialize();
+		sequenceManager.deserialize(map.getEntityManager());
 	}
 	
 	@Override

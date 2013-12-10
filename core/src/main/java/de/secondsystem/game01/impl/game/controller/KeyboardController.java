@@ -31,6 +31,9 @@ public final class KeyboardController extends AbstractGameEntityController {
 		
 		if( Keyboard.isKeyPressed(mapping.use) ) 
 			proxy.incThrowingPower();		
+		
+		if( Keyboard.isKeyPressed(mapping.jump) )
+    		proxy.jump();
 	}
 	
 	public void processEvents(Event event) {
@@ -45,11 +48,5 @@ public final class KeyboardController extends AbstractGameEntityController {
         	}
         	
         }
-    	else
-	    	if( event.type==Event.Type.KEY_PRESSED ) {
-	        	if( event.asKeyEvent().key==mapping.jump) {
-	        		proxy.jump();
-	        	}
-	        }
 	}
 }

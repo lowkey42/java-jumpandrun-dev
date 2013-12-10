@@ -144,7 +144,7 @@ final class GameEntityHelper {
 		return bodyFactory.create();
 	}
 	
-	public static IEntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {
+	public static CollectionEntityEventHandler createCollectionEntityEventHandler(GameEntityManager entityManager, Attributes attributes) {
 		CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
 		Object eventsObj = attributes.getObject("events");		
 		

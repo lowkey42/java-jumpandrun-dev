@@ -2,7 +2,10 @@ package de.secondsystem.game01.impl.game.entities.events;
 
 import java.util.Set;
 
+import org.json.simple.JSONObject;
+
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public interface IEntityEventHandler {
 
@@ -64,4 +67,8 @@ public interface IEntityEventHandler {
 	boolean isHandled( EntityEventType type );
 	
 	Set<EntityEventType> getHandled();
+	
+	JSONObject serialize();
+	
+	void deserialize(JSONObject obj, IGameMap map);
 }

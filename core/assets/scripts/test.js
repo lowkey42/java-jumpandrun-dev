@@ -25,8 +25,8 @@ function anotherTimerFunc(timer) {
 	
 }
 
-var entity = entities.createControllable( "enemy", {"x": 150, "y": 200, "events": {"TOUCHED": "touchFunc"} } );
-map.getTimerManager().createTimer(1000, true, "timerFunc", entity, " test1 ", " test2 ");
+//var entity = entities.createControllable( "enemy", {"x": 150, "y": 200, "events": {"TOUCHED": "touchFunc"} } );
+//map.getTimerManager().createTimer(1000, true, "timerFunc", entity, " test1 ", " test2 ");
 
 //var movingPlatform = entities.createControllable( "moving platform", {"x": 150, "y": 100} );
 //var movingPlatformCon = new PatrollingController(movingPlatform, true);

@@ -1,10 +1,13 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.security.cert.CollectionCertStoreParameters;
 import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
+import org.json.simple.JSONObject;
 
+import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -33,19 +36,25 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected IDrawable representation;
 	
-	protected IEntityEventHandler eventHandler;
+	protected CollectionEntityEventHandler eventHandler;
 	
 	protected final IGameMap map;
+	
+	protected Attributes attributes;
 	
 	public GameEntity(UUID uuid, String archetype,
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
-				GameEntityHelper.createEventHandler(em, attributes) );
+				GameEntityHelper.createCollectionEntityEventHandler(em, attributes) );
+		
+		this.attributes = attributes;
 	}
 	
-	public GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, IDynamicPhysicsBody physicsBody, IGameMap map, IEntityEventHandler eventHandler) {
+	public GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, 
+			IDynamicPhysicsBody physicsBody, IGameMap map, CollectionEntityEventHandler eventHandler) {
+		
 		this.uuid = uuid;
 		this.archetype = archetype;
 		this.em = em;
@@ -199,17 +208,20 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		return archetype;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Attributes serialize() {
-		final Attributes attributes = new Attributes();
+	public JSONObject serialize() {
+		JSONObject obj = new JSONObject();
+		obj.put("uuid", uuid.toString());		
+		obj.put("archetype", archetype);	
+		obj.put("attributes", attributes);
+		obj.put("eventHandler", eventHandler.serialize());
 		
-		// TODO
-		
-		return attributes;
+		return obj;
 	}
 
 	@Override
-	public IEntityEventHandler getEventHandler() {
+	public CollectionEntityEventHandler getEventHandler() {
 		return eventHandler;
 	}
 
@@ -221,6 +233,11 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	@Override
 	public IPhysicsBody getPhysicsBody() {
 		return physicsBody;
+	}
+
+	@Override
+	public void setEventHandler(CollectionEntityEventHandler eventHandler) {
+		this.eventHandler = eventHandler;
 	}
 
 }

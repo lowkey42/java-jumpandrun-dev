@@ -260,7 +260,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		}
 		
 		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
-			float maxSlope = 20;
+			float maxSlope = 45;
 			float maxReach = 10;
 			float maxThrowSpeed = Float.MAX_VALUE;
 			float maxLiftWeight = Float.MAX_VALUE;

@@ -75,7 +75,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlayedB
 	public JSONObject serialize() {
 		JSONObject obj = super.serialize();
 		obj.put("animatedEntity", animatedEntity.uuid().toString());
-		obj.put("animationType", animationType);
+		obj.put("animationType", animationType == null ? null : animationType.toString());
 		
 		return obj;
 	}
@@ -88,7 +88,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlayedB
 		
 		UUID uuid = (UUID) obj.get("animatedEntity");
 		animatedEntity = entityManager.get(uuid);
-		animationType = (AnimationType) obj.get("animationType");
+		animationType = AnimationType.valueOf( (String) obj.get("animationType") );
 		
 		return null;
 	} 
