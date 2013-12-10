@@ -126,7 +126,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<? extends IGameEntity> clazz = (Class<? extends IGameEntity>) getClass().getClassLoader().loadClass(className);
-				constructor = clazz.getConstructor( UUID.class, String.class, GameEntityManager.class, IGameMap.class, Attributes.class );
+				constructor = clazz.getConstructor( UUID.class, GameEntityManager.class, IGameMap.class, Attributes.class );
 				
 			} catch (ClassNotFoundException | NoSuchMethodException e) {
 				throw new EntityCreationException("Unable to load GameEntity-Class with required constructor: "+e.getMessage(), e);
@@ -137,7 +137,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
 			try {
-				IGameEntity entity = constructor.newInstance(uuid, archetype, em, em.map, new Attributes( attributes, attr) );
+				IGameEntity entity = constructor.newInstance(uuid, em, em.map, new Attributes( attributes, attr) );
 				entity.setEditableState(new EditableEntityStateImpl(archetype, new Attributes(attr)) );
 				return entity;
 				
