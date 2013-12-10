@@ -302,5 +302,4 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		}
 
 	}
-	
 }
