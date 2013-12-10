@@ -1,30 +1,28 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
+import org.json.simple.JSONObject;
+
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 
-public class AnimatedSequencedEntity extends AbstractSequencedEntity implements IPlayedBack {
+public class AnimatedSequencedEntity extends SequencedEntity implements IPlayedBack {
 	
-	private final IAnimated animatedEntity;
+	private final IGameEntity animatedEntity;
 	private AnimationType animationType;
+	private IAnimated animation;
 	
 	public AnimatedSequencedEntity(IGameEntity owner) {
-		this(owner, null, null);
-	}
-	
-	public AnimatedSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity) {
-		this(owner, linkedEntity, null);
+		this(owner, null);
 	}
 	
 	public AnimatedSequencedEntity(IGameEntity owner, AnimationType animationType) {
-		this(owner, null, animationType);
+		animatedEntity = owner;
+		animation = ((IAnimated) owner.getRepresentation());
+		this.animationType = animationType;
 	}
 	
-	public AnimatedSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity, AnimationType animationType) {
-		this.linkedEntity = linkedEntity;
-		
-		animatedEntity = ((IAnimated) owner.getRepresentation());
+	public void setAnimationType(AnimationType animationType) {
 		this.animationType = animationType;
 	}
 	
@@ -32,38 +30,48 @@ public class AnimatedSequencedEntity extends AbstractSequencedEntity implements 
 	public void onTurnOn() {
 		super.onTurnOn();
 		
-		animatedEntity.play(AnimationType.USED, 1.f, true, true, false);
+		animation.play(AnimationType.USED, 1.f, true, true, false);
 	}
 
 	@Override
 	public void onTurnOff() {
 		super.onTurnOff();
 		
-		animatedEntity.play(AnimationType.IDLE, 1.f, true, true, false);
+		animation.play(AnimationType.IDLE, 1.f, true, true, false);
 	}
 
 	@Override
 	public void onPlay() {
-		animatedEntity.play(animationType, 1.f, false, true, false);
+		animation.play(animationType, 1.f, false, true, false);
 	}
 
 	@Override
 	public void onReverse() {
-		animatedEntity.reverse();
+		animation.reverse();
 	}
 
 	@Override
 	public void onStop() {
-		animatedEntity.stop();
+		animation.stop();
 	}
 
 	@Override
 	public void onPause() {
-		animatedEntity.pause();
+		animation.pause();
 	}
 
 	@Override
 	public void onResume() {
-		animatedEntity.resume();
+		animation.resume();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONObject serialize() {
+		JSONObject obj = super.serialize();
+		obj.put("animatedEntity", animatedEntity.uuid());
+		obj.put("animationType", animationType);
+		
+		return obj;
 	}
 }

@@ -1,15 +1,15 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
+import org.json.simple.JSONObject;
+
 import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 
-public class ControllableSequencedEntity extends AbstractSequencedEntity implements IPlayedBack {
+public class ControllableSequencedEntity extends SequencedEntity implements IPlayedBack {
 	
 	private PatrollingController controller;
 	
-	public ControllableSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity, PatrollingController controller) {
-		this.linkedEntity = linkedEntity;
-		
+	public ControllableSequencedEntity(IGameEntity owner, PatrollingController controller) {	
 		this.controller = controller;
 	}
 
@@ -50,5 +50,14 @@ public class ControllableSequencedEntity extends AbstractSequencedEntity impleme
 	@Override
 	public void onResume() {
 		controller.play();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONObject serialize() {
+		JSONObject obj = super.serialize();
+		obj.put("controller", controller.serialize());
+		
+		return obj;
 	}
 }

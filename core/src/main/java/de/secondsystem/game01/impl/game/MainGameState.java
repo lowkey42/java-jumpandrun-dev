@@ -15,7 +15,7 @@ import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHan
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.Comparison;
+import de.secondsystem.game01.impl.game.entities.events.impl.Condition;
 import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.intro.MainMenuState;
@@ -68,12 +68,14 @@ public class MainGameState extends GameState {
 			movingPlatformCon.addTargetPoint(300, 100);
 			movingPlatformCon.addTargetPoint(150, 100);
 			movingPlatformCon.addTargetPoint(150, -100);
-			Comparison isOwnerKinematic = new Comparison();
-			isOwnerKinematic.inTrigger.put(entity, animSequencedEntity);
-			isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTrigger);
-			toggle.addTarget(new ControllableSequencedEntity(movingPlatform, null, movingPlatformCon));
+			Condition isOwnerKinematic = new Condition();
+			isOwnerKinematic.inTriggers.put(entity, animSequencedEntity);
+			isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTriggers);
+			toggle.addTarget(new ControllableSequencedEntity(movingPlatform, movingPlatformCon));
 			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, isOwnerKinematic);
 			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);	
+			
+			isOwnerKinematic.serialize();
 		}
 	}
 	

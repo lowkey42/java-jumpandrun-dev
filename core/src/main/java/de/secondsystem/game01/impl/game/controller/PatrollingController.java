@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jsfml.system.Vector2f;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
@@ -127,5 +129,20 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 				computeDirection();
 			}		
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject serialize() {
+		JSONObject obj = new JSONObject();
+		obj.put("repeated", repeated);
+		obj.put("controlledEntity", controlledEntity.uuid());
+		
+		JSONArray jArray = new JSONArray();
+		for(Vector2f t : targetPoints) 
+			jArray.add(t);
+		
+		obj.put("targetPoints", jArray);
+		
+		return obj;
 	}
 }
