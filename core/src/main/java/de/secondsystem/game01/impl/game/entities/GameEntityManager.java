@@ -78,7 +78,6 @@ public final class GameEntityManager implements IGameEntityManager {
 				throw new EntityCreationException("Unknown archetype '"+type+"' for entity: "+uuid);
 			
 			IGameEntity e = at.create(uuid, this, attr);
-			e.setInputAttributes(new Attributes(attr));
 		
 			entities.put(e.uuid(), e);
 			
@@ -183,7 +182,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 		JSONArray jArray = new JSONArray();
 		for(IGameEntity entity : entities.values()) 
-			jArray.add(entity.serialize());
+			jArray.add(entity.serialize());			// TODO: filter Attributes from archetypes
 		
 		obj.put("entities", jArray);
 		

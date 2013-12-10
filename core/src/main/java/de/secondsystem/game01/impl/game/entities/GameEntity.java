@@ -50,7 +50,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 				GameEntityHelper.createCollectionEntityEventHandler(em, attributes) );
 	}
 	
-	public GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, 
+	protected GameEntity(UUID uuid, String archetype, GameEntityManager em, int worldMask, IDrawable representation, 
 			IDynamicPhysicsBody physicsBody, IGameMap map, CollectionEntityEventHandler eventHandler) {
 		
 		this.uuid = uuid;
@@ -236,11 +236,6 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	@Override
 	public void setEventHandler(CollectionEntityEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
-	}
-
-	@Override
-	public void setInputAttributes(Attributes attributes) {
-		this.attributes = attributes;
 	}
 
 }
