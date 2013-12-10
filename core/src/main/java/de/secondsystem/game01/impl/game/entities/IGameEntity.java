@@ -37,6 +37,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 
 	CollectionEntityEventHandler getEventHandler();
 	void setEventHandler(CollectionEntityEventHandler eventHandler);
+	void setInputAttributes(Attributes attributes);
 	
 	IDrawable getRepresentation();
 	IPhysicsBody getPhysicsBody();

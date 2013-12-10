@@ -78,7 +78,8 @@ public final class GameEntityManager implements IGameEntityManager {
 				throw new EntityCreationException("Unknown archetype '"+type+"' for entity: "+uuid);
 			
 			IGameEntity e = at.create(uuid, this, attr);
-			
+			e.setInputAttributes(new Attributes(attr));
+		
 			entities.put(e.uuid(), e);
 			
 			return e;
