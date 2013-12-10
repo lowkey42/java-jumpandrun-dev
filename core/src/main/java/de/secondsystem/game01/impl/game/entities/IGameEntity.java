@@ -9,7 +9,6 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
-import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
@@ -41,6 +40,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	IDrawable getRepresentation();
 	IPhysicsBody getPhysicsBody();
 	
-	String getArchetype();
-	JSONObject serialize(); // TODO: JSONObject :-(
+	IEditableEntityState getEditableState();
+	void setEditableState( IEditableEntityState state );
+	
 }

@@ -137,7 +137,9 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
 			try {
-				return constructor.newInstance(uuid, archetype, em, em.map, new Attributes( attributes, attr) );
+				IGameEntity entity = constructor.newInstance(uuid, archetype, em, em.map, new Attributes( attributes, attr) );
+				entity.setEditableState(new EditableEntityStateImpl(archetype, new Attributes(attr)) );
+				return entity;
 				
 			} catch (InstantiationException | IllegalAccessException
 					| IllegalArgumentException | InvocationTargetException e) {
@@ -167,6 +169,29 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 	}
 
+	private static final class EditableEntityStateImpl implements IEditableEntityState {
+
+		private final String archetype;
+		
+		private final Attributes attributes;
+		
+		EditableEntityStateImpl(String archetype, Attributes attributes) {
+			this.archetype = archetype;
+			this.attributes = attributes;
+		}
+		
+		@Override
+		public String getArchetype() {
+			return archetype;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			return attributes;
+		}
+		
+	}
+	
 //	@Override
 //	public void deserialize(Iterator<SerializedEntity> iter) {
 //		while( iter.hasNext() ) {
@@ -181,8 +206,13 @@ public final class GameEntityManager implements IGameEntityManager {
 		JSONObject obj = new JSONObject();
 		
 		JSONArray jArray = new JSONArray();
-		for(IGameEntity entity : entities.values()) 
-			jArray.add(entity.serialize());			// TODO: filter Attributes from archetypes
+		for(IGameEntity entity : entities.values()) {
+			JSONObject se = new JSONObject();
+			se.put("uuid", entity.uuid().toString());		
+			se.put("archetype", entity.getEditableState().getArchetype());	
+			se.put("attributes", entity.getEditableState().getAttributes());
+			se.put("eventHandler", entity.getEventHandler().serialize());		// TODO: geht das auch anders (Darstellung im Editor evtl. problematisch)
+		}
 		
 		obj.put("entities", jArray);
 		
