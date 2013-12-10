@@ -198,10 +198,14 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		return ((v2.x - v1.x)*(checkPoint.y - v1.y) - (v2.y - v1.y)*(checkPoint.x - v1.x)) <= 0;
 	}
 	
+	public Vec2 getBodyCenterCorrection() {
+		return new Vec2(0, 0);
+	}
+	
 	public boolean isAbove(Box2dPhysicsBody body, Fixture otherFixture) {
 		// compute top-left and top-right points of the one-way platform
 		Transform t = body.body.getTransform();
-		Vec2 pos = body.body.getLocalCenter();
+		Vec2 pos = body.getBodyCenterCorrection();
 		Vec2 v1 = Transform.mul(t, new Vec2( pos.x-body.width/2.f, pos.y-body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 v2 = Transform.mul(t, new Vec2( pos.x+body.width/2.f, pos.y-body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		
@@ -229,7 +233,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	
 		// bottom-left and bottom-right points of the entity/player
 		t   = this.body.getTransform();
-		pos = this.body.getLocalCenter();
+		pos = getBodyCenterCorrection();
 		Vec2 p1 = Transform.mul(t, new Vec2( pos.x-width/2.f, pos.y+height/2.f ).mul(BOX2D_SCALE_FACTOR));
 		Vec2 p2 = Transform.mul(t, new Vec2( pos.x+width/2.f, pos.y+height/2.f ).mul(BOX2D_SCALE_FACTOR));
 		

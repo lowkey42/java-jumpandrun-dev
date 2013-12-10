@@ -16,8 +16,8 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	
 	private final boolean worldSwitchAllowed;
 	private final boolean complexStableCheck;
-	private float maxXVel;
-	private float maxYVel;
+	protected float maxXVel;
+	protected float maxYVel;
 	
 	private final Set<Contact> worldSwitchSensorContacts = new HashSet<>();
 	private final Set<Contact> footSensorContacts = new HashSet<>();
@@ -110,7 +110,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		return (byte) ((x != 0 ? 2 : 0) | (y != 0 ? 1 : 0));
 	}
 
-	private static float limit(float current, float mod, float max) {
+	protected static float limit(float current, float mod, float max) {
 		return mod < 0 ? Math.max(mod, -max - current) : Math.min(mod, max
 				- current);
 	}

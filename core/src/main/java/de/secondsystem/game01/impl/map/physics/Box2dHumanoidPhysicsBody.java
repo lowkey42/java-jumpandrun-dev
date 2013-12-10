@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
@@ -21,10 +23,11 @@ import org.jsfml.system.Vector2f;
 class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		IHumanoidPhysicsBody {
 	
+	private final static float BASE_HEIGHT = 5;
+	
 	private final float maxSlope;
 	private final float maxReach;
-	private final ObjectDetector exactObjects = new ObjectDetector();
-	private final ObjectDetector baseObjects = new ObjectDetector();
+	private final BodySensor exactObjects = new BodySensor();
 	private final ObjectDetector leftObjects = new ObjectDetector();
 	private final ObjectDetector rightObjects = new ObjectDetector();
 		
@@ -57,29 +60,52 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
-		final float baseRad = (float) Math.floor(getWidth()/2 );
-		final float baseYOffset = Math.min( (float) (Math.tan(Math.toRadians(maxSlope)) * getWidth()/2), baseRad*2); // causes glitches (entity gets stuck on edges)
+		/*
+		 * 0________1
+		 *  |      |
+		 *  |      |
+		 * 5|      |2
+		 *   \____/
+		 *   4    3
+		 */
 		
-		final float sh = 15;
-		final float sb = sh/2;
+		final float halfB2Width = getWidth() / 2f * BOX2D_SCALE_FACTOR;
+		final float halfB2Height = getHeight() / 2f * BOX2D_SCALE_FACTOR;
+
+		float baseHeight = BASE_HEIGHT;
+		float baseWidth = (BASE_HEIGHT*2) / (float) Math.tan(Math.toRadians(maxSlope));
+		
+		if( baseHeight>=getHeight() || baseWidth*2>=getWidth() ) {
+			System.err.println("The HumanoidPhysicsBody is smaller than its base ("+baseHeight+">="+getHeight()+" || "+(baseWidth*2)+"+>="+getWidth()+"): THE END IS NEAR!?!?! (Changed values to fit)");
+			baseHeight = getHeight()/2;
+			baseWidth = Math.min(baseHeight / (float) Math.tan(Math.toRadians(maxSlope)), getWidth()/3);
+		}
+		
+		final float b2BaseHeight = baseHeight * BOX2D_SCALE_FACTOR;
+		final float b2BaseWidth = baseWidth * BOX2D_SCALE_FACTOR;
 		
 		FixtureDef mainBody = new FixtureDef();
-		mainBody.shape = createTrapeziumShape(getWidth(), getHeight()-sh, 0, -2, 0, -sh/2);//createShape(PhysicsBodyShape.BOX, getWidth(), getHeight()-sh, 0, -sh/2, 0 );
+		PolygonShape mbs = new PolygonShape();
+		
+		mbs.m_count = 6;
+		mbs.set(new Vec2[]{
+			/*0*/ new Vec2(-halfB2Width, -halfB2Height),
+			/*1*/ new Vec2( halfB2Width, -halfB2Height),
+			/*2*/ new Vec2( halfB2Width, halfB2Height-b2BaseHeight),
+			/*3*/ new Vec2( halfB2Width-b2BaseWidth, halfB2Height),
+			/*4*/ new Vec2(-halfB2Width+b2BaseWidth, halfB2Height),
+			/*5*/ new Vec2(-halfB2Width, halfB2Height-b2BaseHeight),
+		}, 6);
+				
+		mainBody.shape = mbs;
 		mainBody.friction = 0.f;
-		mainBody.restitution = 0.2f;
+		mainBody.restitution = 0.f;
 		mainBody.density = 1.0f;
 		mainBody.userData = new Box2dContactListener.FixtureData(false, false, exactObjects);
-		body.createFixture(mainBody);
-		
-		FixtureDef baseBody = new FixtureDef();
-		baseBody.shape = createTrapeziumShape(getWidth(), sh, -1, -sb, 0, getHeight()/2-sh/2);
-		baseBody.friction = 1.0f;
-		baseBody.density = 1.0f;
-		baseBody.userData = new Box2dContactListener.FixtureData(false, false, baseObjects);
-		baseFixture = body.createFixture(baseBody);
-		
+		baseFixture = body.createFixture(mainBody);
+				
 		FixtureDef fd = new FixtureDef();
-		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, 10, 0, getHeight()/2, 0);
+		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth()-baseWidth*2, 2, 0, getHeight()/2+1, 0);
 		fd.isSensor = true;
 		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
 		
@@ -98,10 +124,40 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		rightObjSensor.userData = new Box2dContactListener.FixtureData(false, rightObjects);
 		body.createFixture(rightObjSensor);
 	}
+
+	@Override
+	public Vec2 getBodyCenterCorrection() {
+		return new Vec2(0, -BASE_HEIGHT);
+	}
 	
-	private static final class ObjectDetector implements Box2dContactListener.FixtureContactListener {
-		public final Set<IPhysicsBody> bodies = new HashSet<>();
-		public final Map<IPhysicsBody, Runnable> callbacks = new HashMap<>();
+	private static final class BodySensor extends ObjectDetector {
+
+		private Set<IPhysicsBody> contactsWithSolids = new HashSet<>();
+		
+		@Override
+		public void onBeginContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			super.onBeginContact(contact, other, fixture);
+			
+			if( contact.isEnabled() && contact.isTouching() && other.getCollisionHandlerType()==CollisionHandlerType.SOLID )
+				contactsWithSolids.add(other);
+		}
+
+		@Override
+		public void onEndContact(Contact contact, Box2dPhysicsBody other,
+				Fixture fixture) {
+			super.onEndContact(contact, other, fixture);
+
+			contactsWithSolids.remove(other);
+		}
+		
+		public boolean hasContactWithSolid() {
+			return !contactsWithSolids.isEmpty();
+		}
+	}
+	private static class ObjectDetector implements Box2dContactListener.FixtureContactListener {
+		final Set<IPhysicsBody> bodies = new HashSet<>();
+		final Map<IPhysicsBody, Runnable> callbacks = new HashMap<>();
 		
 		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
@@ -215,10 +271,10 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	public byte move(float x, float y) {
 		if( isClimbing() ) {
 			resetVelocity(true, true, false);
-			return super.move(x/2, y);
+			return super.move(x/1.5f, y);
 		}
-		
-		return super.move(!baseObjects.bodies.isEmpty() && isStable() ? x : x/4, y);
+				
+		return super.move(isStable() || !exactObjects.hasContactWithSolid() ? x : 0, y);
 	}
 	
 	@Override
@@ -277,18 +333,18 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	@Override
 	public void setIdle(boolean idle) {
 		this.idle = idle;
-//		float newFriction = idle && isStable() ? 100.f : 0.5f;
-//		if( baseFixture.m_friction!=newFriction ) {
-//			baseFixture.m_friction = newFriction;
-//			ContactEdge contact = baseFixture.getBody().m_contactList;
-//			while( contact!=null ) {
-//				if( contact.contact.m_fixtureA==baseFixture || contact.contact.m_fixtureB==baseFixture ) {
-//					contact.contact.m_friction = contact.contact.m_fixtureA.m_friction * contact.contact.m_fixtureB.m_friction;
-//				}
-//				
-//				contact = contact.next;
-//			}
-//		}
+		float newFriction = idle && isStable() ? 100.f : 0.0f;
+		if( baseFixture.m_friction!=newFriction ) {
+			baseFixture.m_friction = newFriction;
+			ContactEdge contact = baseFixture.getBody().m_contactList;
+			while( contact!=null ) {
+				if( contact.contact.m_fixtureA==baseFixture || contact.contact.m_fixtureB==baseFixture ) {
+					contact.contact.m_friction = contact.contact.m_fixtureA.m_friction * contact.contact.m_fixtureB.m_friction;
+				}
+				
+				contact = contact.next;
+			}
+		}
 	}
 
 //	public void setGameWorldId(int id) {
