@@ -189,11 +189,6 @@ public final class GameEntityManager implements IGameEntityManager {
 		public Attributes getAllAttributes() {
 			return new Attributes(attributes, archetype.attributes);
 		}
-
-		@Override
-		public Attributes getAllAttributes() {
-			return new Attributes(attributes, archetype.attributes);
-		}
 		
 	}
 	
