@@ -224,4 +224,9 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		this.editableEntityState = state;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{"+uuid()+(editableEntityState!=null?(", "+editableEntityState.getAllAttributes()):"")+"}";
+	}
+	
 }

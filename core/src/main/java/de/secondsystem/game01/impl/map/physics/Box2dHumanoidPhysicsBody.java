@@ -186,11 +186,9 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		if( !leftObjects.bodies.contains(other) && !rightObjects.bodies.contains(other) )
 			return false;
 		
-		Joint j = parent.createDistanceJoint(body, ((Box2dPhysicsBody)other).body, (20+getHeight()/2+Math.max(other.getHeight(), other.getWidth())/2) * BOX2D_SCALE_FACTOR );
-		
 		liftJoint = parent.createRevoluteJoint(body, ((Box2dPhysicsBody)other).body, body.getPosition(), false, 0, 0, maxLiftForce);
 		
-		if( j!=null ) {
+		if( liftJoint!=null ) {
 			liftingBody = other;
 			
 			return true;

@@ -132,7 +132,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
 			try {
 				IGameEntity entity = constructor.newInstance(uuid, em, em.map, new Attributes( attributes, attr) );
-				entity.setEditableState(new EditableEntityStateImpl(archetype, new Attributes(attr)) );
+				entity.setEditableState(new EditableEntityStateImpl(this, new Attributes(attr)) );
 				return entity;
 				
 			} catch (InstantiationException | IllegalAccessException
@@ -165,23 +165,28 @@ public final class GameEntityManager implements IGameEntityManager {
 
 	private static final class EditableEntityStateImpl implements IEditableEntityState {
 
-		private final String archetype;
+		private final EntityArchetype archetype;
 		
 		private final Attributes attributes;
 		
-		EditableEntityStateImpl(String archetype, Attributes attributes) {
+		EditableEntityStateImpl(EntityArchetype archetype, Attributes attributes) {
 			this.archetype = archetype;
 			this.attributes = attributes;
 		}
 		
 		@Override
 		public String getArchetype() {
-			return archetype;
+			return archetype.archetype;
 		}
 
 		@Override
 		public Attributes getAttributes() {
 			return attributes;
+		}
+
+		@Override
+		public Attributes getAllAttributes() {
+			return new Attributes(attributes, archetype.attributes);
 		}
 		
 	}
