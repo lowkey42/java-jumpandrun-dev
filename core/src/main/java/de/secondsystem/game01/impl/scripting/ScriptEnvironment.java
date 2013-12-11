@@ -43,6 +43,10 @@ public class ScriptEnvironment {
 		}
 	}
 	
+	public Object eval( String script ) throws ScriptException {
+		return engine.eval(script);
+	}
+	
 	public List<String> list() {
 		return Collections.unmodifiableList(scripts);
 	}

@@ -6,6 +6,7 @@ import org.jsfml.graphics.ConstView;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
+import de.secondsystem.game01.impl.DevConsole;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
@@ -30,6 +31,8 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class MainGameState extends GameState {
 
+	private final DevConsole console = new DevConsole();
+	
 	private final GameMap map;
 	
 	private final Camera camera;
@@ -92,6 +95,8 @@ public class MainGameState extends GameState {
 		
 //		map.getEntityManager().serialize();
 //		sequenceManager.serialize();
+		
+		console.setScriptEnvironment(map.getScriptEnv());
 	}
 	
 	@Override
@@ -107,6 +112,8 @@ public class MainGameState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
+		console.update(frameTime);
+		
 		controller.process();
 		
 		// update worlds

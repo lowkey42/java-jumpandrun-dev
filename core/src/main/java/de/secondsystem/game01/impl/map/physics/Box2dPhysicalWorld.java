@@ -65,21 +65,11 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		return physicsWorld.createBody(def);
 	}
 
-	public Joint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {	
-		DistanceJointDef jointDef = new DistanceJointDef();
-		jointDef.initialize(body1, body2, new Vec2(anchor.x, -anchor.y), anchor);
-//		jointDef.length = 0.0001f;
-//		jointDef.frequencyHz = 1.0f;
-//		jointDef.dampingRatio = 0.8f;
+	public Joint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {
+		RevoluteJointDef jointDef = new RevoluteJointDef();
+		jointDef.initialize(body1, body2, anchor);
 		
-		System.out.println("JOINT");
-		
-		return physicsWorld.createJoint(jointDef);
-		
-//		RevoluteJointDef jointDef = new RevoluteJointDef();
-//		jointDef.initialize(body1, body2, anchor);
-//		
-//		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
+		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
 	}
 
 	public void destroyJoint(Joint joint) {
