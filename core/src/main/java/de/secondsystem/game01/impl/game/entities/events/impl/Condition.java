@@ -10,12 +10,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 
-public class Condition extends SequencedObject {
+public class Condition implements ISequencedObject {
 	public class ComparisonOutputOption {
 		public final List<ISequencedObject> isOtherHumanoid  = new ArrayList<>();
 		public final List<ISequencedObject> isOtherStatic    = new ArrayList<>();
@@ -28,9 +28,13 @@ public class Condition extends SequencedObject {
 	
 	public final ComparisonOutputOption outputOption = new ComparisonOutputOption();
 	public final HashMap<IGameEntity, SequencedEntity> inTriggers = new HashMap<>();
+	protected UUID uuid;
 	
 	public Condition(UUID uuid) {
-		super(uuid);
+		this.uuid = uuid;
+	}
+	
+	public Condition() {
 	}
 	
 	@Override
@@ -93,43 +97,43 @@ public class Condition extends SequencedObject {
 		obj.put("isOwnerKinematic", serializeOutputOptionLinks(outputOption.isOwnerKinematic));
 		obj.put("isOwnerStatic", serializeOutputOptionLinks(outputOption.isOwnerStatic));
 		
-		System.out.println(obj);
+		obj.put("class", "Condition");
 		
 		return obj;
 	}
 
 	@Override
-	public ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+	public ISequencedObject deserialize(JSONObject obj, IGameMap map) {
 		UUID uuid = UUID.fromString( (String) obj.get("uuid") );
-		ISequencedObject seqObj = sequenceManager.getSequencedObject(uuid);
+		ISequencedObject seqObj = map.getSequenceManager().getSequencedObject(uuid);
 		if( seqObj != null )
 			return seqObj;
 		
 		this.uuid = uuid;
-		deserializeTriggers(this.inTriggers, obj, entityManager, "inTriggers", sequenceManager);
+		SequencedObject.deserializeTriggers(this.inTriggers, obj, "inTriggers", map);
 		
-		deserializeOutputOptionLinks("isOtherHumanoid", outputOption.isOtherHumanoid, obj, entityManager, sequenceManager);
-		deserializeOutputOptionLinks("isOtherKinematic", outputOption.isOtherKinematic, obj, entityManager, sequenceManager);
-		deserializeOutputOptionLinks("isOtherStatic", outputOption.isOtherStatic, obj, entityManager, sequenceManager);
+		deserializeOutputOptionLinks("isOtherHumanoid", outputOption.isOtherHumanoid, obj, map);
+		deserializeOutputOptionLinks("isOtherKinematic", outputOption.isOtherKinematic, obj, map);
+		deserializeOutputOptionLinks("isOtherStatic", outputOption.isOtherStatic, obj, map);
 		
-		deserializeOutputOptionLinks("isOwnerHumanoid", outputOption.isOwnerHumanoid, obj, entityManager, sequenceManager);
-		deserializeOutputOptionLinks("isOwnerKinematic", outputOption.isOwnerKinematic, obj, entityManager, sequenceManager);
-		deserializeOutputOptionLinks("isOwnerStatic", outputOption.isOwnerStatic, obj, entityManager, sequenceManager);
+		deserializeOutputOptionLinks("isOwnerHumanoid", outputOption.isOwnerHumanoid, obj, map);
+		deserializeOutputOptionLinks("isOwnerKinematic", outputOption.isOwnerKinematic, obj, map);
+		deserializeOutputOptionLinks("isOwnerStatic", outputOption.isOwnerStatic, obj, map);
 		
 		return null;
 	}
 	
-	private void deserializeOutputOptionLinks(String outputOption, List<ISequencedObject> outputOptionLinks, 
-			JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+	private void deserializeOutputOptionLinks(String outputOption, List<ISequencedObject> outputOptionLinks, JSONObject obj, IGameMap map) {
 		
 		JSONArray jArray = (JSONArray) obj.get(outputOption);
 		
 		if( jArray == null )
-			return;
+			System.out.println("outputOption " + outputOption + " is null");
 		
 		for(Object e : jArray) {
-			ISequencedObject linkedOutputObject = new SequencedObject(null);
-			ISequencedObject lo = linkedOutputObject.deserialize((JSONObject) e, entityManager, sequenceManager);
+			JSONObject jSeqObject = (JSONObject) e;
+			ISequencedObject linkedOutputObject = map.getSequenceManager().createSequencedObject((String) jSeqObject.get("class"));	
+			ISequencedObject lo = linkedOutputObject.deserialize(jSeqObject, map);
 			outputOptionLinks.add(lo != null ? lo : linkedOutputObject);
 		}
 	}

@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.map;
 
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
@@ -76,5 +77,7 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	}
 	
 	SequenceManager getSequenceManager();
+	
+	ControllerManager getControllerManager();
 
 }

@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public interface ISequencedObject {
 	Object handle(EntityEventType type, IGameEntity owner, Object... args);
@@ -15,7 +15,7 @@ public interface ISequencedObject {
 	/**
 	 * @return Null if this ISequencedObject does not exist, returns the existing ISequencedObject otherwise.
 	 */
-	ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager);
+	ISequencedObject deserialize(JSONObject obj, IGameMap map);
 	
 	UUID uuid();
 }

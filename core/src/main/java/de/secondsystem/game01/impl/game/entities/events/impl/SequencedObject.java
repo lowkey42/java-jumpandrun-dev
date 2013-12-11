@@ -9,9 +9,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public class SequencedObject implements ISequencedObject {
 	
@@ -57,7 +57,7 @@ public class SequencedObject implements ISequencedObject {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> JSONObject serializeTriggers(HashMap<IGameEntity, T> map) {
+	protected static <T> JSONObject serializeTriggers(HashMap<IGameEntity, T> map) {
 		JSONObject triggers = new JSONObject();
 		for( IGameEntity entity : map.keySet() )
 			triggers.put(entity.uuid(), ((SequencedEntity)map.get(entity)).serialize());
@@ -75,19 +75,19 @@ public class SequencedObject implements ISequencedObject {
 	 * @return False if this trigger already exists.
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T> void deserializeTriggers(HashMap<IGameEntity, T> map, JSONObject obj, 
-			IGameEntityManager entityManager, String inputOption, SequenceManager sequenceManager) {
+	protected static <T> void deserializeTriggers(HashMap<IGameEntity, T> hashMap, JSONObject obj, String inputOption, IGameMap map) {
 		
 		JSONObject triggers = (JSONObject) obj.get(inputOption);
 		
 		if( triggers == null )
-			return;
+			System.out.println("triggers is null");;
 		
 		for(Object o : triggers.keySet()) {
-			IGameEntity entity = entityManager.get((UUID) o);
-			SequencedEntity seqEntity = new SequencedEntity(null);
-			SequencedEntity se = seqEntity.deserialize((JSONObject)triggers.get(o), entityManager, sequenceManager);
-			map.put(entity, se != null ? (T) se : (T) seqEntity);
+			IGameEntity entity = map.getEntityManager().get(UUID.fromString((String) o));
+			JSONObject jSeqEntity = (JSONObject)triggers.get(o);
+			SequencedEntity seqEntity = map.getSequenceManager().createSequencedEntity((String) jSeqEntity.get("class"));			
+			SequencedEntity se = seqEntity.deserialize(jSeqEntity, map);
+			hashMap.put(entity, se != null ? (T) se : (T) seqEntity);
 		}
 	}
 
@@ -112,9 +112,9 @@ public class SequencedObject implements ISequencedObject {
 	}
 
 	@Override
-	public ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+	public ISequencedObject deserialize(JSONObject obj, IGameMap map) {
 		UUID uuid = UUID.fromString( (String) obj.get("uuid") );
-		ISequencedObject seqObj = sequenceManager.getSequencedObject(uuid);
+		ISequencedObject seqObj = map.getSequenceManager().getSequencedObject(uuid);
 		if( seqObj != null )
 			return seqObj;
 		
@@ -122,11 +122,12 @@ public class SequencedObject implements ISequencedObject {
 		JSONArray targetArray = (JSONArray) obj.get("targets");
 		
 		if( targetArray == null )
-			return null;
+			System.out.println("targetArray is null");
 		
-		for(Object o : targetArray) {		
-			SequencedEntity target = new SequencedEntity(null);
-			SequencedEntity t = target.deserialize((JSONObject) o, entityManager, sequenceManager);
+		for(Object o : targetArray) {	
+			JSONObject jSeqEntity = (JSONObject) o;
+			SequencedEntity target = map.getSequenceManager().createSequencedEntity((String) jSeqEntity.get("class"));			
+			SequencedEntity t = target.deserialize(jSeqEntity, map);
 			this.addTarget(t != null ? t : target);
 		}
 		
@@ -144,8 +145,7 @@ public class SequencedObject implements ISequencedObject {
 
 	@Override
 	public UUID uuid() {
-		// TODO Auto-generated method stub
-		return null;
+		return uuid;
 	}
 
 }

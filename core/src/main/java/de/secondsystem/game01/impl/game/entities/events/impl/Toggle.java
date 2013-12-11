@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public class Toggle extends SequencedObject {
 
@@ -21,6 +21,9 @@ public class Toggle extends SequencedObject {
 	
 	public Toggle(UUID uuid) {
 		super(uuid);
+	}
+	
+	public Toggle() {
 	}
 	
 	@Override
@@ -50,19 +53,20 @@ public class Toggle extends SequencedObject {
 		obj.put("onTriggers", serializeTriggers(inputOption.onTriggers));
 		obj.put("offTriggers", serializeTriggers(inputOption.offTriggers));
 		obj.put("toggleTriggers", serializeTriggers(inputOption.toggleTriggers));
+		obj.put("class", "Toggle");
 		
 		return obj;
 	}
 	
 	@Override
-	public ISequencedObject deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
-		ISequencedObject seqObj = super.deserialize(obj, entityManager, sequenceManager);
+	public ISequencedObject deserialize(JSONObject obj, IGameMap map) {
+		ISequencedObject seqObj = super.deserialize(obj, map);
 		if( seqObj != null )
 			return seqObj;
 		
-		deserializeTriggers(inputOption.onTriggers, obj, entityManager, "onTriggers", sequenceManager);
-		deserializeTriggers(inputOption.offTriggers, obj, entityManager, "offTriggers", sequenceManager);
-		deserializeTriggers(inputOption.toggleTriggers, obj, entityManager, "toggleTriggers", sequenceManager);
+		deserializeTriggers(inputOption.onTriggers, obj, "onTriggers", map);
+		deserializeTriggers(inputOption.offTriggers, obj, "offTriggers", map);
+		deserializeTriggers(inputOption.toggleTriggers, obj, "toggleTriggers", map);
 		
 		return null;
 	}

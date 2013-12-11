@@ -17,6 +17,9 @@ public class ScriptEntityEventHandler extends SingleEntityEventHandler {
 		this.handlerFuncName = handlerFuncName;
 		this.env = env;
 	}
+	
+	public ScriptEntityEventHandler() {	
+	}
 
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner,
@@ -29,6 +32,7 @@ public class ScriptEntityEventHandler extends SingleEntityEventHandler {
 	public JSONObject serialize() {
 		JSONObject obj = super.serialize();
 		obj.put("handlerFuncName", handlerFuncName);
+		obj.put("class", "ScriptEntityEventHandler");
 		
 		return obj;
 	}

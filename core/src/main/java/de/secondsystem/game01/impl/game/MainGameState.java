@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl.game;
 
+import java.util.UUID;
+
 import org.jsfml.graphics.ConstView;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
@@ -32,22 +34,30 @@ public class MainGameState extends GameState {
 	
 	private final Camera camera;
 	
-	private final IControllableGameEntity player;
+	private IControllableGameEntity player;
 	
 	private KeyboardController controller;
 	
 	private SequenceManager sequenceManager;
 	
+	private final String PLAYER_UUID = "aa013690-1408-4a13-8329-cbfb1cfa7f6b";
+	
 	public MainGameState( String mapId ) {
 		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+		sequenceManager = new SequenceManager();
 		
 		map = mapSerializer.deserialize(mapId, true, true);
 		
-		player = map.getEntityManager().createControllable( "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
+//		map.getEntityManager().deserialize();
+//		sequenceManager.deserialize(map.getEntityManager());
+		
+		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
+		if( player == null )
+			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
 		camera = new Camera(player);
 		
-		sequenceManager = new SequenceManager();
+		
 		
 //		// something like this will be implemented in the editor
 //		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
@@ -65,14 +75,14 @@ public class MainGameState extends GameState {
 //			toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire3));
 //			toggle.addTarget(animSequencedEntity);
 //			IControllableGameEntity movingPlatform = map.getEntityManager().createControllable("moving platform", new Attributes(new Attribute("x",150), new Attribute("y",100)) );
-//			PatrollingController movingPlatformCon = new PatrollingController(movingPlatform, false);
+//			PatrollingController movingPlatformCon = map.getControllerManager().createPatrollingController(movingPlatform, false);
 //			movingPlatformCon.addTargetPoint(300, 100);
 //			movingPlatformCon.addTargetPoint(150, 100);
 //			movingPlatformCon.addTargetPoint(150, -100);
 //			Condition isOwnerKinematic = sequenceManager.createCondition();
 //			isOwnerKinematic.inTriggers.put(entity, animSequencedEntity);
 //			isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTriggers);
-//			toggle.addTarget(sequenceManager.createControllableSequencedEntity(movingPlatform, movingPlatformCon));
+//			toggle.addTarget(sequenceManager.createControllableSequencedEntity(movingPlatformCon));
 //			SequencedEntityEventHandler handler = new SequencedEntityEventHandler(EntityEventType.USED, isOwnerKinematic);
 //			eventHandler.addEntityEventHandler(EntityEventType.USED, handler);	
 //			
@@ -82,8 +92,6 @@ public class MainGameState extends GameState {
 		
 //		map.getEntityManager().serialize();
 //		sequenceManager.serialize();
-		map.getEntityManager().deserialize();
-		sequenceManager.deserialize(map.getEntityManager());
 	}
 	
 	@Override

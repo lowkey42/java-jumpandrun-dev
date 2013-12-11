@@ -9,6 +9,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
@@ -58,6 +59,8 @@ public class GameMap implements IGameMap {
 	
 	private final SequenceManager sequenceManager = new SequenceManager();
 	
+	private final ControllerManager controllerManager = new ControllerManager();
+	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
 	final ScriptEnvironment scripts; 
@@ -91,8 +94,8 @@ public class GameMap implements IGameMap {
 		timerManager = new TimerManager(scripts);
 		
 		// temporary
-//		entityManager.deserialize();
-//		sequenceManager.deserialize(entityManager);
+		entityManager.deserialize();
+		sequenceManager.deserialize(this);
 	}
 		
 	/* (non-Javadoc)
@@ -295,6 +298,11 @@ public class GameMap implements IGameMap {
 	@Override
 	public SequenceManager getSequenceManager() {
 		return sequenceManager;
+	}
+
+	@Override
+	public ControllerManager getControllerManager() {
+		return controllerManager;
 	}
 	
 }

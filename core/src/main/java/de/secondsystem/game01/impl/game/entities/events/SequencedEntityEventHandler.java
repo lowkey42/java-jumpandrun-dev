@@ -3,9 +3,7 @@ package de.secondsystem.game01.impl.game.entities.events;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.impl.ISequencedObject;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequencedObject;
 import de.secondsystem.game01.impl.map.IGameMap;
 
 public class SequencedEntityEventHandler extends SingleEntityEventHandler {
@@ -16,6 +14,9 @@ public class SequencedEntityEventHandler extends SingleEntityEventHandler {
 		super(eventType);
 		
 		this.sequencedObject = sequencedObject;
+	}
+	
+	public SequencedEntityEventHandler() {
 	}
 	
 	@Override
@@ -29,6 +30,7 @@ public class SequencedEntityEventHandler extends SingleEntityEventHandler {
 		JSONObject obj = super.serialize();
 		
 		obj.put("sequencedObject", sequencedObject.serialize());
+		obj.put("class", "SequencedEntityEventHandler");
 		
 		return obj;
 	}
@@ -37,8 +39,9 @@ public class SequencedEntityEventHandler extends SingleEntityEventHandler {
 	public void deserialize(JSONObject obj, IGameMap map) {
 		super.deserialize(obj, map);
 		
-		ISequencedObject seqObj = new SequencedObject();
-		seqObj.deserialize(obj, map.getEntityManager(), map.getSequenceManager());
-		this.sequencedObject = seqObj;
+		JSONObject jSeqObject = (JSONObject) obj.get("sequencedObject");
+		ISequencedObject seqObj = map.getSequenceManager().createSequencedObject((String) jSeqObject.get("class"));	
+		ISequencedObject so = seqObj.deserialize(jSeqObject, map);
+		this.sequencedObject = so != null ? so : seqObj;
 	}
 }

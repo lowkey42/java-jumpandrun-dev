@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 
@@ -14,6 +14,9 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlayedB
 	private IGameEntity animatedEntity;
 	private AnimationType animationType;
 	private IAnimated animation;
+	
+	public AnimatedSequencedEntity() {
+	}
 	
 	public AnimatedSequencedEntity(UUID uuid, IGameEntity owner) {
 		this(uuid, owner, null);
@@ -76,19 +79,21 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlayedB
 		JSONObject obj = super.serialize();
 		obj.put("animatedEntity", animatedEntity.uuid().toString());
 		obj.put("animationType", animationType == null ? null : animationType.toString());
+		obj.put("class", "AnimatedSequencedEntity");
 		
 		return obj;
 	}
 	
 	@Override
-	public SequencedEntity deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
-		SequencedEntity seqEntity = super.deserialize(obj, entityManager, sequenceManager);
+	public SequencedEntity deserialize(JSONObject obj, IGameMap map) {
+		SequencedEntity seqEntity = super.deserialize(obj, map);
 		if( seqEntity != null )
 			return seqEntity;
 		
-		UUID uuid = (UUID) obj.get("animatedEntity");
-		animatedEntity = entityManager.get(uuid);
-		animationType = AnimationType.valueOf( (String) obj.get("animationType") );
+		UUID uuid = UUID.fromString( (String) obj.get("animatedEntity") );
+		animatedEntity = map.getEntityManager().get(uuid);
+		animationType = obj.get("animationType") != null ? AnimationType.valueOf( (String) obj.get("animationType") ) : null;	
+		animation = ((IAnimated) animatedEntity.getRepresentation());
 		
 		return null;
 	} 

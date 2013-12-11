@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public class SequencedEntity implements IToggled {
 	
@@ -71,20 +71,21 @@ public class SequencedEntity implements IToggled {
 	/**
 	 * @return Null if this SequencedEntity does not exist, returns the existing SequencedEntity otherwise.
 	 */
-	public SequencedEntity deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
+	public SequencedEntity deserialize(JSONObject obj, IGameMap map) {
 		UUID uuid = UUID.fromString( (String) obj.get("uuid") );
-		if( sequenceManager.getSequencedEntity(uuid) != null )
-			return sequenceManager.getSequencedEntity(uuid);
+		if( map.getSequenceManager().getSequencedEntity(uuid) != null )
+			return map.getSequenceManager().getSequencedEntity(uuid);
 		
 		this.uuid = uuid;
 		JSONArray jArray = (JSONArray) obj.get("linkedEntities");
 		
 		if( jArray == null )
-			return null;
+			System.out.println("linkedEntities array is null");
 		
 		for(Object e : jArray) {
-			SequencedEntity linkedEntity = new SequencedEntity(null);
-			SequencedEntity le = linkedEntity.deserialize((JSONObject) e, entityManager, sequenceManager);
+			JSONObject jSeqEntity = (JSONObject) e;
+			SequencedEntity linkedEntity = map.getSequenceManager().createSequencedEntity((String) jSeqEntity.get("class"));
+			SequencedEntity le = linkedEntity.deserialize(jSeqEntity, map);
 			this.linkedEntities.add(le != null ? le : linkedEntity);
 		}
 		

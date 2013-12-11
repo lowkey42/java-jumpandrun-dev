@@ -63,6 +63,7 @@ public class CollectionEntityEventHandler implements IEntityEventHandler {
 		}
 		
 		obj.put("handlers", handlers);	
+		obj.put("class", "CollectionEntityEventHandler");
 		
 		return obj;
 	}
@@ -76,8 +77,9 @@ public class CollectionEntityEventHandler implements IEntityEventHandler {
 			JSONArray jArray = (JSONArray) handlers.get(type.toString());
 			
 			for(Object object : jArray) {
-				SingleEntityEventHandler eventHandler = new SingleEntityEventHandler();
-				eventHandler.deserialize((JSONObject) object, map);
+				JSONObject jHandler = (JSONObject) object;
+				IEntityEventHandler eventHandler = EventHelper.createEntityEventHandler((String) jHandler.get("class"));
+				eventHandler.deserialize(jHandler, map);
 				this.handlers.put(type, eventHandler);
 			}
 		}

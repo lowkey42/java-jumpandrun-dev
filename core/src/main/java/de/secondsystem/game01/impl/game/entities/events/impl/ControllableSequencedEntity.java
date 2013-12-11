@@ -5,19 +5,21 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.controller.PatrollingController;
-import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public class ControllableSequencedEntity extends SequencedEntity implements IPlayedBack {
 	
 	private PatrollingController controller;
 	
-	public ControllableSequencedEntity(UUID uuid, IGameEntity owner, PatrollingController controller) {	
+	public ControllableSequencedEntity(UUID uuid, PatrollingController controller) {	
 		super(uuid);
 		
 		this.controller = controller;
 	}
-
+	
+	public ControllableSequencedEntity() {		
+	}
+	
 	@Override
 	public void onTurnOn() {
 		super.onTurnOn();
@@ -62,19 +64,19 @@ public class ControllableSequencedEntity extends SequencedEntity implements IPla
 	public JSONObject serialize() {
 		JSONObject obj = super.serialize();
 		obj.put("controller", controller.serialize());
+		obj.put("class", "ControllableSequencedEntity");
 		
 		return obj;
 	}
 	
 	@Override
-	public SequencedEntity deserialize(JSONObject obj, IGameEntityManager entityManager, SequenceManager sequenceManager) {
-		SequencedEntity seqEntity = super.deserialize(obj, entityManager, sequenceManager);
+	public SequencedEntity deserialize(JSONObject obj, IGameMap map) {
+		SequencedEntity seqEntity = super.deserialize(obj, map);
 		if( seqEntity != null )
 			return seqEntity;
 		
-		PatrollingController controller = new PatrollingController();
-		controller.deserialize(obj, entityManager);
-		this.controller = controller;
+		controller = new PatrollingController();
+		controller.deserialize((JSONObject) obj.get("controller"), map);
 		
 		return null;
 	} 

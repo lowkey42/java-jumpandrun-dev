@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -19,8 +18,8 @@ import org.json.simple.parser.ParseException;
 
 import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.map.FormatErrorException;
+import de.secondsystem.game01.impl.map.IGameMap;
 
 public final class SequenceManager {
 	private static final Path SEQUENCE_PATH = Paths.get("assets", "events", "sequences", "test01");
@@ -40,11 +39,18 @@ public final class SequenceManager {
 		return sequencedEntities.get(uuid);
 	}
 	
-	public ISequencedObject createSequencedObject() {
-		SequencedObject seqObj = new SequencedObject(UUID.randomUUID());
-		sequencedObjects.put(seqObj.uuid, seqObj);
+	public ISequencedObject createSequencedObject(String className) {
+		if( className.compareTo("Toggle") == 0 )
+			return new Toggle();
 		
-		return seqObj;
+		if( className.compareTo("Playback") == 0 )
+			return new Playback();
+		
+		if( className.compareTo("Condition") == 0 )
+			return new Condition();
+		
+		System.out.println("className " + className + " unknown");
+		return null;
 	}
 	
 	public Toggle createToggle() {
@@ -68,6 +74,17 @@ public final class SequenceManager {
 		return condition;
 	}
 	
+	public SequencedEntity createSequencedEntity(String className) {
+		if( className.compareTo("AnimatedSequencedEntity") == 0 )
+			return new AnimatedSequencedEntity();
+		
+		if( className.compareTo("ControllableSequencedEntity") == 0 )
+			return new ControllableSequencedEntity();
+		
+		System.out.println("className " + className + " unknown");
+		return null;
+	}
+	
 	public AnimatedSequencedEntity createAnimatedSequencedEntity(IGameEntity owner) {
 		AnimatedSequencedEntity e = new AnimatedSequencedEntity(UUID.randomUUID(), owner);
 		sequencedEntities.put(e.uuid(), e);
@@ -75,8 +92,8 @@ public final class SequenceManager {
 		return e;
 	}
 	
-	public ControllableSequencedEntity createControllableSequencedEntity(IGameEntity owner, PatrollingController controller) {
-		ControllableSequencedEntity e = new ControllableSequencedEntity(UUID.randomUUID(), owner, controller);
+	public ControllableSequencedEntity createControllableSequencedEntity(PatrollingController controller) {
+		ControllableSequencedEntity e = new ControllableSequencedEntity(UUID.randomUUID(), controller);
 		sequencedEntities.put(e.uuid(), e);
 		
 		return e;
@@ -105,23 +122,25 @@ public final class SequenceManager {
 		}
 	}
 	
-	public void deserialize(IGameEntityManager entityManager) {
+	public void deserialize(IGameMap map) {
 		JSONParser parser = new JSONParser();
 		
 		try ( Reader reader = Files.newBufferedReader(SEQUENCE_PATH, StandardCharsets.UTF_8) ) {
 			JSONObject obj = (JSONObject) parser.parse(reader);
 			JSONArray seqObjects = (JSONArray) obj.get("sequencedObjects");
 			for(Object o : seqObjects) {
-				ISequencedObject seqObj = new SequencedObject();
-				seqObj.deserialize((JSONObject) o, entityManager, this);
-				sequencedObjects.put(seqObj.uuid(), seqObj);
+				JSONObject jSeqObject = (JSONObject) o;
+				ISequencedObject seqObj = createSequencedObject((String) jSeqObject.get("class"));
+				ISequencedObject so = seqObj.deserialize(jSeqObject, map);
+				sequencedObjects.put(seqObj.uuid(), so != null ? so : seqObj);
 			}
 			
 			JSONArray seqEntities = (JSONArray) obj.get("sequencedEntities");
 			for(Object o : seqEntities) {
-				SequencedEntity seqEntity = new SequencedEntity();
-				seqEntity.deserialize((JSONObject) o, entityManager, this);
-				sequencedEntities.put(seqEntity.uuid(), seqEntity);
+				JSONObject jSeqEntity = (JSONObject) o;
+				SequencedEntity seqEntity = createSequencedEntity((String) jSeqEntity.get("class"));
+				SequencedEntity se = seqEntity.deserialize(jSeqEntity, map);
+				sequencedEntities.put(seqEntity.uuid(), se != null ? se : seqEntity);
 			}
 			
 		} catch (IOException | ParseException e) {

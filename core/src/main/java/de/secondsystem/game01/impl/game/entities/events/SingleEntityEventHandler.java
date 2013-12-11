@@ -5,10 +5,9 @@ import java.util.Set;
 
 import org.json.simple.JSONObject;
 
-import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.map.IGameMap;
 
-public class SingleEntityEventHandler implements IEntityEventHandler {
+public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 
 	protected EntityEventType eventType;
 	
@@ -41,12 +40,6 @@ public class SingleEntityEventHandler implements IEntityEventHandler {
 	@Override
 	public void deserialize(JSONObject obj, IGameMap map) {
 		this.eventType = EntityEventType.valueOf( (String) obj.get("eventType") );
-	}
-
-	@Override
-	public Object handle(EntityEventType type, IGameEntity owner,
-			Object... args) {
-		return null;
 	}
 
 }

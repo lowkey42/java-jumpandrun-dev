@@ -13,10 +13,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -31,9 +29,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.impl.ISequencedObject;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequencedObject;
 import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
@@ -212,6 +207,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			se.put("archetype", entity.getEditableState().getArchetype());	
 			se.put("attributes", entity.getEditableState().getAttributes());
 			se.put("eventHandler", entity.getEventHandler().serialize());		// TODO: geht das auch anders (Darstellung im Editor evtl. problematisch)
+			jArray.add(se);
 		}
 		
 		obj.put("entities", jArray);
@@ -231,20 +227,32 @@ public final class GameEntityManager implements IGameEntityManager {
 		try ( Reader reader = Files.newBufferedReader(ENTITIES_PATH, StandardCharsets.UTF_8) ) {
 			JSONObject obj = (JSONObject) parser.parse(reader);
 			JSONArray jArray = (JSONArray) obj.get("entities");
-			for(Object o : jArray) {
-				// deserialize game entity
+			// deserialize game entities first
+			for(Object o : jArray) {			
 				JSONObject jObj = (JSONObject) o; 
 				final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
 				final String archetype = (String) jObj.get("archetype");
 				@SuppressWarnings("unchecked")
-				HashMap<String, Object> attributes = (HashMap<String, Object>) jObj.get("attributes");
+				HashMap<String, Object> attributes = (HashMap<String, Object>) jObj.get("attributes");		
+				
+				IGameEntity entity = create(uuid, archetype, attributes);
+				
+				entities.put(entity.uuid(), entity);			
+			}
+			
+			// now deserialize event handlers since they have entity links
+			for(Object o : jArray) {			
+				JSONObject jObj = (JSONObject) o; 
+				final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
 				CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
 				eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
 				
-				IGameEntity entity = create(uuid, archetype, attributes);
+				IGameEntity entity = get(uuid);
 				entity.setEventHandler(eventHandler);
 				
 				entities.put(entity.uuid(), entity);
+				
+				// deserialized 
 			}
 			
 		} catch (IOException | ParseException e) {
