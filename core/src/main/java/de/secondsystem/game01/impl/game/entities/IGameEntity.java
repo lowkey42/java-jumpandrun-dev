@@ -2,9 +2,6 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
-import org.json.simple.JSONObject;
-
-import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -34,8 +31,8 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	void setWorld(WorldId worldId);
 	void setWorldMask(int newWorldMask);
 
-	CollectionEntityEventHandler getEventHandler();
-	void setEventHandler(CollectionEntityEventHandler eventHandler);
+	IEntityEventHandler getEventHandler();
+	void setEventHandler(IEntityEventHandler eventHandler);
 	
 	IDrawable getRepresentation();
 	IPhysicsBody getPhysicsBody();

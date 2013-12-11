@@ -9,6 +9,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.game.entities.events.EventManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -102,8 +103,8 @@ public class SequencedObject implements ISequencedObject {
 			targetArray.add(target.serialize());
 		
 		JSONArray eventArray = new JSONArray();
-//		for(IEntityEventHandler event : events) 
-//			eventArray.add(event.serialize());
+		for(IEntityEventHandler event : events) 
+			eventArray.add(event.serialize());
 		
 		obj.put("targets", targetArray);
 		obj.put("events", eventArray);
@@ -132,13 +133,17 @@ public class SequencedObject implements ISequencedObject {
 		}
 		
 
-//		JSONArray eventArray = (JSONArray) obj.get("targets");
-//		if( eventArray == null )
-//			return null;
-//		for(Object o : eventArray) {
-//			IEntityEventHandler event = new SingleEntityEventHandler();
-//			this.addEvent(event.deserialize(o));
-//		}
+		JSONArray eventArray = (JSONArray) obj.get("events");
+		
+		if( eventArray == null )
+			System.out.println("eventArray is null");;
+			
+		for(Object o : eventArray) {
+			JSONObject jEvent = (JSONObject) o;
+			IEntityEventHandler event = map.getEventManager().createEntityEventHandler( (String) jEvent.get("class")) ;			
+			IEntityEventHandler eh = event.deserialize(jEvent, map);
+			this.addEvent(eh != null ? eh : event);
+		}
 		
 		return null;
 	}

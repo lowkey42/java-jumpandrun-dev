@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.game.entities.events;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,6 +16,15 @@ import de.secondsystem.game01.impl.map.IGameMap;
 public class CollectionEntityEventHandler implements IEntityEventHandler {
 
 	private final ListMultimap<EntityEventType, IEntityEventHandler> handlers = ArrayListMultimap.create();
+	
+	private UUID uuid;
+	
+	public CollectionEntityEventHandler(UUID uuid) {
+		this.uuid = uuid;
+	}
+	
+	public CollectionEntityEventHandler() {
+	}
 	
 	public void addEntityEventHandler(EntityEventType type, IEntityEventHandler handler) {
 		handlers.put(type, handler);
@@ -64,12 +74,18 @@ public class CollectionEntityEventHandler implements IEntityEventHandler {
 		
 		obj.put("handlers", handlers);	
 		obj.put("class", "CollectionEntityEventHandler");
+		obj.put("uuid", uuid.toString());
 		
 		return obj;
 	}
 
 	@Override
-	public void deserialize(JSONObject obj, IGameMap map) {
+	public IEntityEventHandler deserialize(JSONObject obj, IGameMap map) {
+		uuid = UUID.fromString((String) obj.get("uuid"));
+		IEntityEventHandler handler = map.getEventManager().get(uuid);
+		if( handler != null )
+			return handler;
+		
 		JSONObject handlers = (JSONObject) obj.get("handlers");
 		
 		for(Object o : handlers.keySet()) {
@@ -78,12 +94,21 @@ public class CollectionEntityEventHandler implements IEntityEventHandler {
 			
 			for(Object object : jArray) {
 				JSONObject jHandler = (JSONObject) object;
-				IEntityEventHandler eventHandler = EventHelper.createEntityEventHandler((String) jHandler.get("class"));
+				IEntityEventHandler eventHandler = map.getEventManager().createEntityEventHandler((String) jHandler.get("class"));				
 				eventHandler.deserialize(jHandler, map);
+				map.getEventManager().add(eventHandler);
 				this.handlers.put(type, eventHandler);
 			}
 		}
+		
+		map.getEventManager().add(this);
+		
+		return null;
+	}
 
+	@Override
+	public UUID uuid() {
+		return uuid;
 	}
 
 }

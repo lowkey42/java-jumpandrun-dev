@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -31,7 +31,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected IDrawable representation;
 	
-	protected CollectionEntityEventHandler eventHandler;
+	protected IEntityEventHandler eventHandler;
 	
 	protected final IGameMap map;
 	
@@ -40,12 +40,11 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	public GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
-				GameEntityHelper.createCollectionEntityEventHandler(em, attributes) );
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map );
 	}
 	
 	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, 
-			IDynamicPhysicsBody physicsBody, IGameMap map, CollectionEntityEventHandler eventHandler) {
+			IDynamicPhysicsBody physicsBody, IGameMap map) {
 		
 		this.uuid = uuid;
 		this.em = em;
@@ -53,7 +52,6 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		this.representation = representation;
 		this.physicsBody = physicsBody;
 		this.map = map;
-		this.eventHandler = eventHandler;
 		
 		if( physicsBody!=null )
 			physicsBody.setOwner(this);
@@ -195,7 +193,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	}
 
 	@Override
-	public CollectionEntityEventHandler getEventHandler() {
+	public IEntityEventHandler getEventHandler() {
 		return eventHandler;
 	}
 
@@ -210,7 +208,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	}
 
 	@Override
-	public void setEventHandler(CollectionEntityEventHandler eventHandler) {
+	public void setEventHandler(IEntityEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
 
@@ -224,4 +222,9 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 		this.editableEntityState = state;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+"{"+uuid()+(editableEntityState!=null?(", "+editableEntityState.getAllAttributes()):"")+"}";
+	}
+	
 }

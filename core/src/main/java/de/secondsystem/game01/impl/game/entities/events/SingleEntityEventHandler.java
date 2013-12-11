@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.game.entities.events;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 import org.json.simple.JSONObject;
 
@@ -11,8 +12,11 @@ public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 
 	protected EntityEventType eventType;
 	
-	public SingleEntityEventHandler(EntityEventType eventType) {
+	protected UUID uuid;
+	
+	public SingleEntityEventHandler(UUID uuid, EntityEventType eventType) {
 		this.eventType = eventType;
+		this.uuid = uuid;
 	}
 	
 	public SingleEntityEventHandler() {
@@ -33,13 +37,26 @@ public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 	public JSONObject serialize() {
 		JSONObject obj = new JSONObject();
 		obj.put("eventType", eventType.toString());
+		obj.put("uuid", uuid.toString());
 		
 		return obj;
 	}
 	
 	@Override
-	public void deserialize(JSONObject obj, IGameMap map) {
+	public IEntityEventHandler deserialize(JSONObject obj, IGameMap map) {
+		uuid = UUID.fromString( (String) obj.get("uuid"));
+		IEntityEventHandler eventHandler = map.getEventManager().get(uuid);
+		if( eventHandler != null )
+			return eventHandler;
+		
 		this.eventType = EntityEventType.valueOf( (String) obj.get("eventType") );
+		
+		return null;
+	}
+	
+	@Override
+	public UUID uuid() {
+		return uuid;
 	}
 
 }

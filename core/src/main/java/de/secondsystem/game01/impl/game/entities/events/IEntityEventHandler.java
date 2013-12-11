@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.game.entities.events;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.json.simple.JSONObject;
 
@@ -70,5 +71,10 @@ public interface IEntityEventHandler {
 	
 	JSONObject serialize();
 	
-	void deserialize(JSONObject obj, IGameMap map);
+	/**
+	 * @return null if this entity event handler does not exist
+	 */
+	IEntityEventHandler deserialize(JSONObject obj, IGameMap map);
+	
+	UUID uuid();
 }

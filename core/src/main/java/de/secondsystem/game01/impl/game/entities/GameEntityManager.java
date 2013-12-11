@@ -29,6 +29,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
@@ -132,7 +133,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
 			try {
 				IGameEntity entity = constructor.newInstance(uuid, em, em.map, new Attributes( attributes, attr) );
-				entity.setEditableState(new EditableEntityStateImpl(archetype, new Attributes(attr)) );
+				entity.setEditableState(new EditableEntityStateImpl(this, new Attributes(attr)) );
 				return entity;
 				
 			} catch (InstantiationException | IllegalAccessException
@@ -165,23 +166,28 @@ public final class GameEntityManager implements IGameEntityManager {
 
 	private static final class EditableEntityStateImpl implements IEditableEntityState {
 
-		private final String archetype;
+		private final EntityArchetype archetype;
 		
 		private final Attributes attributes;
 		
-		EditableEntityStateImpl(String archetype, Attributes attributes) {
+		EditableEntityStateImpl(EntityArchetype archetype, Attributes attributes) {
 			this.archetype = archetype;
 			this.attributes = attributes;
 		}
 		
 		@Override
 		public String getArchetype() {
-			return archetype;
+			return archetype.archetype;
 		}
 
 		@Override
 		public Attributes getAttributes() {
 			return attributes;
+		}
+
+		@Override
+		public Attributes getAllAttributes() {
+			return new Attributes(attributes, archetype.attributes);
 		}
 		
 	}
@@ -203,7 +209,9 @@ public final class GameEntityManager implements IGameEntityManager {
 			se.put("uuid", entity.uuid().toString());		
 			se.put("archetype", entity.getEditableState().getArchetype());	
 			se.put("attributes", entity.getEditableState().getAttributes());
-			se.put("eventHandler", entity.getEventHandler().serialize());		// TODO: geht das auch anders (Darstellung im Editor evtl. problematisch)
+			IEntityEventHandler eh = entity.getEventHandler();
+			if( eh != null )
+				se.put("eventHandler", eh.serialize());		// TODO: geht das auch anders (Darstellung im Editor evtl. problematisch)
 			jArray.add(se);
 		}
 		
@@ -231,12 +239,15 @@ public final class GameEntityManager implements IGameEntityManager {
 		// now deserialize event handlers since they have entity links
 		for(Object o : jArray) {			
 			JSONObject jObj = (JSONObject) o; 
+			if( jObj.get("eventHandler") == null )
+				continue;
+			
 			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
 			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-			eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
+			IEntityEventHandler eh = eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
 			
 			IGameEntity entity = get(uuid);
-			entity.setEventHandler(eventHandler);
+			entity.setEventHandler(eh != null ? eh : eventHandler);
 			
 			entities.put(entity.uuid(), entity);
 			
