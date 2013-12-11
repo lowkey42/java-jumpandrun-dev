@@ -92,10 +92,6 @@ public class GameMap implements IGameMap {
 		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), new Attribute("map", this), new Attribute("entities", entityManager) );
 		
 		timerManager = new TimerManager(scripts);
-		
-		// temporary
-		entityManager.deserialize();
-		sequenceManager.deserialize(this);
 	}
 		
 	/* (non-Javadoc)

@@ -44,6 +44,8 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		obj.put("world", Arrays.asList(serializeGameWorld(map.gameWorld[0]), serializeGameWorld(map.gameWorld[1])));
 		obj.put("tileset", map.getTileset().name );
 		obj.put("scripts", map.scripts.list());
+		obj.put("entities", map.getEntityManager().serialize());
+		obj.put("events", map.getSequenceManager().serialize());
 		
 		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()), StandardCharsets.UTF_8) ){
 			obj.writeJSONString(writer);
@@ -73,6 +75,9 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 					map.getScriptEnv().load(scriptName.toString());
 				}
 			}
+			
+			map.getEntityManager().deserialize( (JSONArray) obj.get("entities"));
+			map.getSequenceManager().deserialize(map, (JSONObject) obj.get("events"));
 			
 			return map;
 			

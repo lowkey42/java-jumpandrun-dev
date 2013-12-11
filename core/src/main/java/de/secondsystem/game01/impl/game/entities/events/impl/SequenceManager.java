@@ -100,7 +100,7 @@ public final class SequenceManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void serialize() {
+	public JSONObject serialize() {
 		JSONObject obj = new JSONObject();
 		
 		JSONArray seqObjects = new JSONArray();
@@ -114,37 +114,27 @@ public final class SequenceManager {
 		obj.put("sequencedObjects", seqObjects);
 		obj.put("sequencedEntities", seqEntities);
 		
-		try ( Writer writer = Files.newBufferedWriter(SEQUENCE_PATH, StandardCharsets.UTF_8) ){
-			obj.writeJSONString(writer);
-			
-		} catch (IOException e) {
-			throw new FormatErrorException("Unable to write map-file '" + SEQUENCE_PATH + "': " + e.getMessage(), e);
-		}
+		return obj;
 	}
 	
-	public void deserialize(IGameMap map) {
-		JSONParser parser = new JSONParser();
+	public void deserialize(IGameMap map, JSONObject obj) {
+		if( obj == null )
+			return;
 		
-		try ( Reader reader = Files.newBufferedReader(SEQUENCE_PATH, StandardCharsets.UTF_8) ) {
-			JSONObject obj = (JSONObject) parser.parse(reader);
-			JSONArray seqObjects = (JSONArray) obj.get("sequencedObjects");
-			for(Object o : seqObjects) {
-				JSONObject jSeqObject = (JSONObject) o;
-				ISequencedObject seqObj = createSequencedObject((String) jSeqObject.get("class"));
-				ISequencedObject so = seqObj.deserialize(jSeqObject, map);
-				sequencedObjects.put(seqObj.uuid(), so != null ? so : seqObj);
-			}
-			
-			JSONArray seqEntities = (JSONArray) obj.get("sequencedEntities");
-			for(Object o : seqEntities) {
-				JSONObject jSeqEntity = (JSONObject) o;
-				SequencedEntity seqEntity = createSequencedEntity((String) jSeqEntity.get("class"));
-				SequencedEntity se = seqEntity.deserialize(jSeqEntity, map);
-				sequencedEntities.put(seqEntity.uuid(), se != null ? se : seqEntity);
-			}
-			
-		} catch (IOException | ParseException e) {
-			throw new FormatErrorException("Unable to parse map-file '" + SEQUENCE_PATH + "': " + e.getMessage(), e);
+		JSONArray seqObjects = (JSONArray) obj.get("sequencedObjects");
+		for(Object o : seqObjects) {
+			JSONObject jSeqObject = (JSONObject) o;
+			ISequencedObject seqObj = createSequencedObject((String) jSeqObject.get("class"));
+			ISequencedObject so = seqObj.deserialize(jSeqObject, map);
+			sequencedObjects.put(seqObj.uuid(), so != null ? so : seqObj);
+		}
+		
+		JSONArray seqEntities = (JSONArray) obj.get("sequencedEntities");
+		for(Object o : seqEntities) {
+			JSONObject jSeqEntity = (JSONObject) o;
+			SequencedEntity seqEntity = createSequencedEntity((String) jSeqEntity.get("class"));
+			SequencedEntity se = seqEntity.deserialize(jSeqEntity, map);
+			sequencedEntities.put(seqEntity.uuid(), se != null ? se : seqEntity);
 		}
 	}
 }

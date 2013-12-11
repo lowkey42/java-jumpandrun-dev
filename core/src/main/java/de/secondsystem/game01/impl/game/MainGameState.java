@@ -51,17 +51,13 @@ public class MainGameState extends GameState {
 		
 		map = mapSerializer.deserialize(mapId, true, true);
 		
-//		map.getEntityManager().deserialize();
-//		sequenceManager.deserialize(map.getEntityManager());
-		
 		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
 		camera = new Camera(player);
 		
-		
-		
+			
 //		// something like this will be implemented in the editor
 //		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
 //		//IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
@@ -92,9 +88,6 @@ public class MainGameState extends GameState {
 //			//isOwnerKinematic.serialize();
 //			
 //		}
-		
-//		map.getEntityManager().serialize();
-//		sequenceManager.serialize();
 		
 		console.setScriptEnvironment(map.getScriptEnv());
 	}

@@ -36,7 +36,6 @@ import de.secondsystem.game01.model.Attributes;
 public final class GameEntityManager implements IGameEntityManager {
 
 	private static final Path ARCHETYPE_PATH = Paths.get("assets", "entities");
-	private static final Path ENTITIES_PATH = Paths.get("assets", "entities", "saved entities");
 	
 	private final Map<UUID, IGameEntity> entities = new HashMap<>();
 	
@@ -197,9 +196,7 @@ public final class GameEntityManager implements IGameEntityManager {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void serialize() {
-		JSONObject obj = new JSONObject();
-		
+	public JSONArray serialize() {	
 		JSONArray jArray = new JSONArray();
 		for(IGameEntity entity : entities.values()) {
 			JSONObject se = new JSONObject();
@@ -210,53 +207,40 @@ public final class GameEntityManager implements IGameEntityManager {
 			jArray.add(se);
 		}
 		
-		obj.put("entities", jArray);
-		
-		try ( Writer writer = Files.newBufferedWriter(ENTITIES_PATH, StandardCharsets.UTF_8) ){
-			obj.writeJSONString(writer);
-			
-		} catch (IOException e) {
-			throw new FormatErrorException("Unable to write map-file '" + ENTITIES_PATH + "': " + e.getMessage(), e);
-		}
+		return jArray;
 	}
 	
 	@Override
-	public void deserialize() {
-		JSONParser parser = new JSONParser();
+	public void deserialize(JSONArray jArray) {
+		if( jArray == null )
+			return;
 		
-		try ( Reader reader = Files.newBufferedReader(ENTITIES_PATH, StandardCharsets.UTF_8) ) {
-			JSONObject obj = (JSONObject) parser.parse(reader);
-			JSONArray jArray = (JSONArray) obj.get("entities");
-			// deserialize game entities first
-			for(Object o : jArray) {			
-				JSONObject jObj = (JSONObject) o; 
-				final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-				final String archetype = (String) jObj.get("archetype");
-				@SuppressWarnings("unchecked")
-				HashMap<String, Object> attributes = (HashMap<String, Object>) jObj.get("attributes");		
-				
-				IGameEntity entity = create(uuid, archetype, attributes);
-				
-				entities.put(entity.uuid(), entity);			
-			}
+		// deserialize game entities first
+		for(Object o : jArray) {			
+			JSONObject jObj = (JSONObject) o; 
+			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
+			final String archetype = (String) jObj.get("archetype");
+			@SuppressWarnings("unchecked")
+			HashMap<String, Object> attributes = (HashMap<String, Object>) jObj.get("attributes");		
 			
-			// now deserialize event handlers since they have entity links
-			for(Object o : jArray) {			
-				JSONObject jObj = (JSONObject) o; 
-				final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-				CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-				eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
-				
-				IGameEntity entity = get(uuid);
-				entity.setEventHandler(eventHandler);
-				
-				entities.put(entity.uuid(), entity);
-				
-				// deserialized 
-			}
+			IGameEntity entity = create(uuid, archetype, attributes);
 			
-		} catch (IOException | ParseException e) {
-			throw new FormatErrorException("Unable to parse map-file '" + ENTITIES_PATH + "': " + e.getMessage(), e);
+			entities.put(entity.uuid(), entity);			
+		}
+		
+		// now deserialize event handlers since they have entity links
+		for(Object o : jArray) {			
+			JSONObject jObj = (JSONObject) o; 
+			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
+			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
+			eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
+			
+			IGameEntity entity = get(uuid);
+			entity.setEventHandler(eventHandler);
+			
+			entities.put(entity.uuid(), entity);
+			
+			// deserialized 
 		}
 	}
 

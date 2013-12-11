@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -20,8 +23,8 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 
 	IGameEntity get(UUID eId);
 	
-	void deserialize();
-	void serialize();
+	void deserialize(JSONArray jArray);
+	JSONArray serialize();
 //	void deserialize( Iterator<SerializedEntity> iter );
 //	Iterable<SerializedEntity> serialize();
 	
