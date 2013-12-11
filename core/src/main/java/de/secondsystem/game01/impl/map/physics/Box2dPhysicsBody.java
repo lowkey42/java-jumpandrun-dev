@@ -33,13 +33,13 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		return Vector2f.div(new Vector2f(x, y), BOX2D_SCALE_FACTOR);
 	}
 	
-	private final boolean kinematic;
+	protected final boolean kinematic;
 	protected boolean idle;
 	
-	private final Box2dPhysicalWorld parent;
-	private final CollisionHandlerType type;
-	private final float height, width;
-	private final boolean interactive, liftable;
+	protected final Box2dPhysicalWorld parent;
+	protected final CollisionHandlerType type;
+	protected final float height, width;
+	protected final boolean interactive, liftable;
 	protected Body body;
 	
 	private int worldIdMask;

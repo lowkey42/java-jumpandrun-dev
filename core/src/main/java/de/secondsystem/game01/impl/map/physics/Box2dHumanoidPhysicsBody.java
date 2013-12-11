@@ -17,6 +17,8 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
 
@@ -34,7 +36,9 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	
 	private float maxThrowVel;
 	private float maxLiftWeight;
+	private float maxLiftForce = 1; // TODO: should be arg
 	private IPhysicsBody liftingBody = null;
+	private RevoluteJoint liftJoint = null;		// TODO: should use this.bind(...)
 
 	private IPhysicsBody currentClimbingLadder;
 
@@ -130,7 +134,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		return new Vec2(0, -BASE_HEIGHT);
 	}
 	
-	private static final class BodySensor extends ObjectDetector {
+	private final class BodySensor extends ObjectDetector {
 
 		private Set<IPhysicsBody> contactsWithSolids = new HashSet<>();
 		
@@ -139,7 +143,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 				Fixture fixture) {
 			super.onBeginContact(contact, other, fixture);
 			
-			if( contact.isEnabled() && contact.isTouching() && other.getCollisionHandlerType()==CollisionHandlerType.SOLID )
+			if( contact.isEnabled() && contact.isTouching() && other.getCollisionHandlerType()==CollisionHandlerType.SOLID && other!=liftingBody )
 				contactsWithSolids.add(other);
 		}
 
@@ -182,7 +186,11 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		if( !leftObjects.bodies.contains(other) && !rightObjects.bodies.contains(other) )
 			return false;
 		
-		if( bind(other, new Vector2f(getWidth()/2*BOX2D_SCALE_FACTOR, other.getHeight()/1.9f*BOX2D_SCALE_FACTOR)) ) {
+		Joint j = parent.createDistanceJoint(body, ((Box2dPhysicsBody)other).body, (20+getHeight()/2+Math.max(other.getHeight(), other.getWidth())/2) * BOX2D_SCALE_FACTOR );
+		
+		liftJoint = parent.createRevoluteJoint(body, ((Box2dPhysicsBody)other).body, body.getPosition(), false, 0, 0, maxLiftForce);
+		
+		if( j!=null ) {
 			liftingBody = other;
 			
 			return true;
@@ -269,12 +277,23 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	@Override
 	public byte move(float x, float y) {
+		if( liftJoint!=null ) {
+			float a = (float) Math.toDegrees(liftJoint.getJointAngle())+90;
+			
+			if( a<-5 )
+				liftJoint.setMotorSpeed(5);
+			else if( a>5 )
+				liftJoint.setMotorSpeed(-5);
+			else
+				liftJoint.setMotorSpeed(0);
+		}
+		
 		if( isClimbing() ) {
 			resetVelocity(true, true, false);
 			return super.move(x/1.5f, y);
 		}
-				
-		return super.move(isStable() || !exactObjects.hasContactWithSolid() ? x : 0, y);
+		
+		return super.move(isStable() || !exactObjects.hasContactWithSolid() ? x : x/5, y);
 	}
 	
 	@Override

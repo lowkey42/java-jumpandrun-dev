@@ -4,6 +4,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.DistanceJoint;
 import org.jbox2d.dynamics.joints.DistanceJointDef;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
@@ -14,21 +15,16 @@ import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 
 public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	
-	private static final float FIXED_STEP = 1/60f/2;
-	private static final int maxSteps = 5;
 	private static final int velocityIterations = 8;
 	private static final int positionIterations = 3;
 
 	World physicsWorld;
-	
-	private float fixedTimestepAccumulator = 0;
 	
 	@Override
 	public void init(Vector2f gravity) {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
 		physicsWorld.setContactListener(new Box2dContactListener());
-	//	physicsWorld.setAutoClearForces(true);
 	}
 
 	@Override
@@ -39,26 +35,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			physicsWorld.step(max/2, velocityIterations, positionIterations);
 			dt -= max/2;
 		}
-		physicsWorld.step(dt, velocityIterations, positionIterations); //This syncs up the physics engine to the current frame
-		physicsWorld.clearForces();
-
-//		physicsWorld.step(frameTime/1000.f, velocityIterations, positionIterations);
-//		fixedTimestepAccumulator += frameTime/1000.f;
-//	    int steps = (int) Math.floor(fixedTimestepAccumulator / FIXED_STEP);
-//	    if(steps > 0)
-//	    {
-//	        fixedTimestepAccumulator -= steps * FIXED_STEP;
-//	    }
-//	    
-//	    int stepsClamped = Math.min(steps, maxSteps);
-//	 
-//	    for (int i = 0; i < stepsClamped; ++i) {
-//	    	physicsWorld.step(FIXED_STEP, velocityIterations, positionIterations);
-//	    	
-//	    	if( i>0 && i%2==0 )
-//	    	    physicsWorld.clearForces();
-//	    }
-//	    physicsWorld.clearForces();
+		physicsWorld.step(dt, velocityIterations, positionIterations);
 	}
 
 	Body createBody(BodyDef def) {
@@ -66,39 +43,41 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	}
 
 	public Joint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {
+		return createRevoluteJoint(body1, body2, anchor, false, 0, 0, null);
+	}
+	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor, boolean enableAngleLimit, float lowerAngle, float upperAngle, Float maxMotorTorque) {
 		RevoluteJointDef jointDef = new RevoluteJointDef();
 		jointDef.initialize(body1, body2, anchor);
 		
+		if( enableAngleLimit ) {
+			jointDef.enableLimit = true;
+			jointDef.lowerAngle = (float) Math.toRadians(lowerAngle);
+			jointDef.upperAngle = (float) Math.toRadians(upperAngle);
+		}
+		
+		if( maxMotorTorque!=null ) {
+			jointDef.maxMotorTorque = maxMotorTorque;
+			jointDef.enableMotor = true;
+			jointDef.motorSpeed = 1f;
+		}
+		
 		return (RevoluteJoint) physicsWorld.createJoint(jointDef);
+	}
+
+	public Joint createDistanceJoint(Body body1, Body body2, float distance) {
+		DistanceJointDef jointDef = new DistanceJointDef();
+		jointDef.initialize(body1, body2, body1.getPosition(), body2.getPosition());
+		jointDef.length = distance;
+		jointDef.frequencyHz = 4;
+		jointDef.dampingRatio = 0.1f;
+		jointDef.collideConnected = true;
+		
+		return (DistanceJoint) physicsWorld.createJoint(jointDef);
 	}
 
 	public void destroyJoint(Joint joint) {
 		physicsWorld.destroyJoint(joint);
 	}
-
-//	@Override
-//	public IPhysicsBody createStaticBody(int gameWorldIdMask, float x, float y,
-//			float width, float height, float rotation, CollisionHandlerType type) {
-//		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, true, type, false, false, false);
-//	}
-//
-//	@Override
-//	public IPhysicsBody createDynamicBody(int gameWorldIdMask, float x,
-//			float y, float width, float height, float rotation,
-//			CollisionHandlerType type, int features) {
-//		return new Box2dPhysicsBody(this, gameWorldIdMask, x, y, width, height, rotation, false, type, 
-//				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.STABLE_CHECK), 
-//				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.SIDE_CONTACT_CHECK),
-//				PhysicalBodyFeatures.has(features, PhysicalBodyFeatures.WORLD_SWITCH_CHECK) );
-//	}
-//
-//	@Override
-//	public IHumanoidPhysicsBody createHumanoidBody(int worldIdMask, float x,
-//			float y, float width, float height, float maxSlope, float maxReach,
-//			float rotation, int features) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 
 	@Override
 	public PhysicsBodyFactory factory() {
