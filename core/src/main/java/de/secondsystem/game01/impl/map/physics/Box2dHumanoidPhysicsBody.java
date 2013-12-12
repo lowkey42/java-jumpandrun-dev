@@ -36,9 +36,9 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	
 	private float maxThrowVel;
 	private float maxLiftWeight;
-	private float maxLiftForce = 1; // TODO: should be arg
-	private IPhysicsBody liftingBody = null;
-	private RevoluteJoint liftJoint = null;		// TODO: should use this.bind(...)
+	private float maxLiftForce = 2; // TODO: should be arg
+	private IPhysicsBody liftedBody = null;
+	private RevoluteJoint liftJoint = null;
 
 	private IPhysicsBody currentClimbingLadder;
 
@@ -143,7 +143,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 				Fixture fixture) {
 			super.onBeginContact(contact, other, fixture);
 			
-			if( contact.isEnabled() && contact.isTouching() && other.getCollisionHandlerType()==CollisionHandlerType.SOLID && other!=liftingBody )
+			if( contact.isEnabled() && contact.isTouching() && other.getCollisionHandlerType()==CollisionHandlerType.SOLID && other!=liftedBody )
 				contactsWithSolids.add(other);
 		}
 
@@ -186,10 +186,13 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		if( !leftObjects.bodies.contains(other) && !rightObjects.bodies.contains(other) )
 			return false;
 		
-		liftJoint = parent.createRevoluteJoint(body, ((Box2dPhysicsBody)other).body, body.getPosition(), false, 0, 0, maxLiftForce);
+	//	Joint j = parent.createDistanceJoint(body, ((Box2dPhysicsBody)other).body, (20+getHeight()/2+Math.max(other.getHeight(), other.getWidth())/2) * BOX2D_SCALE_FACTOR );
+		
+		liftJoint = bind(other, getPosition(), maxLiftForce);
 		
 		if( liftJoint!=null ) {
-			liftingBody = other;
+			liftedBody = other;
+			((Box2dPhysicsBody)liftedBody).liftingBody = this;
 			
 			return true;
 		}
@@ -199,9 +202,12 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	@Override
 	public boolean throwLiftedBody(float strength, Vector2f direction) {
-		if( liftingBody!=null ) {
-			unbind(liftingBody);
-			((Box2dPhysicsBody)liftingBody).body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
+		if( isLiftingSomething() ) {
+			unbind(liftedBody);
+			((Box2dPhysicsBody)liftedBody).body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
+			((Box2dPhysicsBody)liftedBody).liftingBody = null;
+			liftedBody = null;
+			liftJoint = null;
 			
 			return true;
 		}
@@ -269,19 +275,19 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 
 	@Override
 	public void setMaxLiftWeight(float weight) {
-		// TODO Auto-generated method stub
-		
+		maxLiftWeight = weight;
 	}
 
 	@Override
 	public byte move(float x, float y) {
-		if( liftJoint!=null ) {
-			float a = (float) Math.toDegrees(liftJoint.getJointAngle())+90;
+		if( isLiftingSomething() ) {
+			float a = ((float) Math.toDegrees(Math.atan2(getPosition().y-liftedBody.getPosition().y, getPosition().x-liftedBody.getPosition().x))-90) % 360;
+			a = (a < 0 ? 360 + a : a);
 			
-			if( a<-5 )
-				liftJoint.setMotorSpeed(5);
+			if( a<355 && a>=180  )
+				liftJoint.setMotorSpeed(Math.min((355-a)/4, 10));
 			else if( a>5 )
-				liftJoint.setMotorSpeed(-5);
+				liftJoint.setMotorSpeed(-Math.min(a/4, 10));
 			else
 				liftJoint.setMotorSpeed(0);
 		}
@@ -344,7 +350,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	
 	@Override
 	public boolean isLiftingSomething() {
-		return liftingBody!=null;
+		return liftedBody!=null;
 	}
 	
 	@Override

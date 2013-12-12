@@ -165,7 +165,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			}
 			
 		} else {
-			hBody.throwLiftedBody(throwingPower, new Vector2f(xMove, yMove));
+			hBody.throwLiftedBody(throwingPower+20, new Vector2f(xMove, yMove));
 			throwingPower = 0.f;
 		}
 	}

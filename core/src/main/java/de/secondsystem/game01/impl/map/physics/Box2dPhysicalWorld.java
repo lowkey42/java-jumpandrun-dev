@@ -42,18 +42,12 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		return physicsWorld.createBody(def);
 	}
 
-	public Joint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {
-		return createRevoluteJoint(body1, body2, anchor, false, 0, 0, null);
+	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor) {
+		return createRevoluteJoint(body1, body2, anchor, null);
 	}
-	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor, boolean enableAngleLimit, float lowerAngle, float upperAngle, Float maxMotorTorque) {
+	public RevoluteJoint createRevoluteJoint(Body body1, Body body2, Vec2 anchor, Float maxMotorTorque) {
 		RevoluteJointDef jointDef = new RevoluteJointDef();
 		jointDef.initialize(body1, body2, anchor);
-		
-		if( enableAngleLimit ) {
-			jointDef.enableLimit = true;
-			jointDef.lowerAngle = (float) Math.toRadians(lowerAngle);
-			jointDef.upperAngle = (float) Math.toRadians(upperAngle);
-		}
 		
 		if( maxMotorTorque!=null ) {
 			jointDef.maxMotorTorque = maxMotorTorque;

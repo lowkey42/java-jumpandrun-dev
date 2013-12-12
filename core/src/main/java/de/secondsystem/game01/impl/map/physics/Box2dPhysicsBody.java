@@ -18,6 +18,7 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureContactListener;
@@ -48,6 +49,8 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	private PhysicsContactListener contactListener;
 
 	private final Map<IPhysicsBody, Joint> boundBodies = new HashMap<>();
+	
+	protected Box2dPhysicsBody liftingBody;
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, 
 			CollisionHandlerType type, boolean kinematic ) {
@@ -185,7 +188,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture ownFixture, Fixture otherFixture) {
 		switch (type) {
 			case ONE_WAY:
-				return !other.isAbove(this, otherFixture);
+				return other.liftingBody==null ? !other.isAbove(this, otherFixture) : true;
 				
 			case CLIMBABLE:
 			case SOLID:
@@ -263,40 +266,26 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		body.setTransform(body.getPosition(), (float) Math.toRadians(angle));
 	}
 
-	@Override
-	public boolean bind(IPhysicsBody other, Vector2f anchor) {
+	public RevoluteJoint bind(IPhysicsBody other, Vector2f anchor, Float maxForce) {
 		if( !boundBodies.containsKey(other) ) {
 			final Box2dPhysicsBody otherBody = (Box2dPhysicsBody) other;
 			
-			Joint joint = parent.createRevoluteJoint(body, otherBody.getBody(), new Vec2(anchor.x, anchor.y));
+			RevoluteJoint joint = parent.createRevoluteJoint(body, otherBody.getBody(), new Vec2(anchor.x*BOX2D_SCALE_FACTOR, anchor.y*BOX2D_SCALE_FACTOR), maxForce);
 			
 			if( joint==null )
-				return false;
+				return null;
 			
 			boundBodies.put(other, joint);
 			otherBody.boundBodies.put(other, joint);
 			
-			return true;
+			return joint;
 		}
 		
-		return false;
-		
-//		if( !other.isStatic() )
-//		{
-//			boolean isLiftingPossible = false;
-//			
-//			Box2dPhysicsBody b = (Box2dPhysicsBody) other;
-//			//if( b.body.getMass() <= maxTestValue ) // lifting is possible {
-//			other.setPosition(new Vector2f(getPosition().x, (getPosition().y-height/2.f-b.height/2.f)));
-//			// isLiftingPossible = true;
-//			// }
-//			
-//			revoluteJoint = parent.createRevoluteJoint(body, b.getBody(), new Vec2(anchor.x, anchor.y));
-//			b.revoluteJoint = revoluteJoint;
-//			liftingBody = b.body;
-//			
-//			return isLiftingPossible;
-//		}
+		return null;
+	}
+	@Override
+	public boolean bind(IPhysicsBody other, Vector2f anchor) {
+		return bind(other, anchor, null)!=null;
 	}
 
 	@Override
