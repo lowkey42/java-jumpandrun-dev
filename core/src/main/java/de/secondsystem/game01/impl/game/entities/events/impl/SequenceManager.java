@@ -1,29 +1,16 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
 
-public final class SequenceManager {
-	private static final Path SEQUENCE_PATH = Paths.get("assets", "events", "sequences", "test01");
-	
+public final class SequenceManager {	
 	private final Map<UUID, ISequencedObject> sequencedObjects = new HashMap<>();
 	private final Map<UUID, SequencedEntity> sequencedEntities = new HashMap<>();
 	

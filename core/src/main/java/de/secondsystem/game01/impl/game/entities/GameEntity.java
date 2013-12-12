@@ -74,6 +74,9 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	public void update(long frameTimeMs) {
 		if( representation instanceof IUpdateable )
 			((IUpdateable) representation).update(frameTimeMs);
+		
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.UPDATE) ) 
+			eventHandler.handle(EntityEventType.UPDATE, this);
 	}
 
 	@Override

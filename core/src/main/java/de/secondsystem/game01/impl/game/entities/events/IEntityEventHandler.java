@@ -13,54 +13,61 @@ public interface IEntityEventHandler {
 	public enum EntityEventType {
 		/**
 		 * The entity is touched by another one.
-		 * ARGS: other:IPhysicsBody, force:Vector2f
+		 * ARGS: IGameEntity: owner, other:IPhysicsBody, force:Vector2f
 		 * RETURN: unused 
 		 */
 		TOUCHED,
 		
 		/**
 		 * The entity is no longer touched by another one.
-		 * ARGS: other:IGameEntity
+		 * ARGS: IGameEntity: owner, other:IGameEntity
 		 * RETURN: unused 
 		 */
 		UNTOUCHED,
 		
 		/**
 		 * The player is trying to use this entity
-		 * ARGS: unused
+		 * ARGS: IGameEntity: owner
 		 * RETURN: unused 
 		 */
 		USED,
 
 		/**
 		 * The player has drag-used this entity (e.g. a lever)
-		 * ARGS: force:float
+		 * ARGS: IGameEntity: owner, force:float
 		 * RETURN: animationDiff:float 
 		 */
 		USED_DRAGED,
 		
 		/**
-		 * ARGS: IGameEntity lifting entity
+		 * ARGS: IGameEntity: owner, IGameEntity lifting entity
 		 */
 		LIFTED,
 		/**
-		 * ARGS: IGameEntity lifting entity
+		 * ARGS: IGameEntity: owner, IGameEntity lifting entity
 		 */
 		UNLIFTED,
 		
 		/**
 		 * The entity just appeared on the screen
-		 * ARGS: unused
+		 * ARGS: IGameEntity: owner
 		 * RETURN: unused 
 		 */
 		VIEWED,
 		
 		/**
 		 * The entity just left the screen
-		 * ARGS: unused
+		 * ARGS: IGameEntity: owner
 		 * RETURN: unused 
 		 */
-		UNVIEWED;
+		UNVIEWED,
+		
+		/**
+		 * Called on update of the entity.
+		 * ARGS: IGameEntity: owner
+		 * RETURN: unused
+		 */
+		UPDATE;
 	}
 	
 	Object handle( EntityEventType type, IGameEntity owner, Object... args );

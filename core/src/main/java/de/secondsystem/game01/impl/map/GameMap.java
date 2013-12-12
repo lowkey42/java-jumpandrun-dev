@@ -90,11 +90,14 @@ public class GameMap implements IGameMap {
 		} else
 			physicalWorld = null;
 		
-		entityManager = new GameEntityManager(this);
-
-		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), new Attribute("map", this), new Attribute("entities", entityManager) );
+		entityManager = new GameEntityManager(this);	
+		
+		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), 
+				new Attribute("map", this), new Attribute("entities", entityManager), new Attribute("events", eventManager));
 		
 		timerManager = new TimerManager(scripts);
+		
+		eventManager.setScriptEnvironment(scripts);	
 	}
 		
 	/* (non-Javadoc)

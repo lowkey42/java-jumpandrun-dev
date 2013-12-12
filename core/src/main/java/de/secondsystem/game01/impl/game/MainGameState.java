@@ -16,6 +16,7 @@ import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Condition;
@@ -41,13 +42,10 @@ public class MainGameState extends GameState {
 	
 	private KeyboardController controller;
 	
-	private SequenceManager sequenceManager;
-	
 	private final String PLAYER_UUID = "aa013690-1408-4a13-8329-cbfb1cfa7f6b";
 	
 	public MainGameState( String mapId ) {
 		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-		sequenceManager = new SequenceManager();
 		
 		map = mapSerializer.deserialize(mapId, true, true);
 		
@@ -56,7 +54,6 @@ public class MainGameState extends GameState {
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
 		camera = new Camera(player);
-		
 			
 //		// something like this will be implemented in the editor
 //		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
