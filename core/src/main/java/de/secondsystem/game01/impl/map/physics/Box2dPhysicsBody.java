@@ -17,6 +17,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
@@ -151,6 +152,24 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 	protected final void setWorldIdMask(int worldIdMask) {
 		this.worldIdMask = worldIdMask;
+		
+		// wakeup body
+		body.setAwake(true);
+		
+		// find new contacts
+		body.setTransform(body.getPosition(), body.getAngle());
+		
+		// recall contact-listener
+		for(ContactEdge contact = body.m_contactList; contact!=null; contact=contact.next ) {
+			parent.physicsWorld.getContactManager().m_contactListener.preSolve(contact.contact, null);
+			
+			if(contact.contact.isTouching())
+				if( !contact.contact.isEnabled() ) {
+					parent.physicsWorld.getContactManager().m_contactListener.endContact(contact.contact);
+				} else {
+					parent.physicsWorld.getContactManager().m_contactListener.beginContact(contact.contact);
+				}
+		}
 	}
 	public final boolean isInWorld( int worldId ) {
 		return (worldIdMask&worldId) != 0;

@@ -19,8 +19,8 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	protected float maxXVel;
 	protected float maxYVel;
 	
-	private final Set<Contact> worldSwitchSensorContacts = new HashSet<>();
-	private final Set<Contact> footSensorContacts = new HashSet<>();
+	private final Set<IPhysicsBody> worldSwitchSensorContacts = new HashSet<>();
+	private final Set<IPhysicsBody> footSensorContacts = new HashSet<>();
 	
 	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
 			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, boolean kinematic,
@@ -67,13 +67,13 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	protected final class StableCheckFCL implements Box2dContactListener.FixtureContactListener {
 		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
-			footSensorContacts.remove(contact);
+			footSensorContacts.remove(other);
 		}
 		
 		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
 			if( other.getCollisionHandlerType()==CollisionHandlerType.SOLID || other.getCollisionHandlerType()==CollisionHandlerType.ONE_WAY ) {
-				footSensorContacts.add(contact);
+				footSensorContacts.add(other);
 			}
 		}
 	}
@@ -81,13 +81,13 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	private final class WorldSwitchCheckFCL implements Box2dContactListener.FixtureContactListener {
 		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
-			worldSwitchSensorContacts.remove(contact);
+			worldSwitchSensorContacts.remove(other);
 		}
 		
 		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
 			if( other.getCollisionHandlerType()==CollisionHandlerType.SOLID )
-				worldSwitchSensorContacts.add(contact);
+				worldSwitchSensorContacts.add(other);
 		}
 	}
 
