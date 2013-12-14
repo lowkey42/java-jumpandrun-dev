@@ -16,7 +16,7 @@ public class EditorObject {
 	protected float width    = 1.f;
 	
 	protected ILayerObject layerObject = null;
-	protected Vector2f mapMousePos;
+	protected Vector2f mappedMousePos;
 	
 	public float getWidth() {
 		return width;

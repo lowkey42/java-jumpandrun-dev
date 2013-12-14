@@ -14,6 +14,7 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
+import de.secondsystem.game01.util.Tools;
 
 public class CollisionObject implements ILayerObject {
 
@@ -94,7 +95,7 @@ public class CollisionObject implements ILayerObject {
 
 	@Override
 	public boolean inside(Vector2f point) {
-		return shape.getGlobalBounds().contains(point);
+		return Tools.isInside(this, point);
 	}
 
 	@Override
