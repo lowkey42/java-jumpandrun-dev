@@ -23,7 +23,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 		this.animationTexture = animationTexture;
 	}
 	
-	private void setDimensions(float width, float height) {
+	@Override
+	public void setDimensions(float width, float height) {
 		float widthScale = width/currentAnimationData.frameWidth;
 		sprite.setScale(sprite.getScale().x < 0 ? widthScale*(-1) : widthScale, height/currentAnimationData.frameHeight);
 	}

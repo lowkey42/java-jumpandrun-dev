@@ -48,8 +48,10 @@ public final class EditorGameState extends GameState {
 
 	private final Text editorHint;
 	private final Text layerHint;
-	private MouseEditorObject mouseTile;
-	private SelectedEditorObject selectedObject;
+	private MouseEditorLayerObject mouseTile;
+	private SelectedEditorLayerObject selectedObject;
+	
+	private MouseEditorEntity mouseEntity = new MouseEditorEntity();
 	private float zoom = 1.f;
 	
 	private float cameraX = 0.f;
@@ -59,7 +61,8 @@ public final class EditorGameState extends GameState {
 
 
 	private boolean moveSelectedObject = false;
-	
+
+	private IEditorObject currentEditorObject;
 	
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
@@ -82,8 +85,9 @@ public final class EditorGameState extends GameState {
 		layerHint.setPosition(0, 25);
 		layerHint.setColor(Color.WHITE);
 		
-		mouseTile      = new MouseEditorObject(tileset);
-		selectedObject = new SelectedEditorObject(Color.BLUE, 2.0f, Color.TRANSPARENT);
+		mouseTile      = new MouseEditorLayerObject(tileset);
+		selectedObject = new SelectedEditorLayerObject(Color.BLUE, 2.0f, Color.TRANSPARENT);
+		currentEditorObject = mouseTile;
 	}
 
 	@Override
@@ -117,7 +121,6 @@ public final class EditorGameState extends GameState {
 		final ConstView cView = ctx.window.getView();
 		
 		ctx.window.setView(getTransformedView(ctx));
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
 		currentEditorObject.update(moveSelectedObject, ctx.window, getMouseX(), getMouseY(), zoom);
 		ctx.window.setView(cView);
 		
@@ -151,8 +154,6 @@ public final class EditorGameState extends GameState {
 		map.draw(rt);
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
-
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
 		
 		currentEditorObject.refresh();
 		currentEditorObject.draw(rt);
@@ -161,8 +162,6 @@ public final class EditorGameState extends GameState {
 	}
 
 	private final boolean processInput(GameContext ctx, Event event) {
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
-		
 		switch (event.type) {
 		
 		case KEY_PRESSED:
@@ -188,7 +187,7 @@ public final class EditorGameState extends GameState {
 			case LEFT:
 				moveSelectedObject = false;
 
-				if (selectedObject.getLayerObject() == null) 
+				if( currentEditorObject instanceof MouseEditorLayerObject ) 
 					mouseTile.addToMap(map, currentLayer);
 
 				return true;
@@ -202,6 +201,8 @@ public final class EditorGameState extends GameState {
 
 				if (selectedObject.getLayerObject() == null) 
 					deselectSprite();
+				else
+					currentEditorObject = selectedObject;
 
 			default:
 				return false;
@@ -229,15 +230,22 @@ public final class EditorGameState extends GameState {
 	}
 
 	private void deselectSprite() {
-		if (currentLayer == LayerType.PHYSICS)
+		switch( currentLayer ) {
+		case PHYSICS:
 			mouseTile.createCollisionObject(map);
-		else
+			currentEditorObject = mouseTile;
+			break;
+		case OBJECTS:
+			mouseEntity.createEntity(map, "enemy");
+			currentEditorObject = mouseEntity;
+			break;
+		default:
 			mouseTile.createSpriteObject();
+			currentEditorObject = mouseTile;
+		}
 	}
 
 	private final boolean processInputKeyboard() {
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
-		
 		if (Keyboard.isKeyPressed(Key.W))
 			cameraY -= CAM_MOVE_SPEED;
 		if (Keyboard.isKeyPressed(Key.S))
@@ -261,8 +269,6 @@ public final class EditorGameState extends GameState {
 	
 	
 	private final boolean processInputKey(KeyEvent event) {
-		EditorObject currentEditorObject = selectedObject != null ? selectedObject : mouseTile;
-		
 		switch (event.key) {
 		case F5: // save
 			new JsonGameMapSerializer().serialize(map);

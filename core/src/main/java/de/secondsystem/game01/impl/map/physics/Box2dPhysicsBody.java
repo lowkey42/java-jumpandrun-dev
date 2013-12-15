@@ -94,7 +94,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		fd.shape = createShape(shape, width, height);
 		if (CollisionHandlerType.CLIMBABLE == type)
 			fd.isSensor = true;
-		
+
 		fd.friction = friction;
 		fd.restitution = restitution;
 		

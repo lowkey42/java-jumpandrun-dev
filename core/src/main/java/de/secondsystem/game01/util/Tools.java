@@ -1,8 +1,10 @@
 package de.secondsystem.game01.util;
 
 import org.jsfml.graphics.RectangleShape;
+import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.map.ILayerObject;
 
 public class Tools {
@@ -23,6 +25,13 @@ public class Tools {
 	public static boolean isInside(ILayerObject layerObject, Vector2f p) {
 		Vector2f ns = new Vector2f(layerObject.getWidth(), layerObject.getHeight());
 		setRectangleShape(shape, ns, new Vector2f(ns.x / 2f, ns.y / 2f), layerObject.getPosition(), layerObject.getRotation());
+		
+		return isInside(shape, p);
+	}
+	
+	public static boolean isInside(ISpriteWrapper spriteWrapper, Vector2f p) {
+		Vector2f ns = new Vector2f(spriteWrapper.getWidth(), spriteWrapper.getHeight());
+		setRectangleShape(shape, ns, new Vector2f(ns.x / 2f, ns.y / 2f), spriteWrapper.getPosition(), spriteWrapper.getRotation());
 		
 		return isInside(shape, p);
 	}
