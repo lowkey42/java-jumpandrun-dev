@@ -92,6 +92,24 @@ public final class GameEntityManager implements IGameEntityManager {
 	public IGameEntity get( UUID eId ) {
 		return entities.get(eId);
 	}
+	@Override
+	public IWeakGameEntityRef getRef(final UUID eId) {
+		return new IWeakGameEntityRef() {
+			private IGameEntity entity;
+			@Override public UUID uuid() {
+				return eId;
+			}
+			
+			@Override public IGameEntityManager manager() {
+				return GameEntityManager.this;
+			}
+			
+			@Override public IGameEntity get() {
+				if( entity!=null )	return entity;
+				return entity= GameEntityManager.this.get(eId);
+			}
+		};
+	}
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
@@ -104,7 +122,6 @@ public final class GameEntityManager implements IGameEntityManager {
 		for( IGameEntity entity : entities.values() )
 			entity.update(frameTimeMs);
 	}
-	
 	
 	private static final class EntityArchetype {
 		public final String archetype;
