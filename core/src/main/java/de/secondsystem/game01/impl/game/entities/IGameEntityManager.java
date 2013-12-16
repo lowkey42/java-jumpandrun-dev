@@ -22,6 +22,7 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 	void destroy(UUID eId);
 
 	IGameEntity get(UUID eId);
+	IWeakGameEntityRef getRef(UUID eId);
 	
 	void deserialize(JSONArray jArray);
 	JSONArray serialize();
