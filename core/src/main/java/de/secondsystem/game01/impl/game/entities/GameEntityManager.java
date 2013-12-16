@@ -94,7 +94,7 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	@Override
 	public IWeakGameEntityRef getRef(final UUID eId) {
-		return new IWeakGameEntityRef() {
+		return new IWeakGameEntityRef() { 
 			private IGameEntity entity;
 			@Override public UUID uuid() {
 				return eId;
