@@ -1,9 +1,11 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
-
+import de.secondsystem.game01.impl.game.entities.events.EventManager;
+import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
@@ -56,16 +58,18 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean useEvent = false;
 	
-	public ControllableGameEntity(UUID uuid, String archetype,
+	@SuppressWarnings("unchecked")
+	public ControllableGameEntity(UUID uuid, 
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
-		super(uuid, archetype, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, 
-				GameEntityHelper.createEventHandler(em, attributes) );
-
+		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map);
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
 		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
+		
+		if( attributes.get("events") != null )
+			eventHandler = EventManager.createScriptedEvents((Map<String, Object>) attributes.get("events"), map);
 	}
 
 	@Override
@@ -128,7 +132,10 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
 		facingDirectionH = xMove > 0 ? HDirection.RIGHT : xMove < 0 ? HDirection.LEFT : facingDirectionH;
 		
-		final float effectiveYMove = isVerticalMovementAllowed() ? yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
+		final float effectiveYMove = isVerticalMovementAllowed() ? moveAcceleration*yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
+		
+		if( jump && effectiveYMove != 0 )
+			onJump();
 		
 		physicsBody.move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
 	    
@@ -166,7 +173,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			}
 			
 		} else {
-			hBody.throwLiftedBody(throwingPower, new Vector2f(xMove, yMove));
+			hBody.throwLiftedBody(throwingPower+20, new Vector2f(xMove, yMove));
 			throwingPower = 0.f;
 		}
 	}
@@ -216,7 +223,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		
 		IPhysicsBody nearestBody = ( (IHumanoidPhysicsBody) physicsBody ).getNearestInteractiveBody( new Vector2f(xMove, yMove) );
 		if( nearestBody != null ) {
-			IGameEntity ge = (IGameEntity) nearestBody.getOwner();
+			// TODO: A selection option is probably better 
+			//       since little design mistakes can lead to frustration caused by the inability to pick up an object on top of a lever for example
+			IGameEntity ge = (IGameEntity) nearestBody.getOwner(); 
 			ge.onUsed();
 		}
 	}
@@ -245,13 +254,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public void use() {
 		useEvent = true;
 	}
-
-	@Override
-	public Attributes serialize() {
-		final Attributes attributes = super.serialize();
-		
-		// TODO
-		
-		return attributes;
+	
+	private void onJump() {
+		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.JUMPED) ) 
+			eventHandler.handle(EntityEventType.JUMPED, this);
 	}
 }

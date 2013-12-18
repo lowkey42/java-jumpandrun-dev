@@ -8,6 +8,7 @@ import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -16,7 +17,9 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureContactListener;
@@ -32,13 +35,13 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		return Vector2f.div(new Vector2f(x, y), BOX2D_SCALE_FACTOR);
 	}
 	
-	private final boolean kinematic;
+	protected final boolean kinematic;
 	protected boolean idle;
 	
-	private final Box2dPhysicalWorld parent;
-	private final CollisionHandlerType type;
-	private final float height, width;
-	private final boolean interactive, liftable;
+	protected final Box2dPhysicalWorld parent;
+	protected final CollisionHandlerType type;
+	protected final float height, width;
+	protected final boolean interactive, liftable;
 	protected Body body;
 	
 	private int worldIdMask;
@@ -47,6 +50,8 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	private PhysicsContactListener contactListener;
 
 	private final Map<IPhysicsBody, Joint> boundBodies = new HashMap<>();
+	
+	protected Box2dPhysicsBody liftingBody;
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, 
 			CollisionHandlerType type, boolean kinematic ) {
@@ -89,7 +94,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		fd.shape = createShape(shape, width, height);
 		if (CollisionHandlerType.CLIMBABLE == type)
 			fd.isSensor = true;
-		
+
 		fd.friction = friction;
 		fd.restitution = restitution;
 		
@@ -106,6 +111,17 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 	protected static Shape createShape(PhysicsBodyShape shape, float width, float height) {
 		return createShape(shape, width, height, 0, 0, 0);
+	}
+	protected static Shape createTrapeziumShape(float width, float height, float topDiff, float bottomDiff, float x, float y) {
+		PolygonShape trap = new PolygonShape();
+		trap.setAsBox(width / 2f * BOX2D_SCALE_FACTOR, height / 2f * BOX2D_SCALE_FACTOR, toBox2dCS(x,y), 0);
+
+		trap.m_vertices[0].set(trap.m_vertices[0].x-topDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[0].y);
+		trap.m_vertices[1].set(trap.m_vertices[1].x+topDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[1].y);
+		trap.m_vertices[2].set(trap.m_vertices[2].x+bottomDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[2].y);
+		trap.m_vertices[3].set(trap.m_vertices[3].x-bottomDiff* BOX2D_SCALE_FACTOR, trap.m_vertices[3].y);
+		
+		return trap;
 	}
 	protected static Shape createShape(PhysicsBodyShape shape, float width, float height, float x, float y, float rotation) {
 		switch( shape ) {
@@ -136,6 +152,24 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 	protected final void setWorldIdMask(int worldIdMask) {
 		this.worldIdMask = worldIdMask;
+		
+		// wakeup body
+		body.setAwake(true);
+		
+		// find new contacts
+		body.setTransform(body.getPosition(), body.getAngle());
+		
+		// recall contact-listener
+		for(ContactEdge contact = body.m_contactList; contact!=null; contact=contact.next ) {
+			parent.physicsWorld.getContactManager().m_contactListener.preSolve(contact.contact, null);
+			
+			if(contact.contact.isTouching())
+				if( !contact.contact.isEnabled() ) {
+					parent.physicsWorld.getContactManager().m_contactListener.endContact(contact.contact);
+				} else {
+					parent.physicsWorld.getContactManager().m_contactListener.beginContact(contact.contact);
+				}
+		}
 	}
 	public final boolean isInWorld( int worldId ) {
 		return (worldIdMask&worldId) != 0;
@@ -173,7 +207,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture ownFixture, Fixture otherFixture) {
 		switch (type) {
 			case ONE_WAY:
-				return !other.isAbove(this, otherFixture);
+				return other.liftingBody==null ? !other.isAbove(this, otherFixture) : true;
 				
 			case CLIMBABLE:
 			case SOLID:
@@ -186,10 +220,14 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		return ((v2.x - v1.x)*(checkPoint.y - v1.y) - (v2.y - v1.y)*(checkPoint.x - v1.x)) <= 0;
 	}
 	
+	public Vec2 getBodyCenterCorrection() {
+		return new Vec2(0, 0);
+	}
+	
 	public boolean isAbove(Box2dPhysicsBody body, Fixture otherFixture) {
 		// compute top-left and top-right points of the one-way platform
 		Transform t = body.body.getTransform();
-		Vec2 pos = body.body.getLocalCenter();
+		Vec2 pos = body.getBodyCenterCorrection();
 		Vec2 v1 = Transform.mul(t, new Vec2( pos.x-body.width/2.f, pos.y-body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		Vec2 v2 = Transform.mul(t, new Vec2( pos.x+body.width/2.f, pos.y-body.height/2.f).mul(BOX2D_SCALE_FACTOR));
 		
@@ -217,7 +255,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	
 		// bottom-left and bottom-right points of the entity/player
 		t   = this.body.getTransform();
-		pos = this.body.getLocalCenter();
+		pos = getBodyCenterCorrection();
 		Vec2 p1 = Transform.mul(t, new Vec2( pos.x-width/2.f, pos.y+height/2.f ).mul(BOX2D_SCALE_FACTOR));
 		Vec2 p2 = Transform.mul(t, new Vec2( pos.x+width/2.f, pos.y+height/2.f ).mul(BOX2D_SCALE_FACTOR));
 		
@@ -247,40 +285,26 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		body.setTransform(body.getPosition(), (float) Math.toRadians(angle));
 	}
 
-	@Override
-	public boolean bind(IPhysicsBody other, Vector2f anchor) {
+	public RevoluteJoint bind(IPhysicsBody other, Vector2f anchor, Float maxForce) {
 		if( !boundBodies.containsKey(other) ) {
 			final Box2dPhysicsBody otherBody = (Box2dPhysicsBody) other;
 			
-			Joint joint = parent.createRevoluteJoint(body, otherBody.getBody(), new Vec2(anchor.x, anchor.y));
+			RevoluteJoint joint = parent.createRevoluteJoint(body, otherBody.getBody(), new Vec2(anchor.x*BOX2D_SCALE_FACTOR, anchor.y*BOX2D_SCALE_FACTOR), maxForce);
 			
 			if( joint==null )
-				return false;
+				return null;
 			
 			boundBodies.put(other, joint);
 			otherBody.boundBodies.put(other, joint);
 			
-			return true;
+			return joint;
 		}
 		
-		return false;
-		
-//		if( !other.isStatic() )
-//		{
-//			boolean isLiftingPossible = false;
-//			
-//			Box2dPhysicsBody b = (Box2dPhysicsBody) other;
-//			//if( b.body.getMass() <= maxTestValue ) // lifting is possible {
-//			other.setPosition(new Vector2f(getPosition().x, (getPosition().y-height/2.f-b.height/2.f)));
-//			// isLiftingPossible = true;
-//			// }
-//			
-//			revoluteJoint = parent.createRevoluteJoint(body, b.getBody(), new Vec2(anchor.x, anchor.y));
-//			b.revoluteJoint = revoluteJoint;
-//			liftingBody = b.body;
-//			
-//			return isLiftingPossible;
-//		}
+		return null;
+	}
+	@Override
+	public boolean bind(IPhysicsBody other, Vector2f anchor) {
+		return bind(other, anchor, null)!=null;
 	}
 
 	@Override

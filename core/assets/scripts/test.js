@@ -2,10 +2,12 @@ importPackage(Packages.de.secondsystem.game01.model);
 importPackage(Packages.de.secondsystem.game01.impl.game.controller);
 importPackage(Packages.de.secondsystem.game01.impl.map.physics);
 importPackage(Packages.de.secondsystem.game01.impl.game.entities); 
-importPackage(Packages.de.secondsystem.game01.impl.timer)
+importPackage(Packages.de.secondsystem.game01.impl.timer);
+importPackage(Packages.de.secondsystem.game01.impl.game.entities.events);
+
 println("Ich bin ein Script für die map "+mapId);
 
-function touchFunc(entity, other) {
+function touchFunc(entity) {
 	entity.jump();
 }
 
@@ -25,8 +27,21 @@ function anotherTimerFunc(timer) {
 	
 }
 
-var entity = entities.createControllable( "enemy", {"x": 150, "y": 200, "events": {"TOUCHED": "touchFunc"} } );
-map.getTimerManager().createTimer(1000, true, "timerFunc", entity, " test1 ", " test2 ");
+function liftedFunc() {
+	println("Let me down...");
+}
+
+function unliftedFunc() {
+	println("Thanks.");
+}
+
+function onJump() {
+	println("Woooohoooo !");
+}
+
+//var entity = entities.createControllable( "enemy", {"x": 150, "y": 200} );
+//entity.setEventHandler( events.createScriptedEvents( {"LIFTED": "liftedFunc", "UNLIFTED": "unliftedFunc"} ) );
+//map.getTimerManager().createTimer(1000, true, "timerFunc", entity, " test1 ", " test2 ");
 
 //var movingPlatform = entities.createControllable( "moving platform", {"x": 150, "y": 100} );
 //var movingPlatformCon = new PatrollingController(movingPlatform, true);
@@ -34,3 +49,6 @@ map.getTimerManager().createTimer(1000, true, "timerFunc", entity, " test1 ", " 
 //movingPlatformCon.addTargetPoint(150, 100);
 //movingPlatformCon.addTargetPoint(150, -100);
 //movingPlatformCon.play();
+
+// entities.create("box", {"x": 150, "y": -100} );
+// entities.create("box", {"x": 150, "y": -100, "density":2} );

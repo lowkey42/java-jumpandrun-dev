@@ -16,11 +16,11 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	
 	private final boolean worldSwitchAllowed;
 	private final boolean complexStableCheck;
-	private float maxXVel;
-	private float maxYVel;
+	protected float maxXVel;
+	protected float maxYVel;
 	
-	private final Set<Contact> worldSwitchSensorContacts = new HashSet<>();
-	private final Set<Contact> footSensorContacts = new HashSet<>();
+	private final Set<IPhysicsBody> worldSwitchSensorContacts = new HashSet<>();
+	private final Set<IPhysicsBody> footSensorContacts = new HashSet<>();
 	
 	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
 			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, boolean kinematic,
@@ -67,13 +67,13 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	protected final class StableCheckFCL implements Box2dContactListener.FixtureContactListener {
 		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
-			footSensorContacts.remove(contact);
+			footSensorContacts.remove(other);
 		}
 		
 		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
 			if( other.getCollisionHandlerType()==CollisionHandlerType.SOLID || other.getCollisionHandlerType()==CollisionHandlerType.ONE_WAY ) {
-				footSensorContacts.add(contact);
+				footSensorContacts.add(other);
 			}
 		}
 	}
@@ -81,13 +81,13 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	private final class WorldSwitchCheckFCL implements Box2dContactListener.FixtureContactListener {
 		@Override public void onEndContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
-			worldSwitchSensorContacts.remove(contact);
+			worldSwitchSensorContacts.remove(other);
 		}
 		
 		@Override public void onBeginContact(Contact contact, Box2dPhysicsBody other,
 				Fixture fixture) {
 			if( other.getCollisionHandlerType()==CollisionHandlerType.SOLID )
-				worldSwitchSensorContacts.add(contact);
+				worldSwitchSensorContacts.add(other);
 		}
 	}
 
@@ -101,16 +101,16 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		x = limit(getBody().getLinearVelocity().x, x, maxXVel);
 		y = limit(getBody().getLinearVelocity().y, y, maxYVel);
 
-		if( getBody().getType()==BodyType.KINEMATIC ) {
+		//if( getBody().getType()==BodyType.KINEMATIC ) {
 			getBody().setLinearVelocity(new Vec2(x, y).add(getBody().getLinearVelocity()));
-		}else
+		//}else
 		//getBody().applyForce(new Vec2(x, y), getBody().getWorldCenter());
-		getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
+		//getBody().applyLinearImpulse(new Vec2(x/15, y/65), getBody().getWorldCenter());
 
 		return (byte) ((x != 0 ? 2 : 0) | (y != 0 ? 1 : 0));
 	}
 
-	private static float limit(float current, float mod, float max) {
+	protected static float limit(float current, float mod, float max) {
 		return mod < 0 ? Math.max(mod, -max - current) : Math.min(mod, max
 				- current);
 	}

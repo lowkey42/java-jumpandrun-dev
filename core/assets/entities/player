@@ -1,2 +1,2 @@
-{"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", "moveAcceleration":1, "jumpAcceleration":10, "maxMoveSpeed":6, "maxJumpSpeed":180, "maxThrowSpeed":2,
-"width":50, "height":55, "shape":"HUMANOID"}
+{"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", "moveAcceleration":0.1, "jumpAcceleration":1, "maxMoveSpeed":2.5, "maxJumpSpeed":8, "maxThrowSpeed":2,
+"width":50, "height":55, "shape":"HUMANOID", "events": {"JUMPED": "onJump"} }

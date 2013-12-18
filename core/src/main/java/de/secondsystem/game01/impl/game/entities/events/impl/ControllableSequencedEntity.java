@@ -1,18 +1,25 @@
 package de.secondsystem.game01.impl.game.entities.events.impl;
 
-import de.secondsystem.game01.impl.game.controller.PatrollingController;
-import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import java.util.UUID;
 
-public class ControllableSequencedEntity extends AbstractSequencedEntity implements IPlayedBack {
+import org.json.simple.JSONObject;
+
+import de.secondsystem.game01.impl.game.controller.PatrollingController;
+import de.secondsystem.game01.impl.map.IGameMap;
+
+public class ControllableSequencedEntity extends SequencedEntity implements IPlayedBack {
 	
 	private PatrollingController controller;
 	
-	public ControllableSequencedEntity(IGameEntity owner, AbstractSequencedEntity linkedEntity, PatrollingController controller) {
-		this.linkedEntity = linkedEntity;
+	public ControllableSequencedEntity(UUID uuid, PatrollingController controller) {	
+		super(uuid);
 		
 		this.controller = controller;
 	}
-
+	
+	public ControllableSequencedEntity() {		
+	}
+	
 	@Override
 	public void onTurnOn() {
 		super.onTurnOn();
@@ -51,4 +58,26 @@ public class ControllableSequencedEntity extends AbstractSequencedEntity impleme
 	public void onResume() {
 		controller.play();
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONObject serialize() {
+		JSONObject obj = super.serialize();
+		obj.put("controller", controller.serialize());
+		obj.put("class", "ControllableSequencedEntity");
+		
+		return obj;
+	}
+	
+	@Override
+	public SequencedEntity deserialize(JSONObject obj, IGameMap map) {
+		SequencedEntity seqEntity = super.deserialize(obj, map);
+		if( seqEntity != null )
+			return seqEntity;
+		
+		controller = new PatrollingController();
+		controller.deserialize((JSONObject) obj.get("controller"), map);
+		
+		return null;
+	} 
 }

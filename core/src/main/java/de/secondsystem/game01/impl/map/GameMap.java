@@ -9,8 +9,11 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
+import de.secondsystem.game01.impl.game.entities.events.EventManager;
+import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
@@ -55,6 +58,12 @@ public class GameMap implements IGameMap {
 	
 	private final IGameEntityManager entityManager;
 	
+	private final SequenceManager sequenceManager = new SequenceManager();
+	
+	private final ControllerManager controllerManager = new ControllerManager();
+	
+	private final EventManager eventManager = new EventManager();
+	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
 	final ScriptEnvironment scripts; 
@@ -81,11 +90,14 @@ public class GameMap implements IGameMap {
 		} else
 			physicalWorld = null;
 		
-		entityManager = new GameEntityManager(this);
-
-		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), new Attribute("map", this), new Attribute("entities", entityManager) );
+		entityManager = new GameEntityManager(this);	
+		
+		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), 
+				new Attribute("map", this), new Attribute("entities", entityManager), new Attribute("events", eventManager));
 		
 		timerManager = new TimerManager(scripts);
+		
+		eventManager.setScriptEnvironment(scripts);	
 	}
 		
 	/* (non-Javadoc)
@@ -283,6 +295,21 @@ public class GameMap implements IGameMap {
 	@Override
 	public TimerManager getTimerManager() {
 		return timerManager;
+	}
+
+	@Override
+	public SequenceManager getSequenceManager() {
+		return sequenceManager;
+	}
+
+	@Override
+	public ControllerManager getControllerManager() {
+		return controllerManager;
+	}
+
+	@Override
+	public EventManager getEventManager() {
+		return eventManager;
 	}
 	
 }

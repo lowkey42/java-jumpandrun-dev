@@ -144,22 +144,22 @@ final class GameEntityHelper {
 		return bodyFactory.create();
 	}
 	
-	public static IEntityEventHandler createEventHandler(GameEntityManager entityManager, Attributes attributes) {
-		CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-		Object eventsObj = attributes.getObject("events");		
-		
-		if( eventsObj instanceof Map ) {	
-			@SuppressWarnings("unchecked")
-			HashMap<String, String> events = (HashMap<String, String>) eventsObj;
-			for( String eventType : events.keySet() ) {
-				ScriptEntityEventHandler event;
-				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.valueOf(eventType), events.get(eventType));
-				eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
-			}
-		}
-		
-		return eventHandler;
-	}
+//	public static CollectionEntityEventHandler createCollectionEntityEventHandler(GameEntityManager entityManager, Attributes attributes) {
+//		CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
+//		Object eventsObj = attributes.getObject("events");		
+//		
+//		if( eventsObj instanceof Map ) {	
+//			@SuppressWarnings("unchecked")
+//			HashMap<String, String> events = (HashMap<String, String>) eventsObj;
+//			for( String eventType : events.keySet() ) {
+//				ScriptEntityEventHandler event;
+//				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.valueOf(eventType), events.get(eventType));
+//				eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
+//			}
+//		}
+//		
+//		return eventHandler;
+//	}
 	
 	private GameEntityHelper() {}
 }

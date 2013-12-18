@@ -2,19 +2,23 @@ package de.secondsystem.game01.impl.game.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.IUpdateable;
 
-public class PatrollingController implements IUpdateable, IGameEntityController {
+public class PatrollingController implements IUpdateable, IGameEntityController, IController {
 
-	private final IControllableGameEntity controlledEntity;
-	private final boolean repeated;
+	private IControllableGameEntity controlledEntity;
+	private boolean repeated;
 	
 	private List<Vector2f> targetPoints = new ArrayList<Vector2f>();
 	
@@ -25,10 +29,17 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 	private boolean reverse = false;
 	private boolean play = false;
 	
-	public PatrollingController( IControllableGameEntity controlledEntity, boolean repeated ) {
+	private UUID uuid;
+	
+	public PatrollingController() {
+		
+	}
+	
+	public PatrollingController( UUID uuid, IControllableGameEntity controlledEntity, boolean repeated ) {
 		this.controlledEntity = controlledEntity;
 		this.repeated = repeated;
 		controlledEntity.setController(this);
+		this.uuid = uuid;
 	}
 	
 	static public float vectorLength(float x, float y) {
@@ -127,5 +138,61 @@ public class PatrollingController implements IUpdateable, IGameEntityController 
 				computeDirection();
 			}		
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject serialize() {
+		JSONObject obj = new JSONObject();
+		obj.put("repeated", repeated);
+		obj.put("controlledEntity", controlledEntity.uuid().toString());
+		obj.put("uuid", uuid.toString());
+		
+		JSONObject o = new JSONObject();
+		int i = 0;
+		for(Vector2f t : targetPoints)  {	
+			JSONArray  a = new JSONArray();
+			a.add(t.x);
+			a.add(t.y);
+			o.put(i, a);
+			i++;
+		}
+		
+		obj.put("targetPoints", o);
+		
+		return obj;
+	}
+	
+	/**
+	 * @return null if the controller doesn't already exist
+	 */
+	public PatrollingController deserialize(JSONObject obj, IGameMap map) {
+		this.uuid = UUID.fromString((String) obj.get("uuid"));
+		if( map.getControllerManager().get(this.uuid) != null )
+			return (PatrollingController) map.getControllerManager().get(this.uuid);
+		
+		repeated = (boolean) obj.get("repeated");
+		UUID uuid = UUID.fromString( (String) obj.get("controlledEntity") );;
+		controlledEntity = (IControllableGameEntity) map.getEntityManager().get(uuid);	
+		JSONObject targetPoints = (JSONObject) obj.get("targetPoints");
+		
+		if( targetPoints == null )
+			System.out.println("targetPoints: null");;
+
+		for(Object o : targetPoints.values()) {
+			JSONArray a = ((JSONArray) o);
+			float x = Float.valueOf(a.get(0).toString());
+			float y = Float.valueOf(a.get(1).toString());
+			
+			addTargetPoint(x, y);
+		}
+		
+		controlledEntity.setController(this);
+		map.getControllerManager().add(this);
+		
+		return null;
+	}
+	
+	public UUID uuid() {
+		return uuid;
 	}
 }

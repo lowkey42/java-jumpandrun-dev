@@ -5,14 +5,12 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.model.IDimensioned;
-import de.secondsystem.game01.model.IDrawable;
-import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.util.Tools;
 
-public class SpriteWrappper implements IDrawable, IMoveable, IDimensioned {
-	protected final Sprite  sprite;
-	protected final float width;
-	protected final float height;
+public class SpriteWrappper implements ISpriteWrapper {
+	protected final Sprite sprite;
+	protected float width;
+	protected float height;
 	
 	public SpriteWrappper(float width, float height) {
 		sprite = new Sprite();	
@@ -62,6 +60,24 @@ public class SpriteWrappper implements IDrawable, IMoveable, IDimensioned {
 	public float getWidth() {
 		return width;
 	}
+
+	@Override
+	public void setWidth(float width) {
+		this.width = width;
+	}
+
+	@Override
+	public void setHeight(float height) {
+		this.height = height;
+	}
+
+	@Override
+	public void setDimensions(float width, float height) {
+		sprite.setScale(width/sprite.getTexture().getSize().x, height/sprite.getTexture().getSize().y);
+	}
 	
-	
+	@Override
+	public boolean inside(Vector2f point) {
+		return Tools.isInside(this, point);
+	}
 }

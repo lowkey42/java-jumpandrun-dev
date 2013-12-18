@@ -121,6 +121,8 @@ public final class MainMenuState extends GameState {
 					setNextState(playGameState);
 			}
 		}
+		
+		ctx.window.clear();
 
 		ctx.window.draw(backdrop);
 

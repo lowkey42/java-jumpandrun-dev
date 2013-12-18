@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Text;
@@ -24,12 +23,8 @@ import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
-import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
-import de.secondsystem.game01.impl.map.objects.CollisionObject;
-import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
-import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 /**
  * 
@@ -53,8 +48,10 @@ public final class EditorGameState extends GameState {
 
 	private final Text editorHint;
 	private final Text layerHint;
-	private MouseEditorObject mouseTile;
-	private SelectedEditorObject selectedObject;
+	private MouseEditorLayerObject mouseTile;
+	private SelectedEditorLayerObject selectedObject;
+	
+	private MouseEditorEntity mouseEntity = new MouseEditorEntity();
 	private float zoom = 1.f;
 	
 	private float cameraX = 0.f;
@@ -65,6 +62,8 @@ public final class EditorGameState extends GameState {
 
 	private boolean moveSelectedObject = false;
 
+	private IEditorObject currentEditorObject;
+	
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
 		this.map = map; // TODO: copy
@@ -86,8 +85,9 @@ public final class EditorGameState extends GameState {
 		layerHint.setPosition(0, 25);
 		layerHint.setColor(Color.WHITE);
 		
-		mouseTile      = new MouseEditorObject(tileset);
-		selectedObject = new SelectedEditorObject(Color.BLUE, 2.0f, Color.TRANSPARENT);
+		mouseTile      = new MouseEditorLayerObject(tileset);
+		selectedObject = new SelectedEditorLayerObject(Color.BLUE, 2.0f, Color.TRANSPARENT);
+		currentEditorObject = mouseTile;
 	}
 
 	@Override
@@ -121,7 +121,6 @@ public final class EditorGameState extends GameState {
 		final ConstView cView = ctx.window.getView();
 		
 		ctx.window.setView(getTransformedView(ctx));
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
 		currentEditorObject.update(moveSelectedObject, ctx.window, getMouseX(), getMouseY(), zoom);
 		ctx.window.setView(cView);
 		
@@ -155,8 +154,6 @@ public final class EditorGameState extends GameState {
 		map.draw(rt);
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
-
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
 		
 		currentEditorObject.refresh();
 		currentEditorObject.draw(rt);
@@ -165,8 +162,6 @@ public final class EditorGameState extends GameState {
 	}
 
 	private final boolean processInput(GameContext ctx, Event event) {
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
-		
 		switch (event.type) {
 		
 		case KEY_PRESSED:
@@ -192,13 +187,13 @@ public final class EditorGameState extends GameState {
 			case LEFT:
 				moveSelectedObject = false;
 
-				if (selectedObject.getLayerObject() == null) 
+				if( currentEditorObject instanceof MouseEditorLayerObject ) 
 					mouseTile.addToMap(map, currentLayer);
 
 				return true;
 
 			case RIGHT:
-				selectedObject.resetScales();
+				selectedObject.resetScalingPermission();
 				Vector2f ws = ctx.window.getView().getSize();
 				View view = new View(Vector2f.mul(new Vector2f(cameraX + ws.x / 2, cameraY + ws.y / 2), currentLayer.parallax), Vector2f.div(ws, zoom));
 
@@ -206,6 +201,8 @@ public final class EditorGameState extends GameState {
 
 				if (selectedObject.getLayerObject() == null) 
 					deselectSprite();
+				else
+					currentEditorObject = selectedObject;
 
 			default:
 				return false;
@@ -222,7 +219,7 @@ public final class EditorGameState extends GameState {
 				return true;
 			case RIGHT:
 				selectedObject.checkScaleMarkers(v);
-				selectedObject.setLastMousePos( new Vector2f(getMouseX(), getMouseY()) );
+				selectedObject.setLastMappedMousePos( new Vector2f(v.x, v.y) );
 			default:
 				return false;
 			}
@@ -233,15 +230,22 @@ public final class EditorGameState extends GameState {
 	}
 
 	private void deselectSprite() {
-		if (currentLayer == LayerType.PHYSICS)
+		switch( currentLayer ) {
+		case PHYSICS:
 			mouseTile.createCollisionObject(map);
-		else
+			currentEditorObject = mouseTile;
+			break;
+		case OBJECTS:
+			mouseEntity.createEntity(map, "enemy");
+			currentEditorObject = mouseEntity;
+			break;
+		default:
 			mouseTile.createSpriteObject();
+			currentEditorObject = mouseTile;
+		}
 	}
 
 	private final boolean processInputKeyboard() {
-		EditorObject currentEditorObject = selectedObject.getLayerObject() != null ? selectedObject : mouseTile;
-		
 		if (Keyboard.isKeyPressed(Key.W))
 			cameraY -= CAM_MOVE_SPEED;
 		if (Keyboard.isKeyPressed(Key.S))
@@ -265,23 +269,21 @@ public final class EditorGameState extends GameState {
 	
 	
 	private final boolean processInputKey(KeyEvent event) {
-		EditorObject currentEditorObject = selectedObject != null ? selectedObject : mouseTile;
-		
 		switch (event.key) {
-		case F5:
+		case F5: // save
 			new JsonGameMapSerializer().serialize(map);
 			break;
 
-		case F9:
+		case F9: // load
 			map = new JsonGameMapSerializer().deserialize(map.getMapId(), true,
 					true);
 			break;
 
-		case TAB:
+		case TAB: // switch world
 			map.switchWorlds();
 			break;
 
-		case DELETE:
+		case DELETE: // delete selected object
 			if (selectedObject.getLayerObject() != null) {
 				selectedObject.removeFromMap(map, currentLayer);
 				deselectSprite();
@@ -289,10 +291,10 @@ public final class EditorGameState extends GameState {
 			break;
 
 		case PAGEUP:
-		case ADD:
-			if (event.shift)
+		case ADD: 
+			if (event.shift) // rotate object
 				currentEditorObject.rotate(11.25f);
-			else if (event.control)
+			else if (event.control) // scale up selected object
 				currentEditorObject.zoom(2.f);
 			else
 				zoom *= 2;
@@ -300,69 +302,69 @@ public final class EditorGameState extends GameState {
 
 		case PAGEDOWN:
 		case SUBTRACT:
-			if (event.shift)
+			if (event.shift) // rotate object
 				currentEditorObject.rotate(-11.25f);
-			else if (event.control)
+			else if (event.control) // scale down selected object
 				currentEditorObject.zoom(1/2.f);
 			else
 				zoom /= 2;
 			break;
 
 		case NUM1:
-			if (event.control)
+			if (event.control) // toggle background 2 visibility
 				map.flipShowLayer(LayerType.BACKGROUND_2);
-			else {
-				currentLayer = LayerType.BACKGROUND_2;
+			else { // select background 2
+				currentLayer = LayerType.BACKGROUND_2; 
 				deselectSprite();
 			}
 			break;
 		case NUM2:
-			if (event.control)
+			if (event.control) // toggle background 1 visibility
 				map.flipShowLayer(LayerType.BACKGROUND_1);
-			else {
+			else { // select background 1
 				currentLayer = LayerType.BACKGROUND_1;
 				deselectSprite();
 			}
 			break;
 		case NUM3:
-			if (event.control)
+			if (event.control) // toggle background 0 visibility
 				map.flipShowLayer(LayerType.BACKGROUND_0);
-			else {
+			else { // select background 0
 				currentLayer = LayerType.BACKGROUND_0;
 				deselectSprite();
 			}
 			break;
 
 		case NUM4:
-			if (event.control)
+			if (event.control) // toggle foreground 0 visibility
 				map.flipShowLayer(LayerType.FOREGROUND_0);
-			else {
+			else { // select foreground 0
 				currentLayer = LayerType.FOREGROUND_0;
 				deselectSprite();
 			}
 			break;
 		case NUM5:
-			if (event.control)
+			if (event.control) // toggle foreground 1 visibility
 				map.flipShowLayer(LayerType.FOREGROUND_1);
-			else {
+			else { // select foreground 1
 				currentLayer = LayerType.FOREGROUND_1;
 				deselectSprite();
 			}
 			break;
 
 		case P:
-			if (event.control)
+			if (event.control) // toggle collision layer visibility
 				map.flipShowLayer(LayerType.PHYSICS);
-			else {
+			else { // select collision layer
 				currentLayer = LayerType.PHYSICS;
 				deselectSprite();
 			}
 			break;
 
 		case O:
-			if (event.control)
+			if (event.control) // toggle object layer visibility
 				map.flipShowLayer(LayerType.OBJECTS);
-			else {
+			else { // selection object layer
 				currentLayer = LayerType.OBJECTS;
 				deselectSprite();
 			}

@@ -7,11 +7,11 @@ import de.secondsystem.game01.impl.map.objects.CollisionObject;
 import de.secondsystem.game01.impl.map.objects.CollisionObject.CollisionType;
 import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
-public class MouseEditorObject extends EditorObject {
+public class MouseEditorLayerObject extends EditorLayerObject {
 	private final Tileset tileset;
 	private int currentTile = 0;
 	
-	public MouseEditorObject(Tileset tileset) {
+	public MouseEditorLayerObject(Tileset tileset) {
 		this.tileset = tileset;
 		
 		createSpriteObject();

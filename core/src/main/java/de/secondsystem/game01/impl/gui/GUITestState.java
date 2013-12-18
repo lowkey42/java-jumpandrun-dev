@@ -99,6 +99,8 @@ public final class GUITestState extends GameState {
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		
+		ctx.window.clear();
+		
 		ctx.window.draw(backdrop);
 		
 		for (Event event : ctx.window.pollEvents()) {
@@ -111,8 +113,8 @@ public final class GUITestState extends GameState {
 				break;
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					testButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
-					backButton.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					testButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+					backButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
 					if(Mouse.getPosition(ctx.window).x >= testText.getPos().x && Mouse.getPosition(ctx.window).x <= testText.getPos().x + testText.width  && 
 							   Mouse.getPosition(ctx.window).y >= testText.getPos().y && Mouse.getPosition(ctx.window).y <= testText.getPos().y + testText.height){
 								testText.setActive();

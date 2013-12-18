@@ -11,6 +11,7 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.util.Tools;
 
 /**
  * TODO: tinting
@@ -59,7 +60,7 @@ public class SpriteLayerObject implements ILayerObject {
 
 	@Override
 	public boolean inside(Vector2f point) {
-		return sprite.getGlobalBounds().contains(point);
+		return Tools.isInside(this, point);
 	}
 
 	@Override
