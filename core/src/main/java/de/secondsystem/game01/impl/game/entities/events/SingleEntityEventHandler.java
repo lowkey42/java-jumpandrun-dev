@@ -58,5 +58,9 @@ public abstract class SingleEntityEventHandler implements IEntityEventHandler {
 	public UUID uuid() {
 		return uuid;
 	}
+	
+	public EntityEventType getType() {
+		return eventType;
+	}
 
 }

@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.impl.ISequencedObject;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
-import de.secondsystem.game01.model.Attributes;
 
 public class EventManager {
 	
@@ -22,13 +22,13 @@ public class EventManager {
 	}
 	
 	public IEntityEventHandler createEntityEventHandler(String className) {
-		if( className.compareTo("SequencedEntityEventHandler") == 0 )
+		if( className.equals("SequencedEntityEventHandler") )
 			return new SequencedEntityEventHandler();
 		
-		if( className.compareTo("ScriptEntityEventHandler") == 0 )
+		if( className.equals("ScriptEntityEventHandler") )
 			return new ScriptEntityEventHandler();
 		
-			if( className.compareTo("CollectionEntityEventHandler") == 0 )
+			if( className.equals("CollectionEntityEventHandler"))
 				return new CollectionEntityEventHandler();
 			
 		System.out.println("className " + className + " unknown");
@@ -70,6 +70,18 @@ public class EventManager {
 		for( String eventType : events.keySet() ) {
 			ScriptEntityEventHandler event;
 			event = createScriptEntityEventHandler(EntityEventType.valueOf(eventType), (String) events.get(eventType));
+			eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
+		}
+		
+		return eventHandler;
+	}
+	
+	public static CollectionEntityEventHandler createScriptedEvents(Map<String, Object> events, IGameMap map) {
+		CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler(UUID.randomUUID());	
+		
+		for( String eventType : events.keySet() ) {
+			ScriptEntityEventHandler event;
+			event = new ScriptEntityEventHandler(UUID.randomUUID(), map.getScriptEnv(), EntityEventType.valueOf(eventType), (String) events.get(eventType));
 			eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
 		}
 		

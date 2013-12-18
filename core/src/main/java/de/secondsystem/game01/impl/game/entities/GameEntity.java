@@ -1,11 +1,15 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.EventManager;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.SingleEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -31,16 +35,20 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected IDrawable representation;
 	
-	protected IEntityEventHandler eventHandler;
+	protected CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler(UUID.randomUUID());
 	
 	protected final IGameMap map;
 	
 	protected IEditableEntityState editableEntityState;
 	
+	@SuppressWarnings("unchecked")
 	public GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map );
+		
+		if( attributes.get("events") != null )
+			eventHandler = EventManager.createScriptedEvents((Map<String, Object>) attributes.get("events"), map);
 	}
 	
 	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, 
@@ -211,8 +219,11 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	}
 
 	@Override
-	public void setEventHandler(IEntityEventHandler eventHandler) {
-		this.eventHandler = eventHandler;
+	public void addEventHandler(IEntityEventHandler eventHandler) {		
+		if( eventHandler instanceof CollectionEntityEventHandler )
+			this.eventHandler.addEntityEventHandlers((CollectionEntityEventHandler) eventHandler);
+		else
+			this.eventHandler.addEntityEventHandler(((SingleEntityEventHandler) eventHandler).getType(), eventHandler);
 	}
 
 	@Override

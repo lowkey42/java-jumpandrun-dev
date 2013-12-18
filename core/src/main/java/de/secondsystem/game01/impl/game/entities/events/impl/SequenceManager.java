@@ -12,7 +12,7 @@ import de.secondsystem.game01.impl.map.IGameMap;
 
 public final class SequenceManager {	
 	private final Map<UUID, ISequencedObject> sequencedObjects = new HashMap<>();
-	private final Map<UUID, SequencedEntity> sequencedEntities = new HashMap<>();
+	private final Map<UUID, SequencedEntity>  sequencedEntities = new HashMap<>();
 	
 	public SequenceManager() {
 		
@@ -27,13 +27,13 @@ public final class SequenceManager {
 	}
 	
 	public ISequencedObject createSequencedObject(String className) {
-		if( className.compareTo("Toggle") == 0 )
+		if( className.equals("Toggle") )
 			return new Toggle();
 		
-		if( className.compareTo("Playback") == 0 )
+		if( className.equals("Playback") )
 			return new Playback();
 		
-		if( className.compareTo("Condition") == 0 )
+		if( className.equals("Condition") )
 			return new Condition();
 		
 		System.out.println("className " + className + " unknown");

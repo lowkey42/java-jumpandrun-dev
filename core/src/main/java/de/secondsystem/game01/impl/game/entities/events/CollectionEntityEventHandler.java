@@ -30,6 +30,10 @@ public class CollectionEntityEventHandler implements IEntityEventHandler {
 		handlers.put(type, handler);
 	}
 	
+	public void addEntityEventHandlers(CollectionEntityEventHandler collection) {
+		handlers.putAll(collection.handlers);
+	}
+	
 	@Override
 	public Object handle(EntityEventType type, IGameEntity owner,
 			Object... args) {

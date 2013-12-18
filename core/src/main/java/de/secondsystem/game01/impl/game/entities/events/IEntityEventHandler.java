@@ -67,7 +67,13 @@ public interface IEntityEventHandler {
 		 * ARGS: IGameEntity: owner
 		 * RETURN: unused
 		 */
-		UPDATE;
+		UPDATE,
+		/**
+		 * The entity just jumped.
+		 *  ARGS: IGameEntity: owner
+		 *  RETURN: unused
+		 */
+		JUMPED;
 	}
 	
 	Object handle( EntityEventType type, IGameEntity owner, Object... args );

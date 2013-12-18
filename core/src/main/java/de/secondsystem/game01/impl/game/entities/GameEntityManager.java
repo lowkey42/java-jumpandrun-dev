@@ -264,7 +264,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			IEntityEventHandler eh = eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
 			
 			IGameEntity entity = get(uuid);
-			entity.setEventHandler(eh != null ? eh : eventHandler);
+			entity.addEventHandler(eh != null ? eh : eventHandler);
 			
 			entities.put(entity.uuid(), entity);
 			

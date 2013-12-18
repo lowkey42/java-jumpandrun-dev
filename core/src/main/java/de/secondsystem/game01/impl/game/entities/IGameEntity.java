@@ -32,7 +32,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	void setWorldMask(int newWorldMask);
 
 	IEntityEventHandler getEventHandler();
-	void setEventHandler(IEntityEventHandler eventHandler);
+	void addEventHandler(IEntityEventHandler eventHandler);
 	
 	IDrawable getRepresentation();
 	IPhysicsBody getPhysicsBody();

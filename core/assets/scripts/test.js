@@ -35,6 +35,10 @@ function unliftedFunc() {
 	println("Thanks.");
 }
 
+function onJump() {
+	println("Woooohoooo !");
+}
+
 //var entity = entities.createControllable( "enemy", {"x": 150, "y": 200} );
 //entity.setEventHandler( events.createScriptedEvents( {"LIFTED": "liftedFunc", "UNLIFTED": "unliftedFunc"} ) );
 //map.getTimerManager().createTimer(1000, true, "timerFunc", entity, " test1 ", " test2 ");
