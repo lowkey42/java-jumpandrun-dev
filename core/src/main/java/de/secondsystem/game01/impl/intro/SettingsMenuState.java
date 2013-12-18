@@ -70,7 +70,7 @@ public final class SettingsMenuState extends GameState {
 				// org.jsfml.window.Mouse.Button.LEFT)
 				// setNextState(new MainGameState("test01"));
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					back.onButtonReleased(event.asMouseButtonEvent().position.x, event.asMouseButtonEvent().position.y);
+					back.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
 				}
 
 				break;
@@ -87,7 +87,8 @@ public final class SettingsMenuState extends GameState {
 				break;
 			}
 		}
-
+		ctx.window.clear();
+		
 		ctx.window.draw(backdrop);
 
 		//sliderOneBack.draw(ctx.window);
