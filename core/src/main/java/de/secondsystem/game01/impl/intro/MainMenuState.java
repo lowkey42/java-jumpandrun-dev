@@ -108,10 +108,11 @@ public final class MainMenuState extends GameState {
 				break;
 			case MOUSE_BUTTON_RELEASED:
 				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					newGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-					loadGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-					editorBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-					settingsBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+					boolean dummy =
+					newGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+					loadGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+					editorBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+					settingsBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
 					exitGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
 				}
 				break;

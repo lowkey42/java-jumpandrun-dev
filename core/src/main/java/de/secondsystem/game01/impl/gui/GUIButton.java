@@ -116,10 +116,12 @@ public abstract class GUIButton extends GUIElement {
 		}
 	}
 	
-	public void onButtonReleased(float x, float y) {
+	public boolean onButtonReleased(float x, float y) {
 		if( mySprite.getGlobalBounds().contains(x, y) ) {
 			clickListener.onClick();
+			return true;
 		}
+		return false;
 	}
 	
 }
