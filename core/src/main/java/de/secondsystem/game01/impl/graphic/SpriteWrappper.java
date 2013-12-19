@@ -11,6 +11,7 @@ public class SpriteWrappper implements ISpriteWrapper {
 	protected final Sprite sprite;
 	protected float width;
 	protected float height;
+	protected boolean visible = true;
 	
 	public SpriteWrappper(float width, float height) {
 		sprite = new Sprite();	
@@ -27,7 +28,8 @@ public class SpriteWrappper implements ISpriteWrapper {
 	
 	@Override
 	public void draw(RenderTarget renderTarget) {
-    	renderTarget.draw(sprite);
+		if( visible )
+			renderTarget.draw(sprite);
 	}
 
 	@Override
@@ -79,5 +81,10 @@ public class SpriteWrappper implements ISpriteWrapper {
 	@Override
 	public boolean inside(Vector2f point) {
 		return Tools.isInside(this, point);
+	}
+
+	@Override
+	public void setVisibility(boolean visible) {
+		this.visible = visible;
 	}
 }

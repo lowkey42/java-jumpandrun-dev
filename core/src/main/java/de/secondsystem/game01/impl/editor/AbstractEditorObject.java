@@ -65,7 +65,15 @@ public abstract class AbstractEditorObject implements IEditorObject {
 	}
 	
 	@Override
-	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom) {
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
 		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
+	}
+	
+	@Override
+	public void zoom(int mouseWheelOffset, float mouseWheelDelta) {
+		if (mouseWheelOffset == 1)
+			zoom *= mouseWheelDelta * SCALE_FACTOR;
+		else
+			zoom /= mouseWheelDelta * SCALE_FACTOR * -1;
 	}
 }

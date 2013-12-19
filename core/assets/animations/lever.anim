@@ -1,2 +1,3 @@
 {"USED":{"texture": "lever.png", "frameWidth": 24, "frameHeight":22, "numRowFrames": 2, "frameStart": 1, "frameEnd":2, "fps": 1},
+ "UNUSED":{"texture": "lever.png", "frameWidth": 24, "frameHeight":22, "numRowFrames": 2, "frameStart": 0, "frameEnd":0, "fps": 1},
  "IDLE":{"texture": "lever.png", "frameWidth": 24, "frameHeight":22, "numRowFrames": 2, "frameStart": 0, "frameEnd":0, "fps": 1} }

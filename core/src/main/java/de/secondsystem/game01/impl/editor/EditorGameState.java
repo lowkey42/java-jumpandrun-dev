@@ -48,10 +48,10 @@ public final class EditorGameState extends GameState {
 
 	private final Text editorHint;
 	private final Text layerHint;
-	private MouseEditorLayerObject mouseTile;
-	private SelectedEditorLayerObject selectedObject;
+	private final MouseEditorLayerObject mouseTile;
+	private final SelectedEditorLayerObject selectedObject;
 	
-	private MouseEditorEntity mouseEntity = new MouseEditorEntity();
+	private final MouseEditorEntity mouseEntity;
 	private float zoom = 1.f;
 	
 	private float cameraX = 0.f;
@@ -68,7 +68,8 @@ public final class EditorGameState extends GameState {
 		this.playGameState = playGameState;
 		this.map = map; // TODO: copy
 		this.tileset = new Tileset("test01"); // TODO: get from map
-
+		mouseEntity = new MouseEditorEntity(map);
+		
 		ConstFont freeSans;
 		try {
 			freeSans = ResourceManager.font.get("FreeSans.otf");
@@ -118,10 +119,12 @@ public final class EditorGameState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
+		map.getEntityManager().update(frameTime);
+		
 		final ConstView cView = ctx.window.getView();
 		
 		ctx.window.setView(getTransformedView(ctx));
-		currentEditorObject.update(moveSelectedObject, ctx.window, getMouseX(), getMouseY(), zoom);
+		currentEditorObject.update(moveSelectedObject, ctx.window, getMouseX(), getMouseY(), zoom, frameTime);
 		ctx.window.setView(cView);
 		
 		drawMap(ctx.window);
@@ -176,8 +179,11 @@ public final class EditorGameState extends GameState {
 			if (Keyboard.isKeyPressed(Key.LSHIFT)) {
 				currentEditorObject.zoom(offset, event.asMouseWheelEvent().delta);
 			} else {
-				if( mouseTile != null )
+				if( currentEditorObject instanceof MouseEditorLayerObject )
 					mouseTile.changeTile(offset);
+				else
+					if( currentEditorObject instanceof MouseEditorEntity )
+						mouseEntity.changeEntity(map, offset);
 			}
 
 			return true;
@@ -189,6 +195,9 @@ public final class EditorGameState extends GameState {
 
 				if( currentEditorObject instanceof MouseEditorLayerObject ) 
 					mouseTile.addToMap(map, currentLayer);
+				else
+					if( currentEditorObject instanceof MouseEditorEntity )
+						mouseEntity.addToWorld(map);
 
 				return true;
 
@@ -236,7 +245,7 @@ public final class EditorGameState extends GameState {
 			currentEditorObject = mouseTile;
 			break;
 		case OBJECTS:
-			mouseEntity.createEntity(map, "enemy");
+			mouseEntity.createEntity(map);
 			currentEditorObject = mouseEntity;
 			break;
 		default:

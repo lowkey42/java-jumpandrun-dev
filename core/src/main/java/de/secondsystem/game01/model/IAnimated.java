@@ -25,7 +25,8 @@ public interface IAnimated {
 		CLIMB_DOWN,
 		CLIMB_RIGHT,
 		CLIMB_LEFT,
-		USED
+		USED,
+		UNUSED
 	}
 	
 }

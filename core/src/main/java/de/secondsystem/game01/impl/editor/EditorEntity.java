@@ -5,6 +5,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
+import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
@@ -13,9 +14,7 @@ public class EditorEntity extends AbstractEditorObject {
 	protected IGameEntity entity;
 	protected IPhysicsBody entityBody;
 	protected IDrawable entityRepresentation;
-	
-	public EditorEntity() {
-	}
+	protected String currentArchetype;
 	
 	public void setEntity(IGameEntity entity) {
 		this.entity = entity;
@@ -41,14 +40,10 @@ public class EditorEntity extends AbstractEditorObject {
 	
 	@Override
 	public void refresh() {
-		((IMoveable) entityRepresentation).setRotation(rotation);
-		((ISpriteWrapper) entityRepresentation).setDimensions(width * zoom, height * zoom);
-	}
-
-	@Override
-	public void zoom(int mouseWheelOffset, float mouseWheelDelta) {
-		// TODO Auto-generated method stub
+		if( !(entityBody instanceof IHumanoidPhysicsBody) )
+			((IMoveable) entityRepresentation).setRotation(rotation);
 		
+		((ISpriteWrapper) entityRepresentation).setDimensions(width * zoom, height * zoom);
 	}
 	
 }

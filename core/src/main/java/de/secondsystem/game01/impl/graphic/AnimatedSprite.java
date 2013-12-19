@@ -78,6 +78,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	public void stop() {	
 		playing = false;
 		currentFrame = currentAnimationData.frameStart;
+		sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 	}
 
 

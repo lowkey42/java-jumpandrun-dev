@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
@@ -45,7 +46,7 @@ public class AnimatedSequencedEntity extends SequencedEntity implements IPlayedB
 	public void onTurnOff() {
 		super.onTurnOff();
 		
-		animation.play(AnimationType.IDLE, 1.f, true, true, false);
+		animation.play(AnimationType.UNUSED, 1.f, true, true, false);
 	}
 
 	@Override

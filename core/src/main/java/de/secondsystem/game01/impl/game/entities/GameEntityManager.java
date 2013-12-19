@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -9,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -270,6 +272,29 @@ public final class GameEntityManager implements IGameEntityManager {
 			
 			// deserialized 
 		}
+	}
+
+	@Override
+	public ArrayList<String> getArchetypes() {
+		ArrayList<String> list = new ArrayList<>();
+		final File entityFolder = ARCHETYPE_PATH.toFile();
+		
+	    for (final File fileEntry : entityFolder.listFiles())
+	    	if (fileEntry.isDirectory()) 
+	           list.addAll(listFilesForFolder(fileEntry));
+	        else 
+	           list.add(fileEntry.getName()); 
+	        
+		return list;
+	}
+	
+	private ArrayList<String> listFilesForFolder(final File folder) {
+		ArrayList<String> list = new ArrayList<>();
+		
+	    for (final File fileEntry : folder.listFiles()) 
+	    	list.add(fileEntry.getName());
+	    
+	    return list;
 	}
 
 

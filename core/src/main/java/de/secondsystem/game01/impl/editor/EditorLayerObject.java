@@ -20,14 +20,6 @@ public class EditorLayerObject extends AbstractEditorObject {
 	}
 	
 	@Override
-	public void zoom(int mouseWheelOffset, float mouseWheelDelta) {
-		if (mouseWheelOffset == 1)
-			zoom *= mouseWheelDelta * SCALE_FACTOR;
-		else
-			zoom /= mouseWheelDelta * SCALE_FACTOR * -1;
-	}
-	
-	@Override
 	public boolean isPointInside(Vector2f p) {
 		return layerObject != null && layerObject.inside(p);
 	}

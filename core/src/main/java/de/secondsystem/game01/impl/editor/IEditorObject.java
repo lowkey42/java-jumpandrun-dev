@@ -15,5 +15,5 @@ public interface IEditorObject extends IDrawable, IDimensioned, IMoveable {
 	void zoom(float factor);
 	void refresh();
 	void zoom(int mouseWheelOffset, float mouseWheelDelta);
-	void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom);
+	void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs);
 }

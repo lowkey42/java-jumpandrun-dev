@@ -10,5 +10,6 @@ public interface ISpriteWrapper extends IDrawable, IMoveable, IDimensioned {
 	void setWidth(float width);
 	void setHeight(float height);
 	void setDimensions(float width, float height);
+	void setVisibility(boolean visible);
 	boolean inside(Vector2f point);
 }

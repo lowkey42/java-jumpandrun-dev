@@ -40,7 +40,7 @@ public class SelectedEditorLayerObject extends EditorLayerObject {
 
 	
 	@Override
-	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom) {
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
 		mappedMousePos = rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY));
 		
 		if (movedObj) 

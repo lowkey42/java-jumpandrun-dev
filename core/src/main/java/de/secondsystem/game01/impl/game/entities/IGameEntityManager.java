@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,8 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 	
 	void deserialize(JSONArray jArray);
 	JSONArray serialize();
+	
+	ArrayList<String> getArchetypes();
 //	void deserialize( Iterator<SerializedEntity> iter );
 //	Iterable<SerializedEntity> serialize();
 	
