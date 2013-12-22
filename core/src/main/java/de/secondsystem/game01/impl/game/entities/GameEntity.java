@@ -41,6 +41,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	
 	protected IEditableEntityState editableEntityState;
 	
+	protected boolean dead = false;
+	
 	@SuppressWarnings("unchecked")
 	public GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
@@ -76,6 +78,10 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	@Override
 	public UUID uuid() {
 		return uuid;
+	}
+	@Override
+	public IGameEntityManager manager() {
+		return em;
 	}
 
 	@Override
@@ -164,12 +170,18 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	}
 
 	@Override
-	public void setWorldMask(int newWorldMask) {
-		if( physicsBody==null || physicsBody.tryWorldSwitch(newWorldMask) )
+	public boolean setWorldMask(int newWorldMask) {
+		if( isDead() )
+			return false;
+		
+		if( physicsBody==null || physicsBody.tryWorldSwitch(newWorldMask) ) {
 			this.worldMask = newWorldMask;
+			return true;
 
-		else
+		} else {
 			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
+			return false;
+		}
 	}
 
 	@Override
@@ -178,8 +190,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	}
 
 	@Override
-	public void setWorld(WorldId worldId) {
-		setWorldMask(worldId.id);
+	public boolean setWorld(WorldId worldId) {
+		return setWorldMask(worldId.id);
 	}
 
 	@Override
@@ -239,6 +251,16 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName()+"{"+uuid()+(editableEntityState!=null?(", "+editableEntityState.getAllAttributes()):"")+"}";
+	}
+
+	@Override
+	public void setDead(boolean dead) {
+		this.dead = dead;
+	}
+
+	@Override
+	public boolean isDead() {
+		return dead;
 	}
 	
 }

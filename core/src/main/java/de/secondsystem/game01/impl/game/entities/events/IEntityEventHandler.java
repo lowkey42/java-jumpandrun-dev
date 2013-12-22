@@ -12,6 +12,20 @@ public interface IEntityEventHandler {
 
 	public enum EntityEventType {
 		/**
+		 * The entity has been damaged/killed
+		 * ARGS: IGameEntity: owner, IGameEntity other
+		 * RETURN: unused
+		 */
+		DAMAGED,
+		
+		/**
+		 * The entity has been reanimated
+		 * ARGS: IGameEntity: owner
+		 * RETURN: unused
+		 */
+		REANIMATED,
+		
+		/**
 		 * The entity is touched by another one.
 		 * ARGS: IGameEntity: owner, other:IPhysicsBody, force:Vector2f
 		 * RETURN: unused 

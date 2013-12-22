@@ -18,6 +18,7 @@ import de.secondsystem.game01.model.IUpdateable;
 public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable {
 
 	UUID uuid();
+	IGameEntityManager manager();
 	
 	void  onUsed();
 	float onUsedDraged(float force);
@@ -28,8 +29,11 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	
 	int getWorldMask();
 	boolean isInWorld(WorldId worldId);
-	void setWorld(WorldId worldId);
-	void setWorldMask(int newWorldMask);
+	boolean setWorld(WorldId worldId);
+	boolean setWorldMask(int newWorldMask);
+	
+	void setDead( boolean dead );
+	boolean isDead();
 
 	IEntityEventHandler getEventHandler();
 	void addEventHandler(IEntityEventHandler eventHandler);

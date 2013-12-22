@@ -226,7 +226,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			// TODO: A selection option is probably better 
 			//       since little design mistakes can lead to frustration caused by the inability to pick up an object on top of a lever for example
 			IGameEntity ge = (IGameEntity) nearestBody.getOwner(); 
-			ge.onUsed();
+			ge.getEventHandler().handle(EntityEventType.USED, ge, this);
 		}
 	}
 	

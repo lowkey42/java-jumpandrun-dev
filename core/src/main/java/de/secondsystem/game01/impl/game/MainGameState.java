@@ -21,6 +21,8 @@ import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHand
 import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.Condition;
 import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
+import de.secondsystem.game01.impl.game.entities.events.impl.KillEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.impl.PingPongEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.intro.MainMenuState;
@@ -49,10 +51,15 @@ public class MainGameState extends GameState {
 		
 		map = mapSerializer.deserialize(mapId, true, true);
 		
+		map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
+		.addEventHandler(new PingPongEventHandler(UUID.randomUUID(), EntityEventType.USED, EntityEventType.DAMAGED));
+		
 		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
+		player.addEventHandler( new PlayerDeathEventHandler() );
+		
 		camera = new Camera(player);
 			
 //		// something like this will be implemented in the editor
@@ -85,6 +92,20 @@ public class MainGameState extends GameState {
 		
 		
 		console.setScriptEnvironment(map.getScriptEnv());
+	}
+	
+	private static final UUID PLAYER_DEATH_EVENT_UUID = UUID.nameUUIDFromBytes("playerDeath".getBytes());
+	
+	private final class PlayerDeathEventHandler extends KillEventHandler {
+
+		public PlayerDeathEventHandler() {
+			super(PLAYER_DEATH_EVENT_UUID, EntityEventType.DAMAGED);
+		}
+		
+		@Override
+		protected void killEntity(IGameEntity entity) {
+			setNextState(new GameOverGameState());
+		}
 	}
 	
 	@Override
