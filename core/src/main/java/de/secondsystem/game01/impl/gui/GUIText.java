@@ -29,7 +29,7 @@ public abstract class GUIText extends GUIElement{
 		super(pos_x, pos_y, width, height, content, clickListener);
 		myText.setPosition(getPos().x + 5, getPos().y);
 		myBox = new RectangleShape(new Vector2f(width, height));
-		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
+		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
 	}
 	
 	
@@ -37,7 +37,7 @@ public abstract class GUIText extends GUIElement{
 		super(pos_x, pos_y, width, height, myText, clickListener);
 		myText.setPosition(getPos().x + 5, getPos().y);
 		myBox = new RectangleShape(new Vector2f(width, height));
-		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(1);
+		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
 	}
 	
 	
