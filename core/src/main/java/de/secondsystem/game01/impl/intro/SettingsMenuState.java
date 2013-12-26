@@ -81,8 +81,8 @@ public final class SettingsMenuState extends GameState {
 				}
 			case MOUSE_BUTTON_PRESSED:
 			case MOUSE_MOVED:
-				sliderOne.mouseover(ctx.window, event);
-				sliderTwo.mouseover(ctx.window, event);
+				sliderOne.mouseover(ctx, event);
+				sliderTwo.mouseover(ctx, event);
 
 				break;
 			}

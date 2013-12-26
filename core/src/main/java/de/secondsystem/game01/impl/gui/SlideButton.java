@@ -13,7 +13,9 @@ import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.event.Event.Type;
+import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 
+import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.gui.IOnClickListener;
 import de.secondsystem.game01.model.Settings;
@@ -81,16 +83,16 @@ public final class SlideButton {
 	}
 	
 	
-	public void mouseover(Window window, Event event){
+	public void mouseover(GameContext ctx, Event event){
 		
 		// TODO --> test if there is an alternative:    
 		//if(foregroundSprite.getGlobalBounds().contains(Mouse.getPosition(window).x, Mouse.getPosition(window).y)){
-		if(Mouse.getPosition(window).x < this.foregroundSprite.getPosition().x + width - 10 && Mouse.getPosition(window).x > this.foregroundSprite.getPosition().x + 10
-		&& Mouse.getPosition(window).y < this.foregroundSprite.getPosition().y + height - 10 && Mouse.getPosition(window).y > this.foregroundSprite.getPosition().y + 10){
+		if(ctx.getMousePosition().x < this.foregroundSprite.getPosition().x + width - 10 && ctx.getMousePosition().x > this.foregroundSprite.getPosition().x + 10
+		&& ctx.getMousePosition().y < this.foregroundSprite.getPosition().y + height - 10 && ctx.getMousePosition().y > this.foregroundSprite.getPosition().y + 10){
 			if(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT)){
-			this.foregroundSprite.setTextureRect(new IntRect(0, height, (int)((Mouse.getPosition(window).x) - (this.foregroundSprite.getPosition().x)), height));
+			this.foregroundSprite.setTextureRect(new IntRect(0, height, (int)((ctx.getMousePosition().x) - (this.foregroundSprite.getPosition().x)), height));
 			// Transforming Coordinates into a value (MousePosX - LeftUpCornerSprite - 10 pixels for Border / 4.8 (--> (500pixel - 20) / 100 (max))
-			value = (short)((Mouse.getPosition(window).x - this.foregroundSprite.getPosition().x - 10)/4.8);
+			value = (short)((ctx.getMousePosition().x - this.foregroundSprite.getPosition().x - 10)/4.8);
 			System.out.println(this.myText + ": current value: " + value);
 			}
 		}
