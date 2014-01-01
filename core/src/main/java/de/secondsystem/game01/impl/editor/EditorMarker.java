@@ -12,6 +12,8 @@ import de.secondsystem.game01.util.Tools;
 
 public class EditorMarker implements IDrawable, IDimensioned {
 	private RectangleShape shape  = new RectangleShape();
+	private Vector2f relativePos = new Vector2f(0.f, 0.f);
+
 	
 	public EditorMarker(Color outlineColor, float outlineThickness, Color fillColor) {
 		shape.setOutlineColor(outlineColor);
@@ -28,9 +30,10 @@ public class EditorMarker implements IDrawable, IDimensioned {
 		renderTarget.draw(shape);
 	}
 	
-	public void update(ILayerObject layerObject) {
-		Vector2f newSize = new Vector2f(layerObject.getWidth(), layerObject.getHeight());
-		Tools.setRectangleShape(shape, newSize, new Vector2f(newSize.x / 2f, newSize.y / 2f), layerObject.getPosition(), layerObject.getRotation());
+	public void update(IEditorObject editorObject) {
+		Vector2f newSize = new Vector2f(editorObject.getWidth(), editorObject.getHeight());
+		Tools.setRectangleShape(shape, newSize, new Vector2f(newSize.x / 2f - relativePos.x, newSize.y / 2f - relativePos.y), 
+				editorObject.getPosition(), editorObject.getRotation());
 	}
 	
 	public void setWidth(float width) {
@@ -38,11 +41,19 @@ public class EditorMarker implements IDrawable, IDimensioned {
 	}
 	
 	public void setHeight(float height) {
-		shape.setSize(new Vector2f(shape.getSize().x, height));
+		shape.setSize(new Vector2f(shape.getSize().x, height));		
 	}
 	
 	public void setSize(Vector2f size) {
 		shape.setSize(size);
+	}
+	
+	public void setRelativePos(Vector2f pos) {
+		relativePos = pos;
+	}
+	
+	public void setRelativePos(float x, float y) {
+		relativePos = new Vector2f(x, y);
 	}
 	
 	@Override
@@ -57,6 +68,14 @@ public class EditorMarker implements IDrawable, IDimensioned {
 	
 	public boolean isInside(Vector2f p) {
 		return Tools.isInside(shape, p);
+	}
+	
+	public Vector2f getVertex(int i) {
+		return shape.getTransform().transformPoint(shape.getPoint(i));
+	}
+	
+	public RectangleShape getShape() {
+		return shape;
 	}
 }
 

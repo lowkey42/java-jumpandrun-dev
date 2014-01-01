@@ -14,6 +14,7 @@ import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.util.Tools;
 
 public class PatrollingController implements IUpdateable, IGameEntityController, IController {
 
@@ -42,25 +43,7 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 		this.uuid = uuid;
 	}
 	
-	static public float vectorLength(float x, float y) {
-		return (float) Math.sqrt(x*x + y*y);
-	}
-	
-	static public Vector2f normalizedVector(Vector2f v) {
-		return normalizedVector(v.x, v.y);
-	}
-	
-	static public Vector2f normalizedVector(float x, float y) {
-		float length = vectorLength(x,y);
-		if( length > 0 )
-			return new Vector2f(x / length, y / length);
-		else
-			return new Vector2f(0.f, 0.f);
-	}
-	
-	static public boolean nearEqual(float a, float b) {
-		return Math.abs(a-b) <= 0.1f;
-	}
+
 	
 	public void addTargetPoint(Vector2f point) {
 		addTargetPoint(point.x, point.y);		
@@ -81,7 +64,8 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 		if( tpIndex < 0 || tpIndex >= targetPoints.size() )
 			return;
 		targetPoint = targetPoints.get(tpIndex);
-		dir = targetPoint != null ? normalizedVector(targetPoint.x-controlledEntity.getPosition().x, targetPoint.y-controlledEntity.getPosition().y) : new Vector2f(0,0);
+		dir = targetPoint != null ? Tools.normalizedVector(targetPoint.x-controlledEntity.getPosition().x, 
+				targetPoint.y-controlledEntity.getPosition().y) : new Vector2f(0,0);
 	}
 	
 	public void reverse() {
@@ -115,8 +99,8 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 			Vector2f pos = controlledEntity.getPosition();
 			
 			// check if the target point is reached
-			boolean reachedX = nearEqual(dir.x, 0) ? true : (dir.x<0 ? (pos.x <= targetPoint.x) : (pos.x >= targetPoint.x));
-			boolean reachedY = nearEqual(dir.y, 0) ? true : (dir.y<0 ? (pos.y <= targetPoint.y) : (pos.y >= targetPoint.y));
+			boolean reachedX = Tools.nearEqual(dir.x, 0) ? true : (dir.x<0 ? (pos.x <= targetPoint.x) : (pos.x >= targetPoint.x));
+			boolean reachedY = Tools.nearEqual(dir.y, 0) ? true : (dir.y<0 ? (pos.y <= targetPoint.y) : (pos.y >= targetPoint.y));
 			
 			// if not reached move to target point
 			if( !reachedX )

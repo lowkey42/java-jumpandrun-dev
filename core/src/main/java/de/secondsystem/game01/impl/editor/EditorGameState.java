@@ -202,7 +202,7 @@ public final class EditorGameState extends GameState {
 				return true;
 
 			case RIGHT:
-				selectedObject.resetScalingPermission();
+				selectedObject.resetScalingDirection();
 				Vector2f ws = ctx.window.getView().getSize();
 				View view = new View(Vector2f.mul(new Vector2f(cameraX + ws.x / 2, cameraY + ws.y / 2), currentLayer.parallax), Vector2f.div(ws, zoom));
 
