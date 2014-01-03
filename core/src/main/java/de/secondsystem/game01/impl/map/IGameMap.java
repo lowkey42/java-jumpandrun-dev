@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.map;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.controller.ControllerManager;
+import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.EventManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
@@ -58,8 +59,12 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	
 	ILayerObject findNode(LayerType layer, Vector2f point);
 
+	IGameEntity findEntity(Vector2f pos);
+	
 	void remove(LayerType layer, ILayerObject s);
 
+	void removeEntity(IGameEntity entity);
+	
 	boolean flipShowLayer(LayerType layer);
 
 	boolean[] getShownLayer();

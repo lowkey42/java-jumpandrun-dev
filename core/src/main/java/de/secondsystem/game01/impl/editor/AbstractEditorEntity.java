@@ -10,7 +10,7 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 
-public class EditorEntity extends AbstractEditorObject {
+public abstract class AbstractEditorEntity extends AbstractEditorObject {
 	protected IGameEntity entity;
 	protected IPhysicsBody entityBody;
 	protected IDrawable entityRepresentation;
@@ -26,16 +26,10 @@ public class EditorEntity extends AbstractEditorObject {
 	public void draw(RenderTarget renderTarget) {
 		entityRepresentation.draw(renderTarget);
 	}
-	
-	@Override
-	public void setPosition(Vector2f pos) {
-		super.setPosition(pos);
-		((IMoveable) entityRepresentation).setPosition(pos);
-	}
 
 	@Override
 	public boolean isPointInside(Vector2f p) {
-		return ((ISpriteWrapper) entityRepresentation).inside(p);
+		return entity != null && ((ISpriteWrapper) entityRepresentation).inside(p);
 	}
 	
 	@Override

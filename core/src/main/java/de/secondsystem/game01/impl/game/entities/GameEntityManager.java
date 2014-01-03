@@ -21,6 +21,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.system.Vector2f;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -32,6 +33,7 @@ import com.google.common.cache.LoadingCache;
 
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
+import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
@@ -295,6 +297,16 @@ public final class GameEntityManager implements IGameEntityManager {
 	    	list.add(fileEntry.getName());
 	    
 	    return list;
+	}
+
+	@Override
+	public IGameEntity findEntity(Vector2f pos) {
+		for(IGameEntity entity : entities.values()) {
+			if( ((ISpriteWrapper) entity.getRepresentation()).inside(pos) )
+				return entity;
+		}
+		
+		return null;
 	}
 
 

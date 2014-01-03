@@ -7,11 +7,12 @@ import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.IDimensioned;
 
-public class MouseEditorEntity extends EditorEntity {
+public class MouseEditorEntity extends AbstractEditorEntity {
 	private final ArrayList<String> archetypes;
 	private int currentArchetypeIndex = 0;
 	
@@ -49,10 +50,11 @@ public class MouseEditorEntity extends EditorEntity {
 		currentArchetype = archetypes.get(currentArchetypeIndex);
 		createEntity(map);
 	}
-	
+
 	@Override
 	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
-		super.update(movedObj, rt, mousePosX, mousePosY, zoom, frameTimeMs);
+		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
+		((IMoveable) entityRepresentation).setPosition(pos);
 		
 		if( entityRepresentation instanceof IUpdateable )
 			((IUpdateable) entityRepresentation).update(frameTimeMs);

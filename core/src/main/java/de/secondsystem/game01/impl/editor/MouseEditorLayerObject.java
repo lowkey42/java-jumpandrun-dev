@@ -1,5 +1,8 @@
 package de.secondsystem.game01.impl.editor;
 
+import org.jsfml.graphics.RenderTarget;
+import org.jsfml.system.Vector2i;
+
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
@@ -58,4 +61,10 @@ public class MouseEditorLayerObject extends EditorLayerObject {
 		map.addNode(currentLayer, layerObject.typeUuid().create(map, map.getActiveWorldId(), layerObject.getAttributes()));
 	}	
 
+	@Override
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
+		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
+		
+		super.update(movedObj, rt, mousePosX, mousePosY, zoom, frameTimeMs);
+	}
 }

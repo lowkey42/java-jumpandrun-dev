@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jsfml.system.Vector2f;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,7 +22,8 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 	IControllableGameEntity createControllable(String type, Map<String, Object> attributes);
 	
 	void destroy(UUID eId);
-
+	IGameEntity findEntity(Vector2f pos);
+	
 	IGameEntity get(UUID eId);
 	IWeakGameEntityRef getRef(UUID eId);
 	

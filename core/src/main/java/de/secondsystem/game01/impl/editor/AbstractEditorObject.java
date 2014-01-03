@@ -1,8 +1,6 @@
 package de.secondsystem.game01.impl.editor;
 
-import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
-import org.jsfml.system.Vector2i;
 
 public abstract class AbstractEditorObject implements IEditorObject {
 	protected static final float SCALE_FACTOR = 1.1f;
@@ -62,11 +60,6 @@ public abstract class AbstractEditorObject implements IEditorObject {
 	@Override
 	public void zoom(float factor) {
 		this.zoom *= factor;
-	}
-	
-	@Override
-	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
-		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
 	}
 	
 	@Override

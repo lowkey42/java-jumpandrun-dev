@@ -6,7 +6,6 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 
 public class EditorLayerObject extends AbstractEditorObject {	
 	protected ILayerObject layerObject = null;
-	protected Vector2f mappedMousePos;	
 	
 	@Override
 	public void refresh() {
@@ -25,8 +24,7 @@ public class EditorLayerObject extends AbstractEditorObject {
 	}
 	
 	@Override
-	public void setPosition(Vector2f pos) {
-		super.setPosition(pos);
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {	
 		layerObject.setPosition(pos);
 	}
 
