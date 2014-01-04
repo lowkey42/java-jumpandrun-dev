@@ -4,7 +4,6 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
-import de.secondsystem.game01.impl.game.entities.events.EventManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
@@ -77,10 +76,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 		void onWorldSwitch( WorldId newWorldId );
 	}
 	
-	SequenceManager getSequenceManager();
+	SequenceManager getSequenceManager(); // TODO
 	
-	ControllerManager getControllerManager();
-	
-	EventManager getEventManager();
+	ControllerManager getControllerManager(); // TODO
 
 }

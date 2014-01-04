@@ -1,55 +1,44 @@
 package de.secondsystem.game01.impl.game.entities.events;
 
-import java.util.UUID;
-
-import org.json.simple.JSONObject;
-
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.ISequencedObject;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 
-public class SequencedEntityEventHandler extends SingleEntityEventHandler {
+public class SequencedEntityEventHandler implements IEventHandler {
 	
 	private ISequencedObject sequencedObject;
 	
-	public SequencedEntityEventHandler(UUID uuid, EntityEventType eventType, ISequencedObject sequencedObject) {
-		super(uuid, eventType);
-		
+	public SequencedEntityEventHandler(EventType eventType, ISequencedObject sequencedObject) {
 		this.sequencedObject = sequencedObject;
 	}
 	
-	public SequencedEntityEventHandler() {
-	}
-	
-	@Override
-	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
-		return sequencedObject.handle(type, owner, args);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public JSONObject serialize() {
-		JSONObject obj = super.serialize();
-		
-		obj.put("sequencedObject", sequencedObject.serialize());
-		obj.put("class", "SequencedEntityEventHandler");
-		
-		return obj;
-	}
-	
-	@Override
-	public IEntityEventHandler deserialize(JSONObject obj, IGameMap map) {
-		IEntityEventHandler eventHandler = super.deserialize(obj, map);
-		if( eventHandler != null )
-			return eventHandler;
-		
-		JSONObject jSeqObject = (JSONObject) obj.get("sequencedObject");
-		ISequencedObject seqObj = map.getSequenceManager().createSequencedObject((String) jSeqObject.get("class"));	
+	public SequencedEntityEventHandler(IGameMap map, Attributes attributes) {
+
+		Attributes jSeqObject = attributes.getObject("sequencedObject");
+		ISequencedObject seqObj = map.getSequenceManager().createSequencedObject( jSeqObject.getString("class"));	
 		ISequencedObject so = seqObj.deserialize(jSeqObject, map);
 		this.sequencedObject = so != null ? so : seqObj;
-		
-		map.getEventManager().add(this);
-		
-		return null;
+	}
+	
+	@Override
+	public Object handle(Object... args) {
+		return sequencedObject.handle(args[0] instanceof IGameEntity ? (IGameEntity) args[0] : null, args);
+	}
+	
+	@Override
+	public Attributes serialize() {
+		return new Attributes(
+				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(SequencedEHF.class.getName())), 
+				new Attribute("sequencedObject",sequencedObject.serialize()));
+	}
+	
+}
+
+final class SequencedEHF implements IEventHandlerFactory {
+	@Override
+	public SequencedEntityEventHandler create(IGameMap map, Attributes attributes) {
+		return new SequencedEntityEventHandler(map, attributes);
 	}
 }

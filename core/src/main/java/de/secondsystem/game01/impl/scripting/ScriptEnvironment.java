@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.script.Invocable;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -42,6 +43,20 @@ public class ScriptEnvironment {
 			engine.eval(reader);
 		}
 	}
+	
+	public Object eval( String script, Attribute arg ) throws ScriptException {
+		final String argName = "_tmp"+System.nanoTime();
+		
+		engine.getContext().setAttribute(argName, arg.value, ScriptContext.ENGINE_SCOPE);
+		
+		try {
+			return engine.eval(script.replace(arg.key, argName));
+			
+		} finally {
+			engine.getContext().removeAttribute(argName, ScriptContext.ENGINE_SCOPE);
+		}
+	}
+	
 	
 	public Object eval( String script ) throws ScriptException {
 		return engine.eval(script);

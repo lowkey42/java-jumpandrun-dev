@@ -9,14 +9,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
+import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.model.Attributes;
 
 public class SequencedObject implements ISequencedObject {
 	
 	protected final List<SequencedEntity> targets   = new ArrayList<>();
-	protected final List<IEntityEventHandler> events = new ArrayList<>(); 
+	protected final List<IEventHandler> events = new ArrayList<>(); 
 	protected UUID uuid;
 	
 	public SequencedObject(UUID uuid) {
@@ -28,8 +29,8 @@ public class SequencedObject implements ISequencedObject {
 	}
 	
 	@Override
-	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
-		for( IEntityEventHandler event : events )
+	public Object handle(EventType type, IGameEntity owner, Object... args) {
+		for( IEventHandler event : events )
 			if( event.isHandled(type) )
 				event.handle(type, null);
 		
@@ -48,11 +49,11 @@ public class SequencedObject implements ISequencedObject {
 		targets.remove(target);
 	}
 	
-	public void addEvent(IEntityEventHandler event) {
+	public void addEvent(IEventHandler event) {
 		events.add(event);
 	}
 	
-	public void removeEvent(IEntityEventHandler event) {
+	public void removeEvent(IEventHandler event) {
 		events.remove(event);
 	}
 	
@@ -75,7 +76,7 @@ public class SequencedObject implements ISequencedObject {
 	 * @return False if this trigger already exists.
 	 */
 	@SuppressWarnings("unchecked")
-	protected static <T> void deserializeTriggers(HashMap<IGameEntity, T> hashMap, JSONObject obj, String inputOption, IGameMap map) {
+	protected static <T> void deserializeTriggers(HashMap<IGameEntity, SequencedEntity> inTriggers, Attributes obj, String inputOption, IGameMap map) {
 		
 		JSONObject triggers = (JSONObject) obj.get(inputOption);
 		
@@ -87,7 +88,7 @@ public class SequencedObject implements ISequencedObject {
 			JSONObject jSeqEntity = (JSONObject)triggers.get(o);
 			SequencedEntity seqEntity = map.getSequenceManager().createSequencedEntity((String) jSeqEntity.get("class"));			
 			SequencedEntity se = seqEntity.deserialize(jSeqEntity, map);
-			hashMap.put(entity, se != null ? (T) se : (T) seqEntity);
+			inTriggers.put(entity, se != null ? (T) se : (T) seqEntity);
 		}
 	}
 
@@ -102,7 +103,7 @@ public class SequencedObject implements ISequencedObject {
 			targetArray.add(target.serialize());
 		
 		JSONArray eventArray = new JSONArray();
-		for(IEntityEventHandler event : events) 
+		for(IEventHandler event : events) 
 			eventArray.add(event.serialize());
 		
 		obj.put("targets", targetArray);
@@ -139,8 +140,8 @@ public class SequencedObject implements ISequencedObject {
 			
 		for(Object o : eventArray) {
 			JSONObject jEvent = (JSONObject) o;
-			IEntityEventHandler event = map.getEventManager().createEntityEventHandler( (String) jEvent.get("class")) ;			
-			IEntityEventHandler eh = event.deserialize(jEvent, map);
+			IEventHandler event = map.getEventManager().createEntityEventHandler( (String) jEvent.get("class")) ;			
+			IEventHandler eh = event.deserialize(jEvent, map);
 			this.addEvent(eh != null ? eh : event);
 		}
 		

@@ -10,10 +10,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.model.Attributes;
 
 public class Condition implements ISequencedObject {
 	public class ComparisonOutputOption {
@@ -38,7 +39,7 @@ public class Condition implements ISequencedObject {
 	}
 	
 	@Override
-	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
+	public Object handle(IGameEntity owner, Object... args) {
 		if( !inTriggers.containsKey(owner) )
 			return null;
 		
@@ -57,7 +58,7 @@ public class Condition implements ISequencedObject {
 		return null;	
 	}
 	
-	private void handleCondition(List<ISequencedObject> outputOptionLinks, boolean condition, EntityEventType type, IGameEntity owner, Object... args) {
+	private void handleCondition(List<ISequencedObject> outputOptionLinks, boolean condition, EventType type, IGameEntity owner, Object... args) {
 		if( condition )
 			for( ISequencedObject obj : outputOptionLinks )
 				obj.handle(type, owner, args);
@@ -103,7 +104,7 @@ public class Condition implements ISequencedObject {
 	}
 
 	@Override
-	public ISequencedObject deserialize(JSONObject obj, IGameMap map) {
+	public ISequencedObject deserialize(Attributes obj, IGameMap map) {
 		UUID uuid = UUID.fromString( (String) obj.get("uuid") );
 		ISequencedObject seqObj = map.getSequenceManager().getSequencedObject(uuid);
 		if( seqObj != null )
@@ -123,7 +124,7 @@ public class Condition implements ISequencedObject {
 		return null;
 	}
 	
-	private void deserializeOutputOptionLinks(String outputOption, List<ISequencedObject> outputOptionLinks, JSONObject obj, IGameMap map) {
+	private void deserializeOutputOptionLinks(String outputOption, List<ISequencedObject> outputOptionLinks, Attributes obj, IGameMap map) {
 		
 		JSONArray jArray = (JSONArray) obj.get(outputOption);
 		

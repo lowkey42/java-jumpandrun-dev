@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.game.entities;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
@@ -30,9 +29,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
-import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 
@@ -228,9 +224,6 @@ public final class GameEntityManager implements IGameEntityManager {
 			se.put("uuid", entity.uuid().toString());		
 			se.put("archetype", entity.getEditableState().getArchetype());	
 			se.put("attributes", entity.getEditableState().getAttributes());
-			IEntityEventHandler eh = entity.getEventHandler();
-			if( eh != null )
-				se.put("eventHandler", eh.serialize());		// TODO: geht das auch anders (Darstellung im Editor evtl. problematisch)
 			jArray.add(se);
 		}
 		
@@ -255,23 +248,23 @@ public final class GameEntityManager implements IGameEntityManager {
 			entities.put(entity.uuid(), entity);			
 		}
 		
-		// now deserialize event handlers since they have entity links
-		for(Object o : jArray) {			
-			JSONObject jObj = (JSONObject) o; 
-			if( jObj.get("eventHandler") == null )
-				continue;
-			
-			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-			IEntityEventHandler eh = eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
-			
-			IGameEntity entity = get(uuid);
-			entity.addEventHandler(eh != null ? eh : eventHandler);
-			
-			entities.put(entity.uuid(), entity);
-			
-			// deserialized 
-		}
+//		// now deserialize event handlers since they have entity links
+//		for(Object o : jArray) {			
+//			JSONObject jObj = (JSONObject) o; 
+//			if( jObj.get("eventHandler") == null )
+//				continue;
+//			
+//			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
+//			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
+//			IEventHandler eh = eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
+//			
+//			IGameEntity entity = get(uuid);
+//			entity.addEventHandler(eh != null ? eh : eventHandler);
+//			
+//			entities.put(entity.uuid(), entity);
+//			
+//			// deserialized 
+//		}
 	}
 
 	@Override

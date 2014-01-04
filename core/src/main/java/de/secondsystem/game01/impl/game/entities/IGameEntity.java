@@ -2,12 +2,14 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.IEventHandlerCollection;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 
 /**
@@ -15,7 +17,7 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, ISerializable {
 
 	UUID uuid();
 	IGameEntityManager manager();
@@ -35,9 +37,6 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	void setDead( boolean dead );
 	boolean isDead();
 
-	IEntityEventHandler getEventHandler();
-	void addEventHandler(IEntityEventHandler eventHandler);
-	
 	IDrawable getRepresentation();
 	IPhysicsBody getPhysicsBody();
 	

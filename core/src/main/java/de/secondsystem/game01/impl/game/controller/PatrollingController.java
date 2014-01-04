@@ -13,9 +13,12 @@ import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 
-public class PatrollingController implements IUpdateable, IGameEntityController, IController {
+public class PatrollingController implements IUpdateable, IGameEntityController, ISerializable {
 
 	private IControllableGameEntity controlledEntity;
 	private boolean repeated;
@@ -29,17 +32,14 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 	private boolean reverse = false;
 	private boolean play = false;
 	
-	private UUID uuid;
-	
 	public PatrollingController() {
 		
 	}
 	
-	public PatrollingController( UUID uuid, IControllableGameEntity controlledEntity, boolean repeated ) {
+	public PatrollingController( IControllableGameEntity controlledEntity, boolean repeated ) {
 		this.controlledEntity = controlledEntity;
 		this.repeated = repeated;
 		controlledEntity.setController(this);
-		this.uuid = uuid;
 	}
 	
 	static public float vectorLength(float x, float y) {
@@ -141,21 +141,13 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 	}
 	
 	@SuppressWarnings("unchecked")
-	public JSONObject serialize() {
-		JSONObject obj = new JSONObject();
+	public Attributes serialize() {
+		Attributes obj = new Attributes();
 		obj.put("repeated", repeated);
-		obj.put("controlledEntity", controlledEntity.uuid().toString());
-		obj.put("uuid", uuid.toString());
 		
-		JSONObject o = new JSONObject();
-		int i = 0;
-		for(Vector2f t : targetPoints)  {	
-			JSONArray  a = new JSONArray();
-			a.add(t.x);
-			a.add(t.y);
-			o.put(i, a);
-			i++;
-		}
+		List<Attributes> o = new ArrayList<>(targetPoints.size());
+		for(Vector2f tp : targetPoints)
+			o.add( new Attributes(new Attribute("x", tp.x), new Attribute("y", tp.y)) );
 		
 		obj.put("targetPoints", o);
 		
@@ -192,7 +184,4 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 		return null;
 	}
 	
-	public UUID uuid() {
-		return uuid;
-	}
 }

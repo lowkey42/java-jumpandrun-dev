@@ -1,14 +1,8 @@
 package de.secondsystem.game01.impl.game.entities;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
-import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -143,23 +137,6 @@ final class GameEntityHelper {
 		
 		return bodyFactory.create();
 	}
-	
-//	public static CollectionEntityEventHandler createCollectionEntityEventHandler(GameEntityManager entityManager, Attributes attributes) {
-//		CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-//		Object eventsObj = attributes.getObject("events");		
-//		
-//		if( eventsObj instanceof Map ) {	
-//			@SuppressWarnings("unchecked")
-//			HashMap<String, String> events = (HashMap<String, String>) eventsObj;
-//			for( String eventType : events.keySet() ) {
-//				ScriptEntityEventHandler event;
-//				event = new ScriptEntityEventHandler(entityManager.map.getScriptEnv(), EntityEventType.valueOf(eventType), events.get(eventType));
-//				eventHandler.addEntityEventHandler(EntityEventType.valueOf(eventType), event);
-//			}
-//		}
-//		
-//		return eventHandler;
-//	}
 	
 	private GameEntityHelper() {}
 }

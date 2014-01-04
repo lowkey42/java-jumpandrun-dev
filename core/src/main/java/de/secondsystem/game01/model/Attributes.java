@@ -1,6 +1,7 @@
 package de.secondsystem.game01.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("serial")
@@ -79,6 +80,12 @@ public class Attributes extends HashMap<String, Object> {
 	public Attributes getObject(String key) {
 		Object val = get(key);
 		return val!=null ? new Attributes((Map<String, Object>)val ) : null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> List<T> getList(String key) {
+		Object val = get(key);
+		return val!=null ? (List<T>) val : null; 
 	}
 	
 	@Override

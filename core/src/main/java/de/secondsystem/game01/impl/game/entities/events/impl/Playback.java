@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 
 public class Playback extends SequencedObject {
@@ -29,7 +29,7 @@ public class Playback extends SequencedObject {
 	}
 	
 	@Override
-	public Object handle(EntityEventType type, IGameEntity owner, Object... args) {
+	public Object handle(EventType type, IGameEntity owner, Object... args) {
 		super.handle(type, owner, args);
 		
 		if( inputOption.playTriggers.get(owner) != null ) 
