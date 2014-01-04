@@ -2,7 +2,6 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
-import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEventHandlerCollection;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -17,7 +16,7 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, ISerializable {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, ISerializable, IEventHandlerCollection {
 
 	UUID uuid();
 	IGameEntityManager manager();

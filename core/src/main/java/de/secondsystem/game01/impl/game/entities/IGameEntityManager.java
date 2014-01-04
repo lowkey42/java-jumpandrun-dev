@@ -1,18 +1,16 @@
 package de.secondsystem.game01.impl.game.entities;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
+import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 
-public interface IGameEntityManager extends IDrawable, IUpdateable {
+public interface IGameEntityManager extends IDrawable, IUpdateable, ISerializable {
 
 	Set<String> listArchetypes();
 	
@@ -25,8 +23,7 @@ public interface IGameEntityManager extends IDrawable, IUpdateable {
 	IGameEntity get(UUID eId);
 	IWeakGameEntityRef getRef(UUID eId);
 	
-	void deserialize(JSONArray jArray);
-	JSONArray serialize();
+	void deserialize(Attributes attributes);
 	
 	ArrayList<String> getArchetypes();
 //	void deserialize( Iterator<SerializedEntity> iter );

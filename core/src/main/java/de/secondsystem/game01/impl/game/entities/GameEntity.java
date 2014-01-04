@@ -13,6 +13,7 @@ import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 import de.secondsystem.game01.model.IDrawable;
@@ -41,12 +42,12 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(attributes), 
-				GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes.getObject("events") );
+				GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes );
 	}
 	
 	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, 
-			IDynamicPhysicsBody physicsBody, IGameMap map, Attributes eventAttributes) {
-		super( eventAttributes );
+			IDynamicPhysicsBody physicsBody, IGameMap map, Attributes attributes) {
+		super( map, attributes );
 		
 		this.uuid = uuid;
 		this.em = em;
@@ -81,7 +82,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( representation instanceof IUpdateable )
 			((IUpdateable) representation).update(frameTimeMs);
 		
-		handle(EventType.UPDATE, this);
+		notify(EventType.UPDATE, this);
 	}
 
 	@Override
@@ -101,43 +102,43 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public void beginContact(IPhysicsBody other) {
-		handle(EventType.TOUCHED, this, other);
+		notify(EventType.TOUCHED, this, other);
 	}
 
 	@Override
 	public void endContact(IPhysicsBody other) {
-		handle(EventType.UNTOUCHED, this, other);
+		notify(EventType.UNTOUCHED, this, other);
 	}
 
 	@Override
 	public void onUsed() {
-		handle(EventType.USED, this);
+		notify(EventType.USED, this);
 	}
 
 	@Override
 	public float onUsedDraged(float force) {
-		Object r =handle(EventType.USED_DRAGED, this, force);
+		Object r =notify(EventType.USED_DRAGED, this, force);
 		return r instanceof Float ? (float) r : 0.f;
 	}
 
 	@Override
 	public void onLifted(IGameEntity liftingEntity) {
-		handle(EventType.LIFTED, this, liftingEntity);
+		notify(EventType.LIFTED, this, liftingEntity);
 	}
 
 	@Override
 	public void onUnlifted(IGameEntity unliftingEntity) {
-		handle(EventType.UNLIFTED, this, unliftingEntity);
+		notify(EventType.UNLIFTED, this, unliftingEntity);
 	}
 
 	@Override
 	public void onViewed() {
-		handle(EventType.VIEWED, this);
+		notify(EventType.VIEWED, this);
 	}
 
 	@Override
 	public void onUnviewed() {
-		handle(EventType.UNVIEWED, this);
+		notify(EventType.UNVIEWED, this);
 	}
 	
 	@Override
@@ -231,4 +232,13 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		return dead;
 	}
 	
+	@Override
+	public Attributes serialize() {
+		// TODO
+		return new Attributes( editableEntityState.getAttributes(), 
+				new Attributes(
+						new Attribute("uuid", uuid),
+						new Attribute("archetype", editableEntityState.getArchetype())
+		) );
+	}
 }

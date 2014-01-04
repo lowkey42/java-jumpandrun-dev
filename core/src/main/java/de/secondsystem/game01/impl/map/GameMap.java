@@ -9,10 +9,8 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
@@ -56,10 +54,6 @@ public class GameMap implements IGameMap {
 	private final IPhysicsWorld physicalWorld;
 	
 	private final IGameEntityManager entityManager;
-	
-	private final SequenceManager sequenceManager = new SequenceManager();
-	
-	private final ControllerManager controllerManager = new ControllerManager();
 	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
@@ -292,14 +286,4 @@ public class GameMap implements IGameMap {
 		return timerManager;
 	}
 
-	@Override
-	public SequenceManager getSequenceManager() {
-		return sequenceManager;
-	}
-
-	@Override
-	public ControllerManager getControllerManager() {
-		return controllerManager;
-	}
-	
 }

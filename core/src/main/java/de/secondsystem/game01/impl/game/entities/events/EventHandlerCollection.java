@@ -19,8 +19,10 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 	
 	@SuppressWarnings("unchecked")
 	public EventHandlerCollection(IGameMap map, Attributes attributes) {
+		Attributes events = attributes.getObject("events");
+		
 		for( EventType type : EventType.values() ) {
-			final Object h = attributes.get(type.name());
+			final Object h = events.get(type.name());
 			if( h instanceof List )
 				for( Object e : (List<?>) h )
 					handlers.put(type, EventUtils.createEventHandler(map, new Attributes((Map<String, Object>)e )));
@@ -46,15 +48,18 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 		return returnValue;
 	}
 
+	@Override
 	public void addEventHandler(EventType type, IEventHandler handler) {
 		handlers.put(type, handler);
 	}
 
+	@Override
 	public void setEventHandler(EventType type, IEventHandler handler) {
 		handlers.removeAll(type);
 		addEventHandler(type, handler);
 	}
 
+	@Override
 	public void removeEventHandler(EventType type) {
 		handlers.removeAll(type);
 	}

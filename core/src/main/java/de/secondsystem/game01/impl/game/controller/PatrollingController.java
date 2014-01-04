@@ -2,11 +2,8 @@ package de.secondsystem.game01.impl.game.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
@@ -15,10 +12,11 @@ import de.secondsystem.game01.impl.game.entities.IGameEntityController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.IPlayable;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 
-public class PatrollingController implements IUpdateable, IGameEntityController, ISerializable {
+public class PatrollingController implements IUpdateable, IGameEntityController, ISerializable, IPlayable {
 
 	private IControllableGameEntity controlledEntity;
 	private boolean repeated;
@@ -42,6 +40,21 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 		controlledEntity.setController(this);
 	}
 	
+	public PatrollingController(IControllableGameEntity entity, IGameMap map,
+			Attributes attributes) {
+		repeated = attributes.getBoolean("repeated", true);
+		controlledEntity = entity;
+		
+		List<Attributes> tpAttributes = attributes.getObjectList("targetPoints");
+		
+		if( tpAttributes == null )
+			System.out.println("targetPoints: null");
+		
+		else
+			for(Attributes tp : tpAttributes)
+				addTargetPoint(tp.getFloat("x"), tp.getFloat("y"));
+	}
+
 	static public float vectorLength(float x, float y) {
 		return (float) Math.sqrt(x*x + y*y);
 	}
@@ -100,7 +113,10 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 	public void pause() {
 		play = false;
 	}
-	
+
+	public void resume() {
+		play();
+	}
 	public void play() {
 		play = true;
 		reverse = false;
@@ -140,48 +156,25 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Attributes serialize() {
-		Attributes obj = new Attributes();
-		obj.put("repeated", repeated);
-		
-		List<Attributes> o = new ArrayList<>(targetPoints.size());
+		final List<Attributes> o = new ArrayList<>(targetPoints.size());
 		for(Vector2f tp : targetPoints)
 			o.add( new Attributes(new Attribute("x", tp.x), new Attribute("y", tp.y)) );
 		
-		obj.put("targetPoints", o);
-		
-		return obj;
+		return new Attributes(
+				new Attribute("repeated", repeated),
+				new Attribute("targetPoints", targetPoints),
+				new Attribute(ControllerUtils.FACTORY, ControllerUtils.normalizeControllerFactory(PatrollingControllerFactory.class.getName()))
+		);
 	}
-	
-	/**
-	 * @return null if the controller doesn't already exist
-	 */
-	public PatrollingController deserialize(JSONObject obj, IGameMap map) {
-		this.uuid = UUID.fromString((String) obj.get("uuid"));
-		if( map.getControllerManager().get(this.uuid) != null )
-			return (PatrollingController) map.getControllerManager().get(this.uuid);
 		
-		repeated = (boolean) obj.get("repeated");
-		UUID uuid = UUID.fromString( (String) obj.get("controlledEntity") );;
-		controlledEntity = (IControllableGameEntity) map.getEntityManager().get(uuid);	
-		JSONObject targetPoints = (JSONObject) obj.get("targetPoints");
-		
-		if( targetPoints == null )
-			System.out.println("targetPoints: null");;
+}
 
-		for(Object o : targetPoints.values()) {
-			JSONArray a = ((JSONArray) o);
-			float x = Float.valueOf(a.get(0).toString());
-			float y = Float.valueOf(a.get(1).toString());
-			
-			addTargetPoint(x, y);
-		}
-		
-		controlledEntity.setController(this);
-		map.getControllerManager().add(this);
-		
-		return null;
+class PatrollingControllerFactory implements IControllerFactory {
+
+	@Override
+	public PatrollingController create(IControllableGameEntity entity, IGameMap map, Attributes attributes) {
+		return new PatrollingController(entity, map, attributes);
 	}
 	
 }

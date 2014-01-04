@@ -31,10 +31,17 @@ public enum EventType {
 	
 	/**
 	 * The player is trying to use this entity
-	 * ARGS: IGameEntity: owner
+	 * ARGS: IGameEntity: owner, other:IGameEntity
 	 * RETURN: unused 
 	 */
 	USED,
+	
+	/**
+	 * The entity has been enabled/disabled
+	 * e.g. a switch that has been pulled
+	 */
+	ENABLED,
+	DISABLED,
 
 	/**
 	 * The player has drag-used this entity (e.g. a lever)

@@ -12,7 +12,7 @@ public class ScriptEventHandler implements IEventHandler {
 	
 	public ScriptEventHandler(IGameMap map, Attributes attributes) {
 		this.env = map.getScriptEnv();
-		this.handlerFuncName = attributes.getString("handlerFuncName");
+		this.handlerFuncName = attributes.getString("func");
 	}
 	public ScriptEventHandler(ScriptEnvironment env, String handlerFuncName) {
 		this.handlerFuncName = handlerFuncName;
@@ -27,7 +27,7 @@ public class ScriptEventHandler implements IEventHandler {
 	@Override
 	public Attributes serialize() {
 		Attributes attr = new Attributes();
-		attr.put("handlerFuncName", handlerFuncName);
+		attr.put("func", handlerFuncName);
 		attr.put(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(ScriptEHF.class.getName()) );
 		
 		return attr;

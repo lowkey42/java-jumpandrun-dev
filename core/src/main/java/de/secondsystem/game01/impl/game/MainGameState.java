@@ -11,19 +11,11 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
-import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.game.entities.events.KillEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.PingPongEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.ScriptEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.Condition;
-import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
-import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -51,13 +43,13 @@ public class MainGameState extends GameState {
 		map = mapSerializer.deserialize(mapId, true, true);
 		
 		map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
-		.set(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
+		.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
 		
 		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
-		player.add(EventType.DAMAGED, new PlayerDeathEventHandler() );
+		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
 		
 		camera = new Camera(player);
 			

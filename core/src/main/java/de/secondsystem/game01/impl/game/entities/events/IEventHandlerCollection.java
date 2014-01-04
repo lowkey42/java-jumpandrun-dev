@@ -8,4 +8,10 @@ public interface IEventHandlerCollection {
 
 	Attributes serialize();
 
+	void removeEventHandler(EventType type);
+
+	void setEventHandler(EventType type, IEventHandler handler);
+
+	void addEventHandler(EventType type, IEventHandler handler);
+
 }

@@ -1,7 +1,10 @@
 package de.secondsystem.game01.model;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 @SuppressWarnings("serial")
@@ -85,11 +88,218 @@ public class Attributes extends HashMap<String, Object> {
 	@SuppressWarnings("unchecked")
 	public <T> List<T> getList(String key) {
 		Object val = get(key);
-		return val!=null ? (List<T>) val : null; 
+		if( val==null )
+			return null;
+		
+		return val!=null ? (List<T>) val : null;
+	}
+	
+	public List<Attributes> getObjectList(String key) {
+		return new ListWrapper( this.<Map<String, ?>>getList(key) );
 	}
 	
 	@Override
 	public Attributes clone() {
 		return new Attributes((Map<?,?>) super.clone());
 	}
+}
+
+class ListWrapper implements List<Attributes> {
+
+	private final List<Map<String, ?>> wrappedList;
+	
+	public ListWrapper(List<Map<String, ?>> wrappedList) {
+		this.wrappedList = wrappedList;
+	}
+
+	@Override
+	public int size() {
+		return wrappedList.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return wrappedList.isEmpty();
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		return wrappedList.contains(o);
+	}
+
+	@Override
+	public Iterator<Attributes> iterator() {
+		return new IteratorWrapper();
+	}
+
+	private class IteratorWrapper implements Iterator<Attributes> {
+		
+		private final Iterator<Map<String, ?>> iter = wrappedList.iterator();
+		
+		@Override
+		public boolean hasNext() {
+			return iter.hasNext();
+		}
+
+		@Override
+		public Attributes next() {
+			return new Attributes(iter.next());
+		}
+
+		@Override
+		public void remove() {
+			iter.remove();
+		}
+		
+	}
+	
+	@Override
+	public Object[] toArray() {
+        throw new UnsupportedOperationException("toArray() is not supported by this wrapper");
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+        throw new UnsupportedOperationException("toArray(T[] a) is not supported by this wrapper");
+	}
+
+	@Override
+	public boolean add(Attributes e) {
+		return wrappedList.add(e);
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		return wrappedList.remove(o);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return wrappedList.containsAll(c);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends Attributes> c) {
+		return wrappedList.addAll(c);
+	}
+
+	@Override
+	public boolean addAll(int index, Collection<? extends Attributes> c) {
+		return wrappedList.addAll(c);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		return wrappedList.removeAll(c);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		return wrappedList.retainAll(c);
+	}
+
+	@Override
+	public void clear() {
+		wrappedList.clear();
+	}
+
+	@Override
+	public Attributes get(int index) {
+		return new Attributes(wrappedList.get(index));
+	}
+
+	@Override
+	public Attributes set(int index, Attributes element) {
+		return new Attributes(wrappedList.set(index, element));
+	}
+
+	@Override
+	public void add(int index, Attributes element) {
+		wrappedList.add(index, element);
+	}
+
+	@Override
+	public Attributes remove(int index) {
+		return new Attributes(wrappedList.remove(index));
+	}
+
+	@Override
+	public int indexOf(Object o) {
+		return wrappedList.indexOf(o);
+	}
+
+	@Override
+	public int lastIndexOf(Object o) {
+		return wrappedList.lastIndexOf(o);
+	}
+
+	@Override
+	public ListIterator<Attributes> listIterator() {
+		return new ListIteratorWrapper(wrappedList.listIterator());
+	}
+
+	private static class ListIteratorWrapper implements ListIterator<Attributes> {
+		
+		private final ListIterator<Map<String, ?>> iter;
+		
+		public ListIteratorWrapper(ListIterator<Map<String, ?>> iter) {
+			this.iter = iter;
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return iter.hasNext();
+		}
+
+		@Override
+		public Attributes next() {
+			return new Attributes(iter.next());
+		}
+
+		@Override
+		public void remove() {
+			iter.remove();
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			return iter.hasPrevious();
+		}
+
+		@Override
+		public Attributes previous() {
+			return new Attributes(iter.previous());
+		}
+
+		@Override
+		public int nextIndex() {
+			return iter.nextIndex();
+		}
+
+		@Override
+		public int previousIndex() {
+			return iter.previousIndex();
+		}
+
+		@Override
+		public void set(Attributes e) {
+			iter.set(e);
+		}
+
+		@Override
+		public void add(Attributes e) {
+			iter.add(e);
+		}
+	}
+
+	@Override
+	public ListIterator<Attributes> listIterator(int index) {
+		return new ListIteratorWrapper(wrappedList.listIterator(index));
+	}
+
+	@Override
+	public List<Attributes> subList(int fromIndex, int toIndex) {
+		return new ListWrapper(wrappedList.subList(fromIndex, toIndex));
+	}
+	
 }

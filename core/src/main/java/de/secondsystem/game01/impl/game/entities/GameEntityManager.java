@@ -14,13 +14,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.jsfml.graphics.RenderTarget;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -31,6 +31,7 @@ import com.google.common.cache.LoadingCache;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 
 public final class GameEntityManager implements IGameEntityManager {
 
@@ -215,56 +216,32 @@ public final class GameEntityManager implements IGameEntityManager {
 //		}
 //	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public JSONArray serialize() {	
-		JSONArray jArray = new JSONArray();
-		for(IGameEntity entity : entities.values()) {
-			JSONObject se = new JSONObject();
-			se.put("uuid", entity.uuid().toString());		
-			se.put("archetype", entity.getEditableState().getArchetype());	
-			se.put("attributes", entity.getEditableState().getAttributes());
-			jArray.add(se);
-		}
+	public Attributes serialize() {	
+		final List<Attributes> entityAttributes = new ArrayList<>(entities.size());
+		for(IGameEntity entity : entities.values())
+			entityAttributes.add( entity.serialize() );
 		
-		return jArray;
+		return new Attributes(
+				new Attribute("entities", entityAttributes)
+		);
 	}
 	
 	@Override
-	public void deserialize(JSONArray jArray) {
-		if( jArray == null )
+	public void deserialize(Attributes attributes) {
+		final List<Attributes> entityAttributes = attributes.getObjectList("entities");
+		
+		if( entityAttributes == null )
 			return;
 		
-		// deserialize game entities first
-		for(Object o : jArray) {			
-			JSONObject jObj = (JSONObject) o; 
-			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-			final String archetype = (String) jObj.get("archetype");
-			@SuppressWarnings("unchecked")
-			HashMap<String, Object> attributes = (HashMap<String, Object>) jObj.get("attributes");		
+		for(Attributes entityAttr : entityAttributes) {
+			final UUID uuid = UUID.fromString( entityAttr.getString("uuid") );
+			final String archetype = entityAttr.getString("archetype");
 			
-			IGameEntity entity = create(uuid, archetype, attributes);
+			IGameEntity entity = create(uuid, archetype, entityAttr);
 			
-			entities.put(entity.uuid(), entity);			
+			entities.put(entity.uuid(), entity);
 		}
-		
-//		// now deserialize event handlers since they have entity links
-//		for(Object o : jArray) {			
-//			JSONObject jObj = (JSONObject) o; 
-//			if( jObj.get("eventHandler") == null )
-//				continue;
-//			
-//			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-//			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-//			IEventHandler eh = eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
-//			
-//			IGameEntity entity = get(uuid);
-//			entity.addEventHandler(eh != null ? eh : eventHandler);
-//			
-//			entities.put(entity.uuid(), entity);
-//			
-//			// deserialized 
-//		}
 	}
 
 	@Override
