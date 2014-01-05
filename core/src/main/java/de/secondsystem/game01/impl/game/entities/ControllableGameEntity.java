@@ -63,7 +63,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes.getObject("events"));
+				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes);
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
 		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
@@ -249,6 +249,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	@Override
 	public void setController(IGameEntityController controller) {
 		this.controller = controller;
+	}
+	
+	@Override
+	public IGameEntityController getController() {
+		return controller;
 	}
 
 	@Override

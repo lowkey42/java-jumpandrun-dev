@@ -21,15 +21,16 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 	public EventHandlerCollection(IGameMap map, Attributes attributes) {
 		Attributes events = attributes.getObject("events");
 		
-		for( EventType type : EventType.values() ) {
-			final Object h = events.get(type.name());
-			if( h instanceof List )
-				for( Object e : (List<?>) h )
-					handlers.put(type, EventUtils.createEventHandler(map, new Attributes((Map<String, Object>)e )));
-			
-			else
-				handlers.put(type, EventUtils.createEventHandler(map, new Attributes((Map<String, Object>)h )));
+		if( events!=null ) {
+			for( EventType type : EventType.values() ) {
+				final Object h = events.get(type.name());
+				if( h instanceof List )
+					for( Object e : (List<?>) h )
+						handlers.put(type, EventUtils.createEventHandler(map, new Attributes((Map<String, Object>)e )));
 				
+				else if( h instanceof Map )
+					handlers.put(type, EventUtils.createEventHandler(map, new Attributes((Map<String, Object>)h )));
+			}
 		}
 	}
 	
@@ -40,7 +41,7 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 		Object returnValue = null;
 		
 		for( IEventHandler h : handlers ) {
-			Object r = h.handle(type, args);
+			Object r = h.handle(args);
 			if( returnValue==null )
 				returnValue = r; // returns only the first return value (questionable)
 		}

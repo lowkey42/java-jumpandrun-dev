@@ -10,7 +10,7 @@ import java.util.Map;
 @SuppressWarnings("serial")
 public class Attributes extends HashMap<String, Object> {
 
-	public static final class Attribute {
+	public static class Attribute {
 		public final String key;
 		public final Object value;
 		public Attribute(String k, Object v) {
@@ -18,12 +18,26 @@ public class Attributes extends HashMap<String, Object> {
 			this.value = v;
 		}
 	}
+	public static class AttributeIf extends Attribute {
+		public final boolean condition;
+
+		public AttributeIf(boolean condition, String k, Object v) {
+			super(k, v);
+			this.condition = condition;
+		}
+	}
+	public static final class AttributeIfNotNull extends AttributeIf {
+		public AttributeIfNotNull(String k, Object v) {
+			super(k!=null && v!=null, k, v);
+		}
+	}
 	
 	public Attributes(){}
 	
 	public Attributes(Attribute... entries) {
 		for( Attribute e : entries )
-			put(e.key, e.value);
+			if( !(e instanceof AttributeIf) || ((AttributeIf)e).condition )
+				put(e.key, e.value);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

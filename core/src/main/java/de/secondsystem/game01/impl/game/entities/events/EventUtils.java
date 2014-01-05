@@ -21,6 +21,9 @@ final class EventUtils {
 	public static IEventHandler createEventHandler(IGameMap map, Attributes attributes) {
 		final String factoryName = attributes.getString(EventUtils.FACTORY);
 		
+		if( factoryName==null )
+			throw new Error("No factory defined for event-handler: "+attributes);
+		
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends IEventHandlerFactory> clazz = (Class<? extends IEventHandlerFactory>) EventUtils.class.getClassLoader().loadClass(denormalizeHandlerFactory(factoryName));
