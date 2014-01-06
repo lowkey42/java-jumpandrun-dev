@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -208,23 +209,32 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 	}
 	
-//	@Override
-//	public void deserialize(Iterator<SerializedEntity> iter) {
-//		while( iter.hasNext() ) {
-//			SerializedEntity se = iter.next();
-//			create(se.uuid(), se.archetype(), se.attributes());
-//		}
-//	}
-
 	@Override
 	public Attributes serialize() {	
 		final List<Attributes> entityAttributes = new ArrayList<>(entities.size());
 		for(IGameEntity entity : entities.values())
-			entityAttributes.add( entity.serialize() );
+			entityAttributes.add( filterEntityAttributes(entity.serialize(), entity.getEditableState().getArchetype()) );
 		
 		return new Attributes(
 				new Attribute("entities", entityAttributes)
 		);
+	}
+	
+	private static final Attributes filterEntityAttributes( Attributes attributes, String archetype ) {
+		try {
+			EntityArchetype at = ARCHETYPE_CACHE.get(archetype);
+			
+			if( at!=null ) {
+				for( Entry<String, Object> e : at.attributes.entrySet() )
+					if( e.getValue().equals(attributes.get(e.getKey())) )
+							attributes.remove(e.getKey());
+			}
+			
+		} catch (ExecutionException e) {
+			throw new Error(e.getMessage(), e);
+		}
+		
+		return attributes;
 	}
 	
 	@Override
@@ -267,85 +277,4 @@ public final class GameEntityManager implements IGameEntityManager {
 	    return list;
 	}
 
-
-//	@Override
-//	public Iterable<SerializedEntity> serialize() {
-//		return new SEIterable();
-//	}
-
-//	private static final class SerializedEntityImpl implements SerializedEntity {
-//
-//		private final UUID uuid;
-//		private final String archetype;
-//		private final Map<String, Object> attributes;
-//		
-//		public SerializedEntityImpl(UUID uuid, String archetype, Map<String, Object> attributes) {
-//			this.uuid = uuid;
-//			this.archetype = archetype;
-//			this.attributes = attributes;
-//		}
-//		
-//		@Override
-//		public UUID uuid() {
-//			return uuid;
-//		}
-//
-//		@Override
-//		public String archetype() {
-//			return archetype;
-//		}
-//
-//		@Override
-//		public Map<String, Object> attributes() {
-//			return attributes;
-//		}
-//		
-//	}
-	
-//	private final class SEIterable implements Iterable<SerializedEntity> {
-//		@Override public Iterator<SerializedEntity> iterator() {
-//			return new SEIterator(entities);
-//		}
-//	}
-//	private final class SEIterator implements Iterator<SerializedEntity> {
-//
-//		private final Iterator<Entry<UUID, IGameEntity>> iter;
-//		
-//		public SEIterator(Map<UUID, IGameEntity> entities) {
-//			iter = Collections.unmodifiableMap(entities).entrySet().iterator();
-//		}
-//		
-//		@Override
-//		public boolean hasNext() {
-//			return iter.hasNext();
-//		}
-//
-//		@Override
-//		public SerializedEntity next() {
-//			Entry<UUID, IGameEntity> entity = iter.next();
-//
-//			Map<String, Object> attributes = entity.getValue().serialize().clone();
-//			
-//			try {
-//				EntityArchetype at = ARCHETYPE_CACHE.get(entity.getValue().getArchetype());
-//				
-//				if( at!=null ) {
-//					for( Entry<String, Object> e : at.attributes.entrySet() )
-//						if( e.getValue().equals(attributes.get(e.getKey())) )
-//								attributes.remove(e.getKey());
-//				}
-//				
-//			} catch (ExecutionException e) {
-//				throw new Error(e.getMessage(), e);
-//			}
-//			
-//			return new SerializedEntityImpl(entity.getKey(), entity.getValue().getArchetype(), attributes);
-//		}
-//
-//		@Override
-//		public void remove() {
-//			throw new UnsupportedOperationException("remove is not allowed");
-//		}
-//		
-//	}
 }

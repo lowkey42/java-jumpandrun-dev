@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ListMultimap;
@@ -15,15 +14,15 @@ import de.secondsystem.game01.model.Attributes;
 
 public class EventHandlerCollection implements IEventHandlerCollection {
 
+	private static final String EVENT_PREFIX = "on";
+	
 	private final ListMultimap<EventType, IEventHandler> handlers = ArrayListMultimap.create();
 	
 	@SuppressWarnings("unchecked")
 	public EventHandlerCollection(IGameMap map, Attributes attributes) {
-		Attributes events = attributes.getObject("events");
-		
-		if( events!=null ) {
+		if( attributes!=null ) {
 			for( EventType type : EventType.values() ) {
-				final Object h = events.get(type.name());
+				final Object h = attributes.get(EVENT_PREFIX+type.name());
 				if( h instanceof List )
 					for( Object e : (List<?>) h )
 						handlers.put(type, EventUtils.createEventHandler(map, new Attributes((Map<String, Object>)e )));
@@ -73,17 +72,10 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 		Attributes attr = new Attributes();
 		
 		for( Entry<EventType, Collection<IEventHandler>> handler : handlers.asMap().entrySet() ) {
-			attr.put( handler.getKey().name(), Collections2.transform(handler.getValue(), HANDLER_SERIALIZER) );
+			attr.put( handler.getKey().name(), Collections2.transform(handler.getValue(), EventUtils.HANDLER_SERIALIZER) );
 		}
 		
 		return attr;
 	}
 	
-	private static Function<IEventHandler, Attributes> HANDLER_SERIALIZER = new Function<IEventHandler, Attributes>() {
-		@Override
-		public Attributes apply(IEventHandler input) {
-			return input.serialize();
-		}
-	};
-
 }

@@ -16,15 +16,13 @@
 				"uuid":"e9bd653d-23b8-4752-9ad8-0df01c29f4e7"
 				"y":200.0,
 				"x":150.0,
-				"events":{
-					"LIFTED": {
-						"func":"liftedFunc",
-						"factory":".ScriptEHF",
-					},
-					"UNLIFTED": {
-						"func":"unliftedFunc",
-						"factory":".ScriptEHF",
-					}
+				"onLIFTED": {
+					"func":"liftedFunc",
+					"factory":".ScriptEHF",
+				},
+				"onUNLIFTED": {
+					"func":"unliftedFunc",
+					"factory":".ScriptEHF",
 				}
 			},
 			{
@@ -65,42 +63,39 @@
 				"uuid":"b844b83f-58fc-4213-bdf2-7a9aa0996909",
 				"y":270,
 				"x":210,
-				
-				"events":{
-					"USED": {
-						"factory":".ToggleEHF"
+				"onUSED": {
+					"factory":".ToggleEHF"
+				},
+				"onENABLED": [
+					{
+						"factory":".PPEHF",
+						"target":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
+						"sub":{
+							"factory":".PlaybackEHF",
+							"action":"PLAY",
+							"target":"CONTROLLER"
+						}
 					},
-					"ENABLED": [
-						{
-							"factory":".PPEHF",
-							"target":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
-							"sub":{
-								"factory":".PlaybackEHF",
-								"action":"PLAY",
-								"target":"CONTROLLER"
-							}
-						},
-						{
-							"factory":".AnimateEHF",
-							"anim":"USED"
+					{
+						"factory":".AnimateEHF",
+						"anim":"USED"
+					}
+				],
+				"onDISABLED": [
+					{
+						"factory":".PPEHF",
+						"target":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
+						"sub":{
+							"factory":".PlaybackEHF",
+							"action":"PAUSE",
+							"target":"CONTROLLER"
 						}
-					],
-					"DISABLED": [
-						{
-							"factory":".PPEHF",
-							"target":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
-							"sub":{
-								"factory":".PlaybackEHF",
-								"action":"PAUSE",
-								"target":"CONTROLLER"
-							}
-						},
-						{
-							"factory":".AnimateEHF",
-							"anim":"UNUSED"
-						}
-					]
-				}
+					},
+					{
+						"factory":".AnimateEHF",
+						"anim":"UNUSED"
+					}
+				]
 			}
 		],
 	},

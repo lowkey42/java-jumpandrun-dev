@@ -4,9 +4,8 @@ import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IAnimated;
-import de.secondsystem.game01.model.IPlayable;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.IPlayable;
 
 public class PlaybackEventHandler implements IEventHandler {
 
@@ -74,7 +73,7 @@ public class PlaybackEventHandler implements IEventHandler {
 	@Override
 	public Attributes serialize() {
 		return new Attributes(
-				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(PPEHF.class.getName())), 
+				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(PlaybackEHF.class.getName())), 
 				new Attribute("action", action.name()), 
 				new Attribute("target", target.name()) );
 	}
