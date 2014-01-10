@@ -19,7 +19,9 @@ import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
+import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -261,6 +263,30 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	@Override
 	public boolean isDead() {
 		return dead;
+	}
+
+	@Override
+	public boolean inside(Vector2f point) {
+		if( representation instanceof IInsideCheck )
+			return ((IInsideCheck)representation).inside(point);
+		
+		return false;
+	}
+
+	@Override
+	public float getHeight() {
+		if( representation instanceof IDimensioned )
+			return ((IDimensioned) representation).getHeight();
+			
+		return 1;
+	}
+
+	@Override
+	public float getWidth() {
+		if( representation instanceof IDimensioned )
+			return ((IDimensioned) representation).getWidth();
+			
+		return 1;
 	}
 	
 }

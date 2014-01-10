@@ -119,11 +119,6 @@ public class CollisionObject implements ILayerObject {
 	}
 
 	@Override
-	public Vector2f getOrigin() {
-		return shape.getOrigin();
-	}
-
-	@Override
 	public float getRotation() {
 		return shape.getRotation();
 	}

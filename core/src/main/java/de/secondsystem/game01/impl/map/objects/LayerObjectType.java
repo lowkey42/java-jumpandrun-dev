@@ -11,7 +11,9 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 public enum LayerObjectType {
 
 	SPRITE		("sp", SpriteLayerObject.class),
-	COLLISION	("cl", CollisionObject.class);
+	COLLISION	("cl", CollisionObject.class),
+	ENTITY		("et", EntityLayerObject.class),
+	LIGHT		("li", LightLayerObject.class);
 	
 	private static final String CONSTRUCT_METHOD_NAME = "create";
 	

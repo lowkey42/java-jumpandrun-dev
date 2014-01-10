@@ -2,11 +2,15 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.UUID;
 
+import org.jsfml.system.Vector2f;
+
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
+import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -15,7 +19,7 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, IInsideCheck, IDimensioned {
 
 	UUID uuid();
 	IGameEntityManager manager();

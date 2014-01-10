@@ -84,11 +84,6 @@ public class SpriteLayerObject implements ILayerObject {
 	}
 
 	@Override
-	public Vector2f getOrigin() {
-		return sprite.getOrigin();
-	}
-
-	@Override
 	public float getRotation() {
 		return sprite.getRotation();
 	}

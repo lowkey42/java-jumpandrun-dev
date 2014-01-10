@@ -9,12 +9,17 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.EventManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
+import de.secondsystem.game01.impl.graphic.LightMap;
+import de.secondsystem.game01.impl.map.objects.EntityLayer;
+import de.secondsystem.game01.impl.map.objects.LightLayer;
+import de.secondsystem.game01.impl.map.objects.SimpleLayer;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
@@ -25,13 +30,24 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 public class GameMap implements IGameMap {
 	
 	public static final class GameWorld {
-		final Layer[] graphicLayer;
+		final ILayer[] graphicLayer;
 		Color backgroundColor;
 		
-		GameWorld() {
-			graphicLayer = new Layer[LayerType.LAYER_COUNT];
+		GameWorld( WorldId worldId, IGameEntityManager entityManager, LightMap lightMap ) {
+			graphicLayer = new ILayer[LayerType.LAYER_COUNT];
 			for( LayerType l : LayerType.values() )
-				graphicLayer[l.layerIndex] = new Layer(l);
+				switch( l ) {
+					case OBJECTS:
+						graphicLayer[l.layerIndex] = new EntityLayer(l, entityManager);
+						break;
+						
+					case LIGHTS:
+						graphicLayer[l.layerIndex] = new LightLayer(l, lightMap);
+						break;
+						
+					default:
+						graphicLayer[l.layerIndex] = new SimpleLayer(l);
+				}
 			
 			backgroundColor = Color.BLACK;
 		}
@@ -67,24 +83,25 @@ public class GameMap implements IGameMap {
 	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
+	private final LightMap lightMap;
+	
 	final ScriptEnvironment scripts; 
 	
 	private final TimerManager timerManager;
 	
-	public GameMap(String mapId, Tileset tileset) {
-		this(mapId, tileset, true, true);
+	public GameMap(GameContext ctx, String mapId, Tileset tileset) {
+		this(ctx, mapId, tileset, true, true);
 	}
 	
-	GameMap(String mapId, Tileset tileset, boolean playable, boolean editable) {
+	GameMap(GameContext ctx, String mapId, Tileset tileset, boolean playable, boolean editable) {
 		this.mapId = mapId;
-		gameWorld[0] = new GameWorld();
-		gameWorld[1] = new GameWorld();
-		
 		this.tileset = tileset;
 		this.editable = editable;
 		this.playable = playable;
 		this.activeWorldId = WorldId.MAIN;
 
+		lightMap = ctx!=null && ctx.settings.dynamicLight ? new LightMap(ctx.getViewWidth(), ctx.getViewHeight()) : null;
+		
 		if( playable ) {
 			physicalWorld = new Box2dPhysicalWorld();
 			physicalWorld.init(new Vector2f(0, 15.f));
@@ -92,6 +109,10 @@ public class GameMap implements IGameMap {
 			physicalWorld = null;
 		
 		entityManager = new GameEntityManager(this);	
+
+		for( WorldId wId : WorldId.values() )
+			gameWorld[wId.arrayIndex] = new GameWorld(wId, entityManager, lightMap);
+		
 		
 		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), 
 				new Attribute("map", this), new Attribute("entities", entityManager), new Attribute("events", eventManager));
@@ -157,9 +178,9 @@ public class GameMap implements IGameMap {
 		rt.clear(gameWorld[activeWorldId.arrayIndex].backgroundColor);
 		
 		for( LayerType l : LayerType.values() ) {
-			Layer layer = gameWorld[activeWorldId.arrayIndex].graphicLayer[l.layerIndex];
+			ILayer layer = gameWorld[activeWorldId.arrayIndex].graphicLayer[l.layerIndex];
 			
-			if( layer.show ) {
+			if( layer.isVisible() ) {
 				if( l.parallax!=1.f )
 					rt.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
 				else
@@ -246,7 +267,7 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public boolean flipShowLayer( LayerType layer ) {
-		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].show = !gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].show;
+		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].setVisible( !gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].isVisible() );
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getShownLayer()
@@ -255,7 +276,7 @@ public class GameMap implements IGameMap {
 	public boolean[] getShownLayer() {
 		boolean[] s = new boolean[LayerType.LAYER_COUNT];
 		for( int i=0; i<LayerType.LAYER_COUNT; ++i )
-			s[i] = gameWorld[activeWorldId.arrayIndex].graphicLayer[i].show;
+			s[i] = gameWorld[activeWorldId.arrayIndex].graphicLayer[i].isVisible();
 		
 		return s;
 	}

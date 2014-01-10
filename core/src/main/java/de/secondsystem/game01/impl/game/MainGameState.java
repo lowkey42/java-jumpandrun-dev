@@ -11,20 +11,11 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
-import de.secondsystem.game01.impl.game.controller.PatrollingController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
-import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.SequencedEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.impl.AnimatedSequencedEntity;
-import de.secondsystem.game01.impl.game.entities.events.impl.Condition;
-import de.secondsystem.game01.impl.game.entities.events.impl.ControllableSequencedEntity;
 import de.secondsystem.game01.impl.game.entities.events.impl.KillEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.impl.PingPongEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
-import de.secondsystem.game01.impl.game.entities.events.impl.Toggle;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -34,11 +25,13 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class MainGameState extends GameState {
 
-	private final DevConsole console = new DevConsole();
+	private final String mapId;
 	
-	private final GameMap map;
+	private DevConsole console = new DevConsole();
 	
-	private final Camera camera;
+	private GameMap map;
+	
+	private Camera camera;
 	
 	private IControllableGameEntity player;
 	
@@ -47,9 +40,28 @@ public class MainGameState extends GameState {
 	private final String PLAYER_UUID = "aa013690-1408-4a13-8329-cbfb1cfa7f6b";
 	
 	public MainGameState( String mapId ) {
+		this.mapId = mapId;
+	}
+	
+	private static final UUID PLAYER_DEATH_EVENT_UUID = UUID.nameUUIDFromBytes("playerDeath".getBytes());
+	
+	private final class PlayerDeathEventHandler extends KillEventHandler {
+
+		public PlayerDeathEventHandler() {
+			super(PLAYER_DEATH_EVENT_UUID, EntityEventType.DAMAGED);
+		}
+		
+		@Override
+		protected void killEntity(IGameEntity entity) {
+			setNextState(new GameOverGameState());
+		}
+	}
+	
+	@Override
+	protected void onStart(GameContext ctx) {
 		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
 		
-		map = mapSerializer.deserialize(mapId, true, true);
+		map = mapSerializer.deserialize(ctx, mapId, true, true);
 		
 		map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
 		.addEventHandler(new PingPongEventHandler(UUID.randomUUID(), EntityEventType.USED, EntityEventType.DAMAGED));
@@ -92,24 +104,7 @@ public class MainGameState extends GameState {
 		
 		
 		console.setScriptEnvironment(map.getScriptEnv());
-	}
-	
-	private static final UUID PLAYER_DEATH_EVENT_UUID = UUID.nameUUIDFromBytes("playerDeath".getBytes());
-	
-	private final class PlayerDeathEventHandler extends KillEventHandler {
-
-		public PlayerDeathEventHandler() {
-			super(PLAYER_DEATH_EVENT_UUID, EntityEventType.DAMAGED);
-		}
 		
-		@Override
-		protected void killEntity(IGameEntity entity) {
-			setNextState(new GameOverGameState());
-		}
-	}
-	
-	@Override
-	protected void onStart(GameContext ctx) {
 		controller = new KeyboardController(ctx.settings.keyMapping);
 		controller.addGE(player);
 	}

@@ -172,7 +172,7 @@ public final class EditorGameState extends GameState {
 		switch (event.type) {
 		
 		case KEY_PRESSED:
-			return processInputKey(event.asKeyEvent());
+			return processInputKey(ctx, event.asKeyEvent());
 
 		case MOUSE_WHEEL_MOVED:
 			if (event.asMouseWheelEvent().delta == 0)
@@ -296,14 +296,14 @@ public final class EditorGameState extends GameState {
 	}
 	
 	
-	private final boolean processInputKey(KeyEvent event) {
+	private final boolean processInputKey(GameContext ctx, KeyEvent event) {
 		switch (event.key) {
 		case F5: // save
 			new JsonGameMapSerializer().serialize(map);
 			break;
 
 		case F9: // load
-			map = new JsonGameMapSerializer().deserialize(map.getMapId(), true,
+			map = new JsonGameMapSerializer().deserialize(ctx, map.getMapId(), true,
 					true);
 			break;
 

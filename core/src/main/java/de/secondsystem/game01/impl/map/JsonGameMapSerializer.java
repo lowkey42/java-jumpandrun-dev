@@ -18,9 +18,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.map.GameMap.GameWorld;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.util.SerializationUtil;
 
 
 /**
@@ -56,7 +59,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 	@Override
-	public synchronized GameMap deserialize(String mapId, boolean playable, boolean editable) {
+	public synchronized GameMap deserialize(GameContext ctx, String mapId, boolean playable, boolean editable) {
 		try ( Reader reader = Files.newBufferedReader(MAP_PATH.resolve(mapId), StandardCharsets.UTF_8) ){
 			JSONObject obj = (JSONObject) parser.parse(reader);
 			
@@ -65,7 +68,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			
 			Tileset tileset = new Tileset((String)obj.get("tileset"));
 			
-			GameMap map = new GameMap(mapId, tileset, playable, editable);
+			GameMap map = new GameMap(ctx, mapId, tileset, playable, editable);
 			for( WorldId worldId : WorldId.values() )
 				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			
@@ -91,44 +94,28 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	@SuppressWarnings("unchecked")
 	private JSONObject serializeGameWorld(GameWorld world) {
 		JSONObject obj = new JSONObject();
-		obj.put("backgroundColor", encodeColor(world.backgroundColor) );
+		obj.put("backgroundColor", SerializationUtil.encodeColor(world.backgroundColor) );
 		obj.put("layer", serializeLayers(world.graphicLayer) );
 		
 		return obj;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private JSONArray serializeLayers(Layer[] layers) {
+	private JSONArray serializeLayers(ILayer[] layers) {
 		JSONArray array = new JSONArray();
 		
-		for( Layer l : layers ) {
-			JSONObject layer = new JSONObject();
-			layer.put("layerType", l.type.name());
+		for( ILayer l : layers ) {
+			Attributes attr = l.serialize();
 			
-			JSONArray layerObjs = new JSONArray();
-			for( ILayerObject obj : l.objects )
-				layerObjs.add(serializeLayerObject(obj));
-			
-			layer.put("objects", layerObjs);
-			
-			array.add( layer );
+			if( attr!=null )
+				array.add(attr);
 		}
 
 		return array;
 	}
 
-	@SuppressWarnings("unchecked")
-	private JSONObject serializeLayerObject(ILayerObject objects) {
-		JSONObject obj = new JSONObject();
-		
-		obj.put("$type", objects.typeUuid().shortId);
-		obj.putAll(objects.getAttributes());
-		
-		return obj;
-	}
-
 	private void deserializeGameWorld(GameMap map, WorldId worldId, JSONObject obj) {
-		map.gameWorld[worldId.arrayIndex].backgroundColor = decodeColor((String)obj.get("backgroundColor"));
+		map.gameWorld[worldId.arrayIndex].backgroundColor = SerializationUtil.decodeColor((String)obj.get("backgroundColor"));
 		
 		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}
@@ -150,25 +137,4 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 
-	private String encodeColor(Color color) {
-		return "#"+encodeColorComponent(color.r)+encodeColorComponent(color.g)+encodeColorComponent(color.b)+encodeColorComponent(color.a);
-	}
-	private String encodeColorComponent(int c) {
-		String s = Integer.toHexString(c);
-		assert( s.length()==2 || s.length()==1 );
-		
-		return s.length()==2 ? s : "0"+s;
-	}
-
-	private Color decodeColor(String str) {
-		assert( str.startsWith("#") );
-		return new Color(
-				decodeColorComponent(str.substring(1, 3)),
-				decodeColorComponent(str.substring(3, 5)),
-				decodeColorComponent(str.substring(5, 7)),
-				decodeColorComponent(str.substring(7, 9)) );
-	}
-	private int decodeColorComponent(String str) {
-		return Integer.parseInt(str, 16);
-	}
 }

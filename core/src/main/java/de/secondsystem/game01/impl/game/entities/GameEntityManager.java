@@ -70,6 +70,9 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public IGameEntity create(UUID uuid, String type, Map<String, Object> attr) {
+		if( uuid==null )
+			uuid = UUID.randomUUID();
+			
 		try {
 			EntityArchetype at = ARCHETYPE_CACHE.get(type);
 			
@@ -302,7 +305,7 @@ public final class GameEntityManager implements IGameEntityManager {
 	@Override
 	public IGameEntity findEntity(Vector2f pos) {
 		for(IGameEntity entity : entities.values()) {
-			if( ((ISpriteWrapper) entity.getRepresentation()).inside(pos) )
+			if( entity.inside(pos) )
 				return entity;
 		}
 		

@@ -6,7 +6,10 @@ import org.jsfml.graphics.Vertex;
 import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 
-public class Light {
+import de.secondsystem.game01.model.IInsideCheck;
+import de.secondsystem.game01.model.IMoveable;
+
+public class Light implements IMoveable, IInsideCheck {
 
 	private static final int SUBDIVISIONS = 32;
 	
@@ -31,6 +34,10 @@ public class Light {
 
 	VertexArray getDrawable() {
 		return dirty ? vertices=createDrawable(center, color, radius, degree, centerDegree) : vertices;
+	}
+	
+	public void draw( LightMap lightMap ) {
+		lightMap.drawLight(this);
 	}
 
 
@@ -57,10 +64,6 @@ public class Light {
 	}
 
 	
-	public void setCenter(Vector2f center) {
-		this.center = center;
-		this.dirty = true;
-	}
 	public void setColor(Color color) {
 		this.color = color;
 		this.dirty = true;
@@ -92,5 +95,32 @@ public class Light {
 	}
 	public float getCenterDegree() {
 		return centerDegree;
+	}
+
+	@Override
+	public boolean inside(Vector2f point) {
+		// TODO
+		return false;
+	}
+
+	@Override
+	public void setPosition(Vector2f pos) {
+		this.center = pos;
+		this.dirty = true;
+	}
+
+	@Override
+	public void setRotation(float degree) {
+		this.centerDegree = degree;
+	}
+
+	@Override
+	public float getRotation() {
+		return centerDegree;
+	}
+
+	@Override
+	public Vector2f getPosition() {
+		return center;
 	}
 }

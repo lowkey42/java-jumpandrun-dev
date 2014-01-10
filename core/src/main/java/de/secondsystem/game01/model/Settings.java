@@ -30,6 +30,8 @@ public final class Settings {
 	
 	public final boolean fullscreen;
 	
+	public final boolean dynamicLight;
+	
 	public final KeyMapping keyMapping;
 	
 	public static final class KeyMapping {
@@ -82,6 +84,7 @@ public final class Settings {
 		antiAliasingLevel = 0;
 		verticalSync = true;
 		fullscreen = false;
+		dynamicLight = true;
 		keyMapping = new KeyMapping();
 	}
 	
@@ -93,12 +96,13 @@ public final class Settings {
 		this.antiAliasingLevel = other.antiAliasingLevel;
 		this.verticalSync = other.verticalSync;
 		this.fullscreen = other.fullscreen;
+		this.dynamicLight = other.dynamicLight;
 		this.keyMapping = new KeyMapping(other.keyMapping);
 	}
 	
 	public Settings(int height, int width, byte volume, byte brightness,
 			int antiAliasingLevel, boolean verticalSync, boolean fullscreen,
-			KeyMapping keyMapping) {
+			boolean dynamicLight, KeyMapping keyMapping) {
 		super();
 		this.height = height;
 		this.width = width;
@@ -107,6 +111,7 @@ public final class Settings {
 		this.antiAliasingLevel = antiAliasingLevel;
 		this.verticalSync = verticalSync;
 		this.fullscreen = fullscreen;
+		this.dynamicLight = dynamicLight;
 		this.keyMapping = keyMapping;
 	}
 
@@ -128,6 +133,7 @@ public final class Settings {
 					Integer.valueOf(prop.getProperty("antiAliasingLevel")),
 					Boolean.valueOf(prop.getProperty("verticalSync")),
 					Boolean.valueOf(prop.getProperty("fullscreen")),
+					Boolean.valueOf(prop.getProperty("dynamicLight")),
 					loadMapping( prop, "keyMapping")
 			);
 			
@@ -168,6 +174,7 @@ public final class Settings {
 			prop.put("antiAliasingLevel", 	Integer.toString(settings.antiAliasingLevel) );
 			prop.put("verticalSync", 		Boolean.toString(settings.verticalSync) );
 			prop.put("fullscreen", 			Boolean.toString(settings.fullscreen) );
+			prop.put("dynamicLight", 		Boolean.toString(settings.dynamicLight) );
 
 			prop.put("keyMapping.moveLeft", 	settings.keyMapping.moveLeft.name() );
 			prop.put("keyMapping.moveRight", 	settings.keyMapping.moveRight.name() );

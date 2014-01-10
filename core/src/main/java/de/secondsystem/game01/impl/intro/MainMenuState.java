@@ -39,7 +39,7 @@ public final class MainMenuState extends GameState {
 		
 		@Override public void onClick() {
 			setNextState(new EditorGameState(MainMenuState.this,
-					new JsonGameMapSerializer().deserialize("test01",
+					new JsonGameMapSerializer().deserialize(null, "test01",
 							true, true)));
 		}
 	});
