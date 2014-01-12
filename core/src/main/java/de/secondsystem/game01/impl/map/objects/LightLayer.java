@@ -23,7 +23,7 @@ public final class LightLayer extends SimpleLayer {
 		if( lightMap!=null ) {
 			lightMap.setView(rt.getView());
 
-			lightMap.clear(0.8f);
+			lightMap.clear();
 			
 			for( ILayerObject lo : objects ) {
 				if( lo instanceof LightLayerObject )

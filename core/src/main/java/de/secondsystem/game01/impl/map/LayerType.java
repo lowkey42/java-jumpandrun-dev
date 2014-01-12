@@ -7,10 +7,11 @@ public enum LayerType {
 	
 	PHYSICS		(3, 1.f, false, true, "P[P]"),
 	OBJECTS		(4, 1.f, true,  true, "O[O]"),
-	LIGHTS		(5, 1.f, true,  true, "L[L]"),
 	
-	FOREGROUND_0(6, 1.f, true,  false, "F0[4]"),
-	FOREGROUND_1(7, 1.f, true,  false, "F1[5]");
+	FOREGROUND_0(5, 1.f, true,  false, "F0[4]"),
+	FOREGROUND_1(6, 1.f, true,  false, "F1[5]"),
+	
+	LIGHTS		(7, 1.f, true,  true, "L[L]");
 	
 	public static final int LAYER_COUNT = 8;
 

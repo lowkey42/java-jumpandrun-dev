@@ -1,28 +1,41 @@
 package de.secondsystem.game01.impl.graphic;
 
+import java.io.IOException;
+
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.ConstShader;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderTexture;
+import org.jsfml.graphics.Shader;
 import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
+import org.jsfml.window.Window;
 
+import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.model.GameException;
 
 public class LightMap implements Drawable {
 
 	private final RenderTexture lightMap;
-
-	private final RectangleShape clearRect;
+	
+	private final ConstShader shader;
 	
 	public LightMap( int width, int height ) {
 		lightMap = new RenderTexture();
+		try {
+			shader = ResourceManager.shader_frag.get("lightmap.frag");
+			
+		} catch (IOException e1) {
+			throw new GameException("Unable to load shader");
+		}
 		
 		try {
 			lightMap.create(width, height);
@@ -30,21 +43,24 @@ public class LightMap implements Drawable {
 		} catch (TextureCreationException e) {
 			throw new GameException("Unable to create lightMap");
 		}
-		
-		clearRect = new RectangleShape(new Vector2f(width, height));
-		clearRect.setPosition(0, 0);
 	}
 	
 	public void setView( ConstView view ) {
 		lightMap.setView(view);
 	}
+
 	public void draw( RenderTarget target ) {
 		final ConstView orgView = target.getView();
-		target.setView(new View(target.getDefaultView().getCenter(), orgView.getSize()));
+		target.setView(new View(Vector2f.div(orgView.getSize(), 2), orgView.getSize()));
 		
 		lightMap.display();
 		Sprite s = new Sprite(lightMap.getTexture());
-		target.draw(s, new RenderStates(BlendMode.ADD));
+		
+		((RenderTexture)target).display();
+		((Shader)shader).setParameter("fb", ((RenderTexture)target).getTexture());
+		
+		s.setColor(new Color(255, 255, 255, 255));
+		target.draw(s, new RenderStates(shader));
 		
 		target.setView(orgView);
 	}
@@ -53,15 +69,8 @@ public class LightMap implements Drawable {
 		lightMap.draw(light.getDrawable(), new RenderStates(BlendMode.ADD));
 	}
 	
-	public void clear( float percentage ) {
-		final ConstView orgView = lightMap.getView();
-		lightMap.setView(new View(lightMap.getDefaultView().getCenter(), orgView.getSize()));
-		
+	public void clear() {
 		lightMap.clear();
-		//clearRect.setFillColor(new Color(0, 0, 0, (int) percentage*255));
-		//lightMap.draw(clearRect, new RenderStates(BlendMode.NONE));
-		
-		lightMap.setView(orgView);
 	}
 
 	@Override

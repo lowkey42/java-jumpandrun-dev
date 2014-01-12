@@ -8,8 +8,11 @@ import java.util.concurrent.ExecutionException;
 import org.jsfml.audio.ConstSoundBuffer;
 import org.jsfml.audio.SoundBuffer;
 import org.jsfml.graphics.ConstFont;
+import org.jsfml.graphics.ConstShader;
 import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.Font;
+import org.jsfml.graphics.Shader;
+import org.jsfml.graphics.ShaderSourceException;
 import org.jsfml.graphics.Texture;
 
 import com.google.common.cache.CacheBuilder;
@@ -20,6 +23,40 @@ import de.secondsystem.game01.impl.graphic.AnimationTexture;
 
 
 public abstract class ResourceManager<T> {
+
+	public static final ResourceManager<ConstShader> shader_frag = new ResourceManager<ConstShader>(10) {
+		@Override protected Path getBasePath() {
+			return Paths.get("assets", "shader");
+		}
+		@Override protected ConstShader load(Path path) {
+			Shader shader = new Shader();
+			try {
+				shader.loadFromFile(path, Shader.Type.FRAGMENT);
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			} catch (ShaderSourceException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			return shader;
+		}
+	};
+
+	public static final ResourceManager<ConstShader> shader_vert = new ResourceManager<ConstShader>(10) {
+		@Override protected Path getBasePath() {
+			return Paths.get("assets", "shader");
+		}
+		@Override protected ConstShader load(Path path) {
+			Shader shader = new Shader();
+			try {
+				shader.loadFromFile(path, Shader.Type.VERTEX);
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			} catch (ShaderSourceException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			return shader;
+		}
+	};
 
 	public static final ResourceManager<ConstTexture> texture_gui = new ResourceManager<ConstTexture>(100) {
 		@Override protected Path getBasePath() {

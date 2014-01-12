@@ -5,7 +5,11 @@ import java.util.Set;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.graphics.RenderTexture;
+import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
@@ -120,6 +124,13 @@ public class GameMap implements IGameMap {
 		timerManager = new TimerManager(scripts);
 		
 		eventManager.setScriptEnvironment(scripts);	
+		
+		try {
+			renderBuffer.create(1920, 1080);
+		} catch (TextureCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 		
 	/* (non-Javadoc)
@@ -168,6 +179,9 @@ public class GameMap implements IGameMap {
 			listener.onWorldSwitch(activeWorldId);
 	}
 	
+
+	private final RenderTexture renderBuffer = new RenderTexture();
+	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#draw(org.jsfml.graphics.RenderTarget)
 	 */
@@ -175,24 +189,30 @@ public class GameMap implements IGameMap {
 	public void draw(RenderTarget rt) {
 		final ConstView cView = rt.getView();
 		
-		rt.clear(gameWorld[activeWorldId.arrayIndex].backgroundColor);
+		renderBuffer.clear(gameWorld[activeWorldId.arrayIndex].backgroundColor);
 		
 		for( LayerType l : LayerType.values() ) {
 			ILayer layer = gameWorld[activeWorldId.arrayIndex].graphicLayer[l.layerIndex];
 			
 			if( layer.isVisible() ) {
 				if( l.parallax!=1.f )
-					rt.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
+					renderBuffer.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
 				else
-					rt.setView(cView);
+					renderBuffer.setView(cView);
 				 
-				layer.draw(rt);
+				layer.draw(renderBuffer);
 			}
 			
 			if( l==LayerType.OBJECTS )
-				entityManager.draw(rt);
+				entityManager.draw(renderBuffer);
 		}
 		
+		renderBuffer.setView(cView);
+		
+		renderBuffer.display();
+		
+		rt.setView(new View(Vector2f.div(cView.getSize(), 2), cView.getSize()));
+		rt.draw(new Sprite(renderBuffer.getTexture()));
 		rt.setView(cView);
 	}
 	/* (non-Javadoc)

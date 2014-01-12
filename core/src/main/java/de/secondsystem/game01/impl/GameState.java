@@ -53,9 +53,9 @@ public abstract class GameState implements IState {
 			frameTime = 1;
 		}
 		
-//		if( frameTime > 26 ) {
-//			System.out.println("JITTER: "+frameTime+"  of "+(frameTime-(1000./60.)));
-//		}
+		if( frameTime > 16*3 ) {
+			System.out.println("JITTER: "+frameTime+"  of "+(frameTime-(1000./60.)));
+		}
 		onFrame(ctx, frameTime);
 
 		ctx.window.display();
