@@ -21,16 +21,10 @@ public final class LightLayer extends SimpleLayer {
 	@Override
 	public void draw(RenderTarget rt) {
 		if( lightMap!=null ) {
-			lightMap.setView(rt.getView());
-
-			lightMap.clear();
-			
 			for( ILayerObject lo : objects ) {
 				if( lo instanceof LightLayerObject )
 					((LightLayerObject) lo).drawLight(lightMap);
 			}
-
-			lightMap.draw(rt);
 		}
 	}
 

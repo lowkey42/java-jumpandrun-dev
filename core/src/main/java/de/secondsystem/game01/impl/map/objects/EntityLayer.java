@@ -5,6 +5,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayer;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
@@ -15,16 +16,19 @@ public class EntityLayer implements ILayer {
 
 	private final IGameEntityManager manager;
 	
+	private final WorldId worldId;
+	
 	private boolean show;
 	
-	public EntityLayer(LayerType type, IGameEntityManager entityManager) {
+	public EntityLayer(LayerType type, IGameEntityManager entityManager, WorldId worldId) {
 		this.manager = entityManager;
+		this.worldId = worldId;
 		this.show = type.visible;
 	}
 
 	@Override
 	public void draw(RenderTarget rt) {
-		manager.draw(rt);
+		manager.draw(worldId, rt);
 	}
 
 	@Override

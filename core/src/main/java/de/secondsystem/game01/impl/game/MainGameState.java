@@ -59,12 +59,16 @@ public class MainGameState extends GameState {
 	
 	@Override
 	protected void onStart(GameContext ctx) {
-		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-		
-		map = mapSerializer.deserialize(ctx, mapId, true, true);
-		
-		map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
-		.addEventHandler(new PingPongEventHandler(UUID.randomUUID(), EntityEventType.USED, EntityEventType.DAMAGED));
+		if( map!=null ) {
+			map.setFade(true);
+		} else {
+			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+			
+			map = mapSerializer.deserialize(ctx, mapId, true, true);
+			
+			map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
+			.addEventHandler(new PingPongEventHandler(UUID.randomUUID(), EntityEventType.USED, EntityEventType.DAMAGED));
+		}
 		
 		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
 		if( player == null )

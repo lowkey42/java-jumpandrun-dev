@@ -68,6 +68,7 @@ public final class EditorGameState extends GameState {
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
 		this.map = map; // TODO: copy
+		map.setFade(false);
 		this.tileset = new Tileset("test01"); // TODO: get from map
 		
 		ConstFont freeSans;
@@ -305,6 +306,7 @@ public final class EditorGameState extends GameState {
 		case F9: // load
 			map = new JsonGameMapSerializer().deserialize(ctx, map.getMapId(), true,
 					true);
+			map.setFade(false);
 			break;
 
 		case TAB: // switch world

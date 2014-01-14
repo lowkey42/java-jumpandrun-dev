@@ -36,6 +36,7 @@ import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 
 public final class GameEntityManager implements IGameEntityManager {
@@ -119,9 +120,10 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 
 	@Override
-	public void draw(RenderTarget renderTarget) {
+	public void draw(WorldId worldId, RenderTarget renderTarget) {
 		for( IGameEntity entity : entities.values() )
-			entity.draw(renderTarget);
+			if( entity.isInWorld(worldId) )
+				entity.draw(renderTarget);
 	}
 
 	@Override

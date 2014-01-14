@@ -68,7 +68,9 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			
 			Tileset tileset = new Tileset((String)obj.get("tileset"));
 			
-			GameMap map = new GameMap(ctx, mapId, tileset, playable, editable);
+			Color ambientLight = SerializationUtil.decodeColor((String)obj.get("ambientLight"));
+			
+			GameMap map = new GameMap(ctx, mapId, tileset, ambientLight!=null?ambientLight:Color.WHITE, playable, editable);
 			for( WorldId worldId : WorldId.values() )
 				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			

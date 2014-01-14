@@ -7,17 +7,14 @@ import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstShader;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Drawable;
-import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderTexture;
 import org.jsfml.graphics.Shader;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
-import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.model.GameException;
@@ -26,9 +23,11 @@ public class LightMap implements Drawable {
 
 	private final RenderTexture lightMap;
 	
+	private final Sprite sprite;
+	
 	private final ConstShader shader;
 	
-	public LightMap( int width, int height ) {
+	public LightMap( int width, int height, Color ambientLight ) {
 		lightMap = new RenderTexture();
 		try {
 			shader = ResourceManager.shader_frag.get("lightmap.frag");
@@ -43,6 +42,10 @@ public class LightMap implements Drawable {
 		} catch (TextureCreationException e) {
 			throw new GameException("Unable to create lightMap");
 		}
+		
+		sprite = new Sprite(lightMap.getTexture());
+		sprite.setColor(ambientLight);
+		
 	}
 	
 	public void setView( ConstView view ) {
@@ -54,13 +57,11 @@ public class LightMap implements Drawable {
 		target.setView(new View(Vector2f.div(orgView.getSize(), 2), orgView.getSize()));
 		
 		lightMap.display();
-		Sprite s = new Sprite(lightMap.getTexture());
 		
 		((RenderTexture)target).display();
 		((Shader)shader).setParameter("fb", ((RenderTexture)target).getTexture());
 		
-		s.setColor(new Color(255, 255, 255, 255));
-		target.draw(s, new RenderStates(shader));
+		target.draw(sprite, new RenderStates(shader));
 		
 		target.setView(orgView);
 	}

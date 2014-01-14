@@ -18,8 +18,8 @@ public class LightLayerObject implements ILayerObject {
 
 	private final Light light;
 	
-	public LightLayerObject(float x, float y, float rotation, float radius, float sizeDegree, Color color) {
-		light = new Light(new Vector2f(x, y), color, radius, sizeDegree, rotation);
+	public LightLayerObject(LightMap lightMap, float x, float y, float rotation, float radius, float sizeDegree, Color color) {
+		light = new Light(lightMap, new Vector2f(x, y), color, radius, sizeDegree, rotation);
 	}
 
 	@Override
@@ -92,6 +92,7 @@ public class LightLayerObject implements ILayerObject {
 	public static LightLayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
 		try {
 			return new LightLayerObject(
+					map.getLightMap(),
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),
 					((Number)attributes.get("rotation")).floatValue(),

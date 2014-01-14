@@ -49,7 +49,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	public GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map );
+				GameEntityHelper.createRepresentation(map, attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map );
 		
 		if( attributes.get("events") != null )
 			eventHandler = EventManager.createScriptedEvents((Map<String, Object>) attributes.get("events"), map);
@@ -168,7 +168,7 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	@Override
 	public boolean isInWorld(WorldId worldId) {
-		return (worldMask|worldId.id) !=0;
+		return (worldMask&worldId.id) !=0;
 	}
 
 	@Override

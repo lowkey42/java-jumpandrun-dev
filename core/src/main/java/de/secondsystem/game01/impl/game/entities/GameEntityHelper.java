@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jsfml.graphics.Color;
+import org.jsfml.system.Vector2f;
+
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
 import de.secondsystem.game01.impl.game.entities.events.ScriptEntityEventHandler;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
+import de.secondsystem.game01.impl.graphic.Light;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
@@ -25,10 +29,11 @@ final class GameEntityHelper {
 	public static enum RepresentationType {
 		ANIMATION, 
 		TEXTURE, 
-		TILE;
+		TILE,
+		LIGHT;
 	}
 	
-	public static IDrawable createRepresentation( Attributes attributes ) { // TODO
+	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) { // TODO
 		IDrawable repr = null;
 		try {
 			RepresentationType type = RepresentationType.valueOf(attributes.getString("representationType"));
@@ -48,6 +53,9 @@ final class GameEntityHelper {
 				repr = new SpriteWrappper(width, height);
 				((SpriteWrappper) repr).setTexture(ResourceManager.texture_tiles.get(filename));
 				break;
+			case LIGHT:
+				repr = new Light(map.getLightMap(), new Vector2f(0, -0), new Color(200, 180, 150), 300, 360, 360); // TODO
+				
 			default:
 				System.out.println("Representation unknown.");
 				break;

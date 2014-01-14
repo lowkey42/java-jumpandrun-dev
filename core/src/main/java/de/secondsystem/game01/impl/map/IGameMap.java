@@ -7,6 +7,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.game.entities.events.EventManager;
 import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
+import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.impl.timer.TimerManager;
@@ -34,6 +35,7 @@ public interface IGameMap extends IDrawable, IUpdateable {
 		}
 	}
 	
+	void setFade(boolean enable);
 	
 	String getMapId();
 
@@ -59,10 +61,12 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	
 	ILayerObject findNode(LayerType layer, Vector2f point);
 
+	@Deprecated
 	IGameEntity findEntity(Vector2f pos);
 	
 	void remove(LayerType layer, ILayerObject s);
 
+	@Deprecated
 	void removeEntity(IGameEntity entity);
 	
 	boolean flipShowLayer(LayerType layer);
@@ -70,6 +74,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	boolean[] getShownLayer();
 
 	IPhysicsWorld getPhysicalWorld();
+	
+	LightMap getLightMap();
 
 	boolean isEditable();
 	

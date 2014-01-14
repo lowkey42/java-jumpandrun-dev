@@ -2,16 +2,20 @@ package de.secondsystem.game01.impl.graphic;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.PrimitiveType;
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Vertex;
 import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 
-public class Light implements IMoveable, IInsideCheck {
+public class Light implements IMoveable, IInsideCheck, IDrawable {
 
 	private static final int SUBDIVISIONS = 32;
+	
+	private final LightMap lightMap;
 	
 	private Vector2f center;
 	
@@ -23,7 +27,8 @@ public class Light implements IMoveable, IInsideCheck {
 	
 	private boolean dirty;
 	
-	public Light(Vector2f center, Color color, float radius, float degree, float centerDegree) {
+	public Light(LightMap lightMap, Vector2f center, Color color, float radius, float degree, float centerDegree) {
+		this.lightMap = lightMap;
 		this.center = center;
 		this.color = color;
 		this.radius = radius;
@@ -36,7 +41,7 @@ public class Light implements IMoveable, IInsideCheck {
 		return dirty ? vertices=createDrawable(center, color, radius, degree, centerDegree) : vertices;
 	}
 	
-	public void draw( LightMap lightMap ) {
+	public void draw(RenderTarget rt) {
 		lightMap.drawLight(this);
 	}
 

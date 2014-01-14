@@ -284,9 +284,9 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			float a = ((float) Math.toDegrees(Math.atan2(getPosition().y-liftedBody.getPosition().y, getPosition().x-liftedBody.getPosition().x))-90) % 360;
 			a = (a < 0 ? 360 + a : a);
 			
-			if( a<355 && a>=180  )
+			if( a<350 && a>=180  )
 				liftJoint.setMotorSpeed(Math.min((355-a)/4, 10));
-			else if( a>5 )
+			else if( a>10 )
 				liftJoint.setMotorSpeed(-Math.min(a/4, 10));
 			else
 				liftJoint.setMotorSpeed(0);

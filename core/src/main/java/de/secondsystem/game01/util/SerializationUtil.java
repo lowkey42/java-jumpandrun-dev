@@ -16,6 +16,9 @@ public final class SerializationUtil {
 	}
 
 	public static Color decodeColor(String str) {
+		if( str==null )
+			return null;
+		
 		assert( str.startsWith("#") );
 		return new Color(
 				decodeColorComponent(str.substring(1, 3)),

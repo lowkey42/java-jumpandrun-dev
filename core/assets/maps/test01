@@ -1,4 +1,5 @@
 {
+	"ambientLight":"#ffffff03",
 	"scripts":[
 		"test.js"
 	],
