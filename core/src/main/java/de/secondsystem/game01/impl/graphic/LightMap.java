@@ -1,10 +1,12 @@
 package de.secondsystem.game01.impl.graphic;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstShader;
+import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Drawable;
 import org.jsfml.graphics.RenderStates;
@@ -26,6 +28,8 @@ public class LightMap implements Drawable {
 	private final Sprite sprite;
 	
 	private final ConstShader shader;
+	
+	private final AtomicBoolean enabled = new AtomicBoolean(true);
 	
 	public LightMap( int width, int height, Color ambientLight ) {
 		lightMap = new RenderTexture();
@@ -52,26 +56,38 @@ public class LightMap implements Drawable {
 		lightMap.setView(view);
 	}
 
-	public void draw( RenderTarget target ) {
+	public void draw( RenderTarget target, ConstTexture frameBufferTexture ) {
 		final ConstView orgView = target.getView();
 		target.setView(new View(Vector2f.div(orgView.getSize(), 2), orgView.getSize()));
 		
 		lightMap.display();
 		
-		((RenderTexture)target).display();
-		((Shader)shader).setParameter("fb", ((RenderTexture)target).getTexture());
+		((Shader)shader).setParameter("fb", frameBufferTexture);
 		
 		target.draw(sprite, new RenderStates(shader));
 		
 		target.setView(orgView);
 	}
 	
+	public void draw( RenderTarget target ) {
+		((RenderTexture)target).display();
+		draw(target, ((RenderTexture)target).getTexture());
+	}
+	
 	public void drawLight( Light light ) {
-		lightMap.draw(light.getDrawable(), new RenderStates(BlendMode.ADD));
+		if( enabled.get() )
+			lightMap.draw(light.getDrawable(), new RenderStates(BlendMode.ADD));
 	}
 	
 	public void clear() {
 		lightMap.clear();
+	}
+	
+	public void disable() {
+		enabled.set(false);
+	}
+	public void enable() {
+		enabled.set(true);
 	}
 
 	@Override

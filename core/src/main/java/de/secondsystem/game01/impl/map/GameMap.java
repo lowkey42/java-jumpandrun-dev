@@ -195,64 +195,85 @@ public class GameMap implements IGameMap {
 	
 	private static final int FADE_TIME = 1000;
 	
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.map.IGameMap#draw(org.jsfml.graphics.RenderTarget)
-	 */
-	@Override
-	public void draw(RenderTarget rt) {
-		final ConstView cView = rt.getView();
-		lightMap.setView(cView);
-		lightMap.clear();
+	protected void preDraw(RenderTarget rt) {
+		if( lightMap!=null ) {
+			lightMap.setView(rt.getView());
+			lightMap.clear();
+		}
 		
 		renderBuffer.clear(gameWorld[activeWorldId.arrayIndex].backgroundColor);
-		
-		for( LayerType l : LayerType.values() ) {
-			ILayer layer = gameWorld[activeWorldId.arrayIndex].graphicLayer[l.layerIndex];
-			
-			if( layer.isVisible() ) {
-				if( l.parallax!=1.f )
-					renderBuffer.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
-				else
-					renderBuffer.setView(cView);
-				 
-				layer.draw(renderBuffer);
-			}
-		}
+	}
+	protected void postDraw(RenderTarget rt) {
+		renderBuffer.display();
 
+		if( lightMap!=null ) {
+			lightMap.draw(rt, renderBuffer.getTexture());
+			
+		} else {
+			final ConstView cView = rt.getView();
+			
+			rt.setView(new View(Vector2f.div(cView.getSize(), 2), cView.getSize()));
+			rt.draw(new Sprite(renderBuffer.getTexture()));
+			rt.setView(cView);
+		}
+	}
+	
+	protected final ConstView calcLayerView(float parallax, ConstView baseView) {
+		return parallax!=1.f ? new View(Vector2f.mul(baseView.getCenter(), parallax), baseView.getSize()) : baseView;
+	}
+	protected void drawVisibleLayer(RenderTarget target, ConstView baseView, WorldId worldId, LayerType layerType) {
+		ILayer layer = gameWorld[worldId.arrayIndex].graphicLayer[layerType.layerIndex];
+		
+		if( layer.isVisible() ) {
+			target.setView(calcLayerView(layerType.parallax, baseView));
+			 
+			layer.draw(target);
+		}
+	}
+	protected void drawInactiveWorldFade(RenderTarget rt) {
 		if( fadeTimeLeft>0 && fadeEnabled ) {
-			fadeBuffer.clear(Color.TRANSPARENT);
+			final ConstView cView = rt.getView();
 			
-			final WorldId inactiveWorld = activeWorldId==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN;
-			for( LayerType l : LayerType.values() ) {
-				ILayer layer = gameWorld[inactiveWorld.arrayIndex].graphicLayer[l.layerIndex];
+			if( lightMap!=null )
+				lightMap.disable();
+			
+			try {
+				final WorldId inactiveWorld = activeWorldId==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN;
+				fadeBuffer.clear(Color.TRANSPARENT);
+								
+				for( LayerType l : LayerType.values() )
+					if( l.fade )
+						drawVisibleLayer(fadeBuffer, rt.getView(), inactiveWorld, l);
+								
+				fadeBuffer.display();
 				
-				if( layer.isVisible() && l.fade ) {
-					if( l.parallax!=1.f )
-						fadeBuffer.setView( new View(Vector2f .mul(cView.getCenter(), l.parallax), cView.getSize()) );
-					else
-						fadeBuffer.setView(cView);
-					 
-					layer.draw(fadeBuffer);
-				}
+			} finally {
+				if( lightMap!=null )
+					lightMap.enable();
 			}
-			
-			fadeBuffer.display();
 			
 			Sprite fadeSprite = new Sprite(fadeBuffer.getTexture());
-			fadeSprite.setColor(new Color(255, 255, 255, (int) (((float)fadeTimeLeft)/FADE_TIME*255.f) ));
+			fadeSprite.setColor(new Color(255, 255, 255, (int) (((float)fadeTimeLeft)/FADE_TIME*200.f) ));
 
 			renderBuffer.setView(new View(Vector2f.div(cView.getSize(), 2), cView.getSize()));
 			renderBuffer.draw(fadeSprite, new RenderStates(BlendMode.ALPHA));
 			renderBuffer.setView(cView);
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.secondsystem.game01.impl.map.IGameMap#draw(org.jsfml.graphics.RenderTarget)
+	 */
+	@Override
+	public void draw(RenderTarget rt) {
+		preDraw(rt);
+		
+		for( LayerType l : LayerType.values() )
+			drawVisibleLayer(renderBuffer, rt.getView(), activeWorldId, l);
 
-		lightMap.draw(renderBuffer);
+		drawInactiveWorldFade(rt);
 		
-		renderBuffer.display();
-		
-		rt.setView(new View(Vector2f.div(cView.getSize(), 2), cView.getSize()));
-		rt.draw(new Sprite(renderBuffer.getTexture()));
-		rt.setView(cView);
+		postDraw(rt);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#update(long)
