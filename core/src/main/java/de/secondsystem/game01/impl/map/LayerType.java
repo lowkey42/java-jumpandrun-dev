@@ -1,15 +1,15 @@
 package de.secondsystem.game01.impl.map;
 
 public enum LayerType {
-	BACKGROUND_2(0, .1f, true,  false, false, "B2[1]"),
-	BACKGROUND_1(1, .8f, true,  false, false, "B1[2]"),
-	BACKGROUND_0(2, 1.f, true,  false, false, "B0[3]"),
+	BACKGROUND_2(0, .1f, true,  true, false, "B2[1]"),
+	BACKGROUND_1(1, .8f, true,  true, false, "B1[2]"),
+	BACKGROUND_0(2, 1.f, true,  true, false, "B0[3]"),
 	
 	PHYSICS		(3, 1.f, false, true, true, "P[P]"),
 	OBJECTS		(4, 1.f, true,  true, true, "O[O]"),
 	
-	FOREGROUND_0(5, 1.f, true,  false, true, "F0[4]"),
-	FOREGROUND_1(6, 1.f, true,  false, true, "F1[5]"),
+	FOREGROUND_0(5, 1.f, true,  true, true, "F0[4]"),
+	FOREGROUND_1(6, 1.f, true,  true, true, "F1[5]"),
 	
 	LIGHTS		(7, 1.f, true,  true, true, "L[L]");
 	

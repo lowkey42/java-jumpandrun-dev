@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
@@ -47,5 +48,9 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	
 	IEditableEntityState getEditableState();
 	void setEditableState( IEditableEntityState state );
+	
+	void addEffect( IGameEntityEffect effect );
+	void removeEffect( IGameEntityEffect effect );
+	Set<IGameEntityEffect> getEffects();
 	
 }

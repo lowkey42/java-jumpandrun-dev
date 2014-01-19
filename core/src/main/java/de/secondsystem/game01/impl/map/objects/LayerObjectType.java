@@ -10,10 +10,11 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 
 public enum LayerObjectType {
 
-	SPRITE		("sp", SpriteLayerObject.class),
-	COLLISION	("cl", CollisionObject.class),
-	ENTITY		("et", EntityLayerObject.class),
-	LIGHT		("li", LightLayerObject.class);
+	SPRITE			("sp", SpriteLayerObject.class),
+	COLLISION		("cl", CollisionObject.class),
+	ENTITY			("et", EntityLayerObject.class),
+	LIGHT			("li", LightLayerObject.class),
+	PARTICLE_EMITTER("pe", ParticleEmitterLayerObject.class);
 	
 	private static final String CONSTRUCT_METHOD_NAME = "create";
 	

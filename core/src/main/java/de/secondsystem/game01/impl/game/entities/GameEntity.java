@@ -1,6 +1,9 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
@@ -42,6 +45,8 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 	protected final IGameMap map;
 	
 	protected IEditableEntityState editableEntityState;
+	
+	protected Set<IGameEntityEffect> effects = new HashSet<>();
 	
 	protected boolean dead = false;
 	
@@ -97,12 +102,18 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
+		Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
+		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
+		
 		if( physicsBody!=null && representation instanceof IMoveable ) {
 			((IMoveable) representation).setPosition( physicsBody.getPosition() );
 			((IMoveable) representation).setRotation( physicsBody.getRotation() );
 		}
 		
 		representation.draw(renderTarget);
+		
+		for( IGameEntityEffect effect : effects )
+			effect.draw(renderTarget, position, rotation);
 	}
 
 	@Override
@@ -287,6 +298,21 @@ class GameEntity implements IGameEntity, PhysicsContactListener {
 			return ((IDimensioned) representation).getWidth();
 			
 		return 1;
+	}
+
+	@Override
+	public void addEffect(IGameEntityEffect effect) {
+		effects.add(effect);
+	}
+
+	@Override
+	public void removeEffect(IGameEntityEffect effect) {
+		effects.remove(effect);
+	}
+
+	@Override
+	public Set<IGameEntityEffect> getEffects() {
+		return Collections.unmodifiableSet(effects);
 	}
 	
 }

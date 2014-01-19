@@ -10,6 +10,7 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 
 public class Tools {
 	
+	// FIXME: würg
 	private static final RectangleShape shape = new RectangleShape();
 	
 	public static boolean isInside(RectangleShape shape, Vector2f p) {

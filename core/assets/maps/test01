@@ -1,5 +1,5 @@
 {
-	"ambientLight":"#ffffff03",
+	"ambientLight":"#ffffff33",
 	"scripts":[
 		"test.js"
 	],
@@ -1242,6 +1242,24 @@
 				{
 					"layerType":"FOREGROUND_1",
 					"objects":[
+						{
+							"height":20.0,
+							"width":300.0,
+							"$type":"pe",
+							"y":0.0,
+							"x":200.0,
+							
+							"texture":"box.png",
+							"particles":200,
+							"minTtl":1000,
+							"maxTtl":10000,
+							"minXVelocity":-0.2,
+							"maxXVelocity":0.2,
+							"minYVelocity":-40.0,
+							"maxYVelocity":50.0,
+							"minParticleSize":4.0,
+							"maxParticleSize":10.0
+						}
 						
 					]
 				}
@@ -1422,7 +1440,6 @@
 				{
 					"layerType":"FOREGROUND_1",
 					"objects":[
-						
 					]
 				}
 			]
