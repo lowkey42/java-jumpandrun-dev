@@ -150,9 +150,9 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 		float w = h; 
 				
 		vertexData[i*4 +0] = new Vertex(new Vector2f(pos.x,   pos.y  ), color,	new Vector2f(0,0));
-		vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x,   pos.y+h), color,	new Vector2f(1,0));
-		vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x+w, pos.y+h), color,	new Vector2f(1,1));
-		vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x+w, pos.y  ), color,	new Vector2f(0,1));
+		vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x,   pos.y+h), color,	new Vector2f(texture.getSize().x,0));
+		vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x+w, pos.y+h), color,	new Vector2f(texture.getSize().x,texture.getSize().y));
+		vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x+w, pos.y  ), color,	new Vector2f(0,texture.getSize().y));
 	}
 	
 	

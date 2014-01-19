@@ -1250,7 +1250,7 @@
 							"x":200.0,
 							
 							"texture":"box.png",
-							"particles":200,
+							"particles":500,
 							"minTtl":1000,
 							"maxTtl":10000,
 							"minXVelocity":-0.2,
