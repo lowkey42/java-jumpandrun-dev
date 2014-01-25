@@ -57,18 +57,35 @@ public class MainGameState extends GameState {
 		}
 	}
 	
+	public class ScriptApi {
+		private final GameContext ctx;
+		public ScriptApi(GameContext ctx) {
+			this.ctx = ctx;
+		}
+		
+		public void loadMap(String mapId) {
+			setNextState(new MainGameState(mapId));
+		}
+	}
+	
+	protected Object createScriptApi(GameContext ctx) {
+		return new ScriptApi(ctx);
+	}
+	
 	@Override
 	protected void onStart(GameContext ctx) {
 		if( map!=null ) {
 			map.setFade(true);
+			
 		} else {
 			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-			
 			map = mapSerializer.deserialize(ctx, mapId, true, true);
 			
 			map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
 			.addEventHandler(new PingPongEventHandler(UUID.randomUUID(), EntityEventType.USED, EntityEventType.DAMAGED));
 		}
+		
+		map.getScriptEnv().bind("API", createScriptApi(ctx));
 		
 		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
 		if( player == null )

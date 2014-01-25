@@ -22,6 +22,7 @@ import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
@@ -96,9 +97,21 @@ public final class EditorGameState extends GameState {
 		currentEditorObject = mouseTile;
 	}
 
+	private String mapToLoad=null;
+	public EditorGameState(String mapId) {
+		this(null, null);
+		mapToLoad = mapId;
+	}
+
 	@Override
 	protected void onStart(GameContext ctx) {
 		window = ctx.window;
+		
+		if(map==null && mapToLoad!=null) {
+			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+			map = mapSerializer.deserialize(ctx, mapToLoad, true, true);
+			mapToLoad = null;
+		}
 	}
 
 	@Override

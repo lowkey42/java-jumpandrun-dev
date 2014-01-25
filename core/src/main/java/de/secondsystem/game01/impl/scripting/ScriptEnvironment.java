@@ -43,6 +43,10 @@ public class ScriptEnvironment {
 		}
 	}
 	
+	public void bind(String name, Object obj) {
+		engine.put(name, obj);
+	}
+	
 	public Object eval( String script ) throws ScriptException {
 		return engine.eval(script);
 	}
