@@ -47,13 +47,13 @@ public final class EditorGameState extends GameState {
 	private GameMap map;
 	private final Tileset tileset;
 
-	private final Text editorHint;
-	private final Text layerHint;
+	private Text editorHint;
+	private Text layerHint;
 	private final MouseEditorLayerObject mouseTile;
 	private final SelectedEditorLayerObject selectedObject;
 	
-	private final MouseEditorEntity mouseEntity;
-	private final SelectedEditorEntity selectedEntity;
+	private MouseEditorEntity mouseEntity;
+	private SelectedEditorEntity selectedEntity;
 	private float zoom = 1.f;
 	
 	private float cameraX = 0.f;
@@ -69,30 +69,10 @@ public final class EditorGameState extends GameState {
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
 		this.map = map; // TODO: copy
-		map.setFade(false);
 		this.tileset = new Tileset("test01"); // TODO: get from map
-		
-		ConstFont freeSans;
-		try {
-			freeSans = ResourceManager.font.get("FreeSans.otf");
-
-		} catch (IOException ex) {
-			throw new Error(ex);
-		}
-
-		editorHint = new Text("EDITOR: ${mapName}", freeSans);
-		editorHint.setPosition(0, 0);
-		editorHint.setColor(Color.RED);
-
-		layerHint = new Text(generateLayerHintStr(), freeSans);
-		layerHint.setPosition(0, 25);
-		layerHint.setColor(Color.WHITE);
 		
 		mouseTile      = new MouseEditorLayerObject(tileset);
 		selectedObject = new SelectedEditorLayerObject();
-		
-		mouseEntity    = new MouseEditorEntity(map);
-		selectedEntity = new SelectedEditorEntity(map);
 		
 		currentEditorObject = mouseTile;
 	}
@@ -112,6 +92,27 @@ public final class EditorGameState extends GameState {
 			map = mapSerializer.deserialize(ctx, mapToLoad, true, true);
 			mapToLoad = null;
 		}
+		
+		map.setFade(false);
+		
+		ConstFont freeSans;
+		try {
+			freeSans = ResourceManager.font.get("FreeSans.otf");
+
+		} catch (IOException ex) {
+			throw new Error(ex);
+		}
+
+		layerHint = new Text(generateLayerHintStr(), freeSans);
+		layerHint.setPosition(0, 25);
+		layerHint.setColor(Color.WHITE);
+
+		editorHint = new Text("EDITOR: ${mapName}", freeSans);
+		editorHint.setPosition(0, 0);
+		editorHint.setColor(Color.RED);
+		
+		mouseEntity    = new MouseEditorEntity(map);
+		selectedEntity = new SelectedEditorEntity(map);
 	}
 
 	@Override

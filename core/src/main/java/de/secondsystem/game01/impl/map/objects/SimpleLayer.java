@@ -86,7 +86,7 @@ public class SimpleLayer implements ILayer {
 			layerObjs.add(serializeLayerObject(obj));
 		
 		return new Attributes( 
-				new Attribute("layerType", type.name),
+				new Attribute("layerType", type),
 				new Attribute("objects", layerObjs)
 		);
 	}

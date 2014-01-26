@@ -40,9 +40,6 @@ public class Camera implements IUpdateable {
 	@Override
 	public void update(long frameTimeMs) {
 		if( worldId!=cameraController.getWorldId() ) {
-			// TODO: Add magic here
-			System.out.println("Magic just happend here");
-			
 			worldId = cameraController.getWorldId();
 		}
 		
