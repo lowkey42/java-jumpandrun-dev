@@ -1,0 +1,115 @@
+{
+	"scripts":[
+		
+	],
+	"tileset":"mainLevel",
+	"events":{
+		"sequencedObjects":[
+			
+		],
+		"sequencedEntities":[
+			
+		]
+	},
+	"entities":[
+		
+	],
+	"world":[
+		{
+			"backgroundColor":"#000000ff",
+		    "ambientLight":"#ffffff55",
+			"layer":[
+				{
+					"layerType":BACKGROUND_2,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":BACKGROUND_1,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":BACKGROUND_0,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":PHYSICS,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":FOREGROUND_0,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":FOREGROUND_1,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":LIGHTS,
+					"objects":[
+						
+					]
+				}
+			]
+		},
+		{
+			"backgroundColor":"#000000ff",
+		    "ambientLight":"#ffffff55",
+			"layer":[
+				{
+					"layerType":BACKGROUND_2,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":BACKGROUND_1,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":BACKGROUND_0,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":PHYSICS,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":FOREGROUND_0,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":FOREGROUND_1,
+					"objects":[
+						
+					]
+				},
+				{
+					"layerType":LIGHTS,
+					"objects":[
+						
+					]
+				}
+			]
+		}
+	]
+}

@@ -31,7 +31,7 @@ public class LightMap implements Drawable {
 	
 	private final AtomicBoolean enabled = new AtomicBoolean(true);
 	
-	public LightMap( int width, int height, Color ambientLight ) {
+	public LightMap( int width, int height ) {
 		lightMap = new RenderTexture();
 		try {
 			shader = ResourceManager.shader_frag.get("lightmap.frag");
@@ -48,8 +48,11 @@ public class LightMap implements Drawable {
 		}
 		
 		sprite = new Sprite(lightMap.getTexture());
-		sprite.setColor(ambientLight);
 		
+	}
+	
+	public void setAmbientLight(Color ambientLight) {
+		sprite.setColor(ambientLight);
 	}
 	
 	public void setView( ConstView view ) {

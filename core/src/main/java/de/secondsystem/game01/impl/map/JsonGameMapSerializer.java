@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
-import org.jsfml.graphics.Color;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -50,17 +49,17 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		obj.put("entities", map.getEntityManager().serialize());
 		obj.put("events", map.getSequenceManager().serialize());
 		
-		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()), StandardCharsets.UTF_8) ){
+		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()+".json"), StandardCharsets.UTF_8) ){
 			obj.writeJSONString(writer);
 			
 		} catch (IOException e) {
-			throw new FormatErrorException("Unable to write map-file '"+MAP_PATH.resolve(map.getMapId())+"': "+e.getMessage(), e);
+			throw new FormatErrorException("Unable to write map-file '"+MAP_PATH.resolve(map.getMapId()+".json")+"': "+e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public synchronized GameMap deserialize(GameContext ctx, String mapId, boolean playable, boolean editable) {
-		try ( Reader reader = Files.newBufferedReader(MAP_PATH.resolve(mapId), StandardCharsets.UTF_8) ){
+		try ( Reader reader = Files.newBufferedReader(MAP_PATH.resolve(mapId+".json"), StandardCharsets.UTF_8) ){
 			JSONObject obj = (JSONObject) parser.parse(reader);
 			
 			@SuppressWarnings("unchecked")
@@ -68,9 +67,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			
 			Tileset tileset = new Tileset((String)obj.get("tileset"));
 			
-			Color ambientLight = SerializationUtil.decodeColor((String)obj.get("ambientLight"));
-			
-			GameMap map = new GameMap(ctx, mapId, tileset, ambientLight!=null?ambientLight:Color.WHITE, playable, editable);
+			GameMap map = new GameMap(ctx, mapId, tileset, playable, editable);
 			for( WorldId worldId : WorldId.values() )
 				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			
@@ -87,7 +84,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			return map;
 			
 		} catch (IOException | ParseException e) {
-			throw new FormatErrorException("Unable to parse map-file '"+MAP_PATH.resolve(mapId)+"': "+e.getMessage(), e);
+			throw new FormatErrorException("Unable to parse map-file '"+MAP_PATH.resolve(mapId+".json")+"': "+e.getMessage(), e);
 		} catch (ScriptException e) {
 			throw new FormatErrorException("Unable to parse map-file (Script-Error) '"+MAP_PATH.resolve(mapId)+"': "+e.getMessage(), e);
 		}
@@ -118,6 +115,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 
 	private void deserializeGameWorld(GameMap map, WorldId worldId, JSONObject obj) {
 		map.gameWorld[worldId.arrayIndex].backgroundColor = SerializationUtil.decodeColor((String)obj.get("backgroundColor"));
+		map.gameWorld[worldId.arrayIndex].ambientLight = SerializationUtil.decodeColor((String)obj.get("ambientLight"));
 		
 		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}

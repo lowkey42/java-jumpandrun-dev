@@ -6,7 +6,6 @@ import java.util.Set;
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderTexture;
@@ -38,6 +37,7 @@ public class GameMap implements IGameMap {
 	public static final class GameWorld {
 		final ILayer[] graphicLayer;
 		Color backgroundColor;
+		Color ambientLight;
 		
 		GameWorld( WorldId worldId, IGameEntityManager entityManager, LightMap lightMap ) {
 			graphicLayer = new ILayer[LayerType.LAYER_COUNT];
@@ -56,6 +56,7 @@ public class GameMap implements IGameMap {
 				}
 			
 			backgroundColor = Color.BLACK;
+			ambientLight = Color.WHITE;
 		}
 		void addNode( LayerType layer, ILayerObject sprite ) {
 			addNode(layer.layerIndex, sprite);
@@ -95,18 +96,18 @@ public class GameMap implements IGameMap {
 	
 	private final TimerManager timerManager;
 	
-	public GameMap(GameContext ctx, String mapId, Tileset tileset, Color ambientLight) {
-		this(ctx, mapId, tileset, ambientLight, true, true);
+	public GameMap(GameContext ctx, String mapId, Tileset tileset) {
+		this(ctx, mapId, tileset, true, true);
 	}
 	
-	GameMap(GameContext ctx, String mapId, Tileset tileset, Color ambientLight, boolean playable, boolean editable) {
+	GameMap(GameContext ctx, String mapId, Tileset tileset, boolean playable, boolean editable) {
 		this.mapId = mapId;
 		this.tileset = tileset;
 		this.editable = editable;
 		this.playable = playable;
 		this.activeWorldId = WorldId.MAIN;
 
-		lightMap = ctx!=null && ctx.settings.dynamicLight ? new LightMap(ctx.getViewWidth(), ctx.getViewHeight(), ambientLight) : null;
+		lightMap = ctx!=null && ctx.settings.dynamicLight ? new LightMap(ctx.getViewWidth(), ctx.getViewHeight()) : null;
 		
 		if( playable ) {
 			physicalWorld = new Box2dPhysicalWorld();
@@ -180,6 +181,9 @@ public class GameMap implements IGameMap {
 		
 		for( IWorldSwitchListener listener : worldSwitchListeners )
 			listener.onWorldSwitch(activeWorldId);
+		
+		if( lightMap!=null )
+			lightMap.setAmbientLight(gameWorld[activeWorldId.arrayIndex].ambientLight);
 		
 		fadeTimeLeft=FADE_TIME;
 	}

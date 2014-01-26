@@ -1,5 +1,4 @@
 {
-	"ambientLight":"#ffffff33",
 	"scripts":[
 		"test.js"
 	],
@@ -228,6 +227,7 @@
 	"world":[
 		{
 			"backgroundColor":"#000000ff",
+		    "ambientLight":"#ffffff33",
 			"layer":[
 				{
 					"layerType":"BACKGROUND_2",
@@ -1267,6 +1267,7 @@
 		},
 		{
 			"backgroundColor":"#000000ff",
+	        "ambientLight":"#ffffff77", 
 			"layer":[
 				{
 					"layerType":"BACKGROUND_2",

@@ -12,7 +12,6 @@ import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.Tileset;
-import de.secondsystem.game01.util.SerializationUtil;
 
 public final class Main {
 
@@ -34,7 +33,7 @@ public final class Main {
 					@Override
 					protected void onFrame(GameContext ctx, long frameTime) {
 						IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-						GameMap map = new GameMap(ctx, args[1], new Tileset(args[2]), SerializationUtil.decodeColor(args[3]));
+						GameMap map = new GameMap(ctx, args[1], new Tileset(args[2]));
 						mapSerializer.serialize(map);
 						
 						super.onFrame(ctx, frameTime);
