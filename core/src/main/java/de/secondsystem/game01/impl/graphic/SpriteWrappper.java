@@ -47,7 +47,7 @@ public class SpriteWrappper implements ISpriteWrapper {
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		if( visible ) {
-			final ConstShader shader = lightMap!=null && normalMap!=null ? lightMap.getNMShader(getPosition(), normalMap) : null;
+			final ConstShader shader = lightMap!=null && normalMap!=null ? lightMap.getNMShader(getPosition(), new Vector2f(getWidth(), getHeight()), normalMap) : null;
 			
 			if( shader==null )
 				renderTarget.draw(sprite);

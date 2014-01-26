@@ -40,6 +40,23 @@ public abstract class ResourceManager<T> {
 			return shader;
 		}
 	};
+	
+	public static final ResourceManager<ConstShader> shader = new ResourceManager<ConstShader>(10) {
+		@Override protected Path getBasePath() {
+			return Paths.get("assets", "shader");
+		}
+		@Override protected ConstShader load(Path path) {
+			Shader shader = new Shader();
+			try {
+				shader.loadFromFile(Paths.get(path.toString()+".vert"), Paths.get(path.toString()+".frag"));
+			} catch (IOException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			} catch (ShaderSourceException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+			return shader;
+		}
+	};
 
 	public static final ResourceManager<ConstShader> shader_vert = new ResourceManager<ConstShader>(10) {
 		@Override protected Path getBasePath() {

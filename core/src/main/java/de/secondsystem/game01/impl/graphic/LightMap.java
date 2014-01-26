@@ -43,7 +43,7 @@ public class LightMap implements Drawable {
 			throw new GameException("Unable to load shader");
 		}
 		try {
-			normalShader = (Shader) ResourceManager.shader_frag.get("normalMapping.frag");
+			normalShader = (Shader) ResourceManager.shader.get("normalMapping");
 			
 		} catch (IOException e1) {
 			throw new GameException("Unable to load normalShader");
@@ -68,11 +68,12 @@ public class LightMap implements Drawable {
 		lightMap.setView(view);
 	}
 
-	public ConstShader getNMShader(Vector2f pos, ConstTexture normalMap) {
+	public ConstShader getNMShader(Vector2f pos, Vector2f size, ConstTexture normalMap) {
 		normalShader.setParameter("normals", normalMap);
 		
 		// TODO: determine lights by 'pos'
-		normalShader.setParameter("light0", new Vector3f(0.3f, 1.0f, 0.8f));
+		normalShader.setParameter("lightPos0", new Vector3f(0-pos.x,0-pos.y, 0.07f));
+		normalShader.setParameter("resolution", new Vector2f(10, 10));
 	//	normalShader.setParameter("ambientColor", sprite.getColor());
 		
 		return normalShader; // TODO

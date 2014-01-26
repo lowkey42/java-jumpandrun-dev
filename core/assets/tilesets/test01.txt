@@ -1,1 +1,1 @@
-test01.png, test02.png, bg.jpg, ladder.png, cloud1.png, cloud2.png, cloud3.png, grass.png, plant.png, rock.png
+test01.png, test02.png, bg.jpg, ladder.png, cloud1.png, cloud2.png, cloud3.png, grass.png, plant.png, rock.png, rockWall.png
