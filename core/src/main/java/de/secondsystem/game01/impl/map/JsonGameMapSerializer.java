@@ -94,6 +94,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	private JSONObject serializeGameWorld(GameWorld world) {
 		JSONObject obj = new JSONObject();
 		obj.put("backgroundColor", SerializationUtil.encodeColor(world.backgroundColor) );
+		obj.put("ambientLight", SerializationUtil.encodeColor(world.ambientLight) );
 		obj.put("layer", serializeLayers(world.graphicLayer) );
 		
 		return obj;

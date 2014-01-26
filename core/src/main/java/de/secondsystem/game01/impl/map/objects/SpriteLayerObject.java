@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.graphic.LightMap;
+import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
@@ -22,40 +23,34 @@ public class SpriteLayerObject implements ILayerObject {
 
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(SpriteLayerObject.class);
 	
-	private Sprite sprite;
+	private SpriteWrappper sprite;
 	
 	private int tileId;
 	
-	public SpriteLayerObject(Sprite sprite) {
-		this.sprite = sprite;
+	public SpriteLayerObject(LightMap lightMap, Tileset tileset, int tileId, float x, float y, float rotation) {
+		this(lightMap, tileset, tileId, x, y, rotation, 0, 0);
 	}
-	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation) {
-		this(tileset, tileId, x, y, rotation, 0, 0);
-	}
-	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
+	public SpriteLayerObject(LightMap lightMap, Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
 		this.tileId = tileId;
-		sprite = new Sprite();
-		sprite.setTexture(tileset.tiles.get(tileId));
-		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
-		sprite.setPosition(x, y);
+		sprite = new SpriteWrappper(lightMap, tileset.get(tileId), tileset.getNormals(tileId));
+		sprite.setPosition(new Vector2f(x, y));
 		sprite.setRotation(rotation);
-		setDimensions(width>0?width:sprite.getTexture().getSize().x, height>0?height:sprite.getTexture().getSize().y);
+		sprite.setDimensions(width>0?width:sprite.getWidth(), height>0?height:sprite.getHeight());
 	}
 	
 	public void setTile(Tileset tileset, int tileId) {
 		this.tileId = tileId;
-		sprite.setTexture(tileset.tiles.get(tileId), true);
-		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
+		sprite.setTexture(tileset.get(tileId), tileset.getNormals(tileId));
 	}
 	
 	@Override
 	public void draw(RenderTarget rt) {
-		rt.draw(sprite);
+		sprite.draw(rt);
 	}
 	
 	@Override
 	public void setDimensions(float width, float height) {
-		sprite.setScale(width/sprite.getTexture().getSize().x, height/sprite.getTexture().getSize().y);
+		sprite.setDimensions(width, height);
 	}
 
 	@Override
@@ -75,12 +70,12 @@ public class SpriteLayerObject implements ILayerObject {
 
 	@Override
 	public float getHeight() {
-		return (sprite.getTexture().getSize().y * sprite.getScale().y);
+		return sprite.getHeight();
 	}
 
 	@Override
 	public float getWidth() {
-		return (sprite.getTexture().getSize().x * sprite.getScale().x);
+		return sprite.getWidth();
 	}
 
 	@Override
@@ -113,6 +108,7 @@ public class SpriteLayerObject implements ILayerObject {
 	public static SpriteLayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
 		try {
 			return new SpriteLayerObject(
+					map.getLightMap(),
 					map.getTileset(),
 					((Number)attributes.get("tile")).intValue(), 
 					((Number)attributes.get("x")).floatValue(),

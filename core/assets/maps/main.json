@@ -17,46 +17,63 @@
 	"world":[
 		{
 			"backgroundColor":"#000000ff",
-		    "ambientLight":"#ffffff55",
+		    "ambientLight":"#ffffff33",
 			"layer":[
 				{
-					"layerType":BACKGROUND_2,
+					"layerType":"BACKGROUND_2",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":BACKGROUND_1,
+					"layerType":"BACKGROUND_1",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":BACKGROUND_0,
+					"layerType":"BACKGROUND_0",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":PHYSICS,
+					"layerType":"PHYSICS",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":FOREGROUND_0,
+					"layerType":"FOREGROUND_0",
+					"objects":[
+						{
+							"height":225.0,
+							"rotation":0.0,
+							"tile":10,
+							"width":300.0,
+							"$type":"sp",
+							"y":487.5,
+							"x":1075.5
+						},
+						{
+							"height":225.0,
+							"rotation":0.0,
+							"tile":10,
+							"width":300.0,
+							"$type":"sp",
+							"y":487.5,
+							"x":1498.5
+						}
+					]
+				},
+				{
+					"layerType":"FOREGROUND_1",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":FOREGROUND_1,
-					"objects":[
-						
-					]
-				},
-				{
-					"layerType":LIGHTS,
+					"layerType":"LIGHTS",
 					"objects":[
 						
 					]
@@ -65,46 +82,46 @@
 		},
 		{
 			"backgroundColor":"#000000ff",
-		    "ambientLight":"#ffffff55",
+		    "ambientLight":"#ffffff33",
 			"layer":[
 				{
-					"layerType":BACKGROUND_2,
+					"layerType":"BACKGROUND_2",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":BACKGROUND_1,
+					"layerType":"BACKGROUND_1",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":BACKGROUND_0,
+					"layerType":"BACKGROUND_0",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":PHYSICS,
+					"layerType":"PHYSICS",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":FOREGROUND_0,
+					"layerType":"FOREGROUND_0",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":FOREGROUND_1,
+					"layerType":"FOREGROUND_1",
 					"objects":[
 						
 					]
 				},
 				{
-					"layerType":LIGHTS,
+					"layerType":"LIGHTS",
 					"objects":[
 						
 					]

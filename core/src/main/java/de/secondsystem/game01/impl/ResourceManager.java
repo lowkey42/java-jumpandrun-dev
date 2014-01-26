@@ -159,7 +159,14 @@ public abstract class ResourceManager<T> {
 	protected abstract T load( Path path );
 	
 	protected abstract Path getBasePath();
-	
+
+	public final T getNullable( String name ) throws IOException {
+		try {
+			return cache.get(name);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 	public final T get( String name ) throws IOException {
 		try {
 			return cache.get(name);

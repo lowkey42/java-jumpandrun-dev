@@ -17,6 +17,7 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector3f;
 
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.model.GameException;
@@ -29,6 +30,8 @@ public class LightMap implements Drawable {
 	
 	private final ConstShader shader;
 	
+	private final Shader normalShader;
+	
 	private final AtomicBoolean enabled = new AtomicBoolean(true);
 	
 	public LightMap( int width, int height ) {
@@ -38,6 +41,12 @@ public class LightMap implements Drawable {
 			
 		} catch (IOException e1) {
 			throw new GameException("Unable to load shader");
+		}
+		try {
+			normalShader = (Shader) ResourceManager.shader_frag.get("normalMapping.frag");
+			
+		} catch (IOException e1) {
+			throw new GameException("Unable to load normalShader");
 		}
 		
 		try {
@@ -59,6 +68,16 @@ public class LightMap implements Drawable {
 		lightMap.setView(view);
 	}
 
+	public ConstShader getNMShader(Vector2f pos, ConstTexture normalMap) {
+		normalShader.setParameter("normals", normalMap);
+		
+		// TODO: determine lights by 'pos'
+		normalShader.setParameter("light0", new Vector3f(0.3f, 1.0f, 0.8f));
+	//	normalShader.setParameter("ambientColor", sprite.getColor());
+		
+		return normalShader; // TODO
+	}
+	
 	public void draw( RenderTarget target, ConstTexture frameBufferTexture ) {
 		final ConstView orgView = target.getView();
 		target.setView(new View(Vector2f.div(orgView.getSize(), 2), orgView.getSize()));

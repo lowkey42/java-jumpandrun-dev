@@ -45,12 +45,12 @@ public final class EditorGameState extends GameState {
 
 	private final GameState playGameState;
 	private GameMap map;
-	private final Tileset tileset;
+	private Tileset tileset;
 
 	private Text editorHint;
 	private Text layerHint;
-	private final MouseEditorLayerObject mouseTile;
-	private final SelectedEditorLayerObject selectedObject;
+	private MouseEditorLayerObject mouseTile;
+	private SelectedEditorLayerObject selectedObject;
 	
 	private MouseEditorEntity mouseEntity;
 	private SelectedEditorEntity selectedEntity;
@@ -68,13 +68,7 @@ public final class EditorGameState extends GameState {
 	
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
-		this.map = map; // TODO: copy
-		this.tileset = new Tileset("test01"); // TODO: get from map
-		
-		mouseTile      = new MouseEditorLayerObject(tileset);
-		selectedObject = new SelectedEditorLayerObject();
-		
-		currentEditorObject = mouseTile;
+		this.map = map;
 	}
 
 	private String mapToLoad=null;
@@ -94,6 +88,7 @@ public final class EditorGameState extends GameState {
 		}
 		
 		map.setFade(false);
+		this.tileset = map.getTileset();
 		
 		ConstFont freeSans;
 		try {
@@ -113,6 +108,11 @@ public final class EditorGameState extends GameState {
 		
 		mouseEntity    = new MouseEditorEntity(map);
 		selectedEntity = new SelectedEditorEntity(map);
+		
+		mouseTile      = new MouseEditorLayerObject(map.getLightMap(), tileset);
+		selectedObject = new SelectedEditorLayerObject();
+		
+		currentEditorObject = mouseTile;
 	}
 
 	@Override

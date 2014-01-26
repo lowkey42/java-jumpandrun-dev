@@ -1,6 +1,8 @@
 package de.secondsystem.game01.impl.graphic;
 
+import org.jsfml.graphics.ConstShader;
 import org.jsfml.graphics.ConstTexture;
+import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
@@ -13,23 +15,45 @@ public class SpriteWrappper implements ISpriteWrapper {
 	protected float height;
 	protected boolean visible = true;
 	
+	protected ConstTexture normalMap;
+	protected LightMap lightMap;
+
+	public SpriteWrappper(LightMap lightMap, ConstTexture tex, ConstTexture normalMap) {
+		this(tex);
+		this.normalMap = normalMap;
+		this.lightMap = lightMap;
+	}
+	public SpriteWrappper(ConstTexture tex) {
+		this(tex.getSize().x, tex.getSize().y);
+		setTexture(tex);
+	}
 	public SpriteWrappper(float width, float height) {
 		sprite = new Sprite();	
 		
 		this.width  = width;
 		this.height = height;
 	}
-	
+
+	public void setTexture(ConstTexture tex, ConstTexture normalMap) {
+		setTexture(tex);
+		this.normalMap = normalMap;
+	}
 	public void setTexture(ConstTexture tex) {
-		sprite.setTexture(tex);
+		sprite.setTexture(tex, true);
 		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
 		sprite.setScale(width/tex.getSize().x, height/tex.getSize().y);
 	}
 	
 	@Override
 	public void draw(RenderTarget renderTarget) {
-		if( visible )
-			renderTarget.draw(sprite);
+		if( visible ) {
+			final ConstShader shader = lightMap!=null && normalMap!=null ? lightMap.getNMShader(getPosition(), normalMap) : null;
+			
+			if( shader==null )
+				renderTarget.draw(sprite);
+			else
+				renderTarget.draw(sprite, new RenderStates(shader));
+		}
 	}
 
 	@Override
