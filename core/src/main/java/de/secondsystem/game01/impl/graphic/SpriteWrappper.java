@@ -1,8 +1,6 @@
 package de.secondsystem.game01.impl.graphic;
 
-import org.jsfml.graphics.ConstShader;
 import org.jsfml.graphics.ConstTexture;
-import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
@@ -16,12 +14,10 @@ public class SpriteWrappper implements ISpriteWrapper {
 	protected boolean visible = true;
 	
 	protected ConstTexture normalMap;
-	protected LightMap lightMap;
 
-	public SpriteWrappper(LightMap lightMap, ConstTexture tex, ConstTexture normalMap) {
+	public SpriteWrappper(ConstTexture tex, ConstTexture normalMap) {
 		this(tex);
 		this.normalMap = normalMap;
-		this.lightMap = lightMap;
 	}
 	public SpriteWrappper(ConstTexture tex) {
 		this(tex.getSize().x, tex.getSize().y);
@@ -47,12 +43,11 @@ public class SpriteWrappper implements ISpriteWrapper {
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		if( visible ) {
-			final ConstShader shader = lightMap!=null && normalMap!=null ? lightMap.getNMShader(getPosition(), new Vector2f(getWidth(), getHeight()), normalMap) : null;
-			
-			if( shader==null )
+			if( renderTarget instanceof LightMap ) {
+				((LightMap)renderTarget).draw(sprite, normalMap, 1); // FIXME
+			} else {
 				renderTarget.draw(sprite);
-			else
-				renderTarget.draw(sprite, new RenderStates(shader));
+			}
 		}
 	}
 

@@ -54,7 +54,7 @@ final class GameEntityHelper {
 				((SpriteWrappper) repr).setTexture(ResourceManager.texture_tiles.get(filename));
 				break;
 			case LIGHT:
-				repr = new Light(map.getLightMap(), new Vector2f(0, -0), new Color(200, 180, 150), 300, 360, 360); // TODO
+				repr = map.getLightMap().createLight(attributes.getInteger("worldId", map.getActiveWorldId().id), new Vector2f(0, -0), new Color(200, 180, 150), 300, 360, 360); // TODO
 				break;
 				
 			default:

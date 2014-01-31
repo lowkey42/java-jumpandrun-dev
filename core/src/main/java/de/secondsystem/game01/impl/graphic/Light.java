@@ -15,8 +15,6 @@ public class Light implements IMoveable, IInsideCheck, IDrawable {
 
 	private static final int SUBDIVISIONS = 32;
 	
-	private final LightMap lightMap;
-	
 	private Vector2f center;
 	
 	private Color color;
@@ -27,8 +25,7 @@ public class Light implements IMoveable, IInsideCheck, IDrawable {
 	
 	private boolean dirty;
 	
-	public Light(LightMap lightMap, Vector2f center, Color color, float radius, float degree, float centerDegree) {
-		this.lightMap = lightMap;
+	Light(Vector2f center, Color color, float radius, float degree, float centerDegree) {
 		this.center = center;
 		this.color = color;
 		this.radius = radius;
@@ -39,10 +36,6 @@ public class Light implements IMoveable, IInsideCheck, IDrawable {
 
 	VertexArray getDrawable() {
 		return dirty ? vertices=createDrawable(center, color, radius, degree, centerDegree) : vertices;
-	}
-	
-	public void draw(RenderTarget rt) {
-		lightMap.drawLight(this);
 	}
 
 
@@ -127,5 +120,10 @@ public class Light implements IMoveable, IInsideCheck, IDrawable {
 	@Override
 	public Vector2f getPosition() {
 		return center;
+	}
+
+	@Override
+	public void draw(RenderTarget renderTarget) {
+		// do nothing
 	}
 }

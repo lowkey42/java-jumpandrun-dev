@@ -1,31 +1,28 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.View;
-import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.graphic.LightMap;
-import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.LayerType;
 
 public final class LightLayer extends SimpleLayer {
 
 	private final LightMap lightMap;
 	
-	public LightLayer(LayerType type, LightMap lightMap) {
+	private final WorldId worldId;
+	
+	public LightLayer(WorldId worldId, LayerType type, LightMap lightMap) {
 		super(type);
+		this.worldId = worldId;
 		this.lightMap = lightMap;
 	}
 
 	@Override
 	public void draw(RenderTarget rt) {
 		if( lightMap!=null ) {
-			for( ILayerObject lo : objects ) {
-				if( lo instanceof LightLayerObject )
-					((LightLayerObject) lo).drawLight(lightMap);
-			}
+			lightMap.drawVisibleLights(worldId.id, rt.getView().getViewport());
 		}
 	}
-
+	
 }

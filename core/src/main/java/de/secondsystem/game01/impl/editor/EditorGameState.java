@@ -109,7 +109,7 @@ public final class EditorGameState extends GameState {
 		mouseEntity    = new MouseEditorEntity(map);
 		selectedEntity = new SelectedEditorEntity(map);
 		
-		mouseTile      = new MouseEditorLayerObject(map.getLightMap(), tileset);
+		mouseTile      = new MouseEditorLayerObject(tileset);
 		selectedObject = new SelectedEditorLayerObject();
 		
 		currentEditorObject = mouseTile;

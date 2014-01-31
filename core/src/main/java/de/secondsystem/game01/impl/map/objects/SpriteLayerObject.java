@@ -6,7 +6,6 @@ import java.util.Map;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -27,12 +26,12 @@ public class SpriteLayerObject implements ILayerObject {
 	
 	private int tileId;
 	
-	public SpriteLayerObject(LightMap lightMap, Tileset tileset, int tileId, float x, float y, float rotation) {
-		this(lightMap, tileset, tileId, x, y, rotation, 0, 0);
+	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation) {
+		this(tileset, tileId, x, y, rotation, 0, 0);
 	}
-	public SpriteLayerObject(LightMap lightMap, Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
+	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
 		this.tileId = tileId;
-		sprite = new SpriteWrappper(lightMap, tileset.get(tileId), tileset.getNormals(tileId));
+		sprite = new SpriteWrappper(tileset.get(tileId), tileset.getNormals(tileId));
 		sprite.setPosition(new Vector2f(x, y));
 		sprite.setRotation(rotation);
 		sprite.setDimensions(width>0?width:sprite.getWidth(), height>0?height:sprite.getHeight());
@@ -108,7 +107,6 @@ public class SpriteLayerObject implements ILayerObject {
 	public static SpriteLayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
 		try {
 			return new SpriteLayerObject(
-					map.getLightMap(),
 					map.getTileset(),
 					((Number)attributes.get("tile")).intValue(), 
 					((Number)attributes.get("x")).floatValue(),

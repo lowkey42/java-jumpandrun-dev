@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.editor;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2i;
 
-import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
@@ -13,19 +12,17 @@ import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 public class MouseEditorLayerObject extends EditorLayerObject {
 	private final Tileset tileset;
-	private final LightMap lightMap;
 	private int currentTile = 0;
 	
-	public MouseEditorLayerObject(LightMap lightMap, Tileset tileset) {
+	public MouseEditorLayerObject(Tileset tileset) {
 		this.tileset = tileset;
-		this.lightMap = lightMap;
 		
 		createSpriteObject();
 	}
 	
 	public void createSpriteObject() {
 		if (!(layerObject instanceof SpriteLayerObject))
-			layerObject = new SpriteLayerObject(lightMap, tileset, currentTile, 0, 0, 0);
+			layerObject = new SpriteLayerObject(tileset, currentTile, 0, 0, 0);
 		
 		onTileChanged();
 	}

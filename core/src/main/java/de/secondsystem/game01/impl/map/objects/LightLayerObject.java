@@ -18,18 +18,14 @@ public class LightLayerObject implements ILayerObject {
 
 	private final Light light;
 	
-	public LightLayerObject(LightMap lightMap, float x, float y, float rotation, float radius, float sizeDegree, Color color) {
-		light = new Light(lightMap, new Vector2f(x, y), color, radius, sizeDegree, rotation);
+	public LightLayerObject(LightMap lightMap, WorldId worldId, float x, float y, float rotation, float radius, float sizeDegree, Color color) {
+		light = lightMap.createLight(worldId.id, new Vector2f(x, y), color, radius, sizeDegree, rotation);
 	}
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
 	}
 
-	void drawLight(LightMap lightMap) {
-		lightMap.drawLight(light);
-	}
-	
 	@Override
 	public boolean inside(Vector2f point) {
 		return light.inside(point);
@@ -93,6 +89,7 @@ public class LightLayerObject implements ILayerObject {
 		try {
 			return new LightLayerObject(
 					map.getLightMap(),
+					worldId,
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),
 					((Number)attributes.get("rotation")).floatValue(),
