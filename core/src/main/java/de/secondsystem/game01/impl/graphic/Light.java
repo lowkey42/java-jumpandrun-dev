@@ -21,34 +21,34 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	
 	private Color color;
 	
-	private float radius, degree, centerDegree;
+	private float radius, degree, rotation;
 	
 	private VertexArray vertices;
 	
 	private boolean dirty;
 	
-	Light(Vector2f center, Color color, float radius, float degree, float centerDegree) {
+	Light(Vector2f center, Color color, float radius, float degree, float rotation) {
 		this.center = center;
 		this.color = color;
 		this.radius = radius;
-		this.degree = (float) Math.toRadians(degree);
-		this.centerDegree = (float) Math.toRadians(centerDegree);
+		this.degree = degree;
+		this.rotation = rotation;
 		this.dirty = true;
 	}
 
 	VertexArray getDrawable() {
-		return dirty ? vertices=createDrawable(center, color, radius, degree, centerDegree) : vertices;
+		return dirty ? vertices=createDrawable(center, color, radius, (float)Math.toRadians(degree), (float)Math.toRadians(rotation)) : vertices;
 	}
 
 
 	private static VertexArray createDrawable(Vector2f center, Color color, float radius,
-			float degree, float centerDegree) {
+			float degree, float rotation) {
 		VertexArray v = new VertexArray(PrimitiveType.TRIANGLE_FAN);
 		v.ensureCapacity(SUBDIVISIONS+1);
 		
 		v.add(new Vertex(center, color));
 		
-		final float startDegree = (float) (centerDegree-degree/2 -Math.PI/2);
+		final float startDegree = (float) (rotation-degree/2 -Math.PI/2);
 		final float stepSize = (float) ((Math.PI*2)/SUBDIVISIONS);
 		final Color borderColor = new Color(0, 0, 0, 0);
 		
@@ -76,14 +76,7 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 		this.degree = (float) Math.toRadians(degree);
 		this.dirty = true;
 	}
-	public void setCenterDegree(float centerDegree) {
-		this.centerDegree = (float) Math.toRadians(centerDegree);
-		this.dirty = true;
-	}
 
-	public Vector2f getCenter() {
-		return center;
-	}
 	public Color getColor() {
 		return color;
 	}
@@ -92,9 +85,6 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	}
 	public float getDegree() {
 		return degree;
-	}
-	public float getCenterDegree() {
-		return centerDegree;
 	}
 
 	@Override
@@ -111,12 +101,13 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 
 	@Override
 	public void setRotation(float degree) {
-		this.centerDegree = degree;
+		this.rotation = degree;
+		this.dirty = true;
 	}
 
 	@Override
 	public float getRotation() {
-		return centerDegree;
+		return rotation;
 	}
 
 	@Override

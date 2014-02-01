@@ -54,8 +54,6 @@ function onJump() {
 // entities.create("box", {"x": 150, "y": -100, "density":2} );
 
 entities.create("light", {"x": 150, "y": -100, "worldId":3} );
-//entities.create("light", {"x": 300, "y": -100, "worldId":3} );
-//entities.create("light", {"x": 500, "y": 200, "worldId":3} );
 
 for( var i=0; i<50; i++ )	
 	entities.create("light", {"x": 500+i*50, "y": 200, "worldId":1} );

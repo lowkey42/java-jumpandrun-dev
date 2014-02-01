@@ -95,6 +95,8 @@ public class SpriteWrappper implements ISpriteWrapper {
 	@Override
 	public void setDimensions(float width, float height) {
 		sprite.setScale(width/sprite.getTexture().getSize().x, height/sprite.getTexture().getSize().y);
+		this.width = width;
+		this.height = height;
 	}
 	
 	@Override

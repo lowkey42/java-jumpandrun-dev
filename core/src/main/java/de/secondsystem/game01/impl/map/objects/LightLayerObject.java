@@ -53,7 +53,7 @@ public class LightLayerObject implements ILayerObject {
 
 	@Override
 	public float getHeight() {
-		return light.getCenterDegree();
+		return light.getRotation();
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class LightLayerObject implements ILayerObject {
 	@Override
 	public void setDimensions(float width, float height) {
 		light.setRadius(width/2);
-		light.setCenterDegree(height);
+		light.setRotation(height);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class LightLayerObject implements ILayerObject {
 		Map<String, Object> map = new HashMap<>();
 		map.put("x", getPosition().x);
 		map.put("y", getPosition().y);
-		map.put("rotation", light.getCenterDegree());
+		map.put("rotation", light.getRotation());
 		map.put("radius", light.getRadius());
 		map.put("sizeDegree", light.getDegree());
 		map.put("color", SerializationUtil.encodeColor(light.getColor()));
