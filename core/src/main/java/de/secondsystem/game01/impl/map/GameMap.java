@@ -212,9 +212,11 @@ public class GameMap implements IGameMap {
 		ILayer layer = gameWorld[worldId.arrayIndex].graphicLayer[layerType.layerIndex];
 		
 		if( layer.isVisible() ) {
+			ConstView cv = target.getView();
 			target.setView(calcLayerView(layerType.parallax, baseView));
 			 
 			layer.draw(target);
+			target.setView(cv);
 		}
 	}
 	protected void drawInactiveWorldFade(RenderTarget rt) {
@@ -248,12 +250,15 @@ public class GameMap implements IGameMap {
 			lightMap.setView(rt.getView());
 			rt = lightMap;
 		}
-		
+
+		final ConstView cView = rt.getView();
 		preDraw(rt);
 		
 		for( LayerType l : LayerType.values() )
-			drawVisibleLayer(rt, rt.getView(), activeWorldId, l);
+			drawVisibleLayer(rt, cView, activeWorldId, l);
 
+		rt.setView(cView);
+		
 		drawInactiveWorldFade(rt);
 		
 		postDraw(rt);

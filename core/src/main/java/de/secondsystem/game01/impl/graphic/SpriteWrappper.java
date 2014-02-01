@@ -44,7 +44,7 @@ public class SpriteWrappper implements ISpriteWrapper {
 	public void draw(RenderTarget renderTarget) {
 		if( visible ) {
 			if( renderTarget instanceof LightMap ) {
-				((LightMap)renderTarget).draw(sprite, normalMap, 1); // FIXME
+				((LightMap)renderTarget).draw(sprite, normalMap);
 			} else {
 				renderTarget.draw(sprite);
 			}

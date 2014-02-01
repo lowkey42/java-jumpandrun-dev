@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="lib/jsfml.jar">
@@ -11,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/json_simple-1.1.jar" sourcepath="lib/json_simple-1.1-source.zip"/>
 	<classpathentry kind="lib" path="lib/jbox2d-testbed-2.2.1.1-jar-with-dependencies.jar" sourcepath="lib/jbox2d-sources.zip"/>
 	<classpathentry kind="lib" path="lib/guava-15.0.jar" sourcepath="lib/guava-15.0-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -227,7 +227,7 @@
 	"world":[
 		{
 			"backgroundColor":"#000000ff",
-		    "ambientLight":"#ffffff66",
+		    "ambientLight":"#ffffff33",
 			"layer":[
 				{
 					"layerType":"BACKGROUND_2",

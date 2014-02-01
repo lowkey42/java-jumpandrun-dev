@@ -7,11 +7,13 @@ import org.jsfml.graphics.Vertex;
 import org.jsfml.graphics.VertexArray;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.collections.IndexedMoveable;
 
-public class Light implements IMoveable, IInsideCheck, IDrawable {
+public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, IDrawable, IDimensioned {
 
 	private static final int SUBDIVISIONS = 32;
 	
@@ -102,7 +104,7 @@ public class Light implements IMoveable, IInsideCheck, IDrawable {
 	}
 
 	@Override
-	public void setPosition(Vector2f pos) {
+	protected void doSetPosition(Vector2f pos) {
 		this.center = pos;
 		this.dirty = true;
 	}
@@ -125,5 +127,15 @@ public class Light implements IMoveable, IInsideCheck, IDrawable {
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		// do nothing
+	}
+
+	@Override
+	public float getHeight() {
+		return radius*2;
+	}
+
+	@Override
+	public float getWidth() {
+		return radius*2;
 	}
 }

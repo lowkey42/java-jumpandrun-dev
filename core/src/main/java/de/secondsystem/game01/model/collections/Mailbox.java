@@ -1,4 +1,4 @@
-package de.secondsystem.game01.model;
+package de.secondsystem.game01.model.collections;
 
 import java.util.concurrent.atomic.AtomicReference;
 

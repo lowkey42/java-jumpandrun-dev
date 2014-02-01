@@ -1,8 +1,6 @@
 package de.secondsystem.game01.impl.graphic;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
@@ -21,10 +19,15 @@ import org.jsfml.system.Vector3f;
 
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.collections.ISpatialIndex;
+import de.secondsystem.game01.model.collections.ISpatialIndex.EntryWalker;
+import de.secondsystem.game01.model.collections.SpatialGrid;
 
 public class LightMap extends RenderTargetWrapper {
 
 	private final RenderTexture lightMap;
+	
+	private int lastWorldMask;
 	
 	private final Vector2f windowSize;
 	
@@ -32,7 +35,7 @@ public class LightMap extends RenderTargetWrapper {
 	
 	private final Shader normalShader;
 	
-	private final Set<Light>[] lights;
+	private final ISpatialIndex<Light>[] lights;
 	
 	@SuppressWarnings("unchecked")
 	public LightMap( RenderTarget renderTarget, byte lightGroups, Vector2f windowSize, int width, int height ) {
@@ -40,9 +43,9 @@ public class LightMap extends RenderTargetWrapper {
 		
 		this.windowSize = windowSize;
 		
-		lights = new Set[lightGroups];
-		for( byte g=1; g<=lightGroups; ++g ) 
-			lights[g-1] = new HashSet<>();
+		lights = new ISpatialIndex[lightGroups];
+		for( byte g=0; g<lightGroups; ++g ) 
+			lights[g] = new SpatialGrid<>(500, new Vector2f(-500, -1500), new Vector2f(5000, 1000));
 		
 		lightMap = new RenderTexture();
 		try {
@@ -64,35 +67,71 @@ public class LightMap extends RenderTargetWrapper {
 		this.ambientLight = ambientLight;
 	}
 	
+	@Override
 	public void setView( ConstView view ) {
 		lightMap.setView(view);
+		super.setView(view);
 	}
 
-	public ConstShader getNMShader(Vector2f pos, int groupMask, ConstTexture normalMap) {
+	private static class Closure$getNMShader {
+		Vector2f lightPos;
+		double dist;
+	}
+	
+	public ConstShader getNMShader(final Vector2f pos, Vector2f size, ConstTexture normalMap) {
 		normalShader.setParameter("normalMapped", normalMap!=null ? 1.f : 0.f);
 		
 		if( normalMap!=null ) {
 			normalShader.setParameter("normals", normalMap);
 
-			// TODO: determine lights by 'pos'
-			normalShader.setParameter("lightPos0", new Vector3f(400,100, 0.07f));
+			final Closure$getNMShader c = new Closure$getNMShader();
+			
+			c.lightPos = pos;
+			c.dist = Double.MAX_VALUE;
+			
+			int group = 0;
+			int groupMask = lastWorldMask;
+			while( groupMask!=0 ) {
+				if( (groupMask&1)!=0 )
+					lights[group].query(pos, (float) Math.sqrt(size.x*size.x+size.y*size.y), new EntryWalker<Light>() {
+						@Override public void walk(Light l) {
+							double d = Math.sqrt(
+									(pos.x-l.getPosition().x)*(pos.x-l.getPosition().x) +
+									(pos.y-l.getPosition().y)*(pos.y-l.getPosition().y) );
+							
+							if( d<c.dist ) {
+								c.dist=d;
+								c.lightPos = l.getPosition();
+							}
+						}
+					});
+				
+				group++;
+				groupMask= groupMask>>1;
+			}
+			
+			normalShader.setParameter("lightPos0", new Vector3f(c.lightPos.x, c.lightPos.y, 0.08f));
 		}
 		
 		normalShader.setParameter("lightmap", lightMap.getTexture());
 		normalShader.setParameter("ambientColor", ambientLight!=null ? ambientLight : Color.WHITE);
 		normalShader.setParameter("windowSize", windowSize);
 		
-		return normalShader; // TODO
+		return normalShader;
 	}
 	
 	public void drawVisibleLights( int groupMask, FloatRect rect ) {
+		lastWorldMask = groupMask;
+		
 		int group = 0;
 		while( groupMask!=0 ) {
 			
-			if( (groupMask&1)!=0 )			
-				for( Light l : lights[group] ) {
-					drawLight(l);
-				}
+			if( (groupMask&1)!=0 )
+				lights[group].query(rect, new EntryWalker<Light>() {
+					@Override public void walk(Light l) {
+						drawLight(l);
+					}
+				});
 			
 			group++;
 			groupMask= groupMask>>1;
@@ -121,12 +160,17 @@ public class LightMap extends RenderTargetWrapper {
 		return l;
 	}
 	public void destroyLight(Light light) {
-		for( Set<Light> l : lights )
+		for( ISpatialIndex<Light> l : lights )
 			l.remove(light);
 	}
 
-	public void draw(Sprite sprite, ConstTexture normalMap, int worldMask) {
-		final ConstShader shader = getNMShader(sprite.getPosition(), worldMask, normalMap);
+	public void draw(Sprite sprite, ConstTexture normalMap) {
+		final ConstShader shader = getNMShader(
+				sprite.getPosition(), 
+				new Vector2f(
+					sprite.getTexture().getSize().x*sprite.getScale().x, 
+					sprite.getTexture().getSize().y*sprite.getScale().y),
+				normalMap);
 		
 		draw(sprite, new RenderStates(shader));
 	}
