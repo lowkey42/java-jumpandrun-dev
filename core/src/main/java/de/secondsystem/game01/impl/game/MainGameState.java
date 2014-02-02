@@ -13,9 +13,9 @@ import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
-import de.secondsystem.game01.impl.game.entities.events.impl.KillEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.impl.PingPongEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
+import de.secondsystem.game01.impl.game.entities.events.KillEventHandler;
+import de.secondsystem.game01.impl.game.entities.events.PingPongEventHandler;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -46,14 +46,8 @@ public class MainGameState extends GameState {
 		this.mapId = mapId;
 	}
 	
-	private static final UUID PLAYER_DEATH_EVENT_UUID = UUID.nameUUIDFromBytes("playerDeath".getBytes());
-	
 	private final class PlayerDeathEventHandler extends KillEventHandler {
 
-		public PlayerDeathEventHandler() {
-			super(PLAYER_DEATH_EVENT_UUID, EntityEventType.DAMAGED);
-		}
-		
 		@Override
 		protected void killEntity(IGameEntity entity) {
 			setNextState(new GameOverGameState());
@@ -92,7 +86,7 @@ public class MainGameState extends GameState {
 			map = mapSerializer.deserialize(ctx, mapId, true, true);
 			
 			map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
-			.addEventHandler(new PingPongEventHandler(UUID.randomUUID(), EntityEventType.USED, EntityEventType.DAMAGED));
+			.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
 		}
 		
 		map.getScriptEnv().bind("API", createScriptApi(ctx));
@@ -101,7 +95,7 @@ public class MainGameState extends GameState {
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
-		player.addEventHandler( new PlayerDeathEventHandler() );
+		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
 		
 		camera = new Camera(player);
 			
@@ -139,10 +133,9 @@ public class MainGameState extends GameState {
 		controller = new KeyboardController(ctx.settings.keyMapping);
 		controller.addGE(player);
 	}
-
+	
 	@Override
 	protected void onStop(GameContext ctx) {
-		// TODO: free resources
 		backgroundMusic.pause();
 	}
 

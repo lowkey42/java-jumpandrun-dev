@@ -4,4 +4,6 @@ public interface IControllableGameEntity extends IControllable, IGameEntity {
 
 	void setController( IGameEntityController controller );
 	
+	IGameEntityController getController();
+	
 }

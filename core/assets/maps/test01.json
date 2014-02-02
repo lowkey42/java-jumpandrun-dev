@@ -2,270 +2,103 @@
 	"scripts":[
 		"test.js"
 	],
-	"tileset":"test01",
-	"events":{
-		"sequencedObjects":[
-			
-		],
-		"sequencedEntities":[
-			
-		]
-	},
-	"entities":[
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"dfc686b9-ae1f-4ff1-8dbc-839039ac562a",
-				"handlers":{
-					
-				}
-			},
-			"archetype":"fire",
-			"attributes":{
+	"tileset":"test01",,
+	"entityManager":{
+		"entities":[
+			{
+				"archetype":"fire",
+				"uuid":"9b5ea359-f194-4f17-9bb7-8694b65c29d3",
 				"y":300,
 				"x":-50
 			},
-			"uuid":"9b5ea359-f194-4f17-9bb7-8694b65c29d3"
-		},
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"d8e7acd4-9fd7-41e1-be11-0fd1f7a1e93b",
-				"handlers":{
-					"LIFTED":[
-						{
-							"handlerFuncName":"liftedFunc",
-							"class":"ScriptEntityEventHandler",
-							"uuid":"4c1a02db-1902-4e4c-895b-9a38b432fd5d",
-							"eventType":"LIFTED"
-						}
-					],
-					"UNLIFTED":[
-						{
-							"handlerFuncName":"unliftedFunc",
-							"class":"ScriptEntityEventHandler",
-							"uuid":"fcd2ea9a-4fd2-4a07-bd61-2f872affc915",
-							"eventType":"UNLIFTED"
-						}
-					]
-				}
-			},
-			"archetype":"enemy",
-			"attributes":{
+			{
+				"archetype":"enemy",
+				"uuid":"e9bd653d-23b8-4752-9ad8-0df01c29f4e7"
 				"y":200.0,
-				"x":150.0
-			},
-			"uuid":"e9bd653d-23b8-4752-9ad8-0df01c29f4e7"
-		},
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"d077715a-bf08-4f1d-8295-413861ebdffb",
-				"handlers":{
-					"JUMPED":[
-						{
-							"handlerFuncName":"onJump",
-							"class":"ScriptEntityEventHandler",
-							"uuid":"6e12d310-d954-4f5d-8df8-388af3d4e954",
-							"eventType":"JUMPED"
-						}
-					]
+				"x":150.0,
+				"onLIFTED": {
+					"func":"liftedFunc",
+					"factory":".ScriptEHF",
+				},
+				"onUNLIFTED": {
+					"func":"unliftedFunc",
+					"factory":".ScriptEHF",
 				}
 			},
-			"archetype":"player",
-			"attributes":{
+			{
+				"archetype":"player",
+				"uuid":"aa013690-1408-4a13-8329-cbfb1cfa7f6b",
 				"y":100,
 				"x":300
 			},
-			"uuid":"aa013690-1408-4a13-8329-cbfb1cfa7f6b"
-		},
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"044212a6-22da-4878-8edc-476c19fba89c",
-				"handlers":{
-					
-				}
-			},
-			"archetype":"fire",
-			"attributes":{
-				"y":200,
-				"x":-50
-			},
-			"uuid":"75d5c8c1-22cd-4c5d-939d-1e956ba4d676"
-		},
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"33d02f37-9cde-452c-99b1-769d8fcdfa50",
-				"handlers":{
-					
-				}
-			},
-			"archetype":"moving platform",
-			"attributes":{
+			{
+				"archetype":"moving platform",
+				"uuid":"4cb85984-42f8-4acf-9f5b-c6f724c491d5",
 				"y":100,
-				"x":150
-			},
-			"uuid":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
-		},
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"0384569c-0e23-4dba-a45a-427ecb932a68",
-				"handlers":{
-					
-				}
-			},
-			"archetype":"fire",
-			"attributes":{
-				"y":250,
-				"x":-50
-			},
-			"uuid":"42971594-07df-4695-8d02-dea1e5a9086b"
-		},
-		{
-			"eventHandler":{
-				"class":"CollectionEntityEventHandler",
-				"uuid":"f9c1ac83-fc7f-46f0-8444-73052ed2779a",
-				"handlers":{
-					"USED":[
-						{
-							"sequencedObject":{
-								"isOwnerHumanoid":[
-									
-								],
-								"isOwnerKinematic":[
-									{
-										"offTriggers":{
-											
-										},
-										"events":[
-											
-										],
-										"class":"Toggle",
-										"uuid":"038ca08a-0f45-4f2a-921e-638dc6371d7e",
-										"onTriggers":{
-											
-										},
-										"toggleTriggers":{
-											"b844b83f-58fc-4213-bdf2-7a9aa0996909":{
-												"animationType":null,
-												"linkedEntities":[
-													
-												],
-												"class":"AnimatedSequencedEntity",
-												"uuid":"48395b54-0d01-4f85-97eb-448facd2215b",
-												"animatedEntity":"b844b83f-58fc-4213-bdf2-7a9aa0996909"
-											}
-										},
-										"targets":[
-											{
-												"animationType":null,
-												"linkedEntities":[
-													
-												],
-												"class":"AnimatedSequencedEntity",
-												"uuid":"dce8755d-9e9b-4d60-8613-71a924fa2b52",
-												"animatedEntity":"75d5c8c1-22cd-4c5d-939d-1e956ba4d676"
-											},
-											{
-												"animationType":null,
-												"linkedEntities":[
-													
-												],
-												"class":"AnimatedSequencedEntity",
-												"uuid":"3b05a75b-e7e8-492f-a295-27d4e585f991",
-												"animatedEntity":"42971594-07df-4695-8d02-dea1e5a9086b"
-											},
-											{
-												"animationType":null,
-												"linkedEntities":[
-													
-												],
-												"class":"AnimatedSequencedEntity",
-												"uuid":"936db2e6-6527-4df1-b2cb-e95de3f3152a",
-												"animatedEntity":"9b5ea359-f194-4f17-9bb7-8694b65c29d3"
-											},
-											{
-												"animationType":null,
-												"linkedEntities":[
-													
-												],
-												"class":"AnimatedSequencedEntity",
-												"uuid":"48395b54-0d01-4f85-97eb-448facd2215b",
-												"animatedEntity":"b844b83f-58fc-4213-bdf2-7a9aa0996909"
-											},
-											{
-												"linkedEntities":[
-													
-												],
-												"class":"ControllableSequencedEntity",
-												"controller":{
-													"targetPoints":{
-														"0":[
-															150.0,
-															-100.0
-														],
-														"1":[
-															150.0,
-															100.0
-														],
-														"2":[
-															300.0,
-															100.0
-														]
-													},
-													"uuid":"8d125fbf-420c-4878-90df-1eb27d062d9b",
-													"controlledEntity":"4cb85984-42f8-4acf-9f5b-c6f724c491d5",
-													"repeated":false
-												},
-												"uuid":"b85c2552-2b69-489f-af4b-fc903b777e0d"
-											}
-										]
-									}
-								],
-								"inTriggers":{
-									"b844b83f-58fc-4213-bdf2-7a9aa0996909":{
-										"animationType":null,
-										"linkedEntities":[
-											
-										],
-										"class":"AnimatedSequencedEntity",
-										"uuid":"48395b54-0d01-4f85-97eb-448facd2215b",
-										"animatedEntity":"b844b83f-58fc-4213-bdf2-7a9aa0996909"
-									}
-								},
-								"isOtherHumanoid":[
-									
-								],
-								"class":"Condition",
-								"uuid":"53bb7fef-0133-49a8-b23f-ccfaacc31c26",
-								"isOtherStatic":[
-									
-								],
-								"isOtherKinematic":[
-									
-								],
-								"isOwnerStatic":[
-									
-								]
-							},
-							"class":"SequencedEntityEventHandler",
-							"uuid":"de8a8cc3-f39f-447f-9bbe-5ec359c83d85",
-							"eventType":"USED"
-						}
+				"x":150,
+				"controller":{
+					"factory":".PatrollingControllerFactory"
+					"repeated":"true"
+					"targetPoints":[
+						{"x":300, "y":100},
+						{"x":150, "y":100},
+						{"x":150, "y":-100},
 					]
 				}
 			},
-			"archetype":"lever",
-			"attributes":{
-				"y":270,
-				"x":210
+			{
+				"archetype":"fire",
+				"uuid":"75d5c8c1-22cd-4c5d-939d-1e956ba4d676",
+				"y":200,
+				"x":-50
 			},
-			"uuid":"b844b83f-58fc-4213-bdf2-7a9aa0996909"
-		}
-	],
+			{
+				"archetype":"fire",
+				"uuid":"42971594-07df-4695-8d02-dea1e5a9086b"
+				"y":250,
+				"x":-50
+			},
+			{
+				"archetype":"lever",
+				"uuid":"b844b83f-58fc-4213-bdf2-7a9aa0996909",
+				"y":270,
+				"x":210,
+				"onUSED": {
+					"factory":".ToggleEHF"
+				},
+				"onENABLED": [
+					{
+						"factory":".PPEHF",
+						"target":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
+						"sub":{
+							"factory":".PlaybackEHF",
+							"action":"PLAY",
+							"target":"CONTROLLER"
+						}
+					},
+					{
+						"factory":".AnimateEHF",
+						"anim":"USED"
+					}
+				],
+				"onDISABLED": [
+					{
+						"factory":".PPEHF",
+						"target":"4cb85984-42f8-4acf-9f5b-c6f724c491d5"
+						"sub":{
+							"factory":".PlaybackEHF",
+							"action":"PAUSE",
+							"target":"CONTROLLER"
+						}
+					},
+					{
+						"factory":".AnimateEHF",
+						"anim":"UNUSED"
+					}
+				]
+			}
+		],
+	},
 	"world":[
 		{
 			"backgroundColor":"#000000ff",
@@ -1676,7 +1509,7 @@
 					]
 				}
 			],
-			"ambientLight":"#ffffff77"
+			"ambientLight":"#ff888899"
 		}
 	]
 }

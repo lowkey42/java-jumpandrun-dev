@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.game.entities;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
@@ -15,14 +14,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -31,13 +31,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import de.secondsystem.game01.impl.game.entities.events.CollectionEntityEventHandler;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler;
-import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
-import de.secondsystem.game01.impl.map.FormatErrorException;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 
 public final class GameEntityManager implements IGameEntityManager {
 
@@ -218,62 +215,46 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 	}
 	
-//	@Override
-//	public void deserialize(Iterator<SerializedEntity> iter) {
-//		while( iter.hasNext() ) {
-//			SerializedEntity se = iter.next();
-//			create(se.uuid(), se.archetype(), se.attributes());
-//		}
-//	}
-
-	@SuppressWarnings("unchecked")
 	@Override
-	public JSONArray serialize() {	
-		JSONArray jArray = new JSONArray();
-		for(IGameEntity entity : entities.values()) {
-			JSONObject se = new JSONObject();
-			se.put("uuid", entity.uuid().toString());		
-			se.put("archetype", entity.getEditableState().getArchetype());	
-			se.put("attributes", entity.getEditableState().getAttributes());
-			IEntityEventHandler eh = entity.getEventHandler();
-			if( eh != null )
-				se.put("eventHandler", eh.serialize());		// TODO: geht das auch anders (Darstellung im Editor evtl. problematisch)
-			jArray.add(se);
+	public Attributes serialize() {	
+		final List<Attributes> entityAttributes = new ArrayList<>(entities.size());
+		for(IGameEntity entity : entities.values())
+			entityAttributes.add( filterEntityAttributes(entity.serialize(), entity.getEditableState().getArchetype()) );
+		
+		return new Attributes(
+				new Attribute("entities", entityAttributes)
+		);
+	}
+	
+	private static final Attributes filterEntityAttributes( Attributes attributes, String archetype ) {
+		try {
+			EntityArchetype at = ARCHETYPE_CACHE.get(archetype);
+			
+			if( at!=null ) {
+				for( Entry<String, Object> e : at.attributes.entrySet() )
+					if( e.getValue().equals(attributes.get(e.getKey())) )
+							attributes.remove(e.getKey());
+			}
+			
+		} catch (ExecutionException e) {
+			throw new Error(e.getMessage(), e);
 		}
 		
-		return jArray;
+		return attributes;
 	}
 	
 	@Override
-	public void deserialize(JSONArray jArray) {
-		if( jArray == null )
+	public void deserialize(Attributes attributes) {
+		final List<Attributes> entityAttributes = attributes.getObjectList("entities");
+		
+		if( entityAttributes == null )
 			return;
 		
-		// deserialize game entities first
-		for(Object o : jArray) {			
-			JSONObject jObj = (JSONObject) o; 
-			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-			final String archetype = (String) jObj.get("archetype");
-			@SuppressWarnings("unchecked")
-			HashMap<String, Object> attributes = (HashMap<String, Object>) jObj.get("attributes");		
+		for(Attributes entityAttr : entityAttributes) {
+			final UUID uuid = UUID.fromString( entityAttr.getString("uuid") );
+			final String archetype = entityAttr.getString("archetype");
 			
-			IGameEntity entity = create(uuid, archetype, attributes);
-			
-			entities.put(entity.uuid(), entity);			
-		}
-		
-		// now deserialize event handlers since they have entity links
-		for(Object o : jArray) {			
-			JSONObject jObj = (JSONObject) o; 
-			if( jObj.get("eventHandler") == null )
-				continue;
-			
-			final UUID uuid = UUID.fromString( (String) jObj.get("uuid") );
-			CollectionEntityEventHandler eventHandler = new CollectionEntityEventHandler();
-			IEntityEventHandler eh = eventHandler.deserialize((JSONObject) jObj.get("eventHandler"), map);			
-			
-			IGameEntity entity = get(uuid);
-			entity.addEventHandler(eh != null ? eh : eventHandler);
+			IGameEntity entity = create(uuid, archetype, entityAttr);
 			
 			entities.put(entity.uuid(), entity);
 			
@@ -314,85 +295,4 @@ public final class GameEntityManager implements IGameEntityManager {
 		return null;
 	}
 
-
-//	@Override
-//	public Iterable<SerializedEntity> serialize() {
-//		return new SEIterable();
-//	}
-
-//	private static final class SerializedEntityImpl implements SerializedEntity {
-//
-//		private final UUID uuid;
-//		private final String archetype;
-//		private final Map<String, Object> attributes;
-//		
-//		public SerializedEntityImpl(UUID uuid, String archetype, Map<String, Object> attributes) {
-//			this.uuid = uuid;
-//			this.archetype = archetype;
-//			this.attributes = attributes;
-//		}
-//		
-//		@Override
-//		public UUID uuid() {
-//			return uuid;
-//		}
-//
-//		@Override
-//		public String archetype() {
-//			return archetype;
-//		}
-//
-//		@Override
-//		public Map<String, Object> attributes() {
-//			return attributes;
-//		}
-//		
-//	}
-	
-//	private final class SEIterable implements Iterable<SerializedEntity> {
-//		@Override public Iterator<SerializedEntity> iterator() {
-//			return new SEIterator(entities);
-//		}
-//	}
-//	private final class SEIterator implements Iterator<SerializedEntity> {
-//
-//		private final Iterator<Entry<UUID, IGameEntity>> iter;
-//		
-//		public SEIterator(Map<UUID, IGameEntity> entities) {
-//			iter = Collections.unmodifiableMap(entities).entrySet().iterator();
-//		}
-//		
-//		@Override
-//		public boolean hasNext() {
-//			return iter.hasNext();
-//		}
-//
-//		@Override
-//		public SerializedEntity next() {
-//			Entry<UUID, IGameEntity> entity = iter.next();
-//
-//			Map<String, Object> attributes = entity.getValue().serialize().clone();
-//			
-//			try {
-//				EntityArchetype at = ARCHETYPE_CACHE.get(entity.getValue().getArchetype());
-//				
-//				if( at!=null ) {
-//					for( Entry<String, Object> e : at.attributes.entrySet() )
-//						if( e.getValue().equals(attributes.get(e.getKey())) )
-//								attributes.remove(e.getKey());
-//				}
-//				
-//			} catch (ExecutionException e) {
-//				throw new Error(e.getMessage(), e);
-//			}
-//			
-//			return new SerializedEntityImpl(entity.getKey(), entity.getValue().getArchetype(), attributes);
-//		}
-//
-//		@Override
-//		public void remove() {
-//			throw new UnsupportedOperationException("remove is not allowed");
-//		}
-//		
-//	}
 }

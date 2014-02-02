@@ -7,12 +7,13 @@ import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
-import org.json.simple.JSONArray;
 
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 
-public interface IGameEntityManager extends IUpdateable {
+public interface IGameEntityManager extends IUpdateable, ISerializable {
 
 	Set<String> listArchetypes();
 	
@@ -26,19 +27,10 @@ public interface IGameEntityManager extends IUpdateable {
 	IGameEntity get(UUID eId);
 	IWeakGameEntityRef getRef(UUID eId);
 	
-	void deserialize(JSONArray jArray);
-	JSONArray serialize();
+	void deserialize(Attributes attributes);
 	
 	ArrayList<String> getArchetypes();
-//	void deserialize( Iterator<SerializedEntity> iter );
-//	Iterable<SerializedEntity> serialize();
 
 	void draw(WorldId worldId, RenderTarget rt);
-	
-//	public interface SerializedEntity {
-//		UUID uuid();
-//		String archetype();
-//		Map<String, Object> attributes();
-//	}
 	
 }
