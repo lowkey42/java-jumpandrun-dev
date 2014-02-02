@@ -96,6 +96,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		obj.put("backgroundColor", SerializationUtil.encodeColor(world.backgroundColor) );
 		obj.put("ambientLight", SerializationUtil.encodeColor(world.ambientLight) );
 		obj.put("layer", serializeLayers(world.graphicLayer) );
+		obj.put("backgroundMusic", world.backgroundMusic);
 		
 		return obj;
 	}
@@ -117,6 +118,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	private void deserializeGameWorld(GameMap map, WorldId worldId, JSONObject obj) {
 		map.gameWorld[worldId.arrayIndex].backgroundColor = SerializationUtil.decodeColor((String)obj.get("backgroundColor"));
 		map.gameWorld[worldId.arrayIndex].ambientLight = SerializationUtil.decodeColor((String)obj.get("ambientLight"));
+		map.gameWorld[worldId.arrayIndex].backgroundMusic = (String)obj.get("backgroundMusic");
 		
 		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
 	}

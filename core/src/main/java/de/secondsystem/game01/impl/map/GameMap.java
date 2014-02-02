@@ -38,6 +38,7 @@ public class GameMap implements IGameMap {
 		final ILayer[] graphicLayer;
 		Color backgroundColor;
 		Color ambientLight;
+		String backgroundMusic;
 		
 		GameWorld( WorldId worldId, IGameEntityManager entityManager, LightMap lightMap ) {
 			graphicLayer = new ILayer[LayerType.LAYER_COUNT];
@@ -428,6 +429,10 @@ public class GameMap implements IGameMap {
 	@Override
 	public void setFade(boolean enable) {
 		fadeEnabled = enable;
+	}
+
+	public String getDefaultBgMusic(WorldId world) {
+		return gameWorld[world.arrayIndex].backgroundMusic;
 	}
 	
 }

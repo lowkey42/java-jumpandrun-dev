@@ -20,12 +20,15 @@ import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+import de.secondsystem.game01.impl.sound.MusicWrapper;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class MainGameState extends GameState {
 
 	private final String mapId;
+	
+	private MusicWrapper backgroundMusic;
 	
 	private DevConsole console = new DevConsole();
 	
@@ -74,6 +77,12 @@ public class MainGameState extends GameState {
 	
 	@Override
 	protected void onStart(GameContext ctx) {
+		if( backgroundMusic==null )
+			backgroundMusic = new MusicWrapper(ctx.settings.volume);
+		
+		else
+			backgroundMusic.play();
+		
 		if( map!=null ) {
 			map.setFade(true);
 			
@@ -133,6 +142,7 @@ public class MainGameState extends GameState {
 	@Override
 	protected void onStop(GameContext ctx) {
 		// TODO: free resources
+		backgroundMusic.pause();
 	}
 
 	@Override
@@ -145,6 +155,9 @@ public class MainGameState extends GameState {
 		map.update(frameTime);
 
 		camera.update(frameTime);
+
+		backgroundMusic.fade(map.getDefaultBgMusic(camera.getWorldId()), 5000);
+		backgroundMusic.update(frameTime);
 		
 		final ConstView cView = ctx.window.getView();
 		ctx.window.setView(camera.createView(cView));
