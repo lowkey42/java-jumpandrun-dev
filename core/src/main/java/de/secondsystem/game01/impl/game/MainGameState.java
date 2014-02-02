@@ -85,6 +85,7 @@ public class MainGameState extends GameState {
 		
 		if( map!=null ) {
 			map.setFade(true);
+			backgroundMusic.play();
 			
 		} else {
 			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
