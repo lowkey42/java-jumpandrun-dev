@@ -147,7 +147,7 @@ public class PatrollingController implements IUpdateable, IGameEntityController,
 		
 		return new Attributes(
 				new Attribute("repeated", repeated),
-				new Attribute("targetPoints", targetPoints),
+				new Attribute("targetPoints", o),
 				new Attribute(ControllerUtils.FACTORY, ControllerUtils.normalizeControllerFactory(PatrollingControllerFactory.class.getName()))
 		);
 	}

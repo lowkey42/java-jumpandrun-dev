@@ -232,7 +232,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+"{"+uuid()+(editableEntityState!=null?(", "+editableEntityState.getAllAttributes()):"")+"}";
+		return getClass().getSimpleName()+serialize();
 	}
 
 	@Override
@@ -286,11 +286,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	@Override
 	public Attributes serialize() {
-		// TODO
-		return new Attributes( editableEntityState.getAttributes(), 
+		// TODO: may/should be modified for editor
+		return new Attributes( editableEntityState!=null ? editableEntityState.getAttributes() : Collections.emptyMap(), 
 				new Attributes(
-						new Attribute("uuid", uuid),
-						new Attribute("archetype", editableEntityState.getArchetype())
+						new Attribute("uuid", uuid.toString()),
+						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???")
 		) );
 	}
 }

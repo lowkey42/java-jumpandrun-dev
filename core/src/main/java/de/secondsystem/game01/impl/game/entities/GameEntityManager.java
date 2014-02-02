@@ -205,14 +205,8 @@ public final class GameEntityManager implements IGameEntityManager {
 
 		@Override
 		public Attributes getAttributes() {
-			return attributes;
-		}
-
-		@Override
-		public Attributes getAllAttributes() {
 			return new Attributes(attributes, archetype.attributes);
 		}
-		
 	}
 	
 	@Override
@@ -245,9 +239,12 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public void deserialize(Attributes attributes) {
+		if( attributes==null )
+			return;
+		
 		final List<Attributes> entityAttributes = attributes.getObjectList("entities");
 		
-		if( entityAttributes == null )
+		if( entityAttributes==null )
 			return;
 		
 		for(Attributes entityAttr : entityAttributes) {
@@ -257,8 +254,6 @@ public final class GameEntityManager implements IGameEntityManager {
 			IGameEntity entity = create(uuid, archetype, entityAttr);
 			
 			entities.put(entity.uuid(), entity);
-			
-			// deserialized 
 		}
 	}
 
