@@ -71,7 +71,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			
 			List<String> scripts = obj.getList("scripts");
 			for( String scriptName : scripts ) {
-				map.getScriptEnv().load(scriptName);
+				map.getScriptEnv().queueLoad(scriptName);
 			}
 			
 			map.getEntityManager().deserialize( obj.getObject("entityManager"));

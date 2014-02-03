@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.timer;
+package de.secondsystem.game01.impl.scripting.timer;
 
 import java.util.PriorityQueue;
 
@@ -14,12 +14,16 @@ public class TimerManager implements IUpdateable{
 		env = scriptEnv;
 	}
 	
+	public void createTimer(long intervalMs, boolean repeated, Object callable) {
+		timers.add(new FunctionTimer(env, intervalMs, repeated, callable));
+	}
+	
 	public void createTimer(long intervalMs, boolean repeated, String funcName, IGameEntity target, Object... args) {
-		timers.add(new Timer(env, intervalMs, repeated, funcName, target, args));
+		timers.add(new EntityTimer(env, intervalMs, repeated, funcName, target, args));
 	}
 	
 	public void createTimer(long intervalMs, boolean repeated, String funcName, Object... args) {
-		timers.add(new Timer(env, intervalMs, repeated, funcName, null, args));
+		this.createTimer(intervalMs, repeated, funcName, null, args);
 	}
 	
 	@Override

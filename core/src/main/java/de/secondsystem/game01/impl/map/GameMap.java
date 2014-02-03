@@ -26,8 +26,9 @@ import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment.ScriptType;
-import de.secondsystem.game01.impl.timer.TimerManager;
+import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.GameException;
 
 public class GameMap implements IGameMap {
 	
@@ -84,9 +85,7 @@ public class GameMap implements IGameMap {
 	
 	private final LightMap lightMap;
 	
-	final ScriptEnvironment scripts; 
-	
-	private final TimerManager timerManager;
+	final ScriptEnvironment scripts;
 
 	private final RenderTexture fadeBuffer = new RenderTexture();
 	
@@ -125,17 +124,16 @@ public class GameMap implements IGameMap {
 		for( WorldId wId : WorldId.values() )
 			gameWorld[wId.arrayIndex] = new GameWorld(wId, entityManager, lightMap);
 		
-		
-		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), 
-				new Attribute("map", this), new Attribute("entities", entityManager) );
-		
-		timerManager = new TimerManager(scripts);
-		
+		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT,
+				new Attributes(
+					new Attribute("mapId", mapId), 
+					new Attribute("map", this), 
+					new Attribute("entities", entityManager)) );
+
 		try {
-			fadeBuffer.create(1920, 1080);
+			fadeBuffer.create(ctx.getViewWidth(), ctx.getViewHeight());
 		} catch (TextureCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new GameException("Unable to create fade-buffer: "+e.getMessage(), e);
 		}
 	}
 		
@@ -258,6 +256,8 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public void update(long frameTimeMs) {
+		scripts.update(frameTimeMs);
+		
 		for( LayerType l : LayerType.values() )
 			if( l.updated )
 				for( GameWorld world : gameWorld )
@@ -273,8 +273,6 @@ public class GameMap implements IGameMap {
 		if( System.currentTimeMillis()-ps > 10 ) {
 			System.out.println("pTime-Peak: "+(System.currentTimeMillis()-ps));
 		}
-			
-		timerManager.update(frameTimeMs);
 		
 		fadeTimeLeft-=frameTimeMs;
 	}
@@ -373,11 +371,6 @@ public class GameMap implements IGameMap {
 	@Override
 	public ScriptEnvironment getScriptEnv() {
 		return scripts;
-	}
-
-	@Override
-	public TimerManager getTimerManager() {
-		return timerManager;
 	}
 
 	@Override

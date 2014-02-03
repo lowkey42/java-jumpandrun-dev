@@ -60,3 +60,11 @@ for( var i=0; i<10; i++ )
 	
 for( var i=0; i<10; i++ )	
 	entities.create("light", {"x": i*100, "y": 100, "worldId":2} );
+
+//API.playMonologue("test-mon");
+
+timer.createTimer(1000, false, function(){
+	API.playMonologue("test-mon");
+});
+
+	

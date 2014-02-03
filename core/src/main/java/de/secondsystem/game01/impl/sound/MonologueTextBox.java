@@ -1,8 +1,10 @@
 package de.secondsystem.game01.impl.sound;
 
 import org.jsfml.graphics.ConstFont;
+import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Text;
+import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
@@ -15,13 +17,17 @@ public final class MonologueTextBox implements IUpdateable, IDrawable {
 	
 	private final Text text = new Text();
 	
-	public MonologueTextBox(ConstFont font, int size) {
+	public MonologueTextBox(ConstFont font, int size, Vector2f pos) {
 		text.setCharacterSize(size);
 		text.setFont(font);
+		text.setPosition(pos);
 	}
 
 	public void play(String name) {
-		monologue = Monologue.load(name);
+		if( (monologue = Monologue.load(name))!=null ) {
+			monologue.updateText(sentence=0, text);
+			timePassed=0;
+		}
 	}
 	
 	@Override

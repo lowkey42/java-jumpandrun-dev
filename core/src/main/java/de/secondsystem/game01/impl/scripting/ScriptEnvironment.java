@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.script.Invocable;
 import javax.script.ScriptContext;
@@ -15,9 +16,12 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import de.secondsystem.game01.impl.scripting.timer.TimerManager;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.model.Attributes.Attribute;
 
-public class ScriptEnvironment {
+public class ScriptEnvironment implements IUpdateable {
 	
 	public static enum ScriptType {
 		JAVA_SCRIPT("javascript");
@@ -28,15 +32,24 @@ public class ScriptEnvironment {
 	
 	private final ScriptEngine engine;
 	
+	private final List<String> scriptsToLoad = new ArrayList<>();
+	
 	private final List<String> scripts = new ArrayList<>();
 	
-	public ScriptEnvironment( ScriptType type, Attribute... attributes ) {
+	private final TimerManager timerManager = new TimerManager(this);
+	
+	public ScriptEnvironment( ScriptType type, Attributes attributes ) {
 		engine = new ScriptEngineManager().getEngineByName(type.name);
 		
-		for( Attribute att : attributes )
-			engine.put(att.key, att.value);
+		engine.put("timer", timerManager);
+		
+		for( Entry<String, Object> att : attributes.entrySet() )
+			engine.put(att.getKey(), att.getValue());
 	}
-	
+
+	public void queueLoad( String name ) throws IOException, ScriptException {
+		scriptsToLoad.add(name);
+	}
 	public void load( String name ) throws IOException, ScriptException {
 		scripts.add(name);
 		try ( Reader reader = Files.newBufferedReader(Paths.get("assets", "scripts", name), StandardCharsets.UTF_8) ){
@@ -83,6 +96,23 @@ public class ScriptEnvironment {
 		}
 		
 		return null;
+	}
+
+	@Override
+	public void update(long frameTimeMs) {
+		if( !scriptsToLoad.isEmpty() ) {
+			for( String script : scriptsToLoad )
+				try {
+					load(script);
+				} catch (IOException | ScriptException e) {
+					System.err.println("Error loading script '"+script+"': "+e.getMessage());
+					e.printStackTrace();
+				}
+			
+			scriptsToLoad.clear();
+		}
+		
+		timerManager.update(frameTimeMs);
 	}
 
 }

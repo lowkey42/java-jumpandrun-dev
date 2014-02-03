@@ -1,14 +1,18 @@
 package de.secondsystem.game01.impl.game;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.jsfml.graphics.ConstView;
+import org.jsfml.graphics.View;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.DevConsole;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
@@ -20,13 +24,17 @@ import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+import de.secondsystem.game01.impl.sound.MonologueTextBox;
 import de.secondsystem.game01.impl.sound.MusicWrapper;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.GameException;
 
 public class MainGameState extends GameState {
 
 	private final String mapId;
+	
+	private MonologueTextBox monologueTextBox;
 	
 	private MusicWrapper backgroundMusic;
 	
@@ -63,6 +71,10 @@ public class MainGameState extends GameState {
 		public void loadMap(String mapId) {
 			setNextState(new MainGameState(mapId));
 		}
+		
+		public void playMonologue(String name) {
+			monologueTextBox.play(name);
+		}
 	}
 	
 	protected Object createScriptApi(GameContext ctx) {
@@ -72,10 +84,17 @@ public class MainGameState extends GameState {
 	@Override
 	protected void onStart(GameContext ctx) {
 		if( backgroundMusic==null )
-			backgroundMusic = new MusicWrapper(ctx.settings.volume);
-		
+			backgroundMusic = new MusicWrapper((short) (ctx.settings.volume*0.5));
 		else
 			backgroundMusic.play();
+		
+		if( monologueTextBox==null )
+			try {
+				monologueTextBox = new MonologueTextBox(ResourceManager.font.get("FreeSans.otf"), 30, new Vector2f(ctx.getViewWidth()/2, ctx.getViewHeight()-100));
+				
+			} catch (IOException e) {
+				throw new GameException("Unable to load font for MonologueTextBox: "+e.getMessage(), e);
+			}
 		
 		if( map!=null ) {
 			map.setFade(true);
@@ -87,9 +106,10 @@ public class MainGameState extends GameState {
 			
 			map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
 			.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
+
+			map.getScriptEnv().bind("API", createScriptApi(ctx));
 		}
 		
-		map.getScriptEnv().bind("API", createScriptApi(ctx));
 		
 		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
 		if( player == null )
@@ -153,6 +173,8 @@ public class MainGameState extends GameState {
 		backgroundMusic.fade(map.getDefaultBgMusic(camera.getWorldId()), 5000);
 		backgroundMusic.update(frameTime);
 		
+		monologueTextBox.update(frameTime);
+		
 		final ConstView cView = ctx.window.getView();
 		ctx.window.setView(camera.createView(cView));
 		map.setActiveWorldId(camera.getWorldId());
@@ -162,6 +184,7 @@ public class MainGameState extends GameState {
 		
 		ctx.window.setView(cView);
 		
+		monologueTextBox.draw(ctx.window);
 		
 		// events
 		for(Event event : ctx.window.pollEvents()) {

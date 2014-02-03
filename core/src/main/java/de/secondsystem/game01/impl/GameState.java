@@ -1,6 +1,8 @@
 package de.secondsystem.game01.impl;
 
+import org.jsfml.graphics.View;
 import org.jsfml.system.Clock;
+import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.fsm.IContext;
 import de.secondsystem.game01.fsm.IState;
@@ -30,6 +32,9 @@ public abstract class GameState implements IState {
 		assert(newCtx instanceof GameContext);
 		
 		this.ctx = (GameContext) newCtx;
+		
+		ctx.window.setView(new View(Vector2f.div(ctx.window.getView().getSize(), 2), ctx.window.getView().getSize()));
+		
 		onStart(ctx);
 		firstFrame = true;
 	}

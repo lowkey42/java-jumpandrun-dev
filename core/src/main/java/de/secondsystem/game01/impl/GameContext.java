@@ -58,7 +58,7 @@ public class GameContext implements IContext {
 		window.setVerticalSyncEnabled(settings.verticalSync);
 		
 		viewWidth = (int) ((VIEW_HEIGHT/window.getView().getSize().y) * window.getView().getSize().x);
-		window.setView(new View(window.getView().getCenter(), new Vector2f(viewWidth, VIEW_HEIGHT)));
+		window.setView(new View(new Vector2f(viewWidth/2, VIEW_HEIGHT/2), new Vector2f(viewWidth, VIEW_HEIGHT)));
 	}
 	
 	public Vector2f getMousePosition() {

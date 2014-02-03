@@ -1,3 +1,5 @@
 {"sentences":[
-	{"text":"asd"}
+	{"text":"The - remarkable sane - narrator was confident,\nthat this time he would catch the princess alive...", "lenght":7000, "soundBite":"test-mon-01-acapelaTTS_test.ogg"},
+	{"text":"... or kill her tring.", "lenght":2100, "soundBite":"test-mon-02-acapelaTTS_test.ogg"}
+	{"text":"Infact killing her right now would make the rest much easier.", "lenght":5000, "soundBite":"test-mon-03-acapelaTTS_test.ogg"}
 ]}
