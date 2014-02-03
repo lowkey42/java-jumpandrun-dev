@@ -52,41 +52,9 @@ public final class SettingsMenuState extends GameState {
 		// TODO
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		// TODO
-		for (Event event : ctx.window.pollEvents()) {
-			switch (event.type) {
-			case CLOSED:
-				ctx.window.close();
-				break;
-			case MOUSE_BUTTON_RELEASED:
-				// Checking if the current mouse position is inside the Button
-				// and only the left mouse button is pressed
-				// if(sliderOne.sliderSprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x,
-				// (Mouse.getPosition(ctx.window).y)) &&
-				// event.asMouseButtonEvent().button ==
-				// org.jsfml.window.Mouse.Button.LEFT)
-				// setNextState(new MainGameState("test01"));
-				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					back.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-				}
-
-				break;
-			case KEY_RELEASED:
-				if (event.asKeyEvent().key == Key.ESCAPE) {
-					ctx.window.draw(backdrop);
-					setNextState(playGameState);
-				}
-			case MOUSE_BUTTON_PRESSED:
-			case MOUSE_MOVED:
-				sliderOne.mouseover(ctx, event);
-				sliderTwo.mouseover(ctx, event);
-
-				break;
-			}
-		}
 		ctx.window.clear();
 		
 		ctx.window.draw(backdrop);
@@ -104,4 +72,38 @@ public final class SettingsMenuState extends GameState {
 
 	}
 
+	@SuppressWarnings("incomplete-switch")
+	@Override
+	protected void processEvent(GameContext ctx, Event event) {
+		switch (event.type) {
+		case CLOSED:
+			ctx.window.close();
+			break;
+		case MOUSE_BUTTON_RELEASED:
+			// Checking if the current mouse position is inside the Button
+			// and only the left mouse button is pressed
+			// if(sliderOne.sliderSprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x,
+			// (Mouse.getPosition(ctx.window).y)) &&
+			// event.asMouseButtonEvent().button ==
+			// org.jsfml.window.Mouse.Button.LEFT)
+			// setNextState(new MainGameState("test01"));
+			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
+				back.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+			}
+
+			break;
+		case KEY_RELEASED:
+			if (event.asKeyEvent().key == Key.ESCAPE) {
+				ctx.window.draw(backdrop);
+				setNextState(playGameState);
+			}
+		case MOUSE_BUTTON_PRESSED:
+		case MOUSE_MOVED:
+			sliderOne.mouseover(ctx, event);
+			sliderTwo.mouseover(ctx, event);
+
+			break;
+		}
+	}
+	
 }

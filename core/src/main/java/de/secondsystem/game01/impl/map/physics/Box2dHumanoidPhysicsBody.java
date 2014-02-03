@@ -8,16 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
@@ -36,7 +33,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	
 	private float maxThrowVel;
 	private float maxLiftWeight;
-	private float maxLiftForce = 2; // TODO: should be arg
+	private float maxLiftForce;
 	private IPhysicsBody liftedBody = null;
 	private RevoluteJoint liftJoint = null;
 
@@ -47,10 +44,11 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
 			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
 			float maxXVel, float maxYVel,
-			float maxThrowVel, float maxLiftWeight, float maxSlope, float maxReach) {
+			float maxThrowVel, float maxLiftWeight, float maxLiftForce, float maxSlope, float maxReach) {
 		super(world, gameWorldId, width, height, interactive, liftable, type, false, true, true, maxXVel, maxYVel);
 		this.maxThrowVel = maxThrowVel;
 		this.maxLiftWeight = maxLiftWeight;
+		this.maxLiftForce = maxLiftForce;
 		
 		this.maxSlope = maxSlope;
 		this.maxReach = maxReach;
@@ -186,8 +184,6 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		if( !leftObjects.bodies.contains(other) && !rightObjects.bodies.contains(other) )
 			return false;
 		
-	//	Joint j = parent.createDistanceJoint(body, ((Box2dPhysicsBody)other).body, (20+getHeight()/2+Math.max(other.getHeight(), other.getWidth())/2) * BOX2D_SCALE_FACTOR );
-		
 		liftJoint = bind(other, getPosition(), maxLiftForce);
 		
 		if( liftJoint!=null ) {
@@ -203,6 +199,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	@Override
 	public boolean throwLiftedBody(float strength, Vector2f direction) {
 		if( isLiftingSomething() ) {
+			strength = Math.min(maxThrowVel, strength);
 			unbind(liftedBody);
 			((Box2dPhysicsBody)liftedBody).body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
 			((Box2dPhysicsBody)liftedBody).liftingBody = null;
@@ -369,66 +366,4 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			}
 		}
 	}
-
-//	public void setGameWorldId(int id) {
-//		worldIdMask = id;
-//		
-//		// could/should be done much less hackish
-//		boolean gravContact = false;
-//		
-//		for( ContactEdge c=body.getContactList(); c!=null;  c=c.next ) {
-//			Box2dPhysicsBody body1 = (Box2dPhysicsBody) c.contact.getFixtureA().getBody().getUserData();
-//			Box2dPhysicsBody body2 = (Box2dPhysicsBody) c.contact.getFixtureB().getBody().getUserData();
-//			
-//			
-//			
-//			if( (body1.getGameWorldId() == body2.getGameWorldId()) && (body1.getCollisionHandlerType()==CollisionHandlerType.NO_GRAV || body2.getCollisionHandlerType()==CollisionHandlerType.NO_GRAV) ) {
-//				gravContact = true;
-//				break;
-//			}
-//		}
-//		
-//		if( !gravContact ) {
-//			collisionWithLadder = false;
-//			body.setGravityScale(1.f);
-//			climbing = false;
-//		} else {
-//			collisionWithLadder = true;
-//		}
-//	}
-	
-
-//	@Override
-//	public void throwBoundBody(float x, float y) {
-//		Body body = revoluteJoint.getBodyB();
-//		unbind();
-//		x = x < 0 ? Math.max(x, -maxThrowVel) : Math.min(x, maxThrowVel);
-//		y = y < 0 ? Math.max(y, -maxThrowVel) : Math.min(y, maxThrowVel);
-//		Box2dPhysicsBody b = ((Box2dPhysicsBody)body.getUserData());
-//		float newX = x > 0 ? b.getPosition().x+width/2.f+20f : b.getPosition().x-width/2.f-20f;
-//		if( y > 0) 
-//			b.forcePosition(newX, b.getPosition().y);
-//		
-//		if( Math.abs(x) < 1.f ) {
-//			b.forcePosition(newX, b.getPosition().y + b.height/2.f);
-//		}
-//		else
-//			body.applyLinearImpulse(new Vec2(x, y), body.getPosition());
-//	}
-//
-//	@Override
-//	public void setMaxThrowVelocity(float vel) {
-//		maxThrowVel = vel;
-//	}
-//	
-//	@Override
-//	public IPhysicsBody getTouchingBodyRight() {
-//		return touchingBodiesRight.size() > 0 ? touchingBodiesRight.get(0) : null;
-//	}
-//
-//	@Override
-//	public IPhysicsBody getTouchingBodyLeft() {
-//		return touchingBodiesLeft.size() > 0 ? touchingBodiesLeft.get(0) : null;
-//	}
-
 }

@@ -117,8 +117,6 @@ public final class EditorGameState extends GameState {
 
 	@Override
 	protected void onStop(GameContext ctx) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private View getTransformedView(GameContext ctx) {
@@ -152,21 +150,19 @@ public final class EditorGameState extends GameState {
 		ctx.window.draw(layerHint);
 
 		processInputKeyboard();
+	}
+	
+	@Override
+	protected void processEvent(GameContext ctx, Event event) {
+		if (event.type == Event.Type.KEY_RELEASED
+				&& event.asKeyEvent().key == Key.F12) {
+			setNextState(playGameState);
 
-		for (Event event : ctx.window.pollEvents()) {
-			if (event.type == Event.Type.CLOSED) {
-				ctx.window.close();
-
-			} else if (event.type == Event.Type.KEY_RELEASED
-					&& event.asKeyEvent().key == Key.F12) {
-				setNextState(playGameState);
-
-			} else if (event.type == Event.Type.KEY_RELEASED
-					&& event.asKeyEvent().key == Key.ESCAPE) {
-				setNextState(new MainMenuState(this));
-			} else
-				processInput(ctx, event);
-		}
+		} else if (event.type == Event.Type.KEY_RELEASED
+				&& event.asKeyEvent().key == Key.ESCAPE) {
+			setNextState(new MainMenuState(this));
+		} else
+			processInput(ctx, event);
 	}
 
 	private final void drawMap(RenderTarget rt) {

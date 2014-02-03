@@ -35,11 +35,11 @@ public abstract class AbstractGameEntityController implements IGameEntityControl
 			for( IControllableGameEntity ge : ges )
 				ge.moveVertically(direction, factor);
 		}
-
+		
 		@Override
-		public void liftObject() {
+		public void liftOrThrowObject(float force) {
 			for( IControllableGameEntity ge : ges )
-				ge.liftObject();		
+				ge.liftOrThrowObject(force);
 		}
 
 		@Override
@@ -48,12 +48,6 @@ public abstract class AbstractGameEntityController implements IGameEntityControl
 				ge.switchWorlds();	
 		}
 		
-		@Override
-		public void incThrowingPower() {
-			for( IControllableGameEntity ge : ges )
-				ge.incThrowingPower();	
-		}
-
 		@Override
 		public void use() {
 			for( IControllableGameEntity ge : ges )

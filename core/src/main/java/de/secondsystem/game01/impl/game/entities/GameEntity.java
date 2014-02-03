@@ -63,8 +63,10 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		this.physicsBody = physicsBody;
 		this.map = map;
 		
-		if( physicsBody!=null )
+		if( physicsBody!=null ) {
 			physicsBody.setOwner(this);
+			physicsBody.setContactListener(this);
+		}
 		
 		if( physicsBody!=null && representation instanceof IMoveable ) {
 			((IMoveable) representation).setPosition( physicsBody.getPosition() );

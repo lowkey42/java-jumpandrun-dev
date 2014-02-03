@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Vector2f;
+import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.fsm.IContext;
 import de.secondsystem.game01.fsm.IState;
@@ -61,6 +62,14 @@ public abstract class GameState implements IState {
 		if( frameTime > 16*3 ) {
 			System.out.println("JITTER: "+frameTime+"  of "+(frameTime-(1000./60.)));
 		}
+		
+		for(Event event : ctx.window.pollEvents()) {
+	        if(event.type == Event.Type.CLOSED)
+	            ctx.window.close();
+
+	        processEvent(ctx, event);
+	    }
+		
 		onFrame(ctx, frameTime);
 
 		ctx.window.display();
@@ -71,6 +80,9 @@ public abstract class GameState implements IState {
 			return r;
 		}
 		return this;
+	}
+	
+	protected void processEvent(GameContext ctx, Event event) {
 	}
 
 }

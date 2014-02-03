@@ -26,7 +26,7 @@ final class GameEntityHelper {
 		LIGHT;
 	}
 	
-	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) { // TODO
+	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) {
 		IDrawable repr = null;
 		try {
 			RepresentationType type = RepresentationType.valueOf(attributes.getString("representationType"));
@@ -113,6 +113,10 @@ final class GameEntityHelper {
 			Float maxThrowSpeed = attributes.getFloat("maxThrowSpeed");
 			if( maxThrowSpeed!=null )
 				hBodyFactory.maxThrowSpeed(maxThrowSpeed);
+			
+			Float maxLiftForce = attributes.getFloat("maxLiftForce");
+			if( maxLiftForce!=null )
+				hBodyFactory.maxLiftForce(maxLiftForce);
 			
 			Float maxReach = attributes.getFloat("maxReach");
 			if( maxReach!=null )

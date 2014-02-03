@@ -22,7 +22,6 @@ import de.secondsystem.game01.model.IUpdateable;
  *
  */
 class ControllableGameEntity extends GameEntity implements IControllableGameEntity {
-	private final float THROWING_POWER_INC = 2.f;
 	
 	private IGameEntityController controller; 
 	
@@ -114,9 +113,6 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	    if( liftingEvent )
 	    	onLiftingEvent();
 	    
-	    if( incThrowingPowerEvent )
-	    	onIncThrowingPowerEvent(frameTimeMs);
-	    
 	    if( useEvent )
 	    	onUseEvent(xMove, yMove);
 	    
@@ -174,7 +170,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			}
 			
 		} else {
-			hBody.throwLiftedBody(throwingPower+20, new Vector2f(xMove, yMove));
+			hBody.throwLiftedBody(throwingPower, new Vector2f(xMove, yMove));
 			throwingPower = 0.f;
 		}
 	}
@@ -213,11 +209,6 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			((IHumanoidPhysicsBody) physicsBody).tryClimbing();
 	}
 	
-	private void onIncThrowingPowerEvent(long frameTimeMs) {
-		if( physicsBody instanceof IHumanoidPhysicsBody && ((IHumanoidPhysicsBody) physicsBody).isLiftingSomething() )
-			throwingPower += THROWING_POWER_INC*frameTimeMs/1000.f;
-	}
-	
 	private void onUseEvent(float xMove, float yMove) {
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
 			return;
@@ -232,18 +223,14 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	@Override
-	public void liftObject() {
+	public void liftOrThrowObject(float force) {
 		liftingEvent = true;
+		throwingPower = force;
 	}
 	
 	@Override
 	public void switchWorlds() {
 		setWorld(getWorldId()==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN);
-	}
-	
-	@Override
-	public void incThrowingPower() {
-		incThrowingPowerEvent = true;
 	}
 
 	@Override

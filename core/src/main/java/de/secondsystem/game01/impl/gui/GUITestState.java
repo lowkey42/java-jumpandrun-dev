@@ -10,7 +10,6 @@ import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
-import org.jsfml.window.Mouse;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
@@ -95,58 +94,12 @@ public final class GUITestState extends GameState {
 		// TODO
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
 		
 		ctx.window.clear();
 		
 		ctx.window.draw(backdrop);
-		
-		for (Event event : ctx.window.pollEvents()) {
-			switch (event.type) {
-			case CLOSED:
-				ctx.window.close();
-				break;
-			case MOUSE_WHEEL_MOVED:
-				testMemo.scrollText(event);
-				break;
-			case MOUSE_BUTTON_RELEASED:
-				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					testButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-					backButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-					if(ctx.getMousePosition().x >= testText.getPos().x && ctx.getMousePosition().x <= testText.getPos().x + testText.width  && 
-							ctx.getMousePosition().y >= testText.getPos().y && ctx.getMousePosition().y <= testText.getPos().y + testText.height){
-								testText.setActive();
-					} else { testText.setInactive();}
-					if(ctx.getMousePosition().x >= testMemo.getPos().x && ctx.getMousePosition().x <= testMemo.getPos().x + testMemo.width  && 
-							ctx.getMousePosition().y >= testMemo.getPos().y && ctx.getMousePosition().y <= testMemo.getPos().y + testMemo.height){
-								testMemo.setActive();
-					} else { testMemo.setInactive();}
-				}
-				break;
-			case TEXT_ENTERED:
-				if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
-					//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
-					testText.newKey(event);
-					testMemo.newKey(event);
-				// Backspace pushed
-				} else if (event.asTextEvent().unicode == 8){
-					testText.removeKey();
-					testMemo.removeKey();
-				// Return pushed
-				} else if (event.asTextEvent().unicode == 13){
-					System.out.println("Sent Input Text: " + testText.finalizeInput());
-					System.out.println("Sent Memo Text: " + testMemo.finalizeInput());
-				}
-				break;
-			case KEY_RELEASED:
-				if (event.asKeyEvent().key == Key.ESCAPE)
-					testText.setInactive();
-				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
-					setNextState(playGameState);
-			}
-		}
 
 		ctx.window.draw(infoInputText);
 		ctx.window.draw(infoMemoText);
@@ -158,4 +111,49 @@ public final class GUITestState extends GameState {
 		
 	}	
 	
+	@SuppressWarnings("incomplete-switch")
+	@Override
+	protected void processEvent(GameContext ctx, Event event) {
+		switch (event.type) {
+		case CLOSED:
+			ctx.window.close();
+			break;
+		case MOUSE_WHEEL_MOVED:
+			testMemo.scrollText(event);
+			break;
+		case MOUSE_BUTTON_RELEASED:
+			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
+				testButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+				backButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+				if(ctx.getMousePosition().x >= testText.getPos().x && ctx.getMousePosition().x <= testText.getPos().x + testText.width  && 
+						ctx.getMousePosition().y >= testText.getPos().y && ctx.getMousePosition().y <= testText.getPos().y + testText.height){
+							testText.setActive();
+				} else { testText.setInactive();}
+				if(ctx.getMousePosition().x >= testMemo.getPos().x && ctx.getMousePosition().x <= testMemo.getPos().x + testMemo.width  && 
+						ctx.getMousePosition().y >= testMemo.getPos().y && ctx.getMousePosition().y <= testMemo.getPos().y + testMemo.height){
+							testMemo.setActive();
+				} else { testMemo.setInactive();}
+			}
+			break;
+		case TEXT_ENTERED:
+			if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
+				//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
+				testText.newKey(event);
+				testMemo.newKey(event);
+			// Backspace pushed
+			} else if (event.asTextEvent().unicode == 8){
+				testText.removeKey();
+				testMemo.removeKey();
+			// Return pushed
+			} else if (event.asTextEvent().unicode == 13){
+				System.out.println("Sent Input Text: " + testText.finalizeInput());
+				System.out.println("Sent Memo Text: " + testMemo.finalizeInput());
+			}
+			break;
+		case KEY_RELEASED:
+			if (event.asKeyEvent().key == Key.ESCAPE)
+				testText.setInactive();
+			if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
+				setNextState(playGameState);
+		}	}
 }

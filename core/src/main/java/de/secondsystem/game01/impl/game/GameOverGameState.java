@@ -8,18 +8,15 @@ public class GameOverGameState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	protected void onStop(GameContext ctx) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
+		// TODO: show info on screen and restart last level
 		System.out.println("GAME OVER");
 		setNextState(new MainMenuState());
 	}

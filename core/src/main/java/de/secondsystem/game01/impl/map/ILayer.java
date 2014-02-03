@@ -1,13 +1,12 @@
 package de.secondsystem.game01.impl.map;
 
-import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.ISerializable;
+import de.secondsystem.game01.model.IUpdateable;
 
-public interface ILayer { //TODO: extends ISerializable
-
-	void draw(RenderTarget rt);
+public interface ILayer extends ISerializable, IDrawable, IUpdateable {
 
 	void addNode(ILayerObject obj);
 
@@ -15,12 +14,8 @@ public interface ILayer { //TODO: extends ISerializable
 
 	void remove(ILayerObject s);
 
-	void update(long frameTimeMs);
-
 	boolean isVisible();
 
 	boolean setVisible(boolean visible);
-	
-	Attributes serialize();
 
 }

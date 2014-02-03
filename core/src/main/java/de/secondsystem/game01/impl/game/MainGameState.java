@@ -1,13 +1,20 @@
 package de.secondsystem.game01.impl.game;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import de.secondsystem.game01.impl.DevConsole;
 import de.secondsystem.game01.impl.GameContext;
@@ -63,9 +70,19 @@ public class MainGameState extends GameState {
 	}
 	
 	public class ScriptApi {
+		@SuppressWarnings("unused")
 		private final GameContext ctx;
+		private JSONObject storedValues;
+		private final JSONParser parser = new JSONParser();
+		
 		public ScriptApi(GameContext ctx) {
 			this.ctx = ctx;
+			try ( Reader reader = Files.newBufferedReader(Paths.get("save.json"), StandardCharsets.UTF_8) ){
+				storedValues = (JSONObject) parser.parse(reader);
+				
+			} catch (IOException | ParseException e) {
+				storedValues = new JSONObject();
+			}
 		}
 		
 		public void loadMap(String mapId) {
@@ -74,6 +91,21 @@ public class MainGameState extends GameState {
 		
 		public void playMonologue(String name) {
 			monologueTextBox.play(name);
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void store(String key, Object val) {
+			storedValues.put(key, val);
+			
+			try ( Writer writer = Files.newBufferedWriter(Paths.get("save.json"), StandardCharsets.UTF_8) ){
+				storedValues.writeJSONString(writer);
+				
+			} catch (IOException e) {
+				System.err.println("Unable to store value: "+e.getMessage());
+			}
+		}
+		public Object load(String key) {
+			return storedValues.get(key);
 		}
 	}
 	
@@ -163,7 +195,7 @@ public class MainGameState extends GameState {
 	protected void onFrame(GameContext ctx, long frameTime) {
 		console.update(frameTime);
 		
-		controller.process();
+		controller.update(frameTime);
 		
 		// update worlds
 		map.update(frameTime);
@@ -185,24 +217,20 @@ public class MainGameState extends GameState {
 		ctx.window.setView(cView);
 		
 		monologueTextBox.draw(ctx.window);
-		
-		// events
-		for(Event event : ctx.window.pollEvents()) {
-	        if(event.type == Event.Type.CLOSED) {
-	            //The user pressed the close button
-	            ctx.window.close();
-	            
-	        } else if( event.type==Event.Type.KEY_RELEASED ) {
-	        	if( event.asKeyEvent().key==Key.F12 ) {
-	        		setNextState(new EditorGameState(this, map));
-	        	}
-	        	if( event.asKeyEvent().key==Key.ESCAPE ) {
-	        		setNextState(new MainMenuState(this));
-	        	}
-	        }
-	        
-	        controller.processEvents(event);
-	    }
+	}
+	
+	@Override
+	protected void processEvent(GameContext ctx, Event event) {
+		if( event.type==Event.Type.KEY_RELEASED ) {
+        	if( event.asKeyEvent().key==Key.F12 ) {
+        		setNextState(new EditorGameState(this, map));
+        	}
+        	if( event.asKeyEvent().key==Key.ESCAPE ) {
+        		setNextState(new MainMenuState(this));
+        	}
+        }
+        
+        controller.processEvents(event);
 	}
 
 }

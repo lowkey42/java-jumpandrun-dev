@@ -227,6 +227,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			float maxReach = 10;
 			float maxThrowSpeed = Float.MAX_VALUE;
 			float maxLiftWeight = Float.MAX_VALUE;
+			float maxLiftForce = 2;
 			
 			@Override public HumanoidPhysicsBodyFactory maxXSpeed(float speed) {
 				return (HumanoidPhysicsBodyFactory) super.maxXSpeed(speed);
@@ -255,10 +256,14 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 				maxLiftWeight = weight;
 				return this;
 			}
+			@Override public HumanoidPhysicsBodyFactory maxLiftForce(float force) {
+				maxLiftForce = force;
+				return this;
+			}
 	
 			@Override public IHumanoidPhysicsBody create() {
 				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, maxXSpeed, maxYSpeed, 
-						maxThrowSpeed, maxLiftWeight, maxSlope, maxReach);
+						maxThrowSpeed, maxLiftWeight, maxLiftForce, maxSlope, maxReach);
 				b.initBody(x, y, rotation, null, friction, restitution, density, fixedWeight);
 				return b;
 			}

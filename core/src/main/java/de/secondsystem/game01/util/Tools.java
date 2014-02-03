@@ -1,8 +1,6 @@
 package de.secondsystem.game01.util;
 
-import org.jbox2d.common.Vec2;
 import org.jsfml.graphics.RectangleShape;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
@@ -70,7 +68,7 @@ public class Tools {
 	}
 	
 	public static boolean nearEqual(float a, float b) {
-		return Math.abs(a-b) <= 0.1f;
+		return Math.abs(a-b) <= 0.000001f;
 	}
 	
 	public static float clampedRotation(float rotation) {

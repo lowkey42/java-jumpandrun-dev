@@ -61,6 +61,7 @@ public interface IPhysicsWorld extends IUpdateable {
 		
 		HumanoidPhysicsBodyFactory maxThrowSpeed(float speed);
 		HumanoidPhysicsBodyFactory maxLiftWeight(float weight);
+		HumanoidPhysicsBodyFactory maxLiftForce(float force);
 		
 		IHumanoidPhysicsBody create();
 	}

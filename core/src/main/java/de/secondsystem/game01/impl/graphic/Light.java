@@ -12,6 +12,7 @@ import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.collections.IndexedMoveable;
+import de.secondsystem.game01.util.Tools;
 
 public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, IDrawable, IDimensioned {
 
@@ -37,7 +38,7 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	}
 
 	VertexArray getDrawable() {
-		return dirty ? vertices=createDrawable(center, color, radius, (float)Math.toRadians(degree), (float)Math.toRadians(rotation)) : vertices;
+		return dirty || vertices==null ? vertices=createDrawable(center, color, radius, (float)Math.toRadians(degree), (float)Math.toRadians(rotation)) : vertices;
 	}
 
 
@@ -65,16 +66,17 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 
 	
 	public void setColor(Color color) {
+		this.dirty = !color.equals(this.color);
 		this.color = color;
-		this.dirty = true;
 	}
 	public void setRadius(float radius) {
+		this.dirty = this.radius!=radius;
 		this.radius = radius;
-		this.dirty = true;
 	}
 	public void setDegree(float degree) {
-		this.degree = (float) Math.toRadians(degree);
-		this.dirty = true;
+		float nDegree = (float) Math.toRadians(degree);
+		this.dirty = !Tools.nearEqual(nDegree, this.degree);
+		this.degree = nDegree;
 	}
 
 	public Color getColor() {
@@ -89,20 +91,19 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 
 	@Override
 	public boolean inside(Vector2f point) {
-		// TODO
-		return false;
+		return (point.x-center.x)*(point.x-center.x)+(point.y-center.y)*(point.y-center.y) <= radius*radius;
 	}
-
+	
 	@Override
 	protected void doSetPosition(Vector2f pos) {
+		this.dirty = !pos.equals(center);
 		this.center = pos;
-		this.dirty = true;
 	}
 
 	@Override
 	public void setRotation(float degree) {
+		this.dirty = !Tools.nearEqual(degree, this.rotation);
 		this.rotation = degree;
-		this.dirty = true;
 	}
 
 	@Override

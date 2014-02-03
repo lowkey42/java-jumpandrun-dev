@@ -97,31 +97,8 @@ public final class MainMenuState extends GameState {
 		// TODO
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-
-		for (Event event : ctx.window.pollEvents()) {
-			switch (event.type) {
-			case CLOSED:
-				ctx.window.close();
-				break;
-			case MOUSE_BUTTON_RELEASED:
-				if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-					boolean dummy =
-					newGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-					loadGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-					editorBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-					settingsBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-					exitGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-				}
-				break;
-			case KEY_RELEASED:
-				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
-					setNextState(playGameState);
-			}
-		}
-		
 		ctx.window.clear();
 
 		ctx.window.draw(backdrop);
@@ -132,5 +109,28 @@ public final class MainMenuState extends GameState {
 		loadGameBt.draw(ctx.window);
 		exitGameBt.draw(ctx.window);
 
+	}
+	
+	@SuppressWarnings("incomplete-switch")
+	@Override
+	protected void processEvent(GameContext ctx, Event event) {
+		switch (event.type) {
+		case CLOSED:
+			ctx.window.close();
+			break;
+		case MOUSE_BUTTON_RELEASED:
+			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
+				boolean dummy =
+				newGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+				loadGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+				editorBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+				settingsBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
+				exitGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
+			}
+			break;
+		case KEY_RELEASED:
+			if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
+				setNextState(playGameState);
+		}
 	}
 }
