@@ -46,8 +46,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		obj.put("world", Arrays.asList(serializeGameWorld(map.gameWorld[0]), serializeGameWorld(map.gameWorld[1])));
 		obj.put("tileset", map.getTileset().name );
 		obj.put("scripts", map.scripts.list());
-		obj.put("entities", map.getEntityManager().serialize());
-		obj.put("events", map.getSequenceManager().serialize());
+		obj.put("entityManager", map.getEntityManager().serialize());
 		
 		try ( Writer writer = Files.newBufferedWriter( MAP_PATH.resolve(map.getMapId()+".json"), StandardCharsets.UTF_8) ){
 			obj.writeJSONString(writer);
@@ -60,26 +59,22 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	@Override
 	public synchronized GameMap deserialize(GameContext ctx, String mapId, boolean playable, boolean editable) {
 		try ( Reader reader = Files.newBufferedReader(MAP_PATH.resolve(mapId+".json"), StandardCharsets.UTF_8) ){
-			JSONObject obj = (JSONObject) parser.parse(reader);
+			Attributes obj = new Attributes( (JSONObject) parser.parse(reader) );
 			
-			@SuppressWarnings("unchecked")
-			List<JSONObject> worlds = (List<JSONObject>) obj.get("world");
+			List<Attributes> worlds = obj.getObjectList("world");
 			
-			Tileset tileset = new Tileset((String)obj.get("tileset"));
+			Tileset tileset = new Tileset(obj.getString("tileset"));
 			
 			GameMap map = new GameMap(ctx, mapId, tileset, playable, editable);
 			for( WorldId worldId : WorldId.values() )
 				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			
-			Object scriptsObj = obj.get("scripts");
-			if( scriptsObj instanceof JSONArray ) {
-				for( Object scriptName : ((JSONArray) scriptsObj) ) {
-					map.getScriptEnv().load(scriptName.toString());
-				}
+			List<String> scripts = obj.getList("scripts");
+			for( String scriptName : scripts ) {
+				map.getScriptEnv().load(scriptName);
 			}
 			
-			map.getEntityManager().deserialize( (JSONArray) obj.get("entities"));
-			map.getSequenceManager().deserialize(map, (JSONObject) obj.get("events"));
+			map.getEntityManager().deserialize( obj.getObject("entityManager"));
 			
 			return map;
 			
@@ -115,28 +110,27 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		return array;
 	}
 
-	private void deserializeGameWorld(GameMap map, WorldId worldId, JSONObject obj) {
-		map.gameWorld[worldId.arrayIndex].backgroundColor = SerializationUtil.decodeColor((String)obj.get("backgroundColor"));
-		map.gameWorld[worldId.arrayIndex].ambientLight = SerializationUtil.decodeColor((String)obj.get("ambientLight"));
-		map.gameWorld[worldId.arrayIndex].backgroundMusic = (String)obj.get("backgroundMusic");
+	private void deserializeGameWorld(GameMap map, WorldId worldId, Attributes attributes) {
+		map.gameWorld[worldId.arrayIndex].backgroundColor = SerializationUtil.decodeColor(attributes.getString("backgroundColor"));
+		map.gameWorld[worldId.arrayIndex].ambientLight = SerializationUtil.decodeColor(attributes.getString("ambientLight"));
+		map.gameWorld[worldId.arrayIndex].backgroundMusic = attributes.getString("backgroundMusic");
 		
-		deserializeLayers(map, worldId, (JSONArray)obj.get("layer"));
+		deserializeLayers(map, worldId, attributes.getObjectList("layer"));
 	}
-	@SuppressWarnings("unchecked")
-	private void deserializeLayers( IGameMap map, WorldId worldId, JSONArray layerArray) {
-		for( JSONObject l : (Iterable<JSONObject>) layerArray )
-			for( Object obj : ((JSONArray) l.get("objects")) )
-				map.addNode(worldId, LayerType.valueOf((String)l.get("layerType")), deserializeLayerObject(map, worldId, (JSONObject) obj));
+	
+	private void deserializeLayers( IGameMap map, WorldId worldId, List<Attributes> layerAttributes) {
+		for( Attributes layer : layerAttributes )
+			for( Attributes obj : layer.getObjectList("objects") )
+				map.addNode(worldId, LayerType.valueOf(layer.getString("layerType")), deserializeLayerObject(map, worldId, obj));
 	}
 
-	@SuppressWarnings("unchecked")
-	private ILayerObject deserializeLayerObject(IGameMap map, WorldId worldId, JSONObject obj) {
-		final LayerObjectType type = LayerObjectType.getByShortId((String) obj.get("$type"));
+	private ILayerObject deserializeLayerObject(IGameMap map, WorldId worldId, Attributes attributes) {
+		final LayerObjectType type = LayerObjectType.getByShortId(attributes.getString("$type"));
 		
 		if( type==null )
-			throw new FormatErrorException("Unknown LayerObjectType: "+obj.get("$type"));
+			throw new FormatErrorException("Unknown LayerObjectType: "+attributes.get("$type"));
 		
-		return type.create(map, worldId, obj);
+		return type.create(map, worldId, attributes);
 	}
 
 

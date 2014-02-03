@@ -5,5 +5,4 @@ import de.secondsystem.game01.model.Attributes;
 public interface IEditableEntityState {
 	String getArchetype();
 	Attributes getAttributes();
-	Attributes getAllAttributes();
 }

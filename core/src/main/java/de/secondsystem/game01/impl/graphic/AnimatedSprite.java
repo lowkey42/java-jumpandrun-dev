@@ -73,6 +73,11 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 		this.repeated = repeated;
 		playing = true;
 	}
+
+	@Override
+	public void play() {
+		play(currentAnimationType, animationSpeed, repeated, false, isFlipped());
+	}
 	
 	@Override
 	public void stop() {	
@@ -115,6 +120,5 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	public void pause() {
 		playing = false;
 	}
-	
 
 }

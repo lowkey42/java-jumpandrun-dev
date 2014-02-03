@@ -15,12 +15,9 @@ import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.GameContext;
-import de.secondsystem.game01.impl.game.controller.ControllerManager;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
-import de.secondsystem.game01.impl.game.entities.events.EventManager;
-import de.secondsystem.game01.impl.game.entities.events.impl.SequenceManager;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.objects.EntityLayer;
 import de.secondsystem.game01.impl.map.objects.LightLayer;
@@ -83,12 +80,6 @@ public class GameMap implements IGameMap {
 	
 	private final IGameEntityManager entityManager;
 	
-	private final SequenceManager sequenceManager = new SequenceManager();
-	
-	private final ControllerManager controllerManager = new ControllerManager();
-	
-	private final EventManager eventManager = new EventManager();
-	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
 	private final LightMap lightMap;
@@ -136,11 +127,9 @@ public class GameMap implements IGameMap {
 		
 		
 		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, new Attribute("mapId", mapId), 
-				new Attribute("map", this), new Attribute("entities", entityManager), new Attribute("events", eventManager));
+				new Attribute("map", this), new Attribute("entities", entityManager) );
 		
 		timerManager = new TimerManager(scripts);
-		
-		eventManager.setScriptEnvironment(scripts);	
 		
 		try {
 			fadeBuffer.create(1920, 1080);
@@ -389,21 +378,6 @@ public class GameMap implements IGameMap {
 	@Override
 	public TimerManager getTimerManager() {
 		return timerManager;
-	}
-
-	@Override
-	public SequenceManager getSequenceManager() {
-		return sequenceManager;
-	}
-
-	@Override
-	public ControllerManager getControllerManager() {
-		return controllerManager;
-	}
-
-	@Override
-	public EventManager getEventManager() {
-		return eventManager;
 	}
 
 	@Override

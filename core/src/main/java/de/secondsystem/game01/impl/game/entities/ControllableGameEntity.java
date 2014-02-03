@@ -1,17 +1,18 @@
 package de.secondsystem.game01.impl.game.entities;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.jsfml.system.Vector2f;
-import de.secondsystem.game01.impl.game.entities.events.EventManager;
-import de.secondsystem.game01.impl.game.entities.events.IEntityEventHandler.EntityEventType;
+
+import de.secondsystem.game01.impl.game.controller.ControllerUtils;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IAnimated;
+import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -58,18 +59,18 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean useEvent = false;
 	
-	@SuppressWarnings("unchecked")
 	public ControllableGameEntity(UUID uuid, 
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
-				GameEntityHelper.createRepresentation(map, attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map);
+				GameEntityHelper.createRepresentation(map, attributes), GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes);
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
 		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
 		
-		if( attributes.get("events") != null )
-			eventHandler = EventManager.createScriptedEvents((Map<String, Object>) attributes.get("events"), map);
+		final Attributes controllerAttributes = attributes.getObject("controller");
+		if( controllerAttributes!=null )
+			controller = ControllerUtils.createController(this, map, controllerAttributes);
 	}
 
 	@Override
@@ -226,7 +227,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			// TODO: A selection option is probably better 
 			//       since little design mistakes can lead to frustration caused by the inability to pick up an object on top of a lever for example
 			IGameEntity ge = (IGameEntity) nearestBody.getOwner(); 
-			ge.getEventHandler().handle(EntityEventType.USED, ge, this);
+			ge.notify(EventType.USED, ge, this);
 		}
 	}
 	
@@ -249,6 +250,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public void setController(IGameEntityController controller) {
 		this.controller = controller;
 	}
+	
+	@Override
+	public IGameEntityController getController() {
+		return controller;
+	}
 
 	@Override
 	public void use() {
@@ -256,7 +262,18 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	private void onJump() {
-		if( eventHandler!=null && eventHandler.isHandled(EntityEventType.JUMPED) ) 
-			eventHandler.handle(EntityEventType.JUMPED, this);
+		notify(EventType.JUMPED, this);
+	}
+	
+	@Override
+	public Attributes serialize() {
+		Attributes attributes = super.serialize();
+		
+		if( controller instanceof ISerializable )
+			attributes.put("controller", ((ISerializable) controller).serialize());
+		
+		// TODO
+		
+		return attributes;
 	}
 }

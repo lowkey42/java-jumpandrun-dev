@@ -26,7 +26,7 @@ public class EntityLayerObject implements ILayerObject {
 	public EntityLayerObject(IGameEntity entity) {
 		this.uuid = entity.uuid();
 		this.type = entity.getEditableState()!=null ? entity.getEditableState().getArchetype() : null;
-		this.attributes = entity.getEditableState()!=null ? entity.getEditableState().getAllAttributes() : null;
+		this.attributes = entity.getEditableState()!=null ? entity.getEditableState().getAttributes() : null;
 		this.entity = entity;
 	}
 	public EntityLayerObject(UUID uuid, String type, Attributes attributes) {
