@@ -9,6 +9,14 @@ public enum EventType {
 	DAMAGED,
 	
 	/**
+	 * The entity has attacked another
+	 * Called for all reachable entities, until canceled
+	 * ARGS: owner:IGameEntity, other:IGameEntity, force:float
+	 * RETURN: true if the attack should be canceled
+	 */
+	ATTACK,
+	
+	/**
 	 * The entity has been reanimated
 	 * ARGS: IGameEntity: owner
 	 * RETURN: unused
@@ -44,13 +52,6 @@ public enum EventType {
 	DISABLED,
 
 	/**
-	 * The player has drag-used this entity (e.g. a lever)
-	 * ARGS: IGameEntity: owner, force:float
-	 * RETURN: animationDiff:float 
-	 */
-	USED_DRAGED,
-	
-	/**
 	 * ARGS: IGameEntity: owner, IGameEntity lifting entity
 	 */
 	LIFTED,
@@ -79,6 +80,7 @@ public enum EventType {
 	 * RETURN: unused
 	 */
 	UPDATE,
+	
 	/**
 	 * The entity just jumped.
 	 *  ARGS: IGameEntity: owner

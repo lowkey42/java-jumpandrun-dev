@@ -29,7 +29,7 @@ public abstract class AbstractEditorEntity extends AbstractEditorObject {
 
 	@Override
 	public boolean isPointInside(Vector2f p) {
-		return entity != null && ((ISpriteWrapper) entityRepresentation).inside(p);
+		return entity != null && entityRepresentation instanceof ISpriteWrapper /*TODO*/ && ((ISpriteWrapper) entityRepresentation).inside(p);
 	}
 	
 	@Override
@@ -37,7 +37,8 @@ public abstract class AbstractEditorEntity extends AbstractEditorObject {
 		if( !(entityBody instanceof IHumanoidPhysicsBody) )
 			((IMoveable) entityRepresentation).setRotation(rotation);
 		
-		((ISpriteWrapper) entityRepresentation).setDimensions(width * zoom, height * zoom);
+		if( entityRepresentation instanceof ISpriteWrapper ) /*TODO*/
+			((ISpriteWrapper) entityRepresentation).setDimensions(width * zoom, height * zoom);
 	}
 	
 }

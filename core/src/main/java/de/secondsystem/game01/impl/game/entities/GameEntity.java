@@ -124,37 +124,6 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	public void endContact(IPhysicsBody other) {
 		notify(EventType.UNTOUCHED, this, other);
 	}
-
-	@Override
-	public void onUsed() {
-		notify(EventType.USED, this);
-	}
-
-	@Override
-	public float onUsedDraged(float force) {
-		Object r =notify(EventType.USED_DRAGED, this, force);
-		return r instanceof Float ? (float) r : 0.f;
-	}
-
-	@Override
-	public void onLifted(IGameEntity liftingEntity) {
-		notify(EventType.LIFTED, this, liftingEntity);
-	}
-
-	@Override
-	public void onUnlifted(IGameEntity unliftingEntity) {
-		notify(EventType.UNLIFTED, this, unliftingEntity);
-	}
-
-	@Override
-	public void onViewed() {
-		notify(EventType.VIEWED, this);
-	}
-
-	@Override
-	public void onUnviewed() {
-		notify(EventType.UNVIEWED, this);
-	}
 	
 	@Override
 	public int getWorldMask() {

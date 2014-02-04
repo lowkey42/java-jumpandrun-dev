@@ -2,6 +2,8 @@ package de.secondsystem.game01.impl.map.physics;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -197,38 +199,68 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	}
 
 	@Override
-	public boolean throwLiftedBody(float strength, Vector2f direction) {
+	public IPhysicsBody throwLiftedBody(float strength, Vector2f direction) {
 		if( isLiftingSomething() ) {
+			final Box2dPhysicsBody lBody = (Box2dPhysicsBody) liftedBody;
+			
 			strength = Math.min(maxThrowVel, strength);
-			unbind(liftedBody);
-			((Box2dPhysicsBody)liftedBody).body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
-			((Box2dPhysicsBody)liftedBody).liftingBody = null;
+			unbind(lBody);
+			lBody.body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
+			lBody.liftingBody = null;
 			liftedBody = null;
 			liftJoint = null;
 			
-			return true;
+			return lBody;
 		}
-		return false;
+		return null;
 	}
 
-
+	private final Comparator<IPhysicsBody> distanceComparator = new Comparator<IPhysicsBody>() {
+		@Override public int compare(IPhysicsBody o1, IPhysicsBody o2) {
+			double dist1 = (getPosition().x-o1.getPosition().x)*(getPosition().x-o1.getPosition().x)
+					+ (getPosition().y-o1.getPosition().y)*(getPosition().y-o1.getPosition().y);
+			
+			double dist2 = (getPosition().x-o2.getPosition().x)*(getPosition().x-o2.getPosition().x)
+					+ (getPosition().y-o2.getPosition().y)*(getPosition().y-o2.getPosition().y);
+			
+			return Double.valueOf(dist1).compareTo(dist2);
+		}
+	};
+	
 	@Override
-	public List<IPhysicsBody> listInteractiveBodies() {
+	public List<IPhysicsBody> listNearBodies(Vector2f direction, boolean checkBack, BodyFilter filter) {
 		List<IPhysicsBody> bodies = new ArrayList<>(leftObjects.bodies.size() + rightObjects.bodies.size());
 	
-		for( IPhysicsBody body : leftObjects.bodies )
-			if( body.isInteractive() || body.isLiftable() )
-				bodies.add(body);
+		if( direction.x<0 ) {
+			for( IPhysicsBody body : leftObjects.bodies )
+				if( filter.accept(body) )
+					bodies.add(body);
+
+			Collections.sort(bodies, distanceComparator);
+			
+			if( checkBack )
+				for( IPhysicsBody body : rightObjects.bodies )
+					if( filter.accept(body) )
+						bodies.add(body);
 		
-		for( IPhysicsBody body : rightObjects.bodies )
-			if( body.isInteractive() || body.isLiftable() )
-				bodies.add(body);
+		} else {
+			for( IPhysicsBody body : rightObjects.bodies )
+				if( filter.accept(body) )
+					bodies.add(body);
+
+			Collections.sort(bodies, distanceComparator);
+
+			if( checkBack )
+				for( IPhysicsBody body : leftObjects.bodies )
+					if( filter.accept(body) )
+						bodies.add(body);
+		}
 		
 		return bodies;
 	}
 
 	@Override
-	public IPhysicsBody getNearestInteractiveBody(Vector2f direction) {
+	public IPhysicsBody getNearestBody(Vector2f direction, BodyFilter filter) {
 		final boolean leftFirst = direction.x<0;
 		final float x = getPosition().x;
 		final float y = getPosition().y;
@@ -238,7 +270,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		
 		Collection<IPhysicsBody> bodies = leftFirst ? leftObjects.bodies : rightObjects.bodies;
 		for( IPhysicsBody body : bodies ) {
-			if( body.isInteractive() || body.isLiftable() ) {
+			if( filter.accept(body) ) {
 				double dist = Math.pow(x-body.getPosition().x, 2) + Math.pow(y-body.getPosition().y, 2);
 				if( dist<=nearestDist ) {
 					nearestDist = dist;
@@ -252,7 +284,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 			
 			bodies = !leftFirst ? leftObjects.bodies : rightObjects.bodies;
 			for( IPhysicsBody body : bodies ) {
-				if( body.isInteractive() || body.isLiftable() ) {
+				if( filter.accept(body) ) {
 					double dist = Math.pow(x-body.getPosition().x, 2) + Math.pow(y-body.getPosition().y, 2);
 					if( dist<=nearestDist ) {
 						nearestDist = dist;

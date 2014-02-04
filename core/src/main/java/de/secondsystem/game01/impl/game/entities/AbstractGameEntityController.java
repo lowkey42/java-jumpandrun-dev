@@ -51,7 +51,13 @@ public abstract class AbstractGameEntityController implements IGameEntityControl
 		@Override
 		public void use() {
 			for( IControllableGameEntity ge : ges )
-				ge.use();	
+				ge.use();
+		}
+
+		@Override
+		public void attack(float force) {
+			for( IControllableGameEntity ge : ges )
+				ge.attack(force);
 		}
 		
 	}

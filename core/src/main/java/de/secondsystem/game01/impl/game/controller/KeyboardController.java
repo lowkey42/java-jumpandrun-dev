@@ -1,18 +1,17 @@
 package de.secondsystem.game01.impl.game.controller;
 
 import org.jsfml.window.Joystick;
-import org.jsfml.window.Keyboard;
 import org.jsfml.window.Joystick.Axis;
+import org.jsfml.window.Keyboard;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.game.entities.AbstractGameEntityController;
 import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
-import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.model.Settings.KeyMapping;
 
-public final class KeyboardController extends AbstractGameEntityController implements IUpdateable {
+public final class KeyboardController extends AbstractGameEntityController {
 
 	private static final float THROW_FORCE_INC_PER_MS = 5/1000.f; 
 	
@@ -35,6 +34,7 @@ public final class KeyboardController extends AbstractGameEntityController imple
         	
         	if( event.asKeyEvent().key==mapping.lift ) {
         		proxy.liftOrThrowObject(throwForce);
+				proxy.attack(2.5f+ throwForce*2);
         		throwForce = 0;
         		
         	} else if( event.asKeyEvent().key==mapping.use )
@@ -42,7 +42,6 @@ public final class KeyboardController extends AbstractGameEntityController imple
         }
 	}
 
-	@Override
 	public void update(long frameTimeMs) {
 		if( Joystick.isConnected(0) ) {
 			float x = Joystick.getAxisPosition(0, Axis.X);
@@ -67,8 +66,11 @@ public final class KeyboardController extends AbstractGameEntityController imple
 			if( Joystick.isButtonPressed(0, 2) ) {
 				throwForce+=THROW_FORCE_INC_PER_MS*frameTimeMs;
 				
-			} else if( throwForce>0 )
+			} else if( throwForce>0 ) {
 				proxy.liftOrThrowObject(throwForce);
+				proxy.attack(5+ throwForce*2);
+				throwForce=0;
+			}
 
 			if( Joystick.getAxisPosition(0, Axis.Z)>=50 ) {
 				if( !switchW_cooldown )

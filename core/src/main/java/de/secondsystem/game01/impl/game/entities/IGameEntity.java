@@ -24,13 +24,6 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	UUID uuid();
 	IGameEntityManager manager();
 	
-	void  onUsed();
-	float onUsedDraged(float force);
-	void  onLifted(IGameEntity liftingEntity);
-	void  onUnlifted(IGameEntity unliftingEntity);
-	void  onViewed();
-	void  onUnviewed();
-	
 	int getWorldMask();
 	boolean isInWorld(WorldId worldId);
 	boolean setWorld(WorldId worldId);

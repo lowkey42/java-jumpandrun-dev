@@ -15,16 +15,30 @@ public interface IHumanoidPhysicsBody extends IDynamicPhysicsBody {
 
 	boolean liftBody(IPhysicsBody other);
 	boolean isLiftingSomething();
-	boolean throwLiftedBody(float strength, Vector2f direction);
+	IPhysicsBody throwLiftedBody(float strength, Vector2f direction);
 	
 	/**
-	 * @return all reachable bodies that are usable or liftable
+	 * @return all reachable bodies
 	 */
-	List<IPhysicsBody> listInteractiveBodies();
+	List<IPhysicsBody> listNearBodies(Vector2f direction, boolean checkBack, BodyFilter filter);
 	
 	/**
-	 * @return the nearest reachable body that is usable or liftable (or NULL)
+	 * @return the nearest reachable body
 	 */
-	IPhysicsBody getNearestInteractiveBody(Vector2f direction);
-	
+	IPhysicsBody getNearestBody(Vector2f direction, BodyFilter filter);
+
+	public interface BodyFilter {
+		boolean accept( IPhysicsBody body );
+	}
+	public static final BodyFilter BF_LIFTABLE = new BodyFilter() {
+		@Override public boolean accept(IPhysicsBody body) {
+			return body.isLiftable();
+		}
+	};
+	public static final BodyFilter BF_INTERACTIVE = new BodyFilter() {
+		@Override public boolean accept(IPhysicsBody body) {
+			return body.isInteractive();
+		}
+	};
+
 }

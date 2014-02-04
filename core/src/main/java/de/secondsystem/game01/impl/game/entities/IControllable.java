@@ -19,7 +19,6 @@ public interface IControllable {
 	void switchWorlds();
 	void use();
 	
-	// TODO: attack
-	
+	void attack(float force);
 	
 }

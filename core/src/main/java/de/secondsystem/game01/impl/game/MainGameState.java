@@ -24,6 +24,7 @@ import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.game.entities.events.AttackEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.game.entities.events.KillEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.PingPongEventHandler;
@@ -147,7 +148,8 @@ public class MainGameState extends GameState {
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
-		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
+		player.setEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
+		player.setEventHandler(EventType.ATTACK, new AttackEventHandler());
 		
 		camera = new Camera(player);
 			

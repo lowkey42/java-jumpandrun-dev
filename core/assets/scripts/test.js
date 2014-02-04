@@ -50,7 +50,7 @@ function onJump() {
 //movingPlatformCon.addTargetPoint(150, -100);
 //movingPlatformCon.play();
 
-// entities.create("box", {"x": 150, "y": -100} );
+entities.create("box", {"x": 300, "y": 0, "liftable":false} );
 // entities.create("box", {"x": 150, "y": -100, "density":2} );
 
 entities.create("light", {"x": 150, "y": -100, "worldId":3} );
