@@ -13,7 +13,7 @@ import org.jsfml.system.Vector2i;
 
 public abstract class RenderTargetWrapper implements RenderTarget {
 
-	private final RenderTarget renderTarget;
+	protected RenderTarget renderTarget;
 	
 	public RenderTargetWrapper(RenderTarget renderTarget) {
 		this.renderTarget = renderTarget;
@@ -104,4 +104,7 @@ public abstract class RenderTargetWrapper implements RenderTarget {
 		renderTarget.setView(view);
 	}
 
+	public void setTarget(RenderTarget renderTarget) {
+		this.renderTarget = renderTarget;
+	}
 }

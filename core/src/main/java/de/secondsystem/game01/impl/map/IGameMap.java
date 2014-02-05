@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.map;
 
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
@@ -31,7 +32,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 		}
 	}
 	
-	void setFade(boolean enable);
+
+	void drawInactiveWorld(RenderTarget rt);
 	
 	String getMapId();
 

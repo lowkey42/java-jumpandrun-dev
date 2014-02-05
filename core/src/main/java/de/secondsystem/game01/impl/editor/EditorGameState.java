@@ -87,7 +87,6 @@ public final class EditorGameState extends GameState {
 			mapToLoad = null;
 		}
 		
-		map.setFade(false);
 		this.tileset = map.getTileset();
 		
 		ConstFont freeSans;
@@ -316,7 +315,6 @@ public final class EditorGameState extends GameState {
 		case F9: // load
 			map = new JsonGameMapSerializer().deserialize(ctx, map.getMapId(), true,
 					true);
-			map.setFade(false);
 			break;
 
 		case TAB: // switch world

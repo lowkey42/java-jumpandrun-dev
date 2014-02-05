@@ -11,6 +11,7 @@ import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderTexture;
+import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Shader;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.TextureCreationException;
@@ -115,7 +116,7 @@ public class LightMap extends RenderTargetWrapper {
 		
 		normalShader.setParameter("lightmap", lightMap.getTexture());
 		normalShader.setParameter("ambientColor", ambientLight!=null ? ambientLight : Color.WHITE);
-		normalShader.setParameter("windowSize", windowSize);
+		normalShader.setParameter("windowSize", renderTarget instanceof RenderWindow ? windowSize : new Vector2f(lightMap.getSize().x,lightMap.getSize().y) );
 		
 		return normalShader;
 	}

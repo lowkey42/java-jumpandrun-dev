@@ -3,14 +3,9 @@ package de.secondsystem.game01.impl.map;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
-import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.RenderTexture;
-import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
@@ -28,7 +23,6 @@ import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment.ScriptType;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
-import de.secondsystem.game01.model.GameException;
 
 public class GameMap implements IGameMap {
 	
@@ -86,14 +80,6 @@ public class GameMap implements IGameMap {
 	private final LightMap lightMap;
 	
 	final ScriptEnvironment scripts;
-
-	private final RenderTexture fadeBuffer = new RenderTexture();
-	
-	private int fadeTimeLeft;
-	
-	private boolean fadeEnabled = true;
-	
-	private static final int FADE_TIME = 1000;
 	
 	public GameMap(GameContext ctx, String mapId, Tileset tileset) {
 		this(ctx, mapId, tileset, true, true);
@@ -129,12 +115,6 @@ public class GameMap implements IGameMap {
 					new Attribute("mapId", mapId), 
 					new Attribute("map", this), 
 					new Attribute("entities", entityManager)) );
-
-		try {
-			fadeBuffer.create(ctx.getViewWidth(), ctx.getViewHeight());
-		} catch (TextureCreationException e) {
-			throw new GameException("Unable to create fade-buffer: "+e.getMessage(), e);
-		}
 	}
 		
 	/* (non-Javadoc)
@@ -166,12 +146,6 @@ public class GameMap implements IGameMap {
 		return tileset;
 	}
 	
-	// objectLayer
-	// collisionLayer
-	// triggerLayer
-	// particleLayer
-	
-	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#switchWorlds()
 	 */
@@ -181,8 +155,6 @@ public class GameMap implements IGameMap {
 		
 		for( IWorldSwitchListener listener : worldSwitchListeners )
 			listener.onWorldSwitch(activeWorldId);
-		
-		fadeTimeLeft=FADE_TIME;
 	}
 	
 	protected void preDraw(RenderTarget rt) {
@@ -200,33 +172,27 @@ public class GameMap implements IGameMap {
 		ILayer layer = gameWorld[worldId.arrayIndex].graphicLayer[layerType.layerIndex];
 		
 		if( layer.isVisible() ) {
-			ConstView cv = target.getView();
 			target.setView(calcLayerView(layerType.parallax, baseView));
 			 
 			layer.draw(target);
-			target.setView(cv);
+			target.setView(baseView);
 		}
 	}
-	protected void drawInactiveWorldFade(RenderTarget rt) {
-		if( fadeTimeLeft>0 && fadeEnabled ) {
-			final ConstView cView = rt.getView();
+	
+	@Override
+	public void drawInactiveWorld(RenderTarget rt) {
 		
-			final WorldId inactiveWorld = activeWorldId==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN;
-			fadeBuffer.clear(Color.TRANSPARENT);
-							
-			for( LayerType l : LayerType.values() )
-				if( l.fade )
-					drawVisibleLayer(fadeBuffer, rt.getView(), inactiveWorld, l);
-							
-			fadeBuffer.display();
-			
-			Sprite fadeSprite = new Sprite(fadeBuffer.getTexture());
-			fadeSprite.setColor(new Color(255, 255, 255, (int) (((float)fadeTimeLeft)/FADE_TIME*200.f) ));
+		final ConstView cView = rt.getView();
+		
+		final WorldId inactiveWorld = activeWorldId==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN;
+		
+		rt.clear(Color.TRANSPARENT);
+		
+		for( LayerType l : LayerType.values() )
+			if( l.fade )
+				drawVisibleLayer(rt, cView, inactiveWorld, l);
 
-			rt.setView(new View(Vector2f.div(cView.getSize(), 2), cView.getSize()));
-			rt.draw(fadeSprite, new RenderStates(BlendMode.ALPHA));
-			rt.setView(cView);
-		}
+		rt.setView(cView);
 	}
 	
 	/* (non-Javadoc)
@@ -235,19 +201,15 @@ public class GameMap implements IGameMap {
 	@Override
 	public void draw(RenderTarget rt) {
 		if( lightMap!=null ) {
+			lightMap.setTarget(rt);
 			lightMap.setView(rt.getView());
 			rt = lightMap;
 		}
 
-		final ConstView cView = rt.getView();
 		preDraw(rt);
 		
 		for( LayerType l : LayerType.values() )
-			drawVisibleLayer(rt, cView, activeWorldId, l);
-
-		rt.setView(cView);
-		
-		drawInactiveWorldFade(rt);
+			drawVisibleLayer(rt, rt.getView(), activeWorldId, l);
 		
 		postDraw(rt);
 	}
@@ -265,16 +227,8 @@ public class GameMap implements IGameMap {
 		
 		entityManager.update(frameTimeMs);
 		
-		long ps = System.currentTimeMillis();
-		
 		if( physicalWorld !=null )
 			physicalWorld.update(frameTimeMs);
-		
-		if( System.currentTimeMillis()-ps > 10 ) {
-			System.out.println("pTime-Peak: "+(System.currentTimeMillis()-ps));
-		}
-		
-		fadeTimeLeft-=frameTimeMs;
 	}
 	
 	
@@ -391,11 +345,6 @@ public class GameMap implements IGameMap {
 	@Override
 	public LightMap getLightMap() {
 		return lightMap;
-	}
-
-	@Override
-	public void setFade(boolean enable) {
-		fadeEnabled = enable;
 	}
 
 	public String getDefaultBgMusic(WorldId world) {

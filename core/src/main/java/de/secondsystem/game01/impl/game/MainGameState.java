@@ -54,6 +54,8 @@ public class MainGameState extends GameState {
 	
 	private GameMap map;
 	
+	private EffectMapRenderer mapRenderer;
+	
 	private Camera camera;
 	
 	private IControllableGameEntity player;
@@ -194,7 +196,6 @@ public class MainGameState extends GameState {
 			}
 		
 		if( map!=null ) {
-			map.setFade(true);
 			backgroundMusic.play();
 			
 		} else {
@@ -205,6 +206,8 @@ public class MainGameState extends GameState {
 			.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
 
 			map.getScriptEnv().bind("API", createScriptApi(ctx));
+			
+			mapRenderer = new EffectMapRenderer(ctx, map);
 		}
 		
 		
@@ -268,7 +271,7 @@ public class MainGameState extends GameState {
 		controller.update(frameTime);
 		
 		// update worlds
-		map.update(frameTime);
+		mapRenderer.update(frameTime);
 
 		camera.update(frameTime);
 
@@ -282,7 +285,7 @@ public class MainGameState extends GameState {
 		map.setActiveWorldId(camera.getWorldId());
 		
 		// drawing
-		map.draw(ctx.window);
+		mapRenderer.draw(ctx.window);
 		
 		ctx.window.setView(cView);
 		
