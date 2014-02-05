@@ -15,7 +15,7 @@ public interface IControllable {
 	
 	void jump();
 	
-	void liftOrThrowObject(float force);
+	boolean liftOrThrowObject(float force);
 	void switchWorlds();
 	void use();
 	

@@ -25,6 +25,8 @@ import de.secondsystem.game01.model.IUpdateable;
  */
 class ControllableGameEntity extends GameEntity implements IControllableGameEntity {
 	
+	private boolean possessable;
+	
 	private IGameEntityController controller; 
 	
 	private float moveAcceleration;
@@ -54,6 +56,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
 		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
+		this.possessable = attributes.getBoolean("possessable", false);
 		
 		final Attributes controllerAttributes = attributes.getObject("controller");
 		if( controllerAttributes!=null )
@@ -161,9 +164,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 
 	@Override
-	public void liftOrThrowObject(float force) {
+	public boolean liftOrThrowObject(float force) {
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
-			return;
+			return false;
 		
 		final IHumanoidPhysicsBody hBody = (IHumanoidPhysicsBody) physicsBody;
 		final float xMove = hDirection==HDirection.RIGHT ? 1.f : -1.f;
@@ -176,6 +179,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 				if( hBody.liftBody(touchingBody) && touchingBody.getOwner() instanceof IGameEntity ) {
 					final IGameEntity liftedEntity = (IGameEntity) touchingBody.getOwner();
 					liftedEntity.notify(EventType.LIFTED, liftedEntity, this);
+					return true;
 				}
 			}
 			
@@ -185,8 +189,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			if( liftedBody!=null && liftedBody.getOwner() instanceof IGameEntity ) {
 				final IGameEntity liftedEntity = (IGameEntity) liftedBody.getOwner();
 				liftedEntity.notify(EventType.UNLIFTED, liftedEntity, this);
+				return true;
 			}
 		}
+		
+		return false;
 	}
 	
 	@Override
@@ -251,5 +258,18 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		// TODO
 		
 		return attributes;
+	}
+
+	@Override
+	public boolean isPossessable() {
+		return possessable;
+	}
+
+	@Override
+	public boolean isLiftingSomething() {
+		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
+			return false;
+		
+		return ((IHumanoidPhysicsBody) physicsBody).isLiftingSomething();
 	}
 }

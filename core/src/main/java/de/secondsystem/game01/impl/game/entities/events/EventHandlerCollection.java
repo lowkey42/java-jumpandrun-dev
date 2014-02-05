@@ -1,9 +1,11 @@
 package de.secondsystem.game01.impl.game.entities.events;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
@@ -11,12 +13,15 @@ import com.google.common.collect.ListMultimap;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Tuple;
 
 public class EventHandlerCollection implements IEventHandlerCollection {
 
 	private static final String EVENT_PREFIX = "on";
 	
 	private final ListMultimap<EventType, IEventHandler> handlers = ArrayListMultimap.create();
+	
+	private final Set<Tuple<EventType, IEventHandler>> deleteRequests = new HashSet<>();
 	
 	@SuppressWarnings("unchecked")
 	public EventHandlerCollection(IGameMap map, Attributes attributes) {
@@ -35,6 +40,13 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 	
 	@Override
 	public Object notify(EventType type, Object... args) {
+		for( Tuple<EventType, IEventHandler> r : deleteRequests ) {
+			if( r.b==null )
+				handlers.removeAll(r.a);
+			else
+				handlers.remove(type, r.b);
+		}
+		
 		Collection<IEventHandler> handlers = this.handlers.get(type);
 		
 		Object returnValue = null;
@@ -61,7 +73,12 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 
 	@Override
 	public void removeEventHandler(EventType type) {
-		handlers.removeAll(type);
+		deleteRequests.add(new Tuple<EventType, IEventHandler>(type, null));
+	}
+
+	@Override
+	public void removeEventHandler(EventType type, IEventHandler handler) {
+		deleteRequests.add(new Tuple<EventType, IEventHandler>(type, handler));
 	}
 
 	/* (non-Javadoc)

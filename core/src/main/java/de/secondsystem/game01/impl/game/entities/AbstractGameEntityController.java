@@ -37,9 +37,12 @@ public abstract class AbstractGameEntityController implements IGameEntityControl
 		}
 		
 		@Override
-		public void liftOrThrowObject(float force) {
+		public boolean liftOrThrowObject(float force) {
+			boolean r=false;
 			for( IControllableGameEntity ge : ges )
-				ge.liftOrThrowObject(force);
+				r|= ge.liftOrThrowObject(force);
+			
+			return r;
 		}
 
 		@Override

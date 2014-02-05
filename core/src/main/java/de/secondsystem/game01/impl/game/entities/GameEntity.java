@@ -140,7 +140,10 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( isDead() )
 			return false;
 		
-		if( physicsBody==null || physicsBody.tryWorldSwitch(newWorldMask) ) {
+		if( physicsBody==null || newWorldMask==0 || worldMask==0 || physicsBody.tryWorldSwitch(newWorldMask) ) {
+			if( physicsBody!=null && (newWorldMask==0 || worldMask==0) )
+				physicsBody.forceWorldSwitch(newWorldMask);
+				
 			this.worldMask = newWorldMask;
 			return true;
 
@@ -166,6 +169,9 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			physicsBody.setPosition(pos);
 			physicsBody.resetVelocity(true, true, false);
 		}
+		if( representation instanceof IMoveable ) {
+			((IMoveable) representation).setPosition(pos);
+		}
 	}
 
 	@Override
@@ -173,6 +179,9 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( physicsBody!=null ) {
 			physicsBody.setRotation(degree);
 			physicsBody.resetVelocity(false, false, true);
+		}
+		if( representation instanceof IMoveable ) {
+			((IMoveable) representation).setRotation(degree);
 		}
 	}
 

@@ -13,12 +13,18 @@ import de.secondsystem.game01.model.Settings.KeyMapping;
 
 public final class KeyboardController extends AbstractGameEntityController {
 
+	public static interface IWorldSwitchInterceptor {
+		boolean doWorldSwitch();
+	}
+	
 	private static final float THROW_FORCE_INC_PER_MS = 5/1000.f; 
 	
 	private final KeyMapping mapping;
+	private final IWorldSwitchInterceptor worldSwitchInterceptor;
 	
-	public KeyboardController(KeyMapping mapping) {
+	public KeyboardController(KeyMapping mapping, IWorldSwitchInterceptor worldSwitchInterceptor) {
 		this.mapping = mapping;
+		this.worldSwitchInterceptor = worldSwitchInterceptor;
 	}
 	
 	float throwForce=0;
@@ -29,12 +35,13 @@ public final class KeyboardController extends AbstractGameEntityController {
 	public void processEvents(Event event) {
     	if( event.type==Event.Type.KEY_RELEASED ) {
         	if( event.asKeyEvent().key==Key.TAB ) {
-        		proxy.switchWorlds();
+        		if( worldSwitchInterceptor==null || worldSwitchInterceptor.doWorldSwitch() )
+        			proxy.switchWorlds();
         	}
         	
         	if( event.asKeyEvent().key==mapping.lift ) {
-        		proxy.liftOrThrowObject(throwForce);
-				proxy.attack(2.5f+ throwForce*2);
+        		if( !proxy.liftOrThrowObject(throwForce) )
+        			proxy.attack(2.5f+ throwForce*2);
         		throwForce = 0;
         		
         	} else if( event.asKeyEvent().key==mapping.use )
@@ -67,14 +74,16 @@ public final class KeyboardController extends AbstractGameEntityController {
 				throwForce+=THROW_FORCE_INC_PER_MS*frameTimeMs;
 				
 			} else if( throwForce>0 ) {
-				proxy.liftOrThrowObject(throwForce);
-				proxy.attack(5+ throwForce*2);
+				if( !proxy.liftOrThrowObject(throwForce) )
+					proxy.attack(5+ throwForce*2);
 				throwForce=0;
 			}
 
 			if( Joystick.getAxisPosition(0, Axis.Z)>=50 ) {
-				if( !switchW_cooldown )
-					proxy.switchWorlds();
+				if( !switchW_cooldown ) {
+					if( worldSwitchInterceptor==null || worldSwitchInterceptor.doWorldSwitch() )
+	        			proxy.switchWorlds();
+				}
 				
 				switchW_cooldown = true;
 				

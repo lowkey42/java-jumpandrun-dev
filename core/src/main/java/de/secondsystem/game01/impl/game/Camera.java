@@ -37,6 +37,14 @@ public class Camera implements IUpdateable {
 		this.cameraController = cameraController;
 	}
 	
+	public void setController(ICameraController cameraController) {
+		this.cameraController = cameraController;
+		this.x = cameraController.getPosition().x;
+		this.y = cameraController.getPosition().y;
+		this.recentering = false;
+		this.worldId = cameraController.getWorldId();
+	}
+	
 	@Override
 	public void update(long frameTimeMs) {
 		if( worldId!=cameraController.getWorldId() ) {

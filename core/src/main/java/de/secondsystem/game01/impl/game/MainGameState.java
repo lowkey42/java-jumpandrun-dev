@@ -22,16 +22,20 @@ import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.controller.KeyboardController;
+import de.secondsystem.game01.impl.game.controller.KeyboardController.IWorldSwitchInterceptor;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.game.entities.IGameEntityController;
 import de.secondsystem.game01.impl.game.entities.events.AttackEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
+import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.KillEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.PingPongEventHandler;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.sound.MonologueTextBox;
 import de.secondsystem.game01.impl.sound.MusicWrapper;
 import de.secondsystem.game01.model.Attributes;
@@ -68,6 +72,66 @@ public class MainGameState extends GameState {
 		protected void killEntity(IGameEntity entity) {
 			setNextState(new GameOverGameState());
 		}
+	}
+	
+	private IControllableGameEntity possessedEntity;
+	private IGameEntityController possessedEntityController;
+	private IEventHandler possessedEntityDamagedHandler = new IEventHandler() {
+		@Override public Attributes serialize() {
+			return null;
+		}
+		
+		@Override public Object handle(Object... args) {
+			unpossess();
+			return null;
+		}
+	};
+	
+	private void possess(IControllableGameEntity player, IControllableGameEntity target) {
+		possessedEntity = target;
+
+		possessedEntityController = possessedEntity.getController();
+		controller.addGE(possessedEntity);
+		controller.removeGE(player);
+		player.setWorldMask(0);
+		camera.setController(possessedEntity);
+		possessedEntity.addEventHandler(EventType.DAMAGED, possessedEntityDamagedHandler);
+	}
+	private boolean unpossess() {
+		if( possessedEntity!=null ) {
+			possessedEntity.removeEventHandler(EventType.DAMAGED, possessedEntityDamagedHandler);
+			if( possessedEntity.isLiftingSomething() )
+				possessedEntity.liftOrThrowObject(2);
+				
+			player.setPosition(possessedEntity.getPosition());
+			player.setRotation(possessedEntity.getRotation());
+			player.setWorld(WorldId.MAIN);
+			controller.addGE(player);
+			controller.removeGE(possessedEntity);
+			possessedEntity.setController(possessedEntityController);
+
+			camera.setController(player);
+			possessedEntity = null;
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private final class PlayerAttackEventHandler extends AttackEventHandler {
+		
+		@Override
+		protected boolean attack(IGameEntity owner, IGameEntity target,
+				float force) {
+			if( owner.isInWorld(WorldId.MAIN) && target instanceof IControllableGameEntity && ((IControllableGameEntity) target).isPossessable() ) {
+				possess((IControllableGameEntity) owner, (IControllableGameEntity) target);
+				return true;
+				
+			} else
+				return super.attack(owner, target, force);
+		}
+		
 	}
 	
 	public class ScriptApi {
@@ -148,8 +212,8 @@ public class MainGameState extends GameState {
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
-		player.setEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
-		player.setEventHandler(EventType.ATTACK, new AttackEventHandler());
+		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
+		player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
 		
 		camera = new Camera(player);
 			
@@ -184,7 +248,11 @@ public class MainGameState extends GameState {
 		
 		console.setScriptEnvironment(map.getScriptEnv());
 		
-		controller = new KeyboardController(ctx.settings.keyMapping);
+		controller = new KeyboardController(ctx.settings.keyMapping, new IWorldSwitchInterceptor() {
+			@Override public boolean doWorldSwitch() {
+				return !unpossess();
+			}
+		});
 		controller.addGE(player);
 	}
 	

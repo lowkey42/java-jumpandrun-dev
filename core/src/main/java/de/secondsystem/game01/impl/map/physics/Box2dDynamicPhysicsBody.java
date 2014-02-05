@@ -143,7 +143,10 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		return new Vector2f(getBody().getPosition().x, getBody().getPosition().y);
 	}
 	
-	
+	@Override
+	public void forceWorldSwitch(int id) {
+		setWorldIdMask(id);
+	}
 	@Override
 	public boolean tryWorldSwitch(int id) {
 		if( worldSwitchAllowed && worldSwitchSensorContacts.isEmpty() ) {

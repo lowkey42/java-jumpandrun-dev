@@ -10,6 +10,8 @@ public interface IEventHandlerCollection {
 
 	void removeEventHandler(EventType type);
 
+	void removeEventHandler(EventType type, IEventHandler handler);
+
 	void setEventHandler(EventType type, IEventHandler handler);
 
 	void addEventHandler(EventType type, IEventHandler handler);
