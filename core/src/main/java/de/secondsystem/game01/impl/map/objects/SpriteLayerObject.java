@@ -31,7 +31,7 @@ public class SpriteLayerObject implements ILayerObject {
 	}
 	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
 		this.tileId = tileId;
-		sprite = new SpriteWrappper(tileset.get(tileId), tileset.getNormals(tileId));
+		sprite = new SpriteWrappper(tileset.get(tileId), tileset.getNormals(tileId), tileset.getClip(tileId));
 		sprite.setPosition(new Vector2f(x, y));
 		sprite.setRotation(rotation);
 		sprite.setDimensions(width>0?width:sprite.getWidth(), height>0?height:sprite.getHeight());
@@ -39,7 +39,7 @@ public class SpriteLayerObject implements ILayerObject {
 	
 	public void setTile(Tileset tileset, int tileId) {
 		this.tileId = tileId;
-		sprite.setTexture(tileset.get(tileId), tileset.getNormals(tileId));
+		sprite.setTexture(tileset.get(tileId), tileset.getNormals(tileId), tileset.getClip(tileId));
 	}
 	
 	@Override

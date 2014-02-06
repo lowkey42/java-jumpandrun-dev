@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.graphic;
 
 import org.jsfml.graphics.ConstTexture;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
@@ -15,13 +16,13 @@ public class SpriteWrappper implements ISpriteWrapper {
 	
 	protected ConstTexture normalMap;
 
-	public SpriteWrappper(ConstTexture tex, ConstTexture normalMap) {
-		this(tex);
+	public SpriteWrappper(ConstTexture tex, ConstTexture normalMap, IntRect clip) {
+		this(tex, clip);
 		this.normalMap = normalMap;
 	}
-	public SpriteWrappper(ConstTexture tex) {
+	public SpriteWrappper(ConstTexture tex, IntRect clip) {
 		this(tex.getSize().x, tex.getSize().y);
-		setTexture(tex);
+		setTexture(tex, clip);
 	}
 	public SpriteWrappper(float width, float height) {
 		sprite = new Sprite();	
@@ -30,14 +31,20 @@ public class SpriteWrappper implements ISpriteWrapper {
 		this.height = height;
 	}
 
-	public void setTexture(ConstTexture tex, ConstTexture normalMap) {
-		setTexture(tex);
+	public void setTexture(ConstTexture tex, ConstTexture normalMap, IntRect clip) {
+		setTexture(tex, clip);
 		this.normalMap = normalMap;
 	}
 	public void setTexture(ConstTexture tex) {
+		setTexture(tex, null);
+	}
+	public void setTexture(ConstTexture tex, IntRect clip) {
 		sprite.setTexture(tex, true);
 		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
 		sprite.setScale(width/tex.getSize().x, height/tex.getSize().y);
+		
+		if( clip!=null )
+			sprite.setTextureRect(clip);
 	}
 	
 	@Override

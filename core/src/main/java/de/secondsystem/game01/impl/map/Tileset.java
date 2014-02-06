@@ -8,8 +8,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsfml.graphics.ConstTexture;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.Texture;
 
 import de.secondsystem.game01.impl.ResourceManager;
@@ -46,6 +49,10 @@ public class Tileset {
 	public ConstTexture getNormals(int index) {
 		return tiles.get( index % tiles.size() ).normals;
 	}
+	
+	public IntRect getClip(int index) {
+		return tiles.get( index % tiles.size() ).clip;
+	}
 
 	/** 
 	 * Load each tile as a new {@link Texture}
@@ -56,9 +63,24 @@ public class Tileset {
 	private static final List<Tile> loadTextures( String... tileFiles ) throws IOException {
 		List<Tile> tTiles = new ArrayList<Tile>(tileFiles.length);
 		for( String fn : tileFiles )
-			tTiles.add(new Tile( ResourceManager.texture_tiles.get(fn.trim()), ResourceManager.texture_tiles.getNullable(toNormalTextureName(fn.trim())) ));
+			tTiles.add(loadTexture(fn));
 		
 		return tTiles;
+	}
+	
+	private static final Pattern CLIPPING_PATTERN = Pattern.compile("(.*)\\s*\\{\\s*([0-9]+)\\s*;\\s*([0-9]+)\\s*;\\s*([0-9]+)\\s*;\\s*([0-9]+)\\s*\\}");
+	
+	private static Tile loadTexture(String fn) throws IOException {
+		final IntRect clip;
+		
+		final Matcher m = CLIPPING_PATTERN.matcher(fn);
+		if( m.matches() ) {
+			fn = m.group(1);
+			clip = new IntRect( Integer.valueOf(m.group(2)), Integer.valueOf(m.group(3)), Integer.valueOf(m.group(4)), Integer.valueOf(m.group(5)) );
+		} else
+			clip = null;
+		
+		return new Tile( ResourceManager.texture_tiles.get(fn.trim()), ResourceManager.texture_tiles.getNullable(toNormalTextureName(fn.trim())), clip );
 	}
 	
 	private static String toNormalTextureName(String name) {
@@ -84,9 +106,11 @@ public class Tileset {
 	private static final class Tile {
 		public final ConstTexture texture;
 		public final ConstTexture normals;
-		public Tile(ConstTexture texture, ConstTexture normals) {
+		public final IntRect clip;
+		public Tile(ConstTexture texture, ConstTexture normals, IntRect clip) {
 			this.texture = texture;
 			this.normals = normals;
+			this.clip = clip;
 		}
 	}
 }

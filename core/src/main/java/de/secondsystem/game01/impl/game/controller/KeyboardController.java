@@ -18,6 +18,7 @@ public final class KeyboardController extends AbstractGameEntityController {
 	}
 	
 	private static final float THROW_FORCE_INC_PER_MS = 5/1000.f; 
+	private static final float THROW_FORCE_INI = 1;
 	
 	private final KeyMapping mapping;
 	private final IWorldSwitchInterceptor worldSwitchInterceptor;
@@ -71,7 +72,7 @@ public final class KeyboardController extends AbstractGameEntityController {
 				proxy.use();
 			
 			if( Joystick.isButtonPressed(0, 2) ) {
-				throwForce+=THROW_FORCE_INC_PER_MS*frameTimeMs;
+				throwForce+= throwForce>0 ? THROW_FORCE_INC_PER_MS*frameTimeMs : THROW_FORCE_INI;
 				
 			} else if( throwForce>0 ) {
 				if( !proxy.liftOrThrowObject(throwForce) )
@@ -90,7 +91,7 @@ public final class KeyboardController extends AbstractGameEntityController {
 			} else
 				switchW_cooldown = false;
 		}
-		
+		 
 		if( Keyboard.isKeyPressed(mapping.moveLeft) )
 			proxy.moveHorizontally(HDirection.LEFT, 1);
 		else if( Keyboard.isKeyPressed(mapping.moveRight) )
@@ -103,7 +104,7 @@ public final class KeyboardController extends AbstractGameEntityController {
 			proxy.moveVertically(VDirection.DOWN, 1);
 		
 		if( Keyboard.isKeyPressed(mapping.lift) ) 
-			throwForce+=THROW_FORCE_INC_PER_MS*frameTimeMs;
+			throwForce+= throwForce>0 ? THROW_FORCE_INC_PER_MS*frameTimeMs : THROW_FORCE_INI;
 		
 		if( Keyboard.isKeyPressed(mapping.jump) )
     		proxy.jump();
