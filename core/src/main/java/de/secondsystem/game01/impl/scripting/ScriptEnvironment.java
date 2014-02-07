@@ -79,7 +79,9 @@ public class ScriptEnvironment implements IUpdateable {
 	}
 	
 	public List<String> list() {
-		return Collections.unmodifiableList(scripts);
+		List<String> s = new ArrayList<>(scriptsToLoad);
+		s.addAll(scripts);
+		return Collections.unmodifiableList(s);
 	}
 	
 	public Object exec( String function, Object... args ) {

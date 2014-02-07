@@ -85,12 +85,22 @@ public class EntityLayerObject implements ILayerObject {
 		return LayerObjectType.ENTITY;
 	}
 
-	@Override
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
-
-	public static ILayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
+	public static ILayerObject create(IGameMap map, Map<String, Object> attributes) {
 		throw new UnsupportedOperationException();
+	}
+	@Override
+	public boolean isInWorld(WorldId worldId) {
+		return entity.isInWorld(worldId);
+	}
+	@Override
+	public void setWorld(WorldId worldId, boolean exists) {
+		if( exists )
+			entity.setWorldMask(entity.getWorldMask()|worldId.id);
+		else
+			entity.setWorldMask(entity.getWorldMask()&~worldId.id);
+	}
+	@Override
+	public Attributes serialize() {
+		return attributes;
 	}
 }

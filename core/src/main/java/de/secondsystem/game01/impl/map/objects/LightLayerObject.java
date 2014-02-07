@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.jsfml.graphics.Color;
@@ -10,16 +9,21 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.graphic.Light;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.SerializationUtil;
 
 public class LightLayerObject implements ILayerObject {
 
 	private final Light light;
 	
-	public LightLayerObject(LightMap lightMap, WorldId worldId, float x, float y, float rotation, float radius, float sizeDegree, Color color) {
-		light = lightMap.createLight(worldId.id, new Vector2f(x, y), color, radius, sizeDegree, rotation);
+	private int worldMask;
+	
+	public LightLayerObject(LightMap lightMap, int worldMask, float x, float y, float rotation, float radius, float sizeDegree, Color color) {
+		light = lightMap.createLight(worldMask, new Vector2f(x, y), color, radius, sizeDegree, rotation);
+		this.worldMask = worldMask;
 	}
 
 	@Override
@@ -68,28 +72,42 @@ public class LightLayerObject implements ILayerObject {
 	}
 
 	@Override
+	public boolean isInWorld(WorldId worldId) {
+		return (worldMask & worldId.id)!=0;
+	}
+
+	@Override
+	public void setWorld(WorldId worldId, boolean exists) {
+		if( exists )
+			worldMask|=worldId.id;
+		else
+			worldMask&=~worldId.id;
+	}
+
+	@Override
 	public LayerObjectType typeUuid() {
 		return LayerObjectType.LIGHT;
 	}
 
 	@Override
-	public Map<String, Object> getAttributes() {
-		Map<String, Object> map = new HashMap<>();
-		map.put("x", getPosition().x);
-		map.put("y", getPosition().y);
-		map.put("rotation", light.getRotation());
-		map.put("radius", light.getRadius());
-		map.put("sizeDegree", light.getDegree());
-		map.put("color", SerializationUtil.encodeColor(light.getColor()));
-		
-		return map;
+	public Attributes serialize() {
+		return new Attributes(
+				new Attribute("$type", typeUuid().shortId),
+				new Attribute("world", worldMask),
+				new Attribute("color", SerializationUtil.encodeColor(light.getColor())),
+				new Attribute("x", getPosition().x),
+				new Attribute("y", getPosition().y),
+				new Attribute("rotation", getRotation()),
+				new Attribute("radius", light.getRadius()),
+				new Attribute("sizeDegree", light.getDegree())
+		);
 	}
 
-	public static LightLayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
+	public static LightLayerObject create(IGameMap map, Map<String, Object> attributes) {
 		try {
 			return new LightLayerObject(
 					map.getLightMap(),
-					worldId,
+					((Number)attributes.get("world")).intValue(),
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),
 					((Number)attributes.get("rotation")).floatValue(),

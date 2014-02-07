@@ -14,7 +14,7 @@ public final class LightLayer extends SimpleLayer {
 	private final WorldId worldId;
 	
 	public LightLayer(WorldId worldId, LayerType type, LightMap lightMap) {
-		super(type);
+		super(type, worldId);
 		this.worldId = worldId;
 		this.lightMap = lightMap;
 	}

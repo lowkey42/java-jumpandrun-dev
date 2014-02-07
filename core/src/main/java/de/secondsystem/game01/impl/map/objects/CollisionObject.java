@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.jsfml.graphics.Color;
@@ -14,6 +13,8 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.Tools;
 
 public class CollisionObject implements ILayerObject {
@@ -50,9 +51,12 @@ public class CollisionObject implements ILayerObject {
 	protected final IPhysicsBody physicsBody;
 	
 	private CollisionType type;
+	
+	private int worldMask;
 
-	public CollisionObject(IGameMap map, WorldId worldID, CollisionType type, float x, float y, float width, float height, float rotation) {
+	public CollisionObject(IGameMap map, int worldMask, CollisionType type, float x, float y, float width, float height, float rotation) {
 		this.type = type;
+		this.worldMask = worldMask;
 		
 		if( map.isEditable() ) {
 			this.shape = new RectangleShape(new Vector2f(width, height));
@@ -67,7 +71,7 @@ public class CollisionObject implements ILayerObject {
 		
 		if( map.getPhysicalWorld()!=null )
 			physicsBody = map.getPhysicalWorld().factory()
-				.inWorld(worldID)
+				.worldMask(worldMask)
 				.position(x, y)
 				.dimension(width, height)
 				.rotation(rotation)
@@ -135,28 +139,45 @@ public class CollisionObject implements ILayerObject {
 	}
 
 	@Override
+	public boolean isInWorld(WorldId worldId) {
+		return (worldMask & worldId.id)!=0;
+	}
+
+	@Override
+	public void setWorld(WorldId worldId, boolean exists) {
+		if( physicsBody!=null )
+			physicsBody.setWorld(worldId, exists);
+		
+		if( exists )
+			worldMask|=worldId.id;
+		else
+			worldMask&=~worldId.id;
+	}
+
+	@Override
 	public LayerObjectType typeUuid() {
 		return TYPE_UUID;
 	}
 
 	@Override
-	public Map<String, Object> getAttributes() {
-		Map<String, Object> map = new HashMap<>();
-		map.put("type", type.name());
-		map.put("x", getPosition().x);
-		map.put("y", getPosition().y);
-		map.put("rotation", getRotation());
-		map.put("width", getWidth());
-		map.put("height", getHeight());
-		
-		return map;
+	public Attributes serialize() {
+		return new Attributes(
+				new Attribute("$type", typeUuid().shortId),
+				new Attribute("world", worldMask),
+				new Attribute("type", type.name()),
+				new Attribute("x", getPosition().x),
+				new Attribute("y", getPosition().y),
+				new Attribute("rotation", getRotation()),
+				new Attribute("width", getWidth()),
+				new Attribute("height", getHeight())
+		);
 	}
 	
-	public static CollisionObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
+	public static CollisionObject create(IGameMap map, Map<String, Object> attributes) {
 		try {
 			return new CollisionObject(
 					map,
-					worldId,
+					((Number)attributes.get("world")).intValue(),
 					CollisionType.valueOf((String)attributes.get("type")), 
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),

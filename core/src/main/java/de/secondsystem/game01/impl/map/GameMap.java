@@ -45,7 +45,7 @@ public class GameMap implements IGameMap {
 						break;
 						
 					default:
-						graphicLayer[l.layerIndex] = new SimpleLayer(l);
+						graphicLayer[l.layerIndex] = new SimpleLayer(l, worldId);
 				}
 			
 			backgroundColor = Color.BLACK;

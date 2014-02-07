@@ -21,6 +21,7 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureContactListener;
 
 
@@ -170,6 +171,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 				}
 		}
 	}
+	
 	public final boolean isInWorld( int worldId ) {
 		return (worldIdMask&worldId) != 0;
 	}
@@ -371,6 +373,17 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	@Override
 	public boolean isKinematic() {
 		return kinematic;
+	}
+	@Override
+	public boolean isInWorld(WorldId worldId) {
+		return (worldIdMask & worldId.id)!=0;
+	}
+	@Override
+	public void setWorld(WorldId worldId, boolean exists) {
+		if( exists )
+			setWorldIdMask(worldIdMask|worldId.id);
+		else
+			setWorldIdMask(worldIdMask&~worldId.id);
 	}
 	
 }

@@ -1,5 +1,8 @@
 package de.secondsystem.game01.impl.map.objects;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
@@ -9,7 +12,6 @@ import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayer;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.GameException;
 
 public class EntityLayer implements ILayer {
@@ -66,10 +68,10 @@ public class EntityLayer implements ILayer {
 	public boolean setVisible(boolean visible) {
 		return show = visible;
 	}
-
+	
 	@Override
-	public Attributes serialize() {
-		return null; // noop
+	public List<ILayerObject> listAll() {
+		return Collections.emptyList();
 	}
 
 }

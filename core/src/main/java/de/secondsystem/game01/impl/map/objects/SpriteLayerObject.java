@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.jsfml.graphics.RenderTarget;
@@ -11,6 +10,8 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.Tools;
 
 /**
@@ -26,11 +27,14 @@ public class SpriteLayerObject implements ILayerObject {
 	
 	private int tileId;
 	
-	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation) {
-		this(tileset, tileId, x, y, rotation, 0, 0);
+	private int worldMask;
+	
+	public SpriteLayerObject(Tileset tileset, int worldId, int tileId, float x, float y, float rotation) {
+		this(tileset, worldId, tileId, x, y, rotation, 0, 0);
 	}
-	public SpriteLayerObject(Tileset tileset, int tileId, float x, float y, float rotation, float width, float height) {
+	public SpriteLayerObject(Tileset tileset, int worldId, int tileId, float x, float y, float rotation, float width, float height) {
 		this.tileId = tileId;
+		this.worldMask = worldId;
 		sprite = new SpriteWrappper(tileset.get(tileId), tileset.getNormals(tileId), tileset.getClip(tileId));
 		sprite.setPosition(new Vector2f(x, y));
 		sprite.setRotation(rotation);
@@ -86,28 +90,44 @@ public class SpriteLayerObject implements ILayerObject {
 	public Vector2f getPosition() {
 		return sprite.getPosition();
 	}
+
+	@Override
+	public boolean isInWorld(WorldId worldId) {
+		return (worldMask & worldId.id)!=0;
+	}
+
+	@Override
+	public void setWorld(WorldId worldId, boolean exists) {
+		if( exists )
+			worldMask|=worldId.id;
+		else
+			worldMask&=~worldId.id;
+	}
+	
 	@Override
 	public LayerObjectType typeUuid() {
 		return TYPE_UUID;
 	}
 
 	@Override
-	public Map<String, Object> getAttributes() {
-		Map<String, Object> map = new HashMap<>();
-		map.put("tile", tileId);
-		map.put("x", getPosition().x);
-		map.put("y", getPosition().y);
-		map.put("rotation", getRotation());
-		map.put("width", getWidth());
-		map.put("height", getHeight());
-		
-		return map;
+	public Attributes serialize() {
+		return new Attributes(
+				new Attribute("$type", typeUuid().shortId),
+				new Attribute("world", worldMask),
+				new Attribute("tile", tileId),
+				new Attribute("x", getPosition().x),
+				new Attribute("y", getPosition().y),
+				new Attribute("rotation", getRotation()),
+				new Attribute("width", getWidth()),
+				new Attribute("height", getHeight())
+		);
 	}
 	
-	public static SpriteLayerObject create(IGameMap map, WorldId worldId, Map<String, Object> attributes) {
+	public static SpriteLayerObject create(IGameMap map, Map<String, Object> attributes) {
 		try {
 			return new SpriteLayerObject(
 					map.getTileset(),
+					((Number)attributes.get("world")).intValue(),
 					((Number)attributes.get("tile")).intValue(), 
 					((Number)attributes.get("x")).floatValue(),
 					((Number)attributes.get("y")).floatValue(),

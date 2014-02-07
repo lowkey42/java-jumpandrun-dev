@@ -9,17 +9,18 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.map.ILayer;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.IUpdateable;
 
 public class SimpleLayer implements ILayer {
 	
 	protected final List<ILayerObject> objects = new ArrayList<>();
 	protected final LayerType type;
+	protected final WorldId worldId;
 	protected boolean show;
 	
-	public SimpleLayer( LayerType type ) {
+	public SimpleLayer( LayerType type, WorldId worldId ) {
+		this.worldId = worldId;
 		this.type = type;
 		show = type.visible;
 	}
@@ -38,6 +39,7 @@ public class SimpleLayer implements ILayer {
 	 */
 	@Override
 	public void addNode( ILayerObject obj ) {
+		obj.setWorld(worldId, true);
 		objects.add(obj);
 	}
 	/* (non-Javadoc)
@@ -55,8 +57,9 @@ public class SimpleLayer implements ILayer {
 	 * @see de.secondsystem.game01.impl.map.ILayer#remove(de.secondsystem.game01.impl.map.ILayerObject)
 	 */
 	@Override
-	public void remove( ILayerObject s ) {
-		objects.remove(s);
+	public void remove( ILayerObject obj ) {
+		obj.setWorld(worldId, false);
+		objects.remove(obj);
 	}
 	
 	/* (non-Javadoc)
@@ -80,24 +83,8 @@ public class SimpleLayer implements ILayer {
 	}
 
 	@Override
-	public Attributes serialize() {
-		final List<Attributes> layerObjs = new ArrayList<>(objects.size());
-		for( ILayerObject obj : objects )
-			layerObjs.add(serializeLayerObject(obj));
-		
-		return new Attributes( 
-				new Attribute("layerType", type.toString()),
-				new Attribute("objects", layerObjs)
-		);
-	}
-
-	private static Attributes serializeLayerObject(ILayerObject objects) {
-		Attributes attr = new Attributes();
-		
-		attr.put("$type", objects.typeUuid().shortId);
-		attr.putAll(objects.getAttributes());
-		
-		return attr;
+	public List<ILayerObject> listAll() {
+		return objects;
 	}
 	
 }

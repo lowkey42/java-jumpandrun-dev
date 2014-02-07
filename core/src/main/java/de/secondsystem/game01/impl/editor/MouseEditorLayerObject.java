@@ -14,22 +14,22 @@ public class MouseEditorLayerObject extends EditorLayerObject {
 	private final Tileset tileset;
 	private int currentTile = 0;
 	
-	public MouseEditorLayerObject(Tileset tileset) {
+	public MouseEditorLayerObject(GameMap map, Tileset tileset) {
 		this.tileset = tileset;
 		
-		createSpriteObject();
+		createSpriteObject(map);
 	}
 	
-	public void createSpriteObject() {
+	public void createSpriteObject(GameMap map) {
 		if (!(layerObject instanceof SpriteLayerObject))
-			layerObject = new SpriteLayerObject(tileset, currentTile, 0, 0, 0);
+			layerObject = new SpriteLayerObject(tileset, map.getActiveWorldId().id, currentTile, 0, 0, 0);
 		
 		onTileChanged();
 	}
 
 	public void createCollisionObject(GameMap map) {
 		if (!(layerObject instanceof CollisionObject))
-			layerObject = new CollisionObject(map, map.getActiveWorldId(), CollisionType.NORMAL, 0, 0, 50, 50, 0);
+			layerObject = new CollisionObject(map, map.getActiveWorldId().id, CollisionType.NORMAL, 0, 0, 50, 50, 0);
 		
 		onTileChanged();
 	}
@@ -58,7 +58,7 @@ public class MouseEditorLayerObject extends EditorLayerObject {
 	}
 	
 	public void addToMap(GameMap map, LayerType currentLayer) {
-		map.addNode(currentLayer, layerObject.typeUuid().create(map, map.getActiveWorldId(), layerObject.getAttributes()));
+		map.addNode(currentLayer, layerObject.typeUuid().create(map, layerObject.serialize()));
 	}	
 
 	@Override

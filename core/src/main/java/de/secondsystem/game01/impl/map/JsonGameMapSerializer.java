@@ -7,8 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.script.ScriptException;
 
@@ -22,6 +25,7 @@ import de.secondsystem.game01.impl.map.GameMap.GameWorld;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.SerializationUtil;
 
 
@@ -44,6 +48,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	public void serialize( GameMap map) {
 		JSONObject obj = new JSONObject();
 		obj.put("world", Arrays.asList(serializeGameWorld(map.gameWorld[0]), serializeGameWorld(map.gameWorld[1])));
+		obj.put("layer", serializeLayers(map.gameWorld[0], map.gameWorld[1]));
 		obj.put("tileset", map.getTileset().name );
 		obj.put("scripts", map.scripts.list());
 		obj.put("entityManager", map.getEntityManager().serialize());
@@ -69,6 +74,8 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			for( WorldId worldId : WorldId.values() )
 				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			
+			deserializeLayerObjects(map, obj.getObjectList("layer"));
+			
 			List<String> scripts = obj.getList("scripts");
 			for( String scriptName : scripts ) {
 				map.getScriptEnv().queueLoad(scriptName);
@@ -90,47 +97,60 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		JSONObject obj = new JSONObject();
 		obj.put("backgroundColor", SerializationUtil.encodeColor(world.backgroundColor) );
 		obj.put("ambientLight", SerializationUtil.encodeColor(world.ambientLight) );
-		obj.put("layer", serializeLayers(world.graphicLayer) );
 		obj.put("backgroundMusic", world.backgroundMusic);
 		
 		return obj;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private JSONArray serializeLayers(ILayer[] layers) {
-		JSONArray array = new JSONArray();
+	private JSONArray serializeLayers(GameWorld gameWorld1, GameWorld gameWorld2) {
+		JSONArray layers = new JSONArray();
 		
-		for( ILayer l : layers ) {
-			Attributes attr = l.serialize();
+		for( LayerType l : LayerType.values() ) {
+			Set<ILayerObject> loSet = new HashSet<>(gameWorld1.graphicLayer[l.layerIndex].listAll().size() + gameWorld1.graphicLayer[l.layerIndex].listAll().size());
+			loSet.addAll(gameWorld1.graphicLayer[l.layerIndex].listAll());
+			loSet.addAll(gameWorld2.graphicLayer[l.layerIndex].listAll());
 			
-			if( attr!=null )
-				array.add(attr);
+			List<Attributes> loSerialized = new ArrayList<>(loSet.size());
+			for( ILayerObject lo : loSet ) {
+				loSerialized.add(lo.serialize());
+			}
+			
+			layers.add(new Attributes( 
+					new Attribute("layerType", l.toString()),
+					new Attribute("objects", loSerialized)
+			));
 		}
+		
+		return layers;
+	}
 
-		return array;
+	private void deserializeLayerObjects(GameMap map,
+			List<Attributes> layerAttributes) {
+		for( Attributes layer : layerAttributes )
+			for( Attributes objAttr : layer.getObjectList("objects") ) {
+				ILayerObject obj = deserializeLayerObject(map, objAttr);
+				
+				for( WorldId worldId : WorldId.values() )
+					if( obj.isInWorld(worldId) )
+						map.addNode(worldId, LayerType.valueOf(layer.getString("layerType")), obj);
+			}
+		
 	}
 
 	private void deserializeGameWorld(GameMap map, WorldId worldId, Attributes attributes) {
 		map.gameWorld[worldId.arrayIndex].backgroundColor = SerializationUtil.decodeColor(attributes.getString("backgroundColor"));
 		map.gameWorld[worldId.arrayIndex].ambientLight = SerializationUtil.decodeColor(attributes.getString("ambientLight"));
 		map.gameWorld[worldId.arrayIndex].backgroundMusic = attributes.getString("backgroundMusic");
-		
-		deserializeLayers(map, worldId, attributes.getObjectList("layer"));
-	}
-	
-	private void deserializeLayers( IGameMap map, WorldId worldId, List<Attributes> layerAttributes) {
-		for( Attributes layer : layerAttributes )
-			for( Attributes obj : layer.getObjectList("objects") )
-				map.addNode(worldId, LayerType.valueOf(layer.getString("layerType")), deserializeLayerObject(map, worldId, obj));
 	}
 
-	private ILayerObject deserializeLayerObject(IGameMap map, WorldId worldId, Attributes attributes) {
+	private ILayerObject deserializeLayerObject(IGameMap map, Attributes attributes) {
 		final LayerObjectType type = LayerObjectType.getByShortId(attributes.getString("$type"));
 		
 		if( type==null )
 			throw new FormatErrorException("Unknown LayerObjectType: "+attributes.get("$type"));
 		
-		return type.create(map, worldId, attributes);
+		return type.create(map, attributes);
 	}
 
 

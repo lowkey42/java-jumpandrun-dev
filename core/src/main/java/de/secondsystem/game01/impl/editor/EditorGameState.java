@@ -108,7 +108,7 @@ public final class EditorGameState extends GameState {
 		mouseEntity    = new MouseEditorEntity(map);
 		selectedEntity = new SelectedEditorEntity(map);
 		
-		mouseTile      = new MouseEditorLayerObject(tileset);
+		mouseTile      = new MouseEditorLayerObject(map, tileset);
 		selectedObject = new SelectedEditorLayerObject();
 		
 		currentEditorObject = mouseTile;
@@ -278,7 +278,7 @@ public final class EditorGameState extends GameState {
 			currentEditorObject = mouseEntity;
 			break;
 		default:
-			mouseTile.createSpriteObject();
+			mouseTile.createSpriteObject(map);
 			currentEditorObject = mouseTile;
 		}
 	}

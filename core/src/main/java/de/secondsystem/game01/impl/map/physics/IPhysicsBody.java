@@ -2,11 +2,15 @@ package de.secondsystem.game01.impl.map.physics;
 
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IMoveable;
 
 public interface IPhysicsBody extends IMoveable, IDimensioned {
 
+	boolean isInWorld(WorldId worldId);
+	void setWorld(WorldId worldId, boolean exists);
+	
 	Object getOwner();
 	void setOwner( Object owner );
 	IPhysicsWorld getParent();

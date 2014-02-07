@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 
 public enum LayerObjectType {
@@ -32,7 +31,7 @@ public enum LayerObjectType {
 		this.clazz = clazz;
 		
 		try {
-			constructMethod = clazz.getMethod(CONSTRUCT_METHOD_NAME, IGameMap.class, WorldId.class,  Map.class);
+			constructMethod = clazz.getMethod(CONSTRUCT_METHOD_NAME, IGameMap.class, Map.class);
 			
 		} catch (NoSuchMethodException | SecurityException e) {
 			throw new Error("CONTRACT_VIOLATION: no static "+CONSTRUCT_METHOD_NAME+"-Method in LayerObjectClass "+clazz, e);
@@ -55,9 +54,9 @@ public enum LayerObjectType {
 		return null;
 	}
 	
-	public ILayerObject create( IGameMap map, WorldId world, Map<String, Object> attributes ) {
+	public ILayerObject create( IGameMap map, Map<String, Object> attributes ) {
 		try {
-			return (ILayerObject) constructMethod.invoke(null, map, world, attributes);
+			return (ILayerObject) constructMethod.invoke(null, map, attributes);
 			
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
