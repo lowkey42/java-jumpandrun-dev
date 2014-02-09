@@ -50,10 +50,9 @@ public final class EditorGameState extends GameState {
 	private Text editorHint;
 	private Text layerHint;
 	private MouseEditorLayerObject mouseTile;
-	private SelectedEditorLayerObject selectedObject;
+	private SelectedEditorObject selectedObject;
 	
 	private MouseEditorEntity mouseEntity;
-	private SelectedEditorEntity selectedEntity;
 	private float zoom = 1.f;
 	
 	private float cameraX = 0.f;
@@ -106,10 +105,9 @@ public final class EditorGameState extends GameState {
 		editorHint.setColor(Color.RED);
 		
 		mouseEntity    = new MouseEditorEntity(map);
-		selectedEntity = new SelectedEditorEntity(map);
 		
 		mouseTile      = new MouseEditorLayerObject(map, tileset);
-		selectedObject = new SelectedEditorLayerObject();
+		selectedObject = new SelectedEditorObject(Color.BLUE, 2.f, Color.TRANSPARENT);
 		
 		currentEditorObject = mouseTile;
 	}
@@ -216,28 +214,15 @@ public final class EditorGameState extends GameState {
 				return true;
 
 			case RIGHT:
-				if( currentLayer != LayerType.OBJECTS ) {
-					selectedObject.resetScalingDirection();
-					Vector2f ws = ctx.window.getView().getSize();
-					View view = new View(Vector2f.mul(new Vector2f(cameraX + ws.x / 2, cameraY + ws.y / 2), currentLayer.parallax), Vector2f.div(ws, zoom));
+				selectedObject.resetScalingDirection();
+				View view = getTransformedView(ctx);
+				selectedObject.setLayerObject( map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view)) );
 	
-					selectedObject.setLayerObject( map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view)) );
-	
-					if (selectedObject.getLayerObject() == null) 
-						deselectSprite();
-					else
-						currentEditorObject = selectedObject;
-				}
-				else {
-					selectedEntity.resetScalingDirection();
-					Vector2f ws = ctx.window.getView().getSize();
-					View view = new View(Vector2f.mul(new Vector2f(cameraX + ws.x / 2, cameraY + ws.y / 2), currentLayer.parallax), Vector2f.div(ws, zoom));
-					selectedEntity.setEntity( map.findEntity( ctx.window.mapPixelToCoords( new Vector2i(getMouseX(), getMouseY()), view) ) );
-					if (selectedEntity.getEntity() == null) 
-						deselectSprite();
-					else
-						currentEditorObject = selectedEntity;
-				}
+				if (selectedObject.getLayerObject() == null) 
+					deselectSprite();
+				else
+					currentEditorObject = selectedObject;
+				break;
 
 			default:
 				return false;
@@ -248,16 +233,13 @@ public final class EditorGameState extends GameState {
 			Vector2f v = ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view);
 			switch (event.asMouseButtonEvent().button) {
 			case LEFT:
-				if ( selectedObject.isPointInside(v) || selectedEntity.isPointInside(v) )
+				if ( selectedObject.inside(v) )
 					moveSelectedObject = true;
 
 				return true;
 			case RIGHT:
 				selectedObject.checkScaleMarkers(v);
 				selectedObject.setLastMappedMousePos( new Vector2f(v.x, v.y) );
-				
-				selectedEntity.checkScaleMarkers(v);
-				selectedEntity.setLastMappedMousePos( new Vector2f(v.x, v.y) );
 			default:
 				return false;
 			}
@@ -402,11 +384,19 @@ public final class EditorGameState extends GameState {
 		case O:
 			if (event.control) // toggle object layer visibility
 				map.flipShowLayer(LayerType.OBJECTS);
-			else { // selection object layer
+			else { // select object layer
 				currentLayer = LayerType.OBJECTS;
 				deselectSprite();
 			}
 			break;
+			
+		case L:
+			if(event.control) // toggle light layer visibility
+				map.flipShowLayer(LayerType.LIGHTS);
+			else { // select light layer
+				currentLayer = LayerType.LIGHTS;
+				deselectSprite();
+			}
 
 		default:
 		}

@@ -5,9 +5,12 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
+import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.util.Tools;
 
-public class SelectedEditorObject implements ISelectedEditorObject {
+public class SelectedEditorObject extends EditorLayerObject implements ISelectedEditorObject {
 	private EditorMarker marker;
 	private EditorMarker [] scaleMarkers  = new EditorMarker[4];
 	protected Vector2f mappedMousePos;
@@ -17,6 +20,27 @@ public class SelectedEditorObject implements ISelectedEditorObject {
 	private int scalingX = 0;
 	private int scalingY = 0;	
 	
+	public void setLayerObject(ILayerObject layerObject) {
+		this.layerObject = layerObject;
+		
+		if( layerObject != null ) {
+			rotation = layerObject.getRotation();
+			zoom = 1.0f;
+			height = layerObject.getHeight();
+			width = layerObject.getWidth();
+			setPosition(layerObject.getPosition());
+		}
+	}
+	
+	public ILayerObject getLayerObject() {
+		return layerObject;
+	}
+	
+	public void removeFromMap(GameMap map, LayerType currentLayer) {
+		map.remove(currentLayer, layerObject);
+		layerObject = null;
+	}
+	
 	public SelectedEditorObject(Color outlineColor, float outlineThickness, Color fillColor) {
 		marker = new EditorMarker(outlineColor, outlineThickness, fillColor);
 		
@@ -25,16 +49,24 @@ public class SelectedEditorObject implements ISelectedEditorObject {
 	}
 	
 	public void draw(RenderTarget rt) {	
+		super.draw(rt);
 		marker.draw(rt);
 		
-		for(int i=0; i<4; i++) {
-			if( scaleMarkers[i].isMouseOver(mappedMousePos) )
-				scaleMarkers[i].draw(rt);
+		if( mappedMousePos != null )
+			for(int i=0; i<4; i++) {
+				if( scaleMarkers[i].isMouseOver(mappedMousePos) )
+					scaleMarkers[i].draw(rt);
 		}
 	}
 	
-
-	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, IEditorObject object) {
+	@Override
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
+		super.update(movedObj, rt, mousePosX, mousePosY, zoom, frameTimeMs);
+		
+		update(movedObj, rt, mousePosX, mousePosY, this);
+	}
+	
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, IEditorObject object) {		
 		mappedMousePos = rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY));
 		
 		if (movedObj) 

@@ -3,16 +3,26 @@ package de.secondsystem.game01.impl.editor;
 import java.util.ArrayList;
 
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
+import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.IDimensioned;
 
-public class MouseEditorEntity extends AbstractEditorEntity {
+public class MouseEditorEntity extends AbstractEditorObject {
+	protected IGameEntity entity;
+	protected IPhysicsBody entityBody;
+	protected IDrawable entityRepresentation;
+	protected String currentArchetype;
 	private final ArrayList<String> archetypes;
 	private int currentArchetypeIndex = 0;
 	
@@ -51,12 +61,32 @@ public class MouseEditorEntity extends AbstractEditorEntity {
 		createEntity(map);
 	}
 
-	@Override
 	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
 		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
 		((IMoveable) entityRepresentation).setPosition(pos);
 		
 		if( entityRepresentation instanceof IUpdateable )
 			((IUpdateable) entityRepresentation).update(frameTimeMs);
+	}
+	
+	public void setEntity(IGameEntity entity) {
+		this.entity = entity;
+		entityBody = entity.getPhysicsBody();
+		entityRepresentation = entity.getRepresentation();
+	}
+
+	@Override
+	public void refresh() {
+		if( !(entityBody instanceof IHumanoidPhysicsBody) )
+			((IMoveable) entityRepresentation).setRotation(rotation);
+		
+		if( entityRepresentation instanceof ISpriteWrapper ) /*TODO*/
+			((ISpriteWrapper) entityRepresentation).setDimensions(width * zoom, height * zoom);
+	}
+
+	@Override
+	public void draw(RenderTarget renderTarget) {
+		entityRepresentation.draw(renderTarget);
+		
 	}
 }

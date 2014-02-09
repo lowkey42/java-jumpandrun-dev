@@ -3,8 +3,9 @@ package de.secondsystem.game01.impl.editor;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.model.IInsideCheck;
 
-public class EditorLayerObject extends AbstractEditorObject {	
+public class EditorLayerObject extends AbstractEditorObject implements IInsideCheck {	
 	protected ILayerObject layerObject = null;
 	
 	@Override
@@ -19,13 +20,13 @@ public class EditorLayerObject extends AbstractEditorObject {
 	}
 	
 	@Override
-	public boolean isPointInside(Vector2f p) {
-		return layerObject != null && layerObject.inside(p);
-	}
-	
-	@Override
 	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {	
 		layerObject.setPosition(pos);
+	}
+
+	@Override
+	public boolean inside(Vector2f point) {
+		return layerObject != null && layerObject.inside(point);
 	}
 
 }

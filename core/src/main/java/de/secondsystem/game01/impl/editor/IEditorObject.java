@@ -11,7 +11,6 @@ public interface IEditorObject extends IDrawable, IDimensioned, IMoveable {
 	void setWidth(float width);
 	void setHeight(float height);
 	void rotate(float rotation);
-	boolean isPointInside(Vector2f p);
 	void zoom(float factor);
 	void refresh();
 	void zoom(int mouseWheelOffset, float mouseWheelDelta);
