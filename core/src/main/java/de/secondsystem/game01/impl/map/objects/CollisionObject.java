@@ -99,7 +99,7 @@ public class CollisionObject implements ILayerObject {
 
 	@Override
 	public boolean inside(Vector2f point) {
-		return Tools.isInside(this, point);
+		return shape.getGlobalBounds().contains(point); // checks the AABB not the OBB
 	}
 
 	@Override

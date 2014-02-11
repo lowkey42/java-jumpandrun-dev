@@ -108,7 +108,7 @@ public class SpriteWrappper implements ISpriteWrapper {
 	
 	@Override
 	public boolean inside(Vector2f point) {
-		return Tools.isInside(this, point);
+		return sprite.getGlobalBounds().contains(point); // checks the AABB not the OBB
 	}
 
 	@Override

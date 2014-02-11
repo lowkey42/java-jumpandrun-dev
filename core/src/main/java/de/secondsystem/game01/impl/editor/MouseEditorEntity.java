@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl.editor;
 import java.util.ArrayList;
 
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;

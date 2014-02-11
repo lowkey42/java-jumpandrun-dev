@@ -58,7 +58,7 @@ public class SpriteLayerObject implements ILayerObject {
 
 	@Override
 	public boolean inside(Vector2f point) {
-		return Tools.isInside(this, point);
+		return sprite.inside(point);
 	}
 
 	@Override
