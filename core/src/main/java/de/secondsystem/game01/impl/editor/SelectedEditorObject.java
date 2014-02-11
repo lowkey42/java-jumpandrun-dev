@@ -29,6 +29,9 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 			height = layerObject.getHeight();
 			width = layerObject.getWidth();
 			setPosition(layerObject.getPosition());
+			lastPos = pos;
+			lastWidth = width;
+			lastHeight = height;
 		}
 	}
 	
@@ -63,28 +66,24 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
 		super.update(movedObj, rt, mousePosX, mousePosY, zoom, frameTimeMs);
 		
-		update(movedObj, rt, mousePosX, mousePosY, this);
-	}
-	
-	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, IEditorObject object) {		
 		mappedMousePos = rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY));
 		
 		if (movedObj) 
-			object.setPosition(mappedMousePos);
+			setPosition(mappedMousePos);
 		
-		marker.update(object);		
+		marker.update(this);	
 		
 		EditorMarker em = scaleMarkers[2];
-		em.setRelativePos(object.getWidth() - em.getWidth(), object.getHeight() - em.getHeight());
+		em.setRelativePos(width - em.getWidth(), height - em.getHeight());
 		em = scaleMarkers[3];
-		em.setRelativePos(object.getWidth() - em.getWidth(), object.getHeight() - em.getHeight());
+		em.setRelativePos(width - em.getWidth(), height - em.getHeight());
 		
 		for(int i=0; i<4; i++) {
-			scaleMarkers[i].update(object);
+			scaleMarkers[i].update(this);
 			scaleMarkers[i].setSize( new Vector2f(i%2 == 1 ? scaleMarkers[i].getWidth() : 8.f, i%2 == 0 ? scaleMarkers[i].getHeight() : 8.f));
 		}
 		
-		mouseScaling(object);
+		mouseScaling();
 	}
 	
 	@Override
@@ -112,7 +111,7 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 		lastMappedMousePos = pos;
 	}
 	
-	public void mouseScaling(IEditorObject object) {
+	public void mouseScaling() {
 		Vector2f dir = new Vector2f(0.f, 0.f);
 	
 		if( scalingX != 0 ) {
@@ -124,12 +123,12 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 							Tools.distanceVector(scaleMarkers[2].getShape(), 1, 2, lastMappedMousePos) );
 			
 			float d = Tools.vectorLength(dir);
-			object.setWidth( lastWidth + ( d * (scalingX == -1 ? 1 : -1) ) * ( dir.x < 0 ? -1 : 1 ) );
+			setWidth( lastWidth + ( d * (scalingX == -1 ? 1 : -1) ) * ( dir.x < 0 ? -1 : 1 ) );
 			Vector2f v = Vector2f.sub( lastPos, Vector2f.div(dir, 2.f) );
-			object.setPosition(v);
+			setPosition(v);
 		}
 		else 
-			lastWidth  = object.getWidth();
+			lastWidth  = width;
 		
 		if( scalingY != 0 ) {		
 			if( scalingY == -1 ) 
@@ -140,21 +139,21 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 							Tools.distanceVector(scaleMarkers[3].getShape(), 2, 3, lastMappedMousePos) );
 			
 			float d = Tools.vectorLength(dir);
-			object.setHeight( lastHeight + ( d * (scalingY == -1 ? 1 : -1) ) * ( dir.y < 0 ? -1 : 1 ) );
+			setHeight( lastHeight + ( d * (scalingY == -1 ? 1 : -1) ) * ( dir.y < 0 ? -1 : 1 ) );
 			Vector2f v = Vector2f.sub( lastPos, Vector2f.div(dir, 2.f) );
-			object.setPosition(v);
+			setPosition(v);
 		}
 		else 
-			lastHeight = object.getHeight();
+			lastHeight = height;
 		
 		if( scalingX == 0 && scalingY == 0 )
-			lastPos = object.getPosition();
+			lastPos = pos;
 		
-		if( object.getWidth() < 10.f )
-			object.setWidth( 10.f );
+		if( width < 10.f )
+			setWidth( 10.f );
 		
-		if( object.getHeight() < 10.f )
-			object.setHeight( 10.f );
+		if( height < 10.f )
+			setHeight( 10.f );
 	}
 
 }

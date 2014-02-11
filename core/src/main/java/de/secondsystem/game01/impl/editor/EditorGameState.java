@@ -222,8 +222,8 @@ public final class EditorGameState extends GameState {
 					deselectSprite();
 				else
 					currentEditorObject = selectedObject;
-				break;
-
+				
+				return false;
 			default:
 				return false;
 			}
