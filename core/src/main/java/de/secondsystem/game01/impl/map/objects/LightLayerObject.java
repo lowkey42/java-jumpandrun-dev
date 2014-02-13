@@ -57,7 +57,7 @@ public class LightLayerObject implements ILayerObject {
 
 	@Override
 	public float getHeight() {
-		return light.getRotation();
+		return light.getRadius()*2;
 	}
 
 	@Override

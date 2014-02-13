@@ -19,6 +19,7 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 	private Vector2f lastPos = new Vector2f(0.f, 0.f);
 	private int scalingX = 0;
 	private int scalingY = 0;	
+	private boolean scaling = false;
 	
 	public void setLayerObject(ILayerObject layerObject) {
 		this.layerObject = layerObject;
@@ -106,6 +107,14 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 		}
 	}
 	
+	public void setScaling(boolean scaling) {
+		this.scaling = scaling;
+	}
+	
+	public boolean isScaling() {
+		return scaling;
+	}
+	
 	@Override
 	public void setLastMappedMousePos(Vector2f pos) {
 		lastMappedMousePos = pos;
@@ -148,6 +157,8 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 		
 		if( scalingX == 0 && scalingY == 0 )
 			lastPos = pos;
+		else
+			scaling = true;
 		
 		if( width < 10.f )
 			setWidth( 10.f );

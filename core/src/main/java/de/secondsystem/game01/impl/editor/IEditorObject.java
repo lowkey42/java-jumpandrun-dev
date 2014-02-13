@@ -1,8 +1,6 @@
 package de.secondsystem.game01.impl.editor;
 
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.system.Vector2f;
-
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IMoveable;

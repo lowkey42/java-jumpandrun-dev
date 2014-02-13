@@ -50,20 +50,20 @@ public final class EditorGameState extends GameState {
 	private Text editorHint;
 	private Text layerHint;
 	private MouseEditorLayerObject mouseTile;
+	private MouseEditorEntity mouseEntity;
+	
 	private SelectedEditorObject selectedObject;
 	
-	private MouseEditorEntity mouseEntity;
+	private IEditorObject currentEditorObject;
+	
+	private boolean moveSelectedObject = false;
+	
 	private float zoom = 1.f;
 	
 	private float cameraX = 0.f;
 	private float cameraY = 0.f;
 	
-	private LayerType currentLayer = LayerType.FOREGROUND_0;
-
-
-	private boolean moveSelectedObject = false;
-
-	private IEditorObject currentEditorObject;
+	private LayerType currentLayer = LayerType.FOREGROUND_0;	
 	
 	public EditorGameState(GameState playGameState, GameMap map) {
 		this.playGameState = playGameState;
@@ -215,6 +215,12 @@ public final class EditorGameState extends GameState {
 
 			case RIGHT:
 				selectedObject.resetScalingDirection();
+				
+				if( selectedObject.isScaling() ) {
+					selectedObject.setScaling(false);	
+					return true;
+				}
+				
 				View view = getTransformedView(ctx);
 				selectedObject.setLayerObject( map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view)) );
 	
@@ -223,7 +229,7 @@ public final class EditorGameState extends GameState {
 				else
 					currentEditorObject = selectedObject;
 				
-				return false;
+				return true;
 			default:
 				return false;
 			}
