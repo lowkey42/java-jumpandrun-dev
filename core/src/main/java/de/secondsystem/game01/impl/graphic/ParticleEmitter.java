@@ -17,9 +17,10 @@ import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.IUpdateable;
 
-public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpdateable, IInsideCheck {
+public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpdateable, IInsideCheck, IScalable {
 	
 	private static final Random RAND = new Random();
 
@@ -92,6 +93,8 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	public float getWidth() {
 		return halfSize.x*2;
 	}
+	
+	@Override
 	public void setDimensions(float width, float height) {
 		halfSize = new Vector2f(width/2, height/2);
 	}
@@ -168,7 +171,7 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 
 	@Override
 	public boolean inside(Vector2f point) {
-		return point.x>=centerPosition.x-halfSize.x && point.x<=centerPosition.x-halfSize.x
-				&& point.y>=centerPosition.y-halfSize.y && point.y<=centerPosition.y-halfSize.y;
+		return point.x>=centerPosition.x-halfSize.x && point.x<=centerPosition.x+halfSize.x
+				&& point.y>=centerPosition.y-halfSize.y && point.y<=centerPosition.y+halfSize.y;
 	}
 }

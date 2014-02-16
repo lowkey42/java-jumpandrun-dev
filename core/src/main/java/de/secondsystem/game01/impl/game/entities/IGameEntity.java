@@ -11,6 +11,7 @@ import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -19,7 +20,8 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, IInsideCheck, IDimensioned, ISerializable, IEventHandlerCollection {
+public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, 
+									IInsideCheck, IDimensioned, ISerializable, IEventHandlerCollection, IScalable {
 
 	UUID uuid();
 	IGameEntityManager manager();

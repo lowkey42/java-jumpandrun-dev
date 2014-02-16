@@ -6,6 +6,7 @@ import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.util.Tools;
@@ -165,6 +166,11 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 		
 		if( height < 10.f )
 			setHeight( 10.f );
+	}
+
+	@Override
+	public void deselect(IGameMap map) {
+		// ignored for now
 	}
 
 }

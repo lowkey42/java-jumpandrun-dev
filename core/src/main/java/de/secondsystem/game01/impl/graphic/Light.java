@@ -11,10 +11,11 @@ import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.collections.IndexedMoveable;
 import de.secondsystem.game01.util.Tools;
 
-public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, IDrawable, IDimensioned {
+public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, IDrawable, IDimensioned, IScalable {
 
 	private static final int SUBDIVISIONS = 32;
 	
@@ -129,5 +130,11 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	@Override
 	public float getWidth() {
 		return radius*2;
+	}
+
+	@Override
+	public void setDimensions(float width, float height) {
+		setRadius(width/2);
+		setRotation(height);
 	}
 }

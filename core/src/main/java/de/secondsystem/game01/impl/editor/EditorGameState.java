@@ -114,6 +114,7 @@ public final class EditorGameState extends GameState {
 
 	@Override
 	protected void onStop(GameContext ctx) {
+		selectedObject.deselect(map);
 	}
 
 	private View getTransformedView(GameContext ctx) {
@@ -256,6 +257,8 @@ public final class EditorGameState extends GameState {
 	}
 
 	private void deselectSprite() {
+		selectedObject.deselect(map);
+		
 		switch( currentLayer ) {
 		case PHYSICS:
 			mouseTile.createCollisionObject(map);

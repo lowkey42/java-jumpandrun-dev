@@ -67,8 +67,7 @@ public class LightLayerObject implements ILayerObject {
 
 	@Override
 	public void setDimensions(float width, float height) {
-		light.setRadius(width/2);
-		light.setRotation(height);
+		light.setDimensions(width, height);
 	}
 
 	@Override

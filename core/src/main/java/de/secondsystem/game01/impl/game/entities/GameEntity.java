@@ -23,6 +23,7 @@ import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
+import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.IUpdateable;
 
 class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsContactListener {
@@ -272,5 +273,15 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 						new Attribute("uuid", uuid.toString()),
 						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???")
 		) );
+	}
+
+	@Override
+	public void setDimensions(float width, float height) {
+		if( representation instanceof IScalable )
+			((IScalable) representation).setDimensions(width, height);
+		else
+			System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
+								+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
+		
 	}
 }

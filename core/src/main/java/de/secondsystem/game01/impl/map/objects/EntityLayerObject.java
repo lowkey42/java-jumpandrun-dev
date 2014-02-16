@@ -57,7 +57,7 @@ public class EntityLayerObject implements ILayerObject {
 
 	@Override
 	public void setDimensions(float width, float height) {
-		// ignored; throw something at caller, maybe?
+		entity.setDimensions(width, height);
 	}
 
 	@Override
