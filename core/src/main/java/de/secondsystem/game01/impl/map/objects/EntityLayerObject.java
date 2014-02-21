@@ -88,10 +88,12 @@ public class EntityLayerObject implements ILayerObject {
 	public static ILayerObject create(IGameMap map, Map<String, Object> attributes) {
 		throw new UnsupportedOperationException();
 	}
+	
 	@Override
 	public boolean isInWorld(WorldId worldId) {
 		return entity.isInWorld(worldId);
 	}
+	
 	@Override
 	public void setWorld(WorldId worldId, boolean exists) {
 		if( exists )
@@ -99,8 +101,13 @@ public class EntityLayerObject implements ILayerObject {
 		else
 			entity.setWorldMask(entity.getWorldMask()&~worldId.id);
 	}
+	
 	@Override
 	public Attributes serialize() {
 		return attributes;
+	}
+	
+	public IGameEntity getEntity() {
+		return entity;
 	}
 }

@@ -14,13 +14,23 @@ import de.secondsystem.game01.util.Tools;
 public class SelectedEditorObject extends EditorLayerObject implements ISelectedEditorObject {
 	private EditorMarker marker;
 	private EditorMarker [] scaleMarkers  = new EditorMarker[4];
-	protected Vector2f mappedMousePos;
-	protected Vector2f lastMappedMousePos = new Vector2f(0.f, 0.f);
+	private Vector2f mappedMousePos;
+	private Vector2f lastMappedMousePos = new Vector2f(0.f, 0.f);
 	private float lastWidth, lastHeight;
 	private Vector2f lastPos = new Vector2f(0.f, 0.f);
 	private int scalingX = 0;
 	private int scalingY = 0;	
 	private boolean scaling = false;
+	protected IGameMap map;
+	
+	public SelectedEditorObject(Color outlineColor, float outlineThickness, Color fillColor, IGameMap map) {
+		marker = new EditorMarker(outlineColor, outlineThickness, fillColor);
+		
+		for(int i=0; i<4; i++)
+			scaleMarkers[i] = new EditorMarker(Color.TRANSPARENT, 0.0f, new Color(255, 100, 100, 150));
+		
+		this.map = map;
+	}
 	
 	public void setLayerObject(ILayerObject layerObject) {
 		this.layerObject = layerObject;
@@ -44,13 +54,6 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 	public void removeFromMap(GameMap map, LayerType currentLayer) {
 		map.remove(currentLayer, layerObject);
 		layerObject = null;
-	}
-	
-	public SelectedEditorObject(Color outlineColor, float outlineThickness, Color fillColor) {
-		marker = new EditorMarker(outlineColor, outlineThickness, fillColor);
-		
-		for(int i=0; i<4; i++)
-			scaleMarkers[i] = new EditorMarker(Color.TRANSPARENT, 0.0f, new Color(255, 100, 100, 150));
 	}
 	
 	public void draw(RenderTarget rt) {	
@@ -121,7 +124,7 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 		lastMappedMousePos = pos;
 	}
 	
-	public void mouseScaling() {
+	private void mouseScaling() {
 		Vector2f dir = new Vector2f(0.f, 0.f);
 	
 		if( scalingX != 0 ) {

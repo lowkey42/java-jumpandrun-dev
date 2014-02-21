@@ -19,10 +19,10 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.IDimensioned;
 
 public class MouseEditorEntity extends AbstractEditorObject implements IMouseEditorObject {
-	protected IGameEntity entity;
-	protected IPhysicsBody entityBody;
-	protected IDrawable entityRepresentation;
-	protected String currentArchetype;
+	private IGameEntity entity;
+	private IPhysicsBody entityBody;
+	private IDrawable entityRepresentation;
+	private String currentArchetype;
 	private final ArrayList<String> archetypes;
 	private int currentArchetypeIndex = 0;
 	private IGameMap map;

@@ -15,20 +15,13 @@ public class MouseEditorLayerObject extends EditorLayerObject implements IMouseE
 	private final Tileset tileset;
 	private int currentTile = 0;
 	private IGameMap map;
-	private final boolean physicsObject;
+	private final boolean isPhysicsObject;
 	
-	public MouseEditorLayerObject(GameMap map, Tileset tileset, boolean physicsObject) {
+	public MouseEditorLayerObject(GameMap map, Tileset tileset, boolean isPhysicsObject) {
 		this.tileset = tileset;
-		this.physicsObject = physicsObject;
+		this.isPhysicsObject = isPhysicsObject;
 		
 		create(map);
-	}
-	
-	protected void onTileChanged() {
-		rotation = 0.f;
-		zoom = 1.f;
-		height = layerObject.getHeight();
-		width = layerObject.getWidth();
 	}
 
 	@Override
@@ -42,12 +35,15 @@ public class MouseEditorLayerObject extends EditorLayerObject implements IMouseE
 	public void create(IGameMap map) {
 		this.map = map;
 		
-		if( physicsObject )
+		if( isPhysicsObject )
 			layerObject = new CollisionObject(map, map.getActiveWorldId().id, CollisionType.NORMAL, 0, 0, 50, 50, 0);		
 		else
 			layerObject = new SpriteLayerObject(tileset, map.getActiveWorldId().id, currentTile, 0, 0, 0);
 
-		onTileChanged();
+		rotation = 0.f;
+		zoom = 1.f;
+		height = layerObject.getHeight();
+		width = layerObject.getWidth();
 	}
 
 	@Override
