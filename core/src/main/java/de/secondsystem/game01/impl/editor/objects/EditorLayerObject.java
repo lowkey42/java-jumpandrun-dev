@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.editor;
+package de.secondsystem.game01.impl.editor.objects;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;

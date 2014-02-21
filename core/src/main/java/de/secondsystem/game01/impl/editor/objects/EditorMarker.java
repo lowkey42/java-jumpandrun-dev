@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.editor;
+package de.secondsystem.game01.impl.editor.objects;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;

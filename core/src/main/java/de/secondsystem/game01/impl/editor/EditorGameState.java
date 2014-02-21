@@ -20,6 +20,11 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.editor.objects.IEditorObject;
+import de.secondsystem.game01.impl.editor.objects.IMouseEditorObject;
+import de.secondsystem.game01.impl.editor.objects.MouseEditorEntity;
+import de.secondsystem.game01.impl.editor.objects.MouseEditorLayerObject;
+import de.secondsystem.game01.impl.editor.objects.SelectedEditorObject;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -49,8 +54,8 @@ public final class EditorGameState extends GameState {
 
 	private Text editorHint;
 	private Text layerHint;
-	private MouseEditorLayerObject mouseTile;
-	private MouseEditorEntity mouseEntity;
+	
+	private IMouseEditorObject mouseObject;
 	
 	private SelectedEditorObject selectedObject;
 	
@@ -104,12 +109,10 @@ public final class EditorGameState extends GameState {
 		editorHint.setPosition(0, 0);
 		editorHint.setColor(Color.RED);
 		
-		mouseEntity    = new MouseEditorEntity(map);
-		
-		mouseTile      = new MouseEditorLayerObject(map, tileset);
+		mouseObject      = new MouseEditorLayerObject(map, tileset, false);
 		selectedObject = new SelectedEditorObject(Color.BLUE, 2.f, Color.TRANSPARENT);
 		
-		currentEditorObject = mouseTile;
+		currentEditorObject = mouseObject;
 	}
 
 	@Override
@@ -192,11 +195,8 @@ public final class EditorGameState extends GameState {
 			if (Keyboard.isKeyPressed(Key.LSHIFT)) {
 				currentEditorObject.zoom(offset, event.asMouseWheelEvent().delta);
 			} else {
-				if( currentEditorObject instanceof MouseEditorLayerObject )
-					mouseTile.changeTile(offset);
-				else
-					if( currentEditorObject instanceof MouseEditorEntity )
-						mouseEntity.changeEntity(map, offset);
+				if( currentEditorObject instanceof IMouseEditorObject )
+					mouseObject.changeSelection(offset);
 			}
 
 			return true;
@@ -206,11 +206,8 @@ public final class EditorGameState extends GameState {
 			case LEFT:
 				moveSelectedObject = false;
 
-				if( currentEditorObject instanceof MouseEditorLayerObject ) 
-					mouseTile.addToMap(map, currentLayer);
-				else
-					if( currentEditorObject instanceof MouseEditorEntity )
-						mouseEntity.addToWorld(map);
+				if( currentEditorObject instanceof IMouseEditorObject ) 
+					mouseObject.addToMap(currentLayer);
 
 				return true;
 
@@ -261,17 +258,17 @@ public final class EditorGameState extends GameState {
 		
 		switch( currentLayer ) {
 		case PHYSICS:
-			mouseTile.createCollisionObject(map);
-			currentEditorObject = mouseTile;
+			mouseObject = new MouseEditorLayerObject(map, tileset, true);
 			break;
 		case OBJECTS:
-			mouseEntity.createEntity(map);
-			currentEditorObject = mouseEntity;
+			mouseObject = new MouseEditorEntity(map);
 			break;
 		default:
-			mouseTile.createSpriteObject(map);
-			currentEditorObject = mouseTile;
+			mouseObject = new MouseEditorLayerObject(map, tileset, false);
 		}
+		
+		mouseObject.create(map);
+		currentEditorObject = mouseObject;
 	}
 
 	private final boolean processInputKeyboard() {
