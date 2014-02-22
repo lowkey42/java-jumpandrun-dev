@@ -41,7 +41,7 @@ public class MouseEditorEntity extends AbstractEditorObject implements IMouseEdi
 			((IUpdateable) entityRepresentation).update(frameTimeMs);
 	}
 	
-	public void setEntity(IGameEntity entity) {
+	private void setEntity(IGameEntity entity) {
 		this.entity = entity;
 		entityBody = entity.getPhysicsBody();
 		entityRepresentation = entity.getRepresentation();
@@ -58,8 +58,7 @@ public class MouseEditorEntity extends AbstractEditorObject implements IMouseEdi
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
-		entityRepresentation.draw(renderTarget);
-		
+		entityRepresentation.draw(renderTarget);	
 	}
 
 	@Override

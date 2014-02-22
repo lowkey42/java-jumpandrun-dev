@@ -24,6 +24,7 @@ import de.secondsystem.game01.impl.editor.objects.IEditorObject;
 import de.secondsystem.game01.impl.editor.objects.IMouseEditorObject;
 import de.secondsystem.game01.impl.editor.objects.MouseEditorEntity;
 import de.secondsystem.game01.impl.editor.objects.MouseEditorLayerObject;
+import de.secondsystem.game01.impl.editor.objects.MouseEditorLightObject;
 import de.secondsystem.game01.impl.editor.objects.SelectedEditorEntity;
 import de.secondsystem.game01.impl.editor.objects.SelectedEditorObject;
 import de.secondsystem.game01.impl.intro.MainMenuState;
@@ -276,6 +277,9 @@ public final class EditorGameState extends GameState {
 			break;
 		case OBJECTS:
 			mouseObject = new MouseEditorEntity(map);
+			break;
+		case LIGHTS:
+			mouseObject = new MouseEditorLightObject();
 			break;
 		default:
 			mouseObject = new MouseEditorLayerObject(map, tileset, false);
