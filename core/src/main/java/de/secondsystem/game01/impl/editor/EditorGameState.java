@@ -119,7 +119,7 @@ public final class EditorGameState extends GameState {
 
 	@Override
 	protected void onStop(GameContext ctx) {
-		selectedObject.deselect(map);
+		currentEditorObject.deselect();
 	}
 
 	private View getTransformedView(GameContext ctx) {
@@ -236,8 +236,10 @@ public final class EditorGameState extends GameState {
 	
 				if (selectedObject.getLayerObject() == null) 
 					deselectSprite();
-				else
+				else {
 					currentEditorObject = selectedObject;
+					mouseObject.deselect();
+				}
 				
 				return true;
 			default:
@@ -268,8 +270,8 @@ public final class EditorGameState extends GameState {
 	}
 
 	private void deselectSprite() {
-		if( selectedObject != null )
-			selectedObject.deselect(map);
+		if( currentEditorObject != null )
+			currentEditorObject.deselect();
 		
 		switch( currentLayer ) {
 		case PHYSICS:

@@ -25,6 +25,10 @@ public class LightLayerObject implements ILayerObject {
 		light = lightMap.createLight(worldMask, new Vector2f(x, y), color, radius, sizeDegree, rotation);
 		this.worldMask = worldMask;
 	}
+	
+	public Light getLight() {
+		return light;
+	}
 
 	@Override
 	public void draw(RenderTarget renderTarget) {

@@ -6,6 +6,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.graphic.Light;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
@@ -79,6 +80,8 @@ public class MouseEditorEntity extends AbstractEditorObject implements IMouseEdi
 
 	@Override
 	public void changeSelection(int offset) {
+		deselect();
+		
 		final int typeNum = archetypes.size();
 		currentArchetypeIndex += offset;
 		currentArchetypeIndex = currentArchetypeIndex < 0 ? typeNum - 1 : currentArchetypeIndex % typeNum;
@@ -97,5 +100,11 @@ public class MouseEditorEntity extends AbstractEditorObject implements IMouseEdi
 		Attribute worldId = new Attribute("worldId", map.getActiveWorldId().id);
 		
 		map.getEntityManager().create(currentArchetype, new Attributes(width, height, rotation, x, y, worldId));
+	}
+
+	@Override
+	public void deselect() {
+		if( entity.getRepresentation() instanceof Light )
+		map.getLightMap().destroyLight((Light) entity.getRepresentation());
 	}
 }

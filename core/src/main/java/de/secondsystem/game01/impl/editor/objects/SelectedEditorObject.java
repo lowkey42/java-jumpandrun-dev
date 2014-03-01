@@ -172,7 +172,7 @@ public class SelectedEditorObject extends EditorLayerObject implements ISelected
 	}
 
 	@Override
-	public void deselect(IGameMap map) {
+	public void deselect() {
 		// ignored for now
 	}
 

@@ -31,7 +31,7 @@ public class SelectedEditorEntity extends SelectedEditorObject {
 	}
 	
 	@Override
-	public void deselect(IGameMap map) {
+	public void deselect() {
 		if( layerObject != null )
 			recreate();
 	}

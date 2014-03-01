@@ -2,6 +2,8 @@ package de.secondsystem.game01.impl.editor.objects;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
+
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.model.IInsideCheck;
 
@@ -27,6 +29,11 @@ public class EditorLayerObject extends AbstractEditorObject implements IInsideCh
 	@Override
 	public boolean inside(Vector2f point) {
 		return layerObject != null && layerObject.inside(point);
+	}
+
+	@Override
+	public void deselect() {
+		// not yet used
 	}
 
 }
