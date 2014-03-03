@@ -24,7 +24,7 @@ void main() {
     vec3 lColor = texture2D(lightmap, gl_FragCoord.xy / windowSize).rgb;
     
     
-    vec3 result = clamp((ambientColor.rgb * ambientColor.a) + lambert * lambert * lColor, 0.0, 1.0);
+    vec3 result = clamp((ambientColor.rgb * ambientColor.a) + lambert * lColor, 0.0, 1.0);
     result *= color.rgb;
     
     gl_FragColor = gl_Color * vec4(result + min(lambert * lColor.rgb * 0.5, 0.2), color.a);

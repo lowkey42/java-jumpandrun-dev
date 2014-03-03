@@ -100,7 +100,7 @@ public class LightMap extends RenderTargetWrapper {
 									(pos.x-l.getPosition().x)*(pos.x-l.getPosition().x) +
 									(pos.y-l.getPosition().y)*(pos.y-l.getPosition().y) );
 							
-							if( d<c.dist ) {
+							if( d<c.dist && d<=l.getRadius() ) {
 								c.dist=d;
 								c.lightPos = l.getPosition();
 							}
