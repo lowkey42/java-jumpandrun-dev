@@ -44,6 +44,29 @@
 			"layerType":"BACKGROUND_0",
 			"objects":[
 				{
+					"maxTtl":10000,
+					"texture":"box.png",
+					"width":300.0,
+					"maxXVelocity":0.2,
+					"maxParticleSize":40.0,
+					"minParticleSize":10.0,
+					"minTtl":1000,
+					"minYVelocity":-40.0,
+					"height":300.0,
+					"rotation":0.0,
+					"minXVelocity":-0.2,
+					"maxYVelocity":50.0,
+					"minRotationVelocity":-10,
+					"maxRotationVelocity":10,
+					"minColor":"#ff000099",
+					"maxColor":"#ffffffff",
+					"$type":"pe",
+					"world":1,
+					"particles":200,
+					"y":0.0,
+					"x":200.0
+				},
+				{
 					"height":62.0,
 					"rotation":0.0,
 					"width":55.0,
@@ -1494,25 +1517,6 @@
 		{
 			"layerType":"FOREGROUND_1",
 			"objects":[
-				{
-					"maxTtl":10000,
-					"texture":"box.png",
-					"width":300.0,
-					"maxXVelocity":0.2,
-					"maxParticleSize":10.0,
-					"minParticleSize":4.0,
-					"minTtl":1000,
-					"minYVelocity":-40.0,
-					"height":300.0,
-					"rotation":0.0,
-					"minXVelocity":-0.2,
-					"maxYVelocity":50.0,
-					"$type":"pe",
-					"world":1,
-					"particles":500,
-					"y":0.0,
-					"x":200.0
-				}
 			]
 		}
 	],

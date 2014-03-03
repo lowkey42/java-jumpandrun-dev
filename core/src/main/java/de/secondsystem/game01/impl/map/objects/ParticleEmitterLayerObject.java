@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.map.objects;
 
 import java.util.Map;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
@@ -12,6 +13,7 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.util.SerializationUtil;
 
 public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 
@@ -22,11 +24,13 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 	private int worldMask;
 	
 	public ParticleEmitterLayerObject(String texture, int particles, int worldMask, float x, float y, float width, float height, int minTtl, int maxTtl, 
-			float minXVelocity, float maxXVelocity, float minYVelocity, float maxYVelocity, float minParticleSize, float maxParticleSize) {
+			float minXVelocity, float maxXVelocity, float minYVelocity, float maxYVelocity, float minRotationVelocity, float maxRotationVelocity, 
+			Color minColor, Color maxColor, float minParticleSize, float maxParticleSize ) {
 		this.texture = texture;
 		this.worldMask = worldMask;
 		emitter = new ParticleEmitter(texture, particles, new Vector2f(x, y), new Vector2f(width, height), minTtl, maxTtl, 
-				new Vector2f(minXVelocity, minYVelocity), new Vector2f(maxXVelocity, maxYVelocity), minParticleSize, maxParticleSize);
+				new Vector2f(minXVelocity, minYVelocity), new Vector2f(maxXVelocity, maxYVelocity), minRotationVelocity, 
+				maxRotationVelocity, minColor, maxColor, minParticleSize, maxParticleSize);
 	}
 
 	@Override
@@ -110,8 +114,12 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 				new Attribute("maxXVelocity", emitter.maxVelocity.x),
 				new Attribute("minYVelocity", emitter.minVelocity.y),
 				new Attribute("maxYVelocity", emitter.maxVelocity.y),
+				new Attribute("minRotationVelocity", emitter.minRotationVelocity),
+				new Attribute("maxRotationVelocity", emitter.maxRotationVelocity),
 				new Attribute("minParticleSize", emitter.minParticleSize),
-				new Attribute("maxParticleSize", emitter.maxParticleSize)
+				new Attribute("maxParticleSize", emitter.maxParticleSize),
+				new Attribute("minColor", SerializationUtil.encodeColor(emitter.minColor)),
+				new Attribute("maxColor", SerializationUtil.encodeColor(emitter.maxColor))
 		);
 	}
 	
@@ -131,6 +139,10 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 					((Number)attributes.get("maxXVelocity")).floatValue(),
 					((Number)attributes.get("minYVelocity")).floatValue(),
 					((Number)attributes.get("maxYVelocity")).floatValue(),
+					((Number)attributes.get("minRotationVelocity")).floatValue(),
+					((Number)attributes.get("maxRotationVelocity")).floatValue(),
+					SerializationUtil.decodeColor((String) attributes.get("minColor")),
+					SerializationUtil.decodeColor((String) attributes.get("maxColor")),
 					((Number)attributes.get("minParticleSize")).floatValue(),
 					((Number)attributes.get("maxParticleSize")).floatValue() );
 		

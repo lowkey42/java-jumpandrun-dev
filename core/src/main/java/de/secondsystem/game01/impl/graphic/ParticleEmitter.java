@@ -26,9 +26,18 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 
 	private static final class Particle {
 		final Vector2f velocity;
+		final float rotationVelocity;
+		final float width;
+		final float height;
+		float rotation;
+		Vector2f pos;
 		int ttd;
-		Particle(Vector2f velocity, int ttd) {
+		Particle(Vector2f velocity, float rotationVelocity, float width, float height, Vector2f pos, int ttd) {
 			this.velocity = velocity;
+			this.rotationVelocity = rotationVelocity;
+			this.height = height;
+			this.width = width;
+			this.pos = pos;
 			this.ttd = ttd;
 		}
 	}
@@ -52,16 +61,22 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	public final Vector2f minVelocity;
 	public final Vector2f maxVelocity;
 	
+	public final float minRotationVelocity;
+	public final float maxRotationVelocity;
+	
 	private Vector2f centerPosition;
 	private Vector2f halfSize;
 	
 	public final float minParticleSize;
 	public final float maxParticleSize;
 	
+	public final Color minColor;
+	public final Color maxColor;
+	
 	private final ConstTexture texture;
 	
 	public ParticleEmitter(String texture, int particles, Vector2f centerPosition, Vector2f size, int minTtl, int maxTtl, Vector2f minVelocity, 
-			Vector2f maxVelocity, float minParticleSize, float maxParticleSize) {
+			Vector2f maxVelocity, float minRotationVelocity, float maxRotationVelocity, Color minColor, Color maxColor, float minParticleSize, float maxParticleSize) {
 		particleData = new Particle[particles];
 		vertexData = new Vertex[particles*4];
 
@@ -70,10 +85,14 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 		this.maxTtl = maxTtl;
 		this.minVelocity = minVelocity;
 		this.maxVelocity = maxVelocity;
+		this.minRotationVelocity = minRotationVelocity;
+		this.maxRotationVelocity = maxRotationVelocity;
 		this.centerPosition = centerPosition;
 		this.halfSize = Vector2f.div(size, 2);
 		this.minParticleSize = minParticleSize;
 		this.maxParticleSize = maxParticleSize;
+		this.minColor = minColor;
+		this.maxColor = maxColor;
 		try {
 			this.texture = ResourceManager.texture.get(texture);
 		} catch (IOException e) {
@@ -129,37 +148,54 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	public void update(long frameTimeMs) {
 		gameTime+=frameTimeMs;
 		
-		for( int i=0; i<vertexData.length; ++i ) {
-			if( i%4==0 && gameTime>=particleData[i/4].ttd ) {
-				resetParticle(i/4);
-				i=(i/4+ 1)*4;
+		for( int i=0; i<vertexData.length/4; ++i ) {
+			if( gameTime>=particleData[i].ttd ) {
+				resetParticle(i);
 				
 			} else {
-				vertexData[i] = new Vertex(
-						Vector2f.add(vertexData[i].position, Vector2f.mul(particleData[i/4].velocity, frameTimeMs/1000.f)),
-						vertexData[i].color,
-						vertexData[i].texCoords
-				);
+				particleData[i].rotation+=particleData[i].rotationVelocity*(frameTimeMs/1000.f);
+				Vector2f pos = particleData[i].pos=Vector2f.add(particleData[i].pos, Vector2f.mul(particleData[i].velocity, frameTimeMs/1000.f));
+				
+				final float cosA = (float) Math.cos(particleData[i].rotation);
+				final float sinA = (float) Math.sin(particleData[i].rotation);
+				float h = particleData[i].height;
+				float w = particleData[i].width; 
+
+				vertexData[i*4 +0] = new Vertex(new Vector2f(pos.x + w/2*cosA - h/2*sinA, pos.y + h/2*cosA + w/2*sinA), vertexData[i*4].color,	new Vector2f(0,0));
+				vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x - w/2*cosA - h/2*sinA, pos.y + h/2*cosA - w/2*sinA), vertexData[i*4].color,	new Vector2f(texture.getSize().x,0));
+				vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x - w/2*cosA + h/2*sinA, pos.y - h/2*cosA - w/2*sinA), vertexData[i*4].color,	new Vector2f(texture.getSize().x,texture.getSize().y));
+				vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x + w/2*cosA + h/2*sinA, pos.y - h/2*cosA + w/2*sinA), vertexData[i*4].color,	new Vector2f(0,texture.getSize().y));
 			}
 		}
 	}
 
 	private final void resetParticle(int i) {
-		particleData[i] = new Particle(random(minVelocity, maxVelocity), gameTime+random(minTtl, maxTtl));
+		final float a = random(minRotationVelocity, maxRotationVelocity);
+		final float cosA = (float) Math.cos(a);
+		final float sinA = (float) Math.sin(a);
 		
-		Color color = new Color(255, 255, 255, 255);
+		Color color = random(minColor, maxColor);
 		Vector2f pos = random(Vector2f.sub(centerPosition, halfSize), Vector2f.add(centerPosition, halfSize));
 		float h = random(minParticleSize, maxParticleSize);
-		float w = h; 
-				
-		vertexData[i*4 +0] = new Vertex(new Vector2f(pos.x,   pos.y  ), color,	new Vector2f(0,0));
-		vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x,   pos.y+h), color,	new Vector2f(texture.getSize().x,0));
-		vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x+w, pos.y+h), color,	new Vector2f(texture.getSize().x,texture.getSize().y));
-		vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x+w, pos.y  ), color,	new Vector2f(0,texture.getSize().y));
+		float w = random(minParticleSize, maxParticleSize); 
+		
+		particleData[i] = new Particle( random(minVelocity, maxVelocity), 
+				a, 
+				w, h,
+				pos,
+				gameTime+random(minTtl, maxTtl) );
+		
+		vertexData[i*4 +0] = new Vertex(new Vector2f(pos.x + w/2*cosA - h/2*sinA, pos.y + h/2*cosA + w/2*sinA), color,	new Vector2f(0,0));
+		vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x - w/2*cosA - h/2*sinA, pos.y + h/2*cosA - w/2*sinA), color,	new Vector2f(texture.getSize().x,0));
+		vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x - w/2*cosA + h/2*sinA, pos.y - h/2*cosA - w/2*sinA), color,	new Vector2f(texture.getSize().x,texture.getSize().y));
+		vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x + w/2*cosA + h/2*sinA, pos.y - h/2*cosA + w/2*sinA), color,	new Vector2f(0,texture.getSize().y));
 	}
 	
 	
 	private static int random(int min, int max) {
+		if(min>=max)
+			return min;
+		
 		return RAND.nextInt(max-min) + min;
 	}
 	private static float random(float min, float max) {
@@ -167,6 +203,9 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	}
 	private static Vector2f random(Vector2f min, Vector2f max) {
 		return new Vector2f(random(min.x, max.x), random(min.y, max.y));
+	}
+	private static Color random(Color min, Color max) {
+		return new Color(random(min.r, max.r), random(min.g, max.g), random(min.b, max.b), random(min.a, max.a));
 	}
 
 	@Override
