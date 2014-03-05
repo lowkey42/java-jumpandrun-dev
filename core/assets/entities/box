@@ -1,1 +1,1 @@
-{"representationType":"TEXTURE", "representation":"box.png", "width":50, "height":50, "shape":"BOX", "liftable":"true", "density":0.3}
+{"representationType":"TEXTURE", "representation":"box.png", "width":50, "height":50, "shape":"BOX", "liftable":"true", "density":0.3, "effects":[{"factory":".LightFactory", "x":0, "y":0, "rotation":-90, "color":"#0000ffff", "radius":100, "degree":45}]}

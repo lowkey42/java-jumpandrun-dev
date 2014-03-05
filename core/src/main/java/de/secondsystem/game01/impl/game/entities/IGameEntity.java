@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.Set;
 import java.util.UUID;
 
+import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.IEventHandlerCollection;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;

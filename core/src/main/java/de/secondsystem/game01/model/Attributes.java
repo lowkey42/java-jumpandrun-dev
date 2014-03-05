@@ -109,7 +109,8 @@ public class Attributes extends HashMap<String, Object> {
 	}
 	
 	public List<Attributes> getObjectList(String key) {
-		return new ListWrapper( this.<Map<String, ?>>getList(key) );
+		List<Map<String, ?>> wrappedList = this.<Map<String, ?>>getList(key);
+		return wrappedList!=null ? new ListWrapper(wrappedList) : null;
 	}
 	
 	@Override

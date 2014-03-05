@@ -2,12 +2,17 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import com.google.common.collect.Collections2;
+
+import de.secondsystem.game01.impl.game.entities.effects.EffectUtils;
+import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.EventHandlerCollection;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -76,6 +81,15 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		
 		if( representation instanceof IAnimated )
 			((IAnimated) representation).play(AnimationType.IDLE, 1.f, true, true, false);
+		
+		List<Attributes> effectAttrs = attributes.getObjectList("effects");
+		if( effectAttrs!=null ) {
+			Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
+			float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
+			
+			for( Attributes attr : effectAttrs )
+				effects.add(EffectUtils.createEventHandler(map, attr, worldMask, position, rotation));
+		}
 	}
 	
 	@Override
@@ -257,7 +271,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public void removeEffect(IGameEntityEffect effect) {
-		effects.remove(effect);
+		if( effects.remove(effect) )
+			effect.onDestroy(map);
 	}
 
 	@Override
@@ -267,11 +282,19 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	@Override
 	public Attributes serialize() {
+		Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
+		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
+		
 		// TODO: may/should be modified for editor
 		return new Attributes( editableEntityState!=null ? editableEntityState.getAttributes() : Collections.emptyMap(), 
 				new Attributes(
 						new Attribute("uuid", uuid.toString()),
-						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???")
+						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???"),
+						new Attribute("effects", Collections2.transform(effects, EffectUtils.HANDLER_SERIALIZER)),
+						new Attribute("x", position.x),
+						new Attribute("y", position.y),
+						new Attribute("rotation", rotation),
+						new Attribute("worldId", worldMask)
 		) );
 	}
 
