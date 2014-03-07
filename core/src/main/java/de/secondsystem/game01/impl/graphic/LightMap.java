@@ -164,6 +164,13 @@ public class LightMap extends RenderTargetWrapper {
 		for( ISpatialIndex<Light> l : lights )
 			l.remove(light);
 	}
+	public void moveLight(Light light, int groupMask) {
+		for( int i=0; i<lights.length; ++i )
+			if( (groupMask&(1<<i))!=0 )
+				lights[i].add(light);
+			else
+				lights[i].remove(light);
+	}
 
 	public void draw(Sprite sprite, ConstTexture normalMap) {
 		final ConstShader shader = getNMShader(

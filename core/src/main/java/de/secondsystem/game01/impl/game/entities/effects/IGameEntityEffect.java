@@ -6,10 +6,11 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.ISerializable;
+import de.secondsystem.game01.model.IUpdateable;
 
-public interface IGameEntityEffect extends ISerializable {
+public interface IGameEntityEffect extends ISerializable, IUpdateable {
 
-	void draw(RenderTarget rt, Vector2f position, float rotation);
+	void draw(RenderTarget rt, Vector2f position, float rotation, int worldMask);
 	
 	void onDestroy(IGameMap map);
 	

@@ -3,15 +3,18 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import com.google.common.collect.Collections2;
 
 import de.secondsystem.game01.impl.game.entities.effects.EffectUtils;
+import de.secondsystem.game01.impl.game.entities.effects.GEParticleEffect;
 import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.EventHandlerCollection;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
@@ -47,7 +50,9 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	protected IEditableEntityState editableEntityState;
 	
-	protected Set<IGameEntityEffect> effects = new HashSet<>();
+	protected final Set<IGameEntityEffect> effects = new HashSet<>();
+	
+	protected final PriorityQueue<TimedGameEntityEffect> effectTimer = new PriorityQueue<>(1);
 	
 	protected boolean dead = false;
 	
@@ -106,6 +111,12 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( representation instanceof IUpdateable )
 			((IUpdateable) representation).update(frameTimeMs);
 		
+		while( !effectTimer.isEmpty() && effectTimer.peek().destroyTime<System.currentTimeMillis() )
+			removeEffect(effectTimer.poll().effect);
+		
+		for( IGameEntityEffect e : effects )
+			e.update(frameTimeMs);
+		
 		notify(EventType.UPDATE, this);
 	}
 
@@ -122,7 +133,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		representation.draw(renderTarget);
 		
 		for( IGameEntityEffect effect : effects )
-			effect.draw(renderTarget, position, rotation);
+			effect.draw(renderTarget, position, rotation, worldMask);
 	}
 
 	@Override
@@ -163,6 +174,9 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			return true;
 
 		} else {
+			addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), 
+					100, 500, -10, 10, -10, 10, -5, 5, 
+					new Color(200, 255, 255), Color.WHITE, 10, 40, 0, 0, 0), 2000);
 			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
 			return false;
 		}
@@ -270,6 +284,12 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	}
 
 	@Override
+	public void addEffect(IGameEntityEffect effect, int ttl) {
+		effects.add(effect);
+		effectTimer.add(new TimedGameEntityEffect(effect, ttl+System.currentTimeMillis()));
+	}
+
+	@Override
 	public void removeEffect(IGameEntityEffect effect) {
 		if( effects.remove(effect) )
 			effect.onDestroy(map);
@@ -306,5 +326,18 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
 								+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
 		
+	}
+}
+
+class TimedGameEntityEffect implements Comparable<TimedGameEntityEffect> {
+	public final IGameEntityEffect effect;
+	public final long destroyTime;
+	public TimedGameEntityEffect(IGameEntityEffect effect, long destroyTime) {
+		this.effect = effect;
+		this.destroyTime = destroyTime;
+	}
+	@Override
+	public int compareTo(TimedGameEntityEffect o) {
+		return (destroyTime < o.destroyTime) ? -1 : ((destroyTime == o.destroyTime) ? 0 : 1);
 	}
 }
