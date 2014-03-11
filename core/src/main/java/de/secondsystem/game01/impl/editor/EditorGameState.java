@@ -20,13 +20,10 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.editor.objects.IEditorObject;
-import de.secondsystem.game01.impl.editor.objects.IMouseEditorObject;
-import de.secondsystem.game01.impl.editor.objects.MouseEditorEntity;
-import de.secondsystem.game01.impl.editor.objects.MouseEditorLayerObject;
-import de.secondsystem.game01.impl.editor.objects.MouseEditorLightObject;
-import de.secondsystem.game01.impl.editor.objects.SelectedEditorEntity;
-import de.secondsystem.game01.impl.editor.objects.SelectedEditorObject;
+import de.secondsystem.game01.impl.editor.objects.IEditorLayerObject;
+import de.secondsystem.game01.impl.editor.objects.EditorEntity;
+import de.secondsystem.game01.impl.editor.objects.EditorLayerObject;
+import de.secondsystem.game01.impl.editor.objects.EditorLightObject;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -59,11 +56,7 @@ public final class EditorGameState extends GameState {
 	private Text editorHint;
 	private Text layerHint;
 	
-	private IMouseEditorObject mouseObject;
-	
-	private SelectedEditorObject selectedObject;
-	
-	private IEditorObject currentEditorObject;
+	private IEditorLayerObject editorObject;
 	
 	private boolean moveSelectedObject = false;
 	
@@ -113,13 +106,12 @@ public final class EditorGameState extends GameState {
 		editorHint.setPosition(0, 0);
 		editorHint.setColor(Color.RED);
 		
-		mouseObject      = new MouseEditorLayerObject(map, tileset, false);	
-		currentEditorObject = mouseObject;
+		editorObject = new EditorLayerObject(map, tileset, false);	
 	}
 
 	@Override
 	protected void onStop(GameContext ctx) {
-		currentEditorObject.deselect();
+		editorObject.deselect();
 	}
 
 	private View getTransformedView(GameContext ctx) {
@@ -144,7 +136,7 @@ public final class EditorGameState extends GameState {
 		final ConstView cView = ctx.window.getView();
 		
 		ctx.window.setView(getTransformedView(ctx));
-		currentEditorObject.update(moveSelectedObject, ctx.window, getMouseX(), getMouseY(), zoom, frameTime);
+		editorObject.update(moveSelectedObject, ctx.window, getMouseX(), getMouseY(), zoom, frameTime);
 		ctx.window.setView(cView);
 		
 		drawMap(ctx.window);
@@ -176,8 +168,8 @@ public final class EditorGameState extends GameState {
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), currentLayer.parallax), rt.getView().getSize()));
 		
-		currentEditorObject.refresh();
-		currentEditorObject.draw(rt);
+		editorObject.refresh();
+		editorObject.draw(rt);
 
 		rt.setView(cView);
 	}
@@ -195,10 +187,10 @@ public final class EditorGameState extends GameState {
 			int offset = event.asMouseWheelEvent().delta < 0 ? -1 : 1;
 
 			if (Keyboard.isKeyPressed(Key.LSHIFT)) {
-				currentEditorObject.zoom(offset, event.asMouseWheelEvent().delta);
+				editorObject.zoom(offset, event.asMouseWheelEvent().delta);
 			} else {
-				if( currentEditorObject instanceof IMouseEditorObject )
-					mouseObject.changeSelection(offset);
+				if( editorObject.inMouseState() )
+					editorObject.changeSelection(offset);
 			}
 
 			return true;
@@ -208,17 +200,17 @@ public final class EditorGameState extends GameState {
 			case LEFT:
 				moveSelectedObject = false;
 
-				if( currentEditorObject instanceof IMouseEditorObject ) 
-					mouseObject.addToMap(currentLayer);
+				if( editorObject.inMouseState() ) 
+					editorObject.addToMap(currentLayer);
 
 				return true;
 
 			case RIGHT:
-				if( selectedObject != null ) {
-					selectedObject.resetScalingDirection();
+				if( !editorObject.inMouseState() ) {
+					editorObject.resetScalingDirection();
 				
-					if( selectedObject.isScaling() ) {
-						selectedObject.setScaling(false);	
+					if( editorObject.isScaling() ) {
+						editorObject.setScaling(false);	
 						return true;
 					}
 				}
@@ -227,18 +219,19 @@ public final class EditorGameState extends GameState {
 				
 				ILayerObject layerObject = map.findNode(currentLayer, ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view));
 				
-				if( layerObject instanceof EntityLayerObject )
-					selectedObject = new SelectedEditorEntity(Color.BLUE, 2.f, Color.TRANSPARENT, map);
-				else
-					selectedObject = new SelectedEditorObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
-				
-				selectedObject.setLayerObject( layerObject );
-	
-				if (selectedObject.getLayerObject() == null) 
-					deselectSprite();
+				if( layerObject != null ) {
+					if( editorObject.inMouseState() )
+						editorObject.deselect();
+					
+					if( layerObject instanceof EntityLayerObject )
+						editorObject = new EditorEntity(Color.BLUE, 2.f, Color.TRANSPARENT, map);
+					else
+						editorObject = new EditorLayerObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
+					
+					editorObject.setLayerObject( layerObject );
+				}
 				else {
-					currentEditorObject = selectedObject;
-					mouseObject.deselect();
+					deselectSprite();
 				}
 				
 				return true;
@@ -251,14 +244,14 @@ public final class EditorGameState extends GameState {
 			Vector2f v = ctx.window.mapPixelToCoords(new Vector2i(getMouseX(), getMouseY()), view);
 			switch (event.asMouseButtonEvent().button) {
 			case LEFT:
-				if ( selectedObject != null && selectedObject.inside(v) )
+				if ( editorObject.inside(v) )
 					moveSelectedObject = true;
 
 				return true;
 			case RIGHT:
-				if( selectedObject != null ) {
-					selectedObject.checkScaleMarkers(v);
-					selectedObject.setLastMappedMousePos( new Vector2f(v.x, v.y) );
+				if( !editorObject.inMouseState() ) {
+					editorObject.checkScaleMarkers(v);
+					editorObject.setLastMappedMousePos( new Vector2f(v.x, v.y) );
 				}
 			default:
 				return false;
@@ -270,25 +263,23 @@ public final class EditorGameState extends GameState {
 	}
 
 	private void deselectSprite() {
-		if( currentEditorObject != null )
-			currentEditorObject.deselect();
+		editorObject.deselect();
 		
 		switch( currentLayer ) {
 		case PHYSICS:
-			mouseObject = new MouseEditorLayerObject(map, tileset, true);
+			editorObject = new EditorLayerObject(map, tileset, true);
 			break;
 		case OBJECTS:
-			mouseObject = new MouseEditorEntity(map);
+			editorObject = new EditorEntity(map);
 			break;
 		case LIGHTS:
-			mouseObject = new MouseEditorLightObject();
+			editorObject = new EditorLightObject();
 			break;
 		default:
-			mouseObject = new MouseEditorLayerObject(map, tileset, false);
+			editorObject = new EditorLayerObject(map, tileset, false);
 		}
 		
-		mouseObject.create(map);
-		currentEditorObject = mouseObject;
+		editorObject.create(map);
 	}
 
 	private final boolean processInputKeyboard() {
@@ -301,14 +292,14 @@ public final class EditorGameState extends GameState {
 		if (Keyboard.isKeyPressed(Key.D))
 			cameraX += CAM_MOVE_SPEED;
 
-		if (Keyboard.isKeyPressed(Key.LEFT) && currentEditorObject.getWidth() > 0)
-			currentEditorObject.setWidth(currentEditorObject.getWidth() -1);
+		if (Keyboard.isKeyPressed(Key.LEFT) && editorObject.getWidth() > 0)
+			editorObject.setWidth(editorObject.getWidth() -1);
 		if (Keyboard.isKeyPressed(Key.RIGHT))
-			currentEditorObject.setWidth(currentEditorObject.getWidth() +1);
+			editorObject.setWidth(editorObject.getWidth() +1);
 		if (Keyboard.isKeyPressed(Key.UP))
-			currentEditorObject.setHeight(currentEditorObject.getHeight() +1);
-		if (Keyboard.isKeyPressed(Key.DOWN) && selectedObject.getHeight() > 0)
-			currentEditorObject.setHeight(currentEditorObject.getHeight() -1);
+			editorObject.setHeight(editorObject.getHeight() +1);
+		if (Keyboard.isKeyPressed(Key.DOWN) && editorObject.getHeight() > 0)
+			editorObject.setHeight(editorObject.getHeight() -1);
 
 		return true;
 	}
@@ -330,8 +321,8 @@ public final class EditorGameState extends GameState {
 			break;
 
 		case DELETE: // delete selected object
-			if (selectedObject.getLayerObject() != null) {
-				selectedObject.removeFromMap(map, currentLayer);
+			if (editorObject.getLayerObject() != null) {
+				editorObject.removeFromMap(map, currentLayer);
 				deselectSprite();
 			}
 			break;
@@ -339,9 +330,9 @@ public final class EditorGameState extends GameState {
 		case PAGEUP:
 		case ADD: 
 			if (event.shift) // rotate object
-				currentEditorObject.rotate(11.25f);
+				editorObject.rotate(11.25f);
 			else if (event.control) // scale up selected object
-				currentEditorObject.zoom(2.f);
+				editorObject.zoom(2.f);
 			else
 				zoom *= 2;
 			break;
@@ -349,9 +340,9 @@ public final class EditorGameState extends GameState {
 		case PAGEDOWN:
 		case SUBTRACT:
 			if (event.shift) // rotate object
-				currentEditorObject.rotate(-11.25f);
+				editorObject.rotate(-11.25f);
 			else if (event.control) // scale down selected object
-				currentEditorObject.zoom(1/2.f);
+				editorObject.zoom(1/2.f);
 			else
 				zoom /= 2;
 			break;

@@ -11,9 +11,13 @@ import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.SerializationUtil;
 
-public class MouseEditorLightObject extends AbstractEditorObject implements IMouseEditorObject {
+public class EditorLightObject extends EditorLayerObject {
 	private LightLayerObject lightLayerObject;
 	private IGameMap map;
+	
+	public EditorLightObject() {
+		mouseState = true;
+	}
 	
 	@Override
 	public void refresh() {
@@ -54,13 +58,11 @@ public class MouseEditorLightObject extends AbstractEditorObject implements IMou
 	@Override
 	public void addToMap(LayerType currentLayer) {
 		map.addNode(currentLayer, lightLayerObject);
-		create(map);
-		
+		create(map);	
 	}
 
 	@Override
-	public void update(boolean movedObj, RenderTarget rt, int mousePosX,
-			int mousePosY, float zoom, long frameTimeMs) {
+	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
 		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
 		lightLayerObject.setPosition(pos);
 	}

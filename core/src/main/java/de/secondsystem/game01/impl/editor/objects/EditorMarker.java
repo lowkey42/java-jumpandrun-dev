@@ -29,7 +29,7 @@ public class EditorMarker implements IDrawable, IDimensioned {
 		renderTarget.draw(shape);
 	}
 	
-	public void update(IEditorObject editorObject) {
+	public void update(IEditorLayerObject editorObject) {
 		Vector2f newSize = new Vector2f(editorObject.getWidth(), editorObject.getHeight());
 		Tools.setRectangleShape(shape, newSize, new Vector2f(newSize.x / 2f - relativePos.x, newSize.y / 2f - relativePos.y), 
 				editorObject.getPosition(), editorObject.getRotation());
