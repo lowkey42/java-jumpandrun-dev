@@ -1,1 +1,2 @@
-{"representationType":"LIGHT", "width":25, "height":25, "shape":"BOX", "liftable":"true", "density":0.3}
+{"width":25, "height":25, "shape":"BOX", "liftable":"true", "density":0.3
+"effects":[{"factory":".LightFactory", "x":0, "y":0, "rotation":0, "color":"#ffffffff", "radius":300, "degree":360}] }

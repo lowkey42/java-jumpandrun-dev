@@ -90,7 +90,11 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public void destroy( UUID eId ) {
-		entities.remove(eId); // TODO: remove light representation and linked effects
+		IGameEntity entity = entities.get(eId);
+		if( entity!=null ) {
+			entity.onDestroy();
+			entities.remove(eId);
+		}
 	}
 
 	@Override

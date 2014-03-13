@@ -130,7 +130,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			((IMoveable) representation).setRotation( physicsBody.getRotation() );
 		}
 		
-		representation.draw(renderTarget);
+		if( representation!=null )
+			representation.draw(renderTarget);
 		
 		for( IGameEntityEffect effect : effects )
 			effect.draw(renderTarget, position, rotation, worldMask);
@@ -298,6 +299,14 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	@Override
 	public Set<IGameEntityEffect> getEffects() {
 		return Collections.unmodifiableSet(effects);
+	}
+	
+	@Override
+	public void onDestroy() {
+		for( IGameEntityEffect e : effects )
+			e.onDestroy(map);
+		
+		effects.clear();
 	}
 	
 	@Override

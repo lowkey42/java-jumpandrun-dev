@@ -17,6 +17,8 @@ import de.secondsystem.game01.util.SerializationUtil;
 
 public class LightLayerObject implements ILayerObject {
 
+	private final LightMap lightMap;
+	
 	private final Light light;
 	
 	private int worldMask;
@@ -24,6 +26,7 @@ public class LightLayerObject implements ILayerObject {
 	public LightLayerObject(LightMap lightMap, int worldMask, float x, float y, float rotation, float radius, float sizeDegree, Color color) {
 		light = lightMap.createLight(worldMask, new Vector2f(x, y), color, radius, sizeDegree, rotation);
 		this.worldMask = worldMask;
+		this.lightMap = lightMap;
 	}
 	
 	public Light getLight() {
@@ -85,6 +88,9 @@ public class LightLayerObject implements ILayerObject {
 			worldMask|=worldId.id;
 		else
 			worldMask&=~worldId.id;
+		
+		if( worldMask==0 )
+			lightMap.destroyLight(light);
 	}
 
 	@Override

@@ -2,9 +2,6 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.io.IOException;
 
-import org.jsfml.graphics.Color;
-import org.jsfml.system.Vector2f;
-
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
@@ -29,7 +26,13 @@ final class GameEntityHelper {
 	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) {
 		IDrawable repr = null;
 		try {
-			RepresentationType type = RepresentationType.valueOf(attributes.getString("representationType"));
+			final String typeStr = attributes.getString("representationType");
+			if( typeStr==null )
+				return null;
+			
+			final RepresentationType type = RepresentationType.valueOf(typeStr);
+			
+			
 			float width = attributes.getFloat("width");
 			float height = attributes.getFloat("height");
 			String filename = attributes.getString("representation");
@@ -45,9 +48,6 @@ final class GameEntityHelper {
 			case TILE:
 				repr = new SpriteWrappper(width, height);
 				((SpriteWrappper) repr).setTexture(ResourceManager.texture_tiles.get(filename));
-				break;
-			case LIGHT:
-				repr = map.getLightMap().createLight(attributes.getInteger("worldId", map.getActiveWorldId().id), new Vector2f(attributes.getFloat("x"), attributes.getFloat("y")), new Color(200, 180, 150), 300, 360, 360); // TODO
 				break;
 				
 			default:
