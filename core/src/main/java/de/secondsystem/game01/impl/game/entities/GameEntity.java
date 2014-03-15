@@ -144,12 +144,12 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public void beginContact(IPhysicsBody other) {
-		notify(EventType.TOUCHED, this, other);
+		notify(EventType.TOUCHED, this, other.getOwner(), other);
 	}
 
 	@Override
 	public void endContact(IPhysicsBody other) {
-		notify(EventType.UNTOUCHED, this, other);
+		notify(EventType.UNTOUCHED, this, other.getOwner(), other);
 	}
 	
 	@Override
@@ -162,6 +162,13 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		return (worldMask&worldId.id) !=0;
 	}
 
+	@Override
+	public void forceWorld(WorldId worldId) {
+		physicsBody.forceWorldSwitch(worldId.id);
+		
+		this.worldMask = worldId.id;
+	}
+	
 	@Override
 	public boolean setWorldMask(int newWorldMask) {
 		if( isDead() )

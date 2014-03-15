@@ -9,13 +9,21 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class KillEventHandler implements IEventHandler {
 
+	private long lastHit=0;
+	
 	public KillEventHandler() {
 	}
 	
 	@Override
 	public Object handle(Object... args) {
+		if( lastHit!=0 && lastHit>System.currentTimeMillis() )
+			return null;
+		
+		lastHit = System.currentTimeMillis() + 2000;
+		
 		final IGameEntity owner = (IGameEntity) args[0];
 		final IGameEntity killer = (IGameEntity) args[1];
+		
 		switch( owner.getWorldId() ) {
 			case MAIN:
 				inMainWorld(owner, killer);
@@ -35,8 +43,10 @@ public class KillEventHandler implements IEventHandler {
 	
 	protected void inMainWorld(IGameEntity entity, IGameEntity other) {
 		if( entity instanceof IControllableGameEntity )
-			if( !entity.setWorld(WorldId.OTHER) )
-				killEntity(entity);
+			entity.forceWorld(WorldId.OTHER);
+//			if( !entity.setWorld(WorldId.OTHER) ) {
+//				killEntity(entity);
+//			}
 		
 		entity.setDead(true);
 	}

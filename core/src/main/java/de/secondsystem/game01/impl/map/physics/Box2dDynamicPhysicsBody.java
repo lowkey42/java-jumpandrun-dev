@@ -140,7 +140,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 
 	@Override
 	public Vector2f getVelocity() {
-		return new Vector2f(getBody().getPosition().x, getBody().getPosition().y);
+		return new Vector2f(getBody().getLinearVelocity().x, getBody().getLinearVelocity().y);
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IWeakGameEntityRef;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
@@ -57,11 +58,17 @@ public final class PingPongEventHandler implements IEventHandler {
 		List<Object> newArgs = new ArrayList<>(Arrays.asList(args));
 		Object target = targetEntity==null ? args[1] : targetEntity.get();
 
+		if( targetEntity==null ) {
+			target = args[1];
+			newArgs.set(1, args[0]);
+			
+			if( !(target instanceof IGameEntity) )
+				return null;
+			
+		} else
+			target = targetEntity.get();
+		
 		newArgs.set(0, target);
-		
-		if( targetEntity==null )
-			newArgs.set(1, args[0]);		
-		
 		
 		if( handler!=null )
 			return handler.handle(newArgs.toArray());

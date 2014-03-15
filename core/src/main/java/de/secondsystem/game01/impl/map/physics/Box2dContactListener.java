@@ -59,8 +59,11 @@ class Box2dContactListener implements ContactListener {
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) fixtureB.getBody().getUserData();
 		
 		if( contact.isEnabled() && isWorldShared(body1, body2, fixtureA, fixtureB) ) {
-			callBeginListener(contact, body2, fixtureA, body1);
-			callBeginListener(contact, body1, fixtureB, body2);
+			if( !fixtureB.isSensor() )
+				callBeginListener(contact, body2, fixtureA, body1);
+			
+			if( !fixtureA.isSensor() )
+				callBeginListener(contact, body1, fixtureB, body2);
 		}
 	}
 

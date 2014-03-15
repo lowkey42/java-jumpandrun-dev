@@ -25,14 +25,14 @@ public enum EventType {
 	
 	/**
 	 * The entity is touched by another one.
-	 * ARGS: IGameEntity: owner, other:IPhysicsBody, force:Vector2f
+	 * ARGS: IGameEntity: owner, otherEntity: IGameEntity, other:IPhysicsBody, force:Vector2f
 	 * RETURN: unused 
 	 */
 	TOUCHED,
 	
 	/**
 	 * The entity is no longer touched by another one.
-	 * ARGS: IGameEntity: owner, other:IGameEntity
+	 * ARGS: IGameEntity: owner, otherEntity: IGameEntity, other:IGameEntity
 	 * RETURN: unused 
 	 */
 	UNTOUCHED,

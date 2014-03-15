@@ -71,10 +71,22 @@ public class MainGameState extends GameState {
 	private final class PlayerDeathEventHandler extends KillEventHandler {
 
 		@Override
+		public Object handle(Object... args) {
+			if( ((IGameEntity)args[1]).uuid().equals(ignoreDamageEntity) )
+				return null;
+			
+			return super.handle(args);
+		}
+		
+		@Override
 		protected void killEntity(IGameEntity entity) {
 			setNextState(new GameOverGameState());
+			System.out.println("killed entity");
 		}
 	}
+	
+	private UUID ignoreDamageEntity;
+	private long ignoreDamageTimer=0;
 	
 	private IControllableGameEntity possessedEntity;
 	private IGameEntityController possessedEntityController;
@@ -90,6 +102,9 @@ public class MainGameState extends GameState {
 	};
 	
 	private void possess(IControllableGameEntity player, IControllableGameEntity target) {
+		ignoreDamageEntity = target.uuid();
+		ignoreDamageTimer = Long.MAX_VALUE;
+		
 		possessedEntity = target;
 
 		possessedEntityController = possessedEntity.getController();
@@ -101,19 +116,24 @@ public class MainGameState extends GameState {
 	}
 	private boolean unpossess() {
 		if( possessedEntity!=null ) {
+			ignoreDamageTimer = System.currentTimeMillis() + 5000;
+			
 			possessedEntity.removeEventHandler(EventType.DAMAGED, possessedEntityDamagedHandler);
 			if( possessedEntity.isLiftingSomething() )
 				possessedEntity.liftOrThrowObject(2);
-				
-			player.setPosition(possessedEntity.getPosition());
-			player.setRotation(possessedEntity.getRotation());
-			player.setWorld(WorldId.MAIN);
-			controller.addGE(player);
-			controller.removeGE(possessedEntity);
-			possessedEntity.setController(possessedEntityController);
 
-			camera.setController(player);
-			possessedEntity = null;
+			if( player.setWorld(WorldId.MAIN) ) {
+				player.setPosition(possessedEntity.getPosition());
+				player.setRotation(possessedEntity.getRotation());
+				controller.addGE(player);
+				controller.removeGE(possessedEntity);
+				possessedEntity.setController(possessedEntityController);
+	
+				camera.setController(player);
+				possessedEntity = null;
+				
+			} else
+				return false;
 			
 			return true;
 		}
@@ -290,6 +310,10 @@ public class MainGameState extends GameState {
 		ctx.window.setView(cView);
 		
 		monologueTextBox.draw(ctx.window);
+		
+		if( System.currentTimeMillis()>=ignoreDamageTimer ) {
+			ignoreDamageEntity=null;
+		}
 	}
 	
 	@Override
