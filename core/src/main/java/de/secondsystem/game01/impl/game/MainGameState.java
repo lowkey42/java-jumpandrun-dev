@@ -62,7 +62,7 @@ public class MainGameState extends GameState {
 	
 	private KeyboardController controller;
 	
-	private final String PLAYER_UUID = "aa013690-1408-4a13-8329-cbfb1cfa7f6b";
+	private final UUID PLAYER_UUID = UUID.nameUUIDFromBytes("player".getBytes());
 	
 	public MainGameState( String mapId ) {
 		this.mapId = mapId;
@@ -230,15 +230,18 @@ public class MainGameState extends GameState {
 			mapRenderer = new EffectMapRenderer(ctx, map);
 		}
 		
+		if( player==null ) {
+			player = (IControllableGameEntity) map.getEntityManager().get(PLAYER_UUID);
+			if( player == null )
+				player = (IControllableGameEntity) map.getEntityManager().create(PLAYER_UUID, "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
+	
+			player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
+			player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
+		}
 		
-		player = (IControllableGameEntity) map.getEntityManager().get(UUID.fromString(PLAYER_UUID));
-		if( player == null )
-			player = (IControllableGameEntity) map.getEntityManager().create(UUID.fromString(PLAYER_UUID), "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
-
-		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
-		player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
-		
-		camera = new Camera(player);
+		if( camera==null ) {
+			camera = new Camera(player);
+		}
 			
 //		// something like this will be implemented in the editor
 //		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
@@ -271,12 +274,14 @@ public class MainGameState extends GameState {
 		
 		console.setScriptEnvironment(map.getScriptEnv());
 		
-		controller = new KeyboardController(ctx.settings.keyMapping, new IWorldSwitchInterceptor() {
-			@Override public boolean doWorldSwitch() {
-				return !unpossess();
-			}
-		});
-		controller.addGE(player);
+		if( controller==null ) {
+			controller = new KeyboardController(ctx.settings.keyMapping, new IWorldSwitchInterceptor() {
+				@Override public boolean doWorldSwitch() {
+					return !unpossess();
+				}
+			});
+			controller.addGE(player);
+		}
 	}
 	
 	@Override

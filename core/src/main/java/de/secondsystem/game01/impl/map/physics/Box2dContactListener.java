@@ -16,17 +16,26 @@ class Box2dContactListener implements ContactListener {
 		final boolean multiverse; ///< collides with objects in any part of our complex multi-world map
 		final FixtureContactListener overrideListener;
 		final boolean cancelNormalHandlers;
+		final boolean mainBody;
 		FixtureData(){
-			this(false, false, null);
+			this(false, false, true, null);
 		}
 		FixtureData(boolean multiverse, FixtureContactListener overrideListener){
-			this(multiverse, true, overrideListener);
+			this(multiverse, true, true, overrideListener);
 		}
 		FixtureData(boolean multiverse, boolean cancelNormalHandlers, FixtureContactListener overrideListener){
+			this(multiverse, cancelNormalHandlers, true, overrideListener);
+		}
+		FixtureData(boolean multiverse, boolean cancelNormalHandlers, boolean mainBody, FixtureContactListener overrideListener){
 			this.multiverse = multiverse;
 			this.overrideListener = overrideListener;
 			this.cancelNormalHandlers = cancelNormalHandlers;
+			this.mainBody = mainBody;
 		}
+	}
+	
+	private static boolean isMainBody(Fixture fixture) {
+		return fixture.getUserData()==null || ((FixtureData)fixture.getUserData()).overrideListener==null || ((FixtureData)fixture.getUserData()).mainBody;
 	}
 	
 	private static void callBeginListener(Contact contact, Box2dPhysicsBody otherBody, Fixture fixture, FixtureContactListener def) {
@@ -59,10 +68,10 @@ class Box2dContactListener implements ContactListener {
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) fixtureB.getBody().getUserData();
 		
 		if( contact.isEnabled() && isWorldShared(body1, body2, fixtureA, fixtureB) ) {
-			if( !fixtureB.isSensor() )
+			if( isMainBody(fixtureB) )
 				callBeginListener(contact, body2, fixtureA, body1);
 			
-			if( !fixtureA.isSensor() )
+			if( isMainBody(fixtureA) )	
 				callBeginListener(contact, body1, fixtureB, body2);
 		}
 	}

@@ -12,6 +12,8 @@ public interface IPhysicsWorld extends IUpdateable {
 	@Override
 	void update(long frameTime);
 
+	IPhysicsBody raycastSolid(Vector2f start, Vector2f target);
+	
 	PhysicsBodyFactory factory();
 	
 	

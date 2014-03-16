@@ -1,4 +1,4 @@
 {"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", 
-"moveAcceleration":0.6, "jumpAcceleration":1, "maxMoveSpeed":1.5, "maxJumpSpeed":8, "maxThrowSpeed":10
-"width":60, "height":60, "shape":"HUMANOID", "possessable":"true", "controller":{"factory":".SAiControllerFactory"}
-"onTOUCHED":{"factory":".PPEHF", "out":"DAMAGED"} }
+"moveAcceleration":0.6, "jumpAcceleration":1, "maxMoveSpeed":1.5, "maxJumpSpeed":8, "maxThrowSpeed":10,
+"width":60, "height":60, "shape":"HUMANOID", "possessable":"true", "controller":{"factory":".SAiControllerFactory"},
+"onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".PPEHF", "out":"DAMAGED"}} }

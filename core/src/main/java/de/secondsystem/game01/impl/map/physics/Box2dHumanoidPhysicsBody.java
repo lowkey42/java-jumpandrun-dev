@@ -105,13 +105,13 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		mainBody.friction = 0.f;
 		mainBody.restitution = 0.f;
 		mainBody.density = 1.0f;
-		mainBody.userData = new Box2dContactListener.FixtureData(false, false, exactObjects);
+		mainBody.userData = new Box2dContactListener.FixtureData(false, false, true, exactObjects);
 		baseFixture = body.createFixture(mainBody);
 				
 		FixtureDef fd = new FixtureDef();
 		fd.shape = createShape(PhysicsBodyShape.BOX, getWidth()-baseWidth*2, 2, 0, getHeight()/2+1, 0);
 		fd.isSensor = true;
-		fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
+		fd.userData = new Box2dContactListener.FixtureData(false, true, false, new StableCheckFCL());
 		
 		body.setLinearDamping(1.0f);
 		body.createFixture(fd);
@@ -119,13 +119,13 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		FixtureDef leftObjSensor = new FixtureDef();
 		leftObjSensor.shape = createShape(PhysicsBodyShape.BOX, getWidth()/2+maxReach, getHeight(), -maxReach-getWidth()/4, 0, 0 );
 		leftObjSensor.isSensor = true;
-		leftObjSensor.userData = new Box2dContactListener.FixtureData(false, leftObjects);
+		leftObjSensor.userData = new Box2dContactListener.FixtureData(false, true, false, leftObjects);
 		body.createFixture(leftObjSensor);
 		
 		FixtureDef rightObjSensor = new FixtureDef();
 		rightObjSensor.shape = createShape(PhysicsBodyShape.BOX, getWidth()/2 +maxReach, getHeight(), maxReach+getWidth()/4, 0, 0 );
 		rightObjSensor.isSensor = true;
-		rightObjSensor.userData = new Box2dContactListener.FixtureData(false, rightObjects);
+		rightObjSensor.userData = new Box2dContactListener.FixtureData(false, true, false, rightObjects);
 		body.createFixture(rightObjSensor);
 	}
 

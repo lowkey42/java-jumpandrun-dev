@@ -98,8 +98,6 @@ public class EditorEntity extends EditorLayerObject {
 			width  = ((IDimensioned) entityRepresentation).getWidth();
 			height = ((IDimensioned) entityRepresentation).getHeight();	
 		}
-		else 
-			throw new UnsupportedOperationException("Representation is not dimensioned.");
 	}
 
 	@Override

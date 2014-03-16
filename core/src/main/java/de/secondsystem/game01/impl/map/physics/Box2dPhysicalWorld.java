@@ -1,8 +1,10 @@
 package de.secondsystem.game01.impl.map.physics;
 
+import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.DistanceJoint;
 import org.jbox2d.dynamics.joints.DistanceJointDef;
@@ -36,6 +38,33 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			dt -= max/2;
 		}
 		physicsWorld.step(dt, velocityIterations, positionIterations);
+	}
+
+	private static final class RaycastCbClosure {
+		IPhysicsBody foundBody;
+	}
+	
+	@Override
+	public IPhysicsBody raycastSolid(Vector2f start, Vector2f target) {
+		final RaycastCbClosure c = new RaycastCbClosure();
+		final RayCastCallback callback = new RayCastCallback() {
+			@Override public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal,
+					float fraction) {
+				if( fixture.isSensor() || !(fixture.m_body.getUserData() instanceof IPhysicsBody) )
+					return -1;
+				
+				c.foundBody = (IPhysicsBody) fixture.m_body.getUserData();
+				
+				if( c.foundBody.getCollisionHandlerType()==CollisionHandlerType.SOLID )
+					return -1;
+				
+				return 0;
+			}
+		};
+		
+		physicsWorld.raycast(callback, Box2dPhysicsBody.toBox2dCS(start.x, start.y), Box2dPhysicsBody.toBox2dCS(target.x, target.y));
+		
+		return c.foundBody;
 	}
 
 	Body createBody(BodyDef def) {

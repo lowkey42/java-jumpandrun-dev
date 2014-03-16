@@ -49,7 +49,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 			FixtureDef fd = new FixtureDef();
 			fd.shape = createShape(PhysicsBodyShape.BOX, getWidth() / 2f, 1f, 0, getHeight()/2, 0);
 			fd.isSensor = true;
-			fd.userData = new Box2dContactListener.FixtureData(false, new StableCheckFCL());
+			fd.userData = new Box2dContactListener.FixtureData(false, true, false, new StableCheckFCL());
 			
 			body.createFixture(fd);
 		}
@@ -58,7 +58,7 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		FixtureDef fd = new FixtureDef();
 		fd.shape = createShape(PhysicsBodyShape.BOX, Math.max(1, getWidth()-10), Math.max(1, getHeight()-10) );
 		fd.isSensor = true;
-		fd.userData = new Box2dContactListener.FixtureData(true, new WorldSwitchCheckFCL());
+		fd.userData = new Box2dContactListener.FixtureData(true, true, false, new WorldSwitchCheckFCL());
 		
 		body.createFixture(fd);
 	}

@@ -28,10 +28,10 @@ import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureConta
 class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	protected static final float BOX2D_SCALE_FACTOR = 0.01f;
 	
-	protected static final Vec2 toBox2dCS( float x, float y ) {
+	static final Vec2 toBox2dCS( float x, float y ) {
 		return new Vec2(x, y).mul(BOX2D_SCALE_FACTOR);
 	}
-	protected static final Vector2f fromBox2dCS( float x, float y ) {
+	static final Vector2f fromBox2dCS( float x, float y ) {
 		return Vector2f.div(new Vector2f(x, y), BOX2D_SCALE_FACTOR);
 	}
 	
