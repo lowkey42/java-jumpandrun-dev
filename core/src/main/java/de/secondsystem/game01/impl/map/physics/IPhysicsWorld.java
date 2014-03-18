@@ -13,9 +13,14 @@ public interface IPhysicsWorld extends IUpdateable {
 	void update(long frameTime);
 
 	IPhysicsBody raycastSolid(Vector2f start, Vector2f target);
+	IPhysicsBody raycast(Vector2f start, Vector2f target, RaycastFilter filter);
 	
 	PhysicsBodyFactory factory();
 	
+	
+	public interface RaycastFilter {
+		boolean accept(IPhysicsBody body);
+	}
 	
 	public interface PhysicsBodyFactory {
 		PhysicsBodyFactory inWorld(WorldId worldId);

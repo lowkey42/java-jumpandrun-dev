@@ -66,7 +66,9 @@ final class GameEntityHelper {
 		PhysicsBodyFactory factory = map.getPhysicalWorld().factory()
 				.worldMask(attributes.getInteger("worldId", map.getActiveWorldId().id))
 				.position(attributes.getFloat("x"), attributes.getFloat("y"))
-				.dimension(attributes.getFloat("width"), attributes.getFloat("height"));
+				.dimension(
+						attributes.getFloat("physicsWidth", attributes.getFloat("width")), 
+						attributes.getFloat("physicsHeight", attributes.getFloat("height")) );
 		
 		Float rotation = attributes.getFloat("rotation");
 		if( rotation!=null )

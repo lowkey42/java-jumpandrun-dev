@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.List;
 import java.util.UUID;
 
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.controller.ControllerUtils;
@@ -14,6 +15,7 @@ import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody.BodyFilter;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IAnimated;
+import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 import de.secondsystem.game01.model.IUpdateable;
@@ -63,6 +65,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			controller = ControllerUtils.createController(this, map, controllerAttributes);
 	}
 
+	@Override
+	public void draw(RenderTarget renderTarget) {
+		super.draw(renderTarget);
+		if( controller instanceof IDrawable )
+			((IDrawable) controller).draw(renderTarget);
+	}
+	
 	@Override
 	public void moveHorizontally(HDirection direction, float factor) {
 		hDirection = direction;

@@ -39,12 +39,19 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	}
 
 	VertexArray getDrawable() {
-		return dirty || vertices==null ? vertices=createDrawable(center, color, radius, (float)Math.toRadians(degree), (float)Math.toRadians(rotation)) : vertices;
+		if( dirty || vertices==null ) {
+			dirty = false;
+			
+			return vertices=createDrawable(center, color, radius, (float)Math.toRadians(degree), (float)Math.toRadians(rotation));
+		}
+			
+		return  vertices;
 	}
 
 
 	private static VertexArray createDrawable(Vector2f center, Color color, float radius,
 			float degree, float rotation) {
+		
 		VertexArray v = new VertexArray(PrimitiveType.TRIANGLE_FAN);
 		v.ensureCapacity(SUBDIVISIONS+1);
 		
@@ -67,16 +74,16 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 
 	
 	public void setColor(Color color) {
-		this.dirty = !color.equals(this.color);
+		this.dirty |= !color.equals(this.color);
 		this.color = color;
 	}
 	public void setRadius(float radius) {
-		this.dirty = this.radius!=radius;
+		this.dirty |= this.radius!=radius;
 		this.radius = radius;
 	}
 	public void setDegree(float degree) {
 		float nDegree = (float) Math.toRadians(degree);
-		this.dirty = !Tools.nearEqual(nDegree, this.degree);
+		this.dirty |= !Tools.nearEqual(nDegree, this.degree);
 		this.degree = nDegree;
 	}
 
@@ -97,13 +104,13 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	
 	@Override
 	protected void doSetPosition(Vector2f pos) {
-		this.dirty = !pos.equals(center);
+		this.dirty |= !pos.equals(center);
 		this.center = pos;
 	}
 
 	@Override
 	public void setRotation(float degree) {
-		this.dirty = !Tools.nearEqual(degree, this.rotation);
+		this.dirty |= !Tools.nearEqual(degree, this.rotation);
 		this.rotation = degree;
 	}
 

@@ -42,23 +42,40 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 
 	private static final class RaycastCbClosure {
 		IPhysicsBody foundBody;
+		float qdist = Float.MAX_VALUE;
+		
+		void update(Vector2f start, IPhysicsBody b) {
+			float d = (start.x-b.getPosition().x)*(start.x-b.getPosition().x) + (start.y-b.getPosition().y)*(start.y-b.getPosition().y);
+			if( d<=qdist ) {
+				qdist = d;
+				foundBody = b;
+			}
+		}
 	}
 	
 	@Override
 	public IPhysicsBody raycastSolid(Vector2f start, Vector2f target) {
+		return raycast(start, target, new RaycastFilter() {
+			@Override public boolean accept(IPhysicsBody body) {
+				return body.getCollisionHandlerType()==CollisionHandlerType.SOLID;
+			}
+		});
+	}
+	@Override
+	public IPhysicsBody raycast(final Vector2f start, Vector2f target, final RaycastFilter filter) {
 		final RaycastCbClosure c = new RaycastCbClosure();
 		final RayCastCallback callback = new RayCastCallback() {
 			@Override public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal,
 					float fraction) {
-				if( fixture.isSensor() || !(fixture.m_body.getUserData() instanceof IPhysicsBody) )
+				if( fixture.isSensor() || !(fixture.m_body.getUserData() instanceof Box2dPhysicsBody) )
 					return -1;
 				
-				c.foundBody = (IPhysicsBody) fixture.m_body.getUserData();
+				IPhysicsBody b = (IPhysicsBody) fixture.m_body.getUserData();
 				
-				if( c.foundBody.getCollisionHandlerType()==CollisionHandlerType.SOLID )
-					return -1;
-				
-				return 0;
+				if( filter.accept(b) ) {
+					c.update(start, b);
+				}
+				return -1;
 			}
 		};
 		

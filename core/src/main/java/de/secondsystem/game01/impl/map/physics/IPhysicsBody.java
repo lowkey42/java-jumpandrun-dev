@@ -34,4 +34,6 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 	void unbind(IPhysicsBody other);
 	boolean isBound(IPhysicsBody other);
 	boolean isBound();
+	
+	IPhysicsBody raycastSolid(Vector2f target);
 }

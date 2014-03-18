@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -229,9 +230,13 @@ public final class GameEntityManager implements IGameEntityManager {
 			EntityArchetype at = ARCHETYPE_CACHE.get(archetype);
 			
 			if( at!=null ) {
-				for( Entry<String, Object> e : at.attributes.entrySet() )
-					if( e.getValue().equals(attributes.get(e.getKey())) )
-							attributes.remove(e.getKey());
+				for( Entry<String, Object> e : at.attributes.entrySet() ) {
+					Object o1 = e.getValue();
+					Object o2 = attributes.get(e.getKey());
+					
+					if( compObject(o1, o2) )
+						attributes.remove(e.getKey());
+				}
 			}
 			
 		} catch (ExecutionException e) {
@@ -241,6 +246,56 @@ public final class GameEntityManager implements IGameEntityManager {
 		return attributes;
 	}
 	
+	private static boolean compObject(Object o1, Object o2) {
+		return o1.equals(o2) 
+				|| (o1 instanceof Number && o2 instanceof Number && !o1.getClass().equals(o2.getClass()) && compNumber(o1,o2))
+				|| (o1 instanceof Collection && o2 instanceof Collection && compCollection(o1,o2)) 
+				|| (o1 instanceof Map && o2 instanceof Map && compMap(o1,o2));
+	}
+	
+	private static boolean compNumber(Object o1, Object o2) {
+		if( o1 instanceof Double || o1 instanceof Float || o2 instanceof Double || o2 instanceof Float )
+			return ((Number) o1).doubleValue()==((Number)o2).doubleValue();
+		
+		else
+			return ((Number) o1).longValue()==((Number)o2).longValue();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static boolean compMap(Object o1, Object o2) {
+		Map<Object, Object> m1 = (Map<Object, Object>) o1;
+		Map<Object, Object> m2 = (Map<Object, Object>) o2;
+		
+		if( m1.size()!=m2.size() )
+			return false;
+
+		for( Entry<Object, Object> e : m1.entrySet() ) {
+			Object so1 = e.getValue();
+			Object so2 = m2.get(e.getKey());
+			
+			if( !compObject(so1, so2) )
+				return false;
+		}
+		
+		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static boolean compCollection(Object o1, Object o2) {
+		Collection<Object> c1 = (Collection<Object>) o1;
+		Collection<Object> c2 = (Collection<Object>) o2;
+		
+		outer: for( Object so1 : c1 ) {
+			for( Object so2 : c2 )
+				if( compObject(so1, so2) )
+					continue outer;
+			
+			return false;
+		}
+		
+		return true;
+	}
+
 	@Override
 	public void deserialize(Attributes attributes) {
 		if( attributes==null )

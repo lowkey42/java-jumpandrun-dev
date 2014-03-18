@@ -116,5 +116,9 @@ public class ScriptEnvironment implements IUpdateable {
 		
 		timerManager.update(frameTimeMs);
 	}
+	
+	public TimerManager getTimerManager() {
+		return timerManager;
+	}
 
 }

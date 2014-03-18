@@ -65,12 +65,14 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
 		/*
-		 * 0________1
+		 * 
+		 *  0_____1
+		 * 7/     \ 2
 		 *  |      |
 		 *  |      |
-		 * 5|      |2
+		 * 6|      |3
 		 *   \____/
-		 *   4    3
+		 *   5    4
 		 */
 		
 		final float halfB2Width = getWidth() / 2f * BOX2D_SCALE_FACTOR;
@@ -91,15 +93,17 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		FixtureDef mainBody = new FixtureDef();
 		PolygonShape mbs = new PolygonShape();
 		
-		mbs.m_count = 6;
+		mbs.m_count = 8;
 		mbs.set(new Vec2[]{
-			/*0*/ new Vec2(-halfB2Width, -halfB2Height),
-			/*1*/ new Vec2( halfB2Width, -halfB2Height),
-			/*2*/ new Vec2( halfB2Width, halfB2Height-b2BaseHeight),
-			/*3*/ new Vec2( halfB2Width-b2BaseWidth, halfB2Height),
-			/*4*/ new Vec2(-halfB2Width+b2BaseWidth, halfB2Height),
-			/*5*/ new Vec2(-halfB2Width, halfB2Height-b2BaseHeight),
-		}, 6);
+			/*0*/ new Vec2(-halfB2Width/3, -halfB2Height),
+			/*1*/ new Vec2( halfB2Width/3, -halfB2Height),
+			/*2*/ new Vec2( halfB2Width, -halfB2Height*0.9f),
+			/*3*/ new Vec2( halfB2Width, halfB2Height-b2BaseHeight),
+			/*4*/ new Vec2( halfB2Width-b2BaseWidth, halfB2Height),
+			/*5*/ new Vec2(-halfB2Width+b2BaseWidth, halfB2Height),
+			/*6*/ new Vec2(-halfB2Width, halfB2Height-b2BaseHeight),
+			/*7*/ new Vec2(-halfB2Width, -halfB2Height*0.9f),
+		}, 8);
 				
 		mainBody.shape = mbs;
 		mainBody.friction = 0.f;
@@ -362,6 +366,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		currentClimbingLadder = null;
 		body.setGravityScale(1.f);
 		body.setLinearDamping(1.0f);
+		body.applyForceToCenter(parent.physicsWorld.getGravity());
 	}
 	
 	@Override

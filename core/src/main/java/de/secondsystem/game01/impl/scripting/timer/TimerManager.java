@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.scripting.timer;
 import java.util.PriorityQueue;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
+import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -13,7 +14,10 @@ public class TimerManager implements IUpdateable{
 	public TimerManager(ScriptEnvironment scriptEnv) {
 		env = scriptEnv;
 	}
-	
+
+	public void createTimer(long intervalMs, boolean repeated, IGameEntity sender, IEventHandler handler, Object[] args) {
+		timers.add(new EventTimer(intervalMs, repeated, sender, handler, args));
+	}
 	public void createTimer(long intervalMs, boolean repeated, Object callable) {
 		timers.add(new FunctionTimer(env, intervalMs, repeated, callable));
 	}

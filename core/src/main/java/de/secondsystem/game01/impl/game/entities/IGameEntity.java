@@ -46,6 +46,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	void removeEffect( IGameEntityEffect effect );
 	Set<IGameEntityEffect> getEffects();
 	void addEffect(IGameEntityEffect effect, int ttl);
-	void onDestroy();
 	
+	void onDestroy();
+	boolean isDestroyed();
 }

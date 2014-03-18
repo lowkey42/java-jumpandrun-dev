@@ -18,7 +18,7 @@ public final class KeyboardController extends AbstractGameEntityController {
 	}
 	
 	private static final float THROW_FORCE_INC_PER_MS = 5/1000.f; 
-	private static final float THROW_FORCE_INI = 1;
+	private static final float THROW_FORCE_INI = 5;
 	
 	private final KeyMapping mapping;
 	private final IWorldSwitchInterceptor worldSwitchInterceptor;

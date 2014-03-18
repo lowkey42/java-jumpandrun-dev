@@ -67,6 +67,10 @@ public class MainGameState extends GameState {
 	public MainGameState( String mapId ) {
 		this.mapId = mapId;
 	}
+	public MainGameState( String mapId, GameContext ctx ) {
+		this.mapId = mapId;
+		init(ctx);
+	}
 	
 	private final class PlayerDeathEventHandler extends KillEventHandler {
 
@@ -156,8 +160,8 @@ public class MainGameState extends GameState {
 		
 	}
 	
+	private ThreadedMapLoader activeMapLoader;
 	public class ScriptApi {
-		@SuppressWarnings("unused")
 		private final GameContext ctx;
 		private JSONObject storedValues;
 		private final JSONParser parser = new JSONParser();
@@ -173,7 +177,8 @@ public class MainGameState extends GameState {
 		}
 		
 		public void loadMap(String mapId) {
-			setNextState(new MainGameState(mapId));
+			if( activeMapLoader==null )
+				activeMapLoader = new ThreadedMapLoader(mapId, ctx);
 		}
 		
 		public void playMonologue(String name) {
@@ -200,88 +205,61 @@ public class MainGameState extends GameState {
 		return new ScriptApi(ctx);
 	}
 	
-	@Override
-	protected void onStart(GameContext ctx) {
-		if( backgroundMusic==null )
-			backgroundMusic = new MusicWrapper((short) (ctx.settings.volume*0.5));
+	private boolean initCalled=false;
+	private void init(GameContext ctx) {
+		if( initCalled )
+			return;
 		else
-			backgroundMusic.play();
+			initCalled = true;
 		
-		if( monologueTextBox==null )
-			try {
-				monologueTextBox = new MonologueTextBox(ResourceManager.font.get("FreeSans.otf"), 30, new Vector2f(ctx.getViewWidth()/2, ctx.getViewHeight()-100));
-				
-			} catch (IOException e) {
-				throw new GameException("Unable to load font for MonologueTextBox: "+e.getMessage(), e);
-			}
+		backgroundMusic = new MusicWrapper((short) (ctx.settings.volume*0.5));
 		
-		if( map!=null ) {
-			backgroundMusic.play();
+		try {
+			monologueTextBox = new MonologueTextBox(ResourceManager.font.get("FreeSans.otf"), 30, new Vector2f(ctx.getViewWidth()/2, ctx.getViewHeight()-100));
 			
-		} else {
-			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-			map = mapSerializer.deserialize(ctx, mapId, true, true);
-			
-			map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
-			.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
+		} catch (IOException e) {
+			throw new GameException("Unable to load font for MonologueTextBox: "+e.getMessage(), e);
+		}
+		
+		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+		map = mapSerializer.deserialize(ctx, mapId, true, true);
+		
+		map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
+		.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
 
-			map.getScriptEnv().bind("API", createScriptApi(ctx));
-			
-			mapRenderer = new EffectMapRenderer(ctx, map);
+		map.getScriptEnv().bind("API", createScriptApi(ctx));
+		
+		mapRenderer = new EffectMapRenderer(ctx, map);
+
+		// lets kick the JIT in his ass
+		for(int i=0; i<100; i++) {
+			mapRenderer.update(1);
 		}
 		
-		if( player==null ) {
-			player = (IControllableGameEntity) map.getEntityManager().get(PLAYER_UUID);
-			if( player == null )
-				player = (IControllableGameEntity) map.getEntityManager().create(PLAYER_UUID, "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
-	
-			player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
-			player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
-		}
-		
-		if( camera==null ) {
-			camera = new Camera(player);
-		}
-			
-//		// something like this will be implemented in the editor
-//		IGameEntity entity = map.getEntityManager().create( "lever", new Attributes(new Attribute("x",210), new Attribute("y",270)) );
-//		//IGameEntity explosion = map.getEntityManager().create( "explosion", new Attributes(new Attribute("x",50), new Attribute("y",-80)) );
-//		IGameEntity fire1 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",200)) );
-//		IGameEntity fire2 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",250)) );
-//		IGameEntity fire3 = map.getEntityManager().create( "fire", new Attributes(new Attribute("x",-50), new Attribute("y",300)) );
-//		
-//		CollectionEntityEventHandler eventHandler = map.getEventManager().createCollectionEntityEventHandler();
-//		AnimatedSequencedEntity animSequencedEntity = sequenceManager.createAnimatedSequencedEntity(entity);
-//		Toggle toggle = sequenceManager.createToggle();
-//		//toggle.inputOption.toggleTrigger.put(entity, animSequencedEntity);
-//		toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire1));
-//		toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire2));
-//		toggle.addTarget(sequenceManager.createAnimatedSequencedEntity(fire3));
-//		toggle.addTarget(animSequencedEntity);
-//		IControllableGameEntity movingPlatform = map.getEntityManager().createControllable("moving platform", new Attributes(new Attribute("x",150), new Attribute("y",100)) );
-//		PatrollingController movingPlatformCon = map.getControllerManager().createPatrollingController(movingPlatform, false);
-//		movingPlatformCon.addTargetPoint(300, 100);
-//		movingPlatformCon.addTargetPoint(150, 100);
-//		movingPlatformCon.addTargetPoint(150, -100);
-//		Condition isOwnerKinematic = sequenceManager.createCondition();
-//		isOwnerKinematic.inTriggers.put(entity, animSequencedEntity);
-//		isOwnerKinematic.add(toggle, isOwnerKinematic.outputOption.isOwnerKinematic, toggle.inputOption.toggleTriggers);
-//		toggle.addTarget(sequenceManager.createControllableSequencedEntity(movingPlatformCon));
-//		SequencedEntityEventHandler handler = map.getEventManager().createSequencedEntityEventHandler(EntityEventType.USED, isOwnerKinematic);
-//		eventHandler.addEntityEventHandler(EntityEventType.USED, handler);	
-//		entity.setEventHandler(eventHandler);
-		
+		player = (IControllableGameEntity) map.getEntityManager().get(PLAYER_UUID);
+		if( player == null )
+			player = (IControllableGameEntity) map.getEntityManager().create(PLAYER_UUID, "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
+
+		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
+		player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
+
+		camera = new Camera(player);
+
+		controller = new KeyboardController(ctx.settings.keyMapping, new IWorldSwitchInterceptor() {
+			@Override public boolean doWorldSwitch() {
+				return !unpossess();
+			}
+		});
+		controller.addGE(player);
 		
 		console.setScriptEnvironment(map.getScriptEnv());
+	}
+	
+	@Override
+	protected void onStart(GameContext ctx) {
+		init(ctx);
 		
-		if( controller==null ) {
-			controller = new KeyboardController(ctx.settings.keyMapping, new IWorldSwitchInterceptor() {
-				@Override public boolean doWorldSwitch() {
-					return !unpossess();
-				}
-			});
-			controller.addGE(player);
-		}
+		backgroundMusic.play();
 	}
 	
 	@Override
@@ -291,6 +269,10 @@ public class MainGameState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
+		if( activeMapLoader!=null && activeMapLoader.isFinished() ) {
+			setNextState(activeMapLoader.getLoadedMap());
+		}
+		
 		console.update(frameTime);
 		
 		controller.update(frameTime);

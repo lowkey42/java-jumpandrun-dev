@@ -1,5 +1,6 @@
 package de.secondsystem.game01.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +14,11 @@ public class Attributes extends HashMap<String, Object> {
 	public static class Attribute {
 		public final String key;
 		public final Object value;
+		public Attribute(String k, Number v) {this(k, (Object) v);}
+		public Attribute(String k, Boolean v) {this(k, (Object) v);}
+		public Attribute(String k, String v) {this(k, (Object) v);}
+		public Attribute(String k, Map<?, ?> v) {this(k, (Object) v);}
+		public Attribute(String k, Collection<?> v) {this(k, (Object) (v instanceof List ? v : new ArrayList<>(v)));}
 		public Attribute(String k, Object v) {
 			this.key = k;
 			this.value = v;
@@ -21,6 +27,7 @@ public class Attributes extends HashMap<String, Object> {
 	public static class AttributeIf extends Attribute {
 		public final boolean condition;
 
+		public AttributeIf(boolean condition, String k, Collection<?> v) {this(condition, k, (Object) (v instanceof List ? v : new ArrayList<>(v)));}
 		public AttributeIf(boolean condition, String k, Object v) {
 			super(k, v);
 			this.condition = condition;

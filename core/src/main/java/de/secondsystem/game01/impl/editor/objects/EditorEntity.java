@@ -21,6 +21,7 @@ import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.IDimensioned;
 
+// TODO: duplicated code (from gameEntity) => throws because of missing checks (e.g. no representation)
 public class EditorEntity extends EditorLayerObject {
 	private IGameEntity entity;
 	private IPhysicsBody entityBody;
@@ -46,7 +47,8 @@ public class EditorEntity extends EditorLayerObject {
 	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
 		if( mouseState ) {
 			setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
-			((IMoveable) entityRepresentation).setPosition(pos);
+			if( entityRepresentation instanceof IMoveable ) // Workaround (see: Class-comment)
+				((IMoveable) entityRepresentation).setPosition(pos);
 			
 			if( entityRepresentation instanceof IUpdateable )
 				((IUpdateable) entityRepresentation).update(frameTimeMs);
@@ -65,7 +67,7 @@ public class EditorEntity extends EditorLayerObject {
 	@Override
 	public void refresh() {
 		if( mouseState ) {
-			if( !(entityBody instanceof IHumanoidPhysicsBody) )
+			if( !(entityBody instanceof IHumanoidPhysicsBody) && entityRepresentation instanceof IMoveable ) // Workaround (see: class-comment)
 				((IMoveable) entityRepresentation).setRotation(rotation);
 			
 			if( entityRepresentation instanceof IScalable )
@@ -78,7 +80,7 @@ public class EditorEntity extends EditorLayerObject {
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
-		if( mouseState ) {
+		if( mouseState && entityRepresentation!=null ) { // workaround (see: class-comment)
 			entityRepresentation.draw(renderTarget);	
 		}
 		else {

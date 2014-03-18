@@ -25,6 +25,7 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.Attributes.AttributeIf;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 import de.secondsystem.game01.model.IDimensioned;
@@ -55,6 +56,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	protected final PriorityQueue<TimedGameEntityEffect> effectTimer = new PriorityQueue<>(1);
 	
 	protected boolean dead = false;
+	
+	private boolean destroyed = false;
 	
 	public GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
@@ -185,7 +188,6 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), 
 					100, 500, -10, 10, -10, 10, -5, 5, 
 					new Color(200, 255, 255), Color.WHITE, 10, 40, 0, 0, 0), 2000);
-			System.out.println("WorldSwitch of '"+uuid()+"' cancled: Collision detected by isTestFixtureColliding()");	// TODO: replace debug-logging with visual feedback
 			return false;
 		}
 	}
@@ -310,10 +312,17 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	@Override
 	public void onDestroy() {
+		destroyed = true;
+		
 		for( IGameEntityEffect e : effects )
 			e.onDestroy(map);
 		
 		effects.clear();
+	}
+	
+	@Override
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 	
 	@Override
@@ -326,7 +335,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 				new Attributes(
 						new Attribute("uuid", uuid.toString()),
 						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???"),
-						new Attribute("effects", Collections2.transform(effects, EffectUtils.HANDLER_SERIALIZER)),
+						new AttributeIf(!effects.isEmpty(), "effects", Collections2.transform(effects, EffectUtils.HANDLER_SERIALIZER)),
 						new Attribute("x", position.x),
 						new Attribute("y", position.y),
 						new Attribute("rotation", rotation),

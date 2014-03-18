@@ -23,6 +23,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.Box2dContactListener.FixtureContactListener;
+import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.RaycastFilter;
 
 
 class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
@@ -133,7 +134,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 			case CIRCLE:
 				assert( Math.abs(height-width)<0.00001 );
 				CircleShape circle = new CircleShape();
-				circle.setRadius(height * BOX2D_SCALE_FACTOR);
+				circle.setRadius(height/2 * BOX2D_SCALE_FACTOR);
 				circle.m_p.x = x*BOX2D_SCALE_FACTOR;
 				circle.m_p.y = y*BOX2D_SCALE_FACTOR;
 				return circle;
@@ -384,6 +385,27 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 			setWorldIdMask(worldIdMask|worldId.id);
 		else
 			setWorldIdMask(worldIdMask&~worldId.id);
+	}
+	@Override
+	public IPhysicsBody raycastSolid(Vector2f target) {
+		return parent.raycast(getPosition(), target, new RaycastFilter() {
+			
+			@Override
+			public boolean accept(IPhysicsBody body) {
+				return body.getCollisionHandlerType()==CollisionHandlerType.SOLID && !body.equals(this) 
+						&& (((Box2dPhysicsBody)body).worldIdMask&worldIdMask)!=0
+						&& !isContact(((Box2dPhysicsBody)body).body);
+			}
+			
+			private boolean isContact(Body otherBody) {
+				for( ContactEdge c=otherBody.getContactList(); c!=null; c=c.next ) {
+					if( body.equals(c.contact.m_fixtureA.m_body) || body.equals(c.contact.m_fixtureB.m_body) )
+						return true;
+				}
+				
+				return false;
+			}
+		});
 	}
 	
 }
