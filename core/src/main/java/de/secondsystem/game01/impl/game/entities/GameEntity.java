@@ -41,9 +41,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	protected final GameEntityManager em;
 	
+	protected final byte orderId;
+	
 	protected int worldMask;
 	
-	protected IDynamicPhysicsBody physicsBody;
+	protected IPhysicsBody physicsBody;
 	
 	protected IDrawable representation;
 	
@@ -67,7 +69,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	}
 	
 	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, 
-			IDynamicPhysicsBody physicsBody, IGameMap map, Attributes attributes) {
+			IPhysicsBody physicsBody, IGameMap map, Attributes attributes) {
 		super( map, attributes );
 		
 		this.uuid = uuid;
@@ -76,6 +78,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		this.representation = representation;
 		this.physicsBody = physicsBody;
 		this.map = map;
+		this.orderId = (byte) attributes.getInteger("orderId", 0);
 		
 		if( physicsBody!=null ) {
 			physicsBody.setOwner(this);
@@ -120,7 +123,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		for( IGameEntityEffect e : effects )
 			e.update(frameTimeMs);
 		
-		notify(EventType.UPDATE, this);
+		notify(EventType.UPDATE, this, frameTimeMs);
 	}
 
 	@Override
@@ -167,7 +170,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public void forceWorld(WorldId worldId) {
-		physicsBody.forceWorldSwitch(worldId.id);
+		physicsBody.setWorldIdMask(worldId.id);
 		
 		this.worldMask = worldId.id;
 	}
@@ -177,19 +180,21 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( isDead() )
 			return false;
 		
-		if( physicsBody==null || newWorldMask==0 || worldMask==0 || physicsBody.tryWorldSwitch(newWorldMask) ) {
-			if( physicsBody!=null && (newWorldMask==0 || worldMask==0) )
-				physicsBody.forceWorldSwitch(newWorldMask);
+		if( physicsBody!=null ) {
+			if( newWorldMask!=0 && worldMask!=0 && physicsBody instanceof IDynamicPhysicsBody ) {
+				if( !((IDynamicPhysicsBody)physicsBody).tryWorldSwitch(newWorldMask) ) {
+					addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), 
+							100, 500, -10, 10, -10, 10, -5, 5, 
+							new Color(200, 255, 255), Color.WHITE, 10, 40, 0, 0, 0), 2000);
+					return false;
+				}
 				
-			this.worldMask = newWorldMask;
-			return true;
-
-		} else {
-			addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), 
-					100, 500, -10, 10, -10, 10, -5, 5, 
-					new Color(200, 255, 255), Color.WHITE, 10, 40, 0, 0, 0), 2000);
-			return false;
+			} else 
+				physicsBody.setWorldIdMask(newWorldMask);
 		}
+		
+		this.worldMask = newWorldMask;
+		return true;
 	}
 
 	@Override
@@ -206,7 +211,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	public void setPosition(Vector2f pos) {
 		if( physicsBody!=null ) {
 			physicsBody.setPosition(pos);
-			physicsBody.resetVelocity(true, true, false);
+			if( physicsBody instanceof IDynamicPhysicsBody )
+				((IDynamicPhysicsBody)physicsBody).resetVelocity(true, true, false);
 		}
 		if( representation instanceof IMoveable ) {
 			((IMoveable) representation).setPosition(pos);
@@ -217,7 +223,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	public void setRotation(float degree) {
 		if( physicsBody!=null ) {
 			physicsBody.setRotation(degree);
-			physicsBody.resetVelocity(false, false, true);
+			if( physicsBody instanceof IDynamicPhysicsBody )
+				((IDynamicPhysicsBody)physicsBody).resetVelocity(false, false, true);
 		}
 		if( representation instanceof IMoveable ) {
 			((IMoveable) representation).setRotation(degree);
@@ -336,6 +343,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 						new Attribute("uuid", uuid.toString()),
 						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???"),
 						new AttributeIf(!effects.isEmpty(), "effects", Collections2.transform(effects, EffectUtils.HANDLER_SERIALIZER)),
+						new AttributeIf(orderId!=0, "orderId", orderId),
 						new Attribute("x", position.x),
 						new Attribute("y", position.y),
 						new Attribute("rotation", rotation),
@@ -351,6 +359,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
 								+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
 		
+	}
+
+	@Override
+	public byte orderId() {
+		return orderId;
 	}
 }
 

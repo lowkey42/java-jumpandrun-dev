@@ -10,10 +10,12 @@ import de.secondsystem.game01.impl.game.controller.ControllerUtils;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody.BodyFilter;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.GameException;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.ISerializable;
@@ -63,8 +65,15 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		final Attributes controllerAttributes = attributes.getObject("controller");
 		if( controllerAttributes!=null )
 			controller = ControllerUtils.createController(this, map, controllerAttributes);
+		
+		if( !(physicsBody instanceof IDynamicPhysicsBody) )
+			throw new GameException("A ControllableGameEntity (uuid="+uuid+") doesn' make sense with a static PhysicsBody!");
 	}
 
+	private IDynamicPhysicsBody dynPhysicsBody() {
+		return (IDynamicPhysicsBody) physicsBody;
+	}
+	
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		super.draw(renderTarget);
@@ -119,17 +128,17 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
-		final float effectiveYMove = isVerticalMovementAllowed() ? moveAcceleration*yMove : (jump && physicsBody.isStable() ? -jumpAcceleration : 0);
+		final float effectiveYMove = isVerticalMovementAllowed() ? moveAcceleration*yMove : (jump && dynPhysicsBody().isStable() ? -jumpAcceleration : 0);
 		
 		if( jump && effectiveYMove != 0 )
 			notify(EventType.JUMPED, this);
 		
-		physicsBody.move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
+		dynPhysicsBody().move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
 	    
 	    if( hDirection!=null && hFactor!=0 )
 	    	moved = true;
 	    else if( moved ) {
-	    	physicsBody.resetVelocity(true, false, false);
+	    	dynPhysicsBody().resetVelocity(true, false, false);
 	    	moved = false;
 	    }
 	    

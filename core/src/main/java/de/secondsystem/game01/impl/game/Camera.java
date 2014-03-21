@@ -56,7 +56,6 @@ public class Camera implements IUpdateable {
 		if( inDistance(nc, 20) ) {
 			if( !freezeCam && (notMovingTime+=frameTimeMs) >= 2000 ) {
 				freezeCam = true;
-				System.out.println("freeze");
 			}
 		
 		} else {

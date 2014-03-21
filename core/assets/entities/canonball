@@ -1,0 +1,3 @@
+{"representationType":"TEXTURE", "representation":"ghost.png", "width":30, "height":30, "shape":"CIRCLE", "density":0.6, "physicsType":"FLYING", 
+
+"onTOUCHED":[{"factory":".PPEHF", "out":"DAMAGED"}, {"factory":".DeleteEHF"}]  }

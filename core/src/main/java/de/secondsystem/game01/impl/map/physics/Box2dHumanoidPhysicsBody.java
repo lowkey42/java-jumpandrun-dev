@@ -44,10 +44,10 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	private Fixture baseFixture;
 	
 	Box2dHumanoidPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
-			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, 
+			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, boolean flying,
 			float maxXVel, float maxYVel,
 			float maxThrowVel, float maxLiftWeight, float maxLiftForce, float maxSlope, float maxReach) {
-		super(world, gameWorldId, width, height, interactive, liftable, type, false, true, true, maxXVel, maxYVel);
+		super(world, gameWorldId, width, height, interactive, liftable, type, false, flying, true, true, maxXVel, maxYVel);
 		this.maxThrowVel = maxThrowVel;
 		this.maxLiftWeight = maxLiftWeight;
 		this.maxLiftForce = maxLiftForce;
@@ -61,7 +61,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		return true;
 	}
 	@Override
-	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+	protected void createFixtures(Body body, PhysicsBodyShape shape, boolean sensor, float friction, float restitution, float density, Float fixedWeight) {
 		createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
 		
 		/*

@@ -1,1 +1,1 @@
-{"representationType":"ANIMATION", "representation":"explosion.anim", "width":128, "height":128, "shape":"BOX","kinematic":true}
+{"representationType":"ANIMATION", "representation":"explosion.anim", "width":128, "height":128, "shape":"BOX","physicsType":"STATIC"}

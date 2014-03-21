@@ -40,11 +40,15 @@ public class SpriteWrappper implements ISpriteWrapper {
 	}
 	public void setTexture(ConstTexture tex, IntRect clip) {
 		sprite.setTexture(tex, true);
-		sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
-		sprite.setScale(width/tex.getSize().x, height/tex.getSize().y);
-		
-		if( clip!=null )
+		float texWidth=tex.getSize().x, texHeight=tex.getSize().y;
+		if( clip!=null ) {
 			sprite.setTextureRect(clip);
+			texWidth = clip.width;
+			texHeight = clip.height;
+		}
+		
+		sprite.setOrigin(texWidth/2, texHeight/2);
+		sprite.setScale(width/texWidth, height/texHeight);
 	}
 	
 	@Override

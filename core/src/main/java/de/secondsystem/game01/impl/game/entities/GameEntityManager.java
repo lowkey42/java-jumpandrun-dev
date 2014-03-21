@@ -42,6 +42,12 @@ public final class GameEntityManager implements IGameEntityManager {
 	private static final Path ARCHETYPE_PATH = Paths.get("assets", "entities");
 	
 	private final Map<UUID, IGameEntity> entities = new HashMap<>();
+	@SuppressWarnings("unchecked")
+	private final List<IGameEntity>[] orderedEntities = new ArrayList[256];
+	private final List<Byte> orderedEntitiesKeys = new ArrayList<>(5);
+	
+	private final Set<UUID> entitiesToDestroy = new HashSet<>();
+	private final Set<IGameEntity> entitiesToAdd = new HashSet<>();
 	
 	private static final LoadingCache<String, EntityArchetype> ARCHETYPE_CACHE = 
 			CacheBuilder.newBuilder().concurrencyLevel(3).maximumSize(100).build(new ArchetypeLoader());
@@ -80,8 +86,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			
 			IGameEntity e = at.create(uuid, this, attr);
 		
-			entities.put(e.uuid(), e);
-			
+			entitiesToAdd.add(e);
 			return e;
 			
 		} catch (ExecutionException e) {
@@ -91,11 +96,39 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public void destroy( UUID eId ) {
-		IGameEntity entity = entities.get(eId);
-		if( entity!=null ) {
-			entity.onDestroy();
-			entities.remove(eId);
+		entitiesToDestroy.add(eId);
+	}
+	
+	private void destroyAndAddEntites() {
+		for( IGameEntity e : entitiesToAdd ) {
+			if( entities.put(e.uuid(), e)==null ) {
+				int oId = e.orderId()+128;
+				
+				List<IGameEntity> sg = orderedEntities[oId];
+				if( sg==null ) {
+					sg = new ArrayList<>();
+					orderedEntities[oId] = sg;
+					orderedEntitiesKeys.add(e.orderId());
+					Collections.sort(orderedEntitiesKeys);
+				}
+				
+				sg.add(e);
+			}
 		}
+		entitiesToAdd.clear();
+		
+		for( UUID eId : entitiesToDestroy ) {
+			IGameEntity entity = entities.get(eId);
+			if( entity!=null ) {
+				entity.onDestroy();
+				entities.remove(eId);
+				List<IGameEntity> sg = orderedEntities[entity.orderId()+128];
+				if( sg!=null ) {
+					sg.remove(entity);
+				}
+			}
+		}
+		entitiesToDestroy.clear();
 	}
 
 	@Override
@@ -122,10 +155,13 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 
 	@Override
-	public void draw(WorldId worldId, RenderTarget renderTarget) {
-		for( IGameEntity entity : entities.values() )
-			if( entity.isInWorld(worldId) )
-				entity.draw(renderTarget);
+	public void draw(final WorldId worldId, final RenderTarget rt) {
+		destroyAndAddEntites();
+		
+		for( Byte orderId : orderedEntitiesKeys )
+			for( IGameEntity entity : orderedEntities[orderId+128] )
+				if( entity.isInWorld(worldId) )
+					entity.draw(rt);
 	}
 
 	@Override
@@ -310,10 +346,10 @@ public final class GameEntityManager implements IGameEntityManager {
 			final UUID uuid = UUID.fromString( entityAttr.getString("uuid") );
 			final String archetype = entityAttr.getString("archetype");
 			
-			IGameEntity entity = create(uuid, archetype, entityAttr);
-			
-			entities.put(entity.uuid(), entity);
+			create(uuid, archetype, entityAttr);
 		}
+		
+		destroyAndAddEntites();
 	}
 
 	@Override

@@ -38,12 +38,14 @@ public interface IPhysicsWorld extends IUpdateable {
 		
 		PhysicsBodyFactory interactive(boolean interactive);
 		PhysicsBodyFactory liftable(boolean liftable);
-		PhysicsBodyFactory kinematic(boolean kinematic);
+		PhysicsBodyFactory flying(boolean flying);
+		PhysicsBodyFactory sensor(boolean sensor);
 		
 		PhysicsBodyFactory type(CollisionHandlerType type);
 		
 		StaticPhysicsBodyFactory staticBody(PhysicsBodyShape shape);
 		DynamicPhysicsBodyFactory dynamicBody(PhysicsBodyShape shape);
+		DynamicPhysicsBodyFactory kinematicBody(PhysicsBodyShape shape);
 		HumanoidPhysicsBodyFactory humanoidBody();
 	}
 	public interface StaticPhysicsBodyFactory {
@@ -57,6 +59,8 @@ public interface IPhysicsWorld extends IUpdateable {
 		
 		DynamicPhysicsBodyFactory stableCheck(boolean enable);
 		DynamicPhysicsBodyFactory worldSwitch(boolean allowed);
+
+		DynamicPhysicsBodyFactory initialRelativeSpeed(float x, float y);
 	
 	}
 	public interface HumanoidPhysicsBodyFactory extends DynamicPhysicsBodyFactory {

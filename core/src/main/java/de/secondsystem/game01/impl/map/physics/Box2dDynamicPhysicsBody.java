@@ -22,9 +22,9 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	private final Set<IPhysicsBody> footSensorContacts = new HashSet<>();
 	
 	Box2dDynamicPhysicsBody(Box2dPhysicalWorld world, int gameWorldId, 
-			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, boolean kinematic,
+			float width, float height, boolean interactive, boolean liftable, CollisionHandlerType type, boolean kinematic, boolean flying,
 			boolean stableCheck, boolean worldSwitchAllowed, float maxXVel, float maxYVel) {
-		super(world, gameWorldId, width, height, interactive, liftable, type, kinematic);
+		super(world, gameWorldId, width, height, interactive, liftable, type, kinematic, flying);
 
 		this.worldSwitchAllowed = worldSwitchAllowed;
 		this.complexStableCheck = stableCheck;
@@ -38,8 +38,8 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 	}
 	
 	@Override
-	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
-		super.createFixtures(body, shape, friction, restitution, density, fixedWeight);
+	protected void createFixtures(Body body, PhysicsBodyShape shape, boolean sensor, float friction, float restitution, float density, Float fixedWeight) {
+		super.createFixtures(body, shape, sensor, friction, restitution, density, fixedWeight);
 		
 		if( worldSwitchAllowed ) {
 			createWorldSwitchFixture(body, shape, friction, restitution, density, fixedWeight);
@@ -143,10 +143,6 @@ class Box2dDynamicPhysicsBody extends Box2dPhysicsBody implements
 		return new Vector2f(getBody().getLinearVelocity().x, getBody().getLinearVelocity().y);
 	}
 	
-	@Override
-	public void forceWorldSwitch(int id) {
-		setWorldIdMask(id);
-	}
 	@Override
 	public boolean tryWorldSwitch(int id) {
 		if( worldSwitchAllowed && worldSwitchSensorContacts.isEmpty() ) {

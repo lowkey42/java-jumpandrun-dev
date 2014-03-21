@@ -12,7 +12,6 @@ public interface IDynamicPhysicsBody extends IPhysicsBody {
 	boolean isStable();
 	
 	boolean tryWorldSwitch(int worldMask);
-	void forceWorldSwitch(int worldMask);
 
 	Vector2f getVelocity();
 	

@@ -10,6 +10,7 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 
 	boolean isInWorld(WorldId worldId);
 	void setWorld(WorldId worldId, boolean exists);
+	void setWorldIdMask(int worldMask);
 	
 	Object getOwner();
 	void setOwner( Object owner );
@@ -20,6 +21,7 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 	CollisionHandlerType getCollisionHandlerType();
 	boolean isStatic();
 	boolean isKinematic();
+	boolean isFlying();
 	
 	float getWeight();
 	boolean isInteractive();

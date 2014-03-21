@@ -37,6 +37,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	}
 	
 	protected final boolean kinematic;
+	protected final boolean flying;
 	protected boolean idle;
 	
 	protected final Box2dPhysicalWorld parent;
@@ -55,7 +56,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	protected Box2dPhysicsBody liftingBody;
 	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, 
-			CollisionHandlerType type, boolean kinematic ) {
+			CollisionHandlerType type, boolean kinematic, boolean flying ) {
 		this.worldIdMask = worldIdMask;
 		this.type = type;
 		this.parent = world;
@@ -64,6 +65,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		this.interactive = interactive;
 		this.liftable = liftable;
 		this.kinematic = kinematic;
+		this.flying = flying;
 	}
 	
 	@Override
@@ -74,9 +76,9 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		return false;
 	}
 
-	final void initBody(float x, float y, float rotation, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+	final void initBody(float x, float y, float rotation, PhysicsBodyShape shape, boolean sensor, float friction, float restitution, float density, Float fixedWeight) {
 		body = createBody(x, y, rotation);
-		createFixtures(body, shape, friction, restitution, density, fixedWeight);
+		createFixtures(body, shape, sensor, friction, restitution, density, fixedWeight);
 	}
 	protected final Body createBody(float x, float y, float rotation) {
 		BodyDef bd = new BodyDef();
@@ -88,13 +90,17 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		Body body = parent.physicsWorld.createBody(bd);
 		body.setUserData(this);
 		
+		if( flying ) {
+			body.setGravityScale(0);
+			body.setLinearDamping(0);
+		}
+		
 		return body;
 	}
-	protected void createFixtures(Body body, PhysicsBodyShape shape, float friction, float restitution, float density, Float fixedWeight) {
+	protected void createFixtures(Body body, PhysicsBodyShape shape, boolean sensor, float friction, float restitution, float density, Float fixedWeight) {
 		FixtureDef fd = new FixtureDef();
 		fd.shape = createShape(shape, width, height);
-		if (CollisionHandlerType.CLIMBABLE == type)
-			fd.isSensor = true;
+		fd.isSensor = sensor || CollisionHandlerType.CLIMBABLE == type;
 
 		fd.friction = friction;
 		fd.restitution = restitution;
@@ -151,7 +157,8 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	protected final int getWorldIdMask() {
 		return worldIdMask;
 	}
-	protected final void setWorldIdMask(int worldIdMask) {
+	@Override
+	public final void setWorldIdMask(int worldIdMask) {
 		this.worldIdMask = worldIdMask;
 		
 		// wakeup body
@@ -180,6 +187,11 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		worldIdMask|= worldId;
 	}
 		
+	@Override
+	public boolean isFlying() {
+		return flying;
+	}
+	
 	@Override
 	public final void setContactListener(PhysicsContactListener contactListener) {
 		this.contactListener = contactListener;
@@ -386,6 +398,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		else
 			setWorldIdMask(worldIdMask&~worldId.id);
 	}
+	
 	@Override
 	public IPhysicsBody raycastSolid(Vector2f target) {
 		return parent.raycast(getPosition(), target, new RaycastFilter() {

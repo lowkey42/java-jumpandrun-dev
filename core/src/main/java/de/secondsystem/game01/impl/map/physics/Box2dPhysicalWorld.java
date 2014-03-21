@@ -137,8 +137,10 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		float friction = 0.5f;
 		float restitution = 0.f;
 		boolean interactive = false;
-		boolean liftable = false;	
+		boolean liftable = false;
 		boolean kinematic = false;
+		boolean flying = false;
+		boolean sensor = false;
 		CollisionHandlerType type = CollisionHandlerType.SOLID;
 		PhysicsBodyShape shape = null;
 		
@@ -204,10 +206,16 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			this.liftable = liftable;
 			return this;
 		}
+
+		@Override
+		public PhysicsBodyFactory flying(boolean flying) {
+			this.flying = flying;
+			return this;
+		}
 		
 		@Override
-		public PhysicsBodyFactory kinematic(boolean kinematic) {
-			this.kinematic = kinematic;
+		public PhysicsBodyFactory sensor(boolean sensor) {
+			this.sensor = sensor;
 			return this;
 		}
 	
@@ -220,6 +228,11 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			this.shape = shape;
 			return new Box2dDynamicPhysicsBodyFactory();
 		}
+		@Override
+		public DynamicPhysicsBodyFactory kinematicBody(PhysicsBodyShape shape) {
+			this.kinematic = true;
+			return dynamicBody(shape);
+		}
 	
 		@Override public HumanoidPhysicsBodyFactory humanoidBody() {
 			return new Box2dHumanoidPhysicsBodyFactory();
@@ -227,8 +240,8 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 
 		class Box2dStaticPhysicsBodyFactory implements StaticPhysicsBodyFactory {
 			@Override public IPhysicsBody create() {
-				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, kinematic);
-				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+				Box2dPhysicsBody b = new Box2dPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, kinematic, flying);
+				b.initBody(x, y, rotation, shape, sensor, friction, restitution, density, fixedWeight);
 				return b;
 			}
 		}
@@ -238,14 +251,32 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			boolean worldSwitchAllowed = false;
 			float maxXSpeed = Float.MAX_VALUE;
 			float maxYSpeed = Float.MAX_VALUE;
+			Float initialRelXSpeed;
+			Float initialRelYSpeed;
 			
 			@Override public IDynamicPhysicsBody create() {
 				Box2dDynamicPhysicsBody b = new Box2dDynamicPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, 
-						type, kinematic, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
-				b.initBody(x, y, rotation, shape, friction, restitution, density, fixedWeight);
+						type, kinematic, flying, stableCheck, worldSwitchAllowed, maxXSpeed, maxYSpeed);
+				b.initBody(x, y, rotation, shape, sensor, friction, restitution, density, fixedWeight);
+				
+				if( initialRelXSpeed!=null && initialRelYSpeed!=null )
+					b.move(initialRelXSpeed, initialRelYSpeed);
+				
 				return b;
 			}
 	
+			@Override
+			public DynamicPhysicsBodyFactory initialRelativeSpeed(
+					float x, float y) {
+				  float sr = (float) Math.sin(Math.toRadians(rotation));
+				  float cr = (float) Math.cos(Math.toRadians(rotation));
+				  
+				  initialRelXSpeed = x * cr - y * sr;
+				  initialRelYSpeed = x * sr - y * cr;
+				  
+				return this;
+			}
+			
 			@Override public DynamicPhysicsBodyFactory stableCheck(boolean enable) {
 				stableCheck = enable;
 				return this;
@@ -308,9 +339,9 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 			}
 	
 			@Override public IHumanoidPhysicsBody create() {
-				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, maxXSpeed, maxYSpeed, 
+				Box2dHumanoidPhysicsBody b = new Box2dHumanoidPhysicsBody(Box2dPhysicalWorld.this, worldMask, width, height, interactive, liftable, type, flying, maxXSpeed, maxYSpeed, 
 						maxThrowSpeed, maxLiftWeight, maxLiftForce, maxSlope, maxReach);
-				b.initBody(x, y, rotation, null, friction, restitution, density, fixedWeight);
+				b.initBody(x, y, rotation, null, sensor, friction, restitution, density, fixedWeight);
 				return b;
 			}
 		}

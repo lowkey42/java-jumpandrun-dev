@@ -6,10 +6,11 @@ import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
+import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.DynamicPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.HumanoidPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.PhysicsBodyFactory;
+import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.StaticPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
@@ -21,6 +22,13 @@ final class GameEntityHelper {
 		TEXTURE, 
 		TILE,
 		LIGHT;
+	}
+	
+	public static enum PhysicsType {
+		STATIC,
+		DYNAMIC,
+		KINEMATIC,
+		FLYING
 	}
 	
 	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) {
@@ -61,7 +69,7 @@ final class GameEntityHelper {
 		return repr;
 	}
 	
-	public static IDynamicPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 
+	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 
 			canPickUpObjects, boolean createTestFixture, Attributes attributes ) {
 		PhysicsBodyFactory factory = map.getPhysicalWorld().factory()
 				.worldMask(attributes.getInteger("worldId", map.getActiveWorldId().id))
@@ -89,10 +97,6 @@ final class GameEntityHelper {
 		Float restitution = attributes.getFloat("restitution");
 		if( restitution!=null )
 			factory.restitution(restitution);
-		
-		Boolean kinematic = attributes.getBoolean("kinematic");
-		if( kinematic!=null )
-			factory.kinematic(kinematic);
 
 		Boolean interactive = attributes.getBoolean("interactive");
 		if( interactive!=null )
@@ -102,8 +106,18 @@ final class GameEntityHelper {
 		if( liftable!=null )
 			factory.liftable(liftable);
 		
+		Boolean sensor = attributes.getBoolean("sensor");
+		if( sensor!=null )
+			factory.sensor(sensor);
+		
+		PhysicsType type = PhysicsType.valueOf(attributes.getString("physicsType", "DYNAMIC"));
+		if( type==null )
+			type = PhysicsType.DYNAMIC;
+		else if( type==PhysicsType.FLYING )
+			factory.flying(true);
+		
 		PhysicsBodyShape shape = PhysicsBodyShape.valueOf(attributes.getString("shape"));
-		final DynamicPhysicsBodyFactory bodyFactory;
+		StaticPhysicsBodyFactory bodyFactory = null;
 		
 		if( shape==null || shape==PhysicsBodyShape.HUMANOID ) {
 			HumanoidPhysicsBodyFactory hBodyFactory = factory.humanoidBody();
@@ -129,25 +143,45 @@ final class GameEntityHelper {
 				hBodyFactory.maxSlope(maxSlope);
 						
 			bodyFactory = hBodyFactory;
-			
-		} else {
-			bodyFactory = factory.dynamicBody(shape);
-			Boolean jumpAllowed = attributes.getBoolean("jumpAllowed");
-			if( jumpAllowed!=null )
-				bodyFactory.stableCheck(jumpAllowed);
-				
-			Boolean worldSwitchAllowed = attributes.getBoolean("worldSwitchAllowed");
-			if( worldSwitchAllowed!=null )
-				bodyFactory.worldSwitch(worldSwitchAllowed);
 		}
 
-		Float maxMoveSpeed = attributes.getFloat("maxMoveSpeed");
-		if( maxMoveSpeed!=null )
-			bodyFactory.maxXSpeed(maxMoveSpeed);
-		
-		Float maxJumpSpeed = attributes.getFloat("maxJumpSpeed");
-		if( maxJumpSpeed!=null )
-			bodyFactory.maxYSpeed(maxJumpSpeed);
+		switch (type) {
+			case STATIC:
+				if( bodyFactory==null )
+					bodyFactory = factory.staticBody(shape);
+				break;
+				
+			case KINEMATIC:
+				if( bodyFactory==null )
+					bodyFactory = factory.kinematicBody(shape);
+	
+			case FLYING:
+			case DYNAMIC:
+				if( bodyFactory==null )
+					bodyFactory = factory.dynamicBody(shape);
+
+				Float maxMoveSpeed = attributes.getFloat("maxMoveSpeed");
+				if( maxMoveSpeed!=null )
+					((DynamicPhysicsBodyFactory)bodyFactory).maxXSpeed(maxMoveSpeed);
+				
+				Float maxJumpSpeed = attributes.getFloat("maxJumpSpeed");
+				if( maxJumpSpeed!=null )
+					((DynamicPhysicsBodyFactory)bodyFactory).maxYSpeed(maxJumpSpeed);
+	
+				Float initialRelXSpeed = attributes.getFloat("initialRelXSpeed");
+				Float initialRelYSpeed = attributes.getFloat("initialRelYSpeed");
+				if( initialRelXSpeed!=null && initialRelYSpeed!=null )
+					((DynamicPhysicsBodyFactory)bodyFactory).initialRelativeSpeed(initialRelXSpeed, initialRelYSpeed);
+
+				Boolean jumpAllowed = attributes.getBoolean("jumpAllowed");
+				if( jumpAllowed!=null )
+					((DynamicPhysicsBodyFactory)bodyFactory).stableCheck(jumpAllowed);
+					
+				Boolean worldSwitchAllowed = attributes.getBoolean("worldSwitchAllowed");
+				if( worldSwitchAllowed!=null )
+					((DynamicPhysicsBodyFactory)bodyFactory).worldSwitch(worldSwitchAllowed);
+				break;
+		}
 		
 		return bodyFactory.create();
 	}

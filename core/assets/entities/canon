@@ -1,0 +1,5 @@
+{"representationType":"TEXTURE", "representation":"box.png", "width":100, "height":100, "shape":"BOX", "liftable":"true", "density":1.0, 
+"onUPDATE":{"factory":".RepeatEHF", "intervalMs":5000, "sub":{
+	"factory":".SpawnEHF", "type":"canonball", "relX":70, "relY":0, "attributes":{"initialRelXSpeed":4, "initialRelYSpeed":0} }
+}, 
+"effects":[{"factory":".LightFactory", "x":0, "y":0, "rotation":90, "color":"#ff0000ff", "radius":200, "degree":45}] }
