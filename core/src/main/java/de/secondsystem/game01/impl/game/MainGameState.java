@@ -1,25 +1,15 @@
 package de.secondsystem.game01.impl.game;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.jsfml.audio.Sound;
-import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import de.secondsystem.game01.impl.DevConsole;
 import de.secondsystem.game01.impl.GameContext;
@@ -42,6 +32,7 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.scripting.IScriptApi;
 import de.secondsystem.game01.impl.sound.MonologueTextBox;
 import de.secondsystem.game01.impl.sound.MusicWrapper;
 import de.secondsystem.game01.model.Attributes;
@@ -52,7 +43,7 @@ public class MainGameState extends GameState {
 
 	private final String mapId;
 	
-	private MonologueTextBox monologueTextBox;
+	MonologueTextBox monologueTextBox;
 	
 	private MusicWrapper backgroundMusic;
 	
@@ -170,91 +161,10 @@ public class MainGameState extends GameState {
 		
 	}
 	
-	private ThreadedMapLoader activeMapLoader;
-	public final Set<Sprite> sprites = new HashSet<>();
-	public class ScriptApi {
-		private final GameContext ctx;
-		private JSONObject storedValues;
-		private final JSONParser parser = new JSONParser();
-		
-		public ScriptApi(GameContext ctx) {
-			this.ctx = ctx;
-			try ( Reader reader = Files.newBufferedReader(Paths.get("save.json"), StandardCharsets.UTF_8) ){
-				storedValues = (JSONObject) parser.parse(reader);
-				
-			} catch (IOException | ParseException e) {
-				storedValues = new JSONObject();
-			}
-		}
-		
-		public void loadMap(String mapId) {
-			if( activeMapLoader==null )
-				activeMapLoader = new ThreadedMapLoader(mapId, ctx);
-		}
-		
-		public void playMonologue(String name) {
-			monologueTextBox.play(name);
-		}
-		
-		@SuppressWarnings("unchecked")
-		public void store(String key, Object val) {
-			storedValues.put(key, val);
-			
-			try ( Writer writer = Files.newBufferedWriter(Paths.get("save.json"), StandardCharsets.UTF_8) ){
-				storedValues.writeJSONString(writer);
-				
-			} catch (IOException e) {
-				System.err.println("Unable to store value: "+e.getMessage());
-			}
-		}
-		public Object load(String key) {
-			return storedValues.get(key);
-		}
-		public Sound playSound(String name) {
-			try {
-				Sound s = new Sound(ResourceManager.sound.get(name));
-				s.setRelativeToListener(false);
-				s.play();
-				return s;
-				
-			} catch (IOException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-				return null;
-			}
-		}
-		public Sprite createSprite(String texture, float x, float y) {
-			try {
-				Sprite s = new Sprite(ResourceManager.texture_gui.get(texture));
-				s.setPosition(x, y);
-				sprites.add(s);
-				return s;
-				
-			} catch (IOException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-				return null;
-			}
-		}
-		public void deleteSprite(Sprite sprite) {
-			sprites.remove(sprite);
-		}
-		public void updateSpriteTex(Sprite sprite, String texture) {
-			try {
-				sprite.setTexture(ResourceManager.texture_gui.get(texture));
-				
-			} catch (IOException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
-			}
-		}
-		public void updateSpriteColor(Sprite sprite, int r, int g, int b, int a) {
-			sprite.setColor(new Color(r, g, b, a));
-		}
-	}
-	
-	protected Object createScriptApi(GameContext ctx) {
-		return new ScriptApi(ctx);
+	ThreadedMapLoader activeMapLoader;
+	final Set<Sprite> sprites = new HashSet<>();
+	protected IScriptApi createScriptApi(GameContext ctx) {
+		return new ScriptApiImpl(this, ctx);
 	}
 	
 	private boolean initCalled=false;
@@ -274,12 +184,10 @@ public class MainGameState extends GameState {
 		}
 		
 		IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-		map = mapSerializer.deserialize(ctx, mapId, true, true);
+		map = mapSerializer.deserialize(ctx, mapId, createScriptApi(ctx), true, true);
 		
 		map.getEntityManager().create("lever", new Attributes(new Attribute("x",300), new Attribute("y",500), new Attribute("worldId",3)) )
 		.setEventHandler(EventType.USED, new PingPongEventHandler(EventType.DAMAGED));
-
-		map.getScriptEnv().bind("API", createScriptApi(ctx));
 		
 		mapRenderer = new EffectMapRenderer(ctx, map);
 
@@ -368,7 +276,7 @@ public class MainGameState extends GameState {
 	protected void processEvent(GameContext ctx, Event event) {
 		if( event.type==Event.Type.KEY_RELEASED ) {
         	if( event.asKeyEvent().key==Key.F12 ) {
-        		setNextState(new EditorGameState(this, map));
+        		setNextState(EditorGameState.createLive(this, map));
         	}
         	if( event.asKeyEvent().key==Key.ESCAPE ) {
         		setNextState(new MainMenuState(this));

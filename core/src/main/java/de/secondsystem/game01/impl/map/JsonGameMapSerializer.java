@@ -24,6 +24,7 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.map.GameMap.GameWorld;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
+import de.secondsystem.game01.impl.scripting.IScriptApi;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.SerializationUtil;
@@ -62,7 +63,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 	}
 
 	@Override
-	public synchronized GameMap deserialize(GameContext ctx, String mapId, boolean playable, boolean editable) {
+	public synchronized GameMap deserialize(GameContext ctx, String mapId, IScriptApi scriptApi, boolean playable, boolean editable) {
 		try ( Reader reader = Files.newBufferedReader(MAP_PATH.resolve(mapId+".json"), StandardCharsets.UTF_8) ){
 			Attributes obj = new Attributes( (JSONObject) parser.parse(reader) );
 			
@@ -70,7 +71,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 			
 			Tileset tileset = new Tileset(obj.getString("tileset"));
 			
-			GameMap map = new GameMap(ctx, mapId, tileset, playable, editable);
+			GameMap map = new GameMap(ctx, mapId, tileset, scriptApi, playable, editable);
 			for( WorldId worldId : WorldId.values() )
 				deserializeGameWorld(map, worldId, worlds.get(worldId.arrayIndex));
 			

@@ -3,9 +3,6 @@ package de.secondsystem.game01.util;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
-import de.secondsystem.game01.impl.map.ILayerObject;
-
 public class Tools {
 	
 	public static boolean isInside(RectangleShape shape, Vector2f p) {

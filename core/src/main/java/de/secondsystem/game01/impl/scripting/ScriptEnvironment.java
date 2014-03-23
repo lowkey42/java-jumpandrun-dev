@@ -38,10 +38,11 @@ public class ScriptEnvironment implements IUpdateable {
 	
 	private final TimerManager timerManager = new TimerManager(this);
 	
-	public ScriptEnvironment( ScriptType type, Attributes attributes ) {
+	public ScriptEnvironment( ScriptType type, IScriptApi scriptApi, Attributes attributes ) {
 		engine = new ScriptEngineManager().getEngineByName(type.name);
 		
 		engine.put("timer", timerManager);
+		engine.put("API", scriptApi!=null ? scriptApi : new DummyScriptApi());
 		
 		for( Entry<String, Object> att : attributes.entrySet() )
 			engine.put(att.getKey(), att.getValue());

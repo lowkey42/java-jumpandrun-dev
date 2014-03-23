@@ -19,6 +19,7 @@ import de.secondsystem.game01.impl.map.objects.LightLayer;
 import de.secondsystem.game01.impl.map.objects.SimpleLayer;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
+import de.secondsystem.game01.impl.scripting.IScriptApi;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment.ScriptType;
 import de.secondsystem.game01.model.Attributes;
@@ -81,11 +82,11 @@ public class GameMap implements IGameMap {
 	
 	final ScriptEnvironment scripts;
 	
-	public GameMap(GameContext ctx, String mapId, Tileset tileset) {
-		this(ctx, mapId, tileset, true, true);
+	public GameMap(GameContext ctx, String mapId, Tileset tileset, IScriptApi scriptApi) {
+		this(ctx, mapId, tileset, scriptApi, true, true);
 	}
 	
-	GameMap(GameContext ctx, String mapId, Tileset tileset, boolean playable, boolean editable) {
+	GameMap(GameContext ctx, String mapId, Tileset tileset, IScriptApi scriptApi, boolean playable, boolean editable) {
 		this.mapId = mapId;
 		this.tileset = tileset;
 		this.editable = editable;
@@ -99,18 +100,15 @@ public class GameMap implements IGameMap {
 				ctx.getViewWidth(), 
 				ctx.getViewHeight()) : null;
 		
-		if( playable ) {
-			physicalWorld = new Box2dPhysicalWorld();
-			physicalWorld.init(new Vector2f(0, 15.f));
-		} else
-			physicalWorld = null;
+		physicalWorld = new Box2dPhysicalWorld();
+		physicalWorld.init(new Vector2f(0, 15.f));
 		
-		entityManager = new GameEntityManager(this);	
+		entityManager = new GameEntityManager(this, !playable);	
 
 		for( WorldId wId : WorldId.values() )
 			gameWorld[wId.arrayIndex] = new GameWorld(wId, entityManager, lightMap);
 		
-		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT,
+		scripts = new ScriptEnvironment(ScriptType.JAVA_SCRIPT, scriptApi,
 				new Attributes(
 					new Attribute("mapId", mapId), 
 					new Attribute("map", this), 

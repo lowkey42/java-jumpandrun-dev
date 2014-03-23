@@ -33,7 +33,7 @@ public final class Main {
 					@Override
 					protected void onFrame(GameContext ctx, long frameTime) {
 						IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-						GameMap map = new GameMap(ctx, args[1], new Tileset(args[2]));
+						GameMap map = new GameMap(ctx, args[1], new Tileset(args[2]), null);
 						mapSerializer.serialize(map);
 						
 						super.onFrame(ctx, frameTime);
@@ -42,7 +42,7 @@ public final class Main {
 				break;
 		
 			case "editor":
-				initialState = new EditorGameState(args[1]);
+				initialState = EditorGameState.create(args[1]);
 				break;
 				
 			case "play":

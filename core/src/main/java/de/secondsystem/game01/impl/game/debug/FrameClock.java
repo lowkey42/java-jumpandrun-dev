@@ -15,9 +15,6 @@ public final class FrameClock {
 	public FrameClock(int depth) {
 		assert(depth >= 1);
 		sample = new SampleData(depth);
-
-        freq.minimum = Float.MAX_VALUE;
-        time.minimum = Long.MAX_VALUE;
 	}
 
     /**
@@ -165,7 +162,7 @@ class SampleData {
 }
 
 class Range {
-	float minimum;
+	float minimum = Float.MAX_VALUE;
     float maximum;
     float average;
     float current;

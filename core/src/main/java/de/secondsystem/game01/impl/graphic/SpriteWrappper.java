@@ -6,8 +6,6 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.util.Tools;
-
 public class SpriteWrappper implements ISpriteWrapper {
 	protected final Sprite sprite;
 	protected float width;

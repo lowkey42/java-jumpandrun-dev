@@ -65,17 +65,23 @@ public final class EditorGameState extends GameState {
 	private float cameraX = 0.f;
 	private float cameraY = 0.f;
 	
-	private LayerType currentLayer = LayerType.FOREGROUND_0;	
-	
-	public EditorGameState(GameState playGameState, GameMap map) {
-		this.playGameState = playGameState;
-		this.map = map;
-	}
+	private LayerType currentLayer = LayerType.FOREGROUND_0;
 
 	private String mapToLoad=null;
-	public EditorGameState(String mapId) {
-		this(null, null);
+	
+	private EditorGameState(GameState playGameState, GameMap map, String mapId) {
+		this.playGameState = playGameState;
+		this.map = map;
 		mapToLoad = mapId;
+	}
+	public static EditorGameState createLive(GameState playGameState, GameMap map) {
+		return new EditorGameState(playGameState, map, null);
+	}
+	public static EditorGameState create(GameState playGameState, String mapId) {
+		return new EditorGameState(playGameState, null, mapId);
+	}
+	public static EditorGameState create(String mapId) {
+		return new EditorGameState(null, null, mapId);
 	}
 
 	@Override
@@ -84,7 +90,7 @@ public final class EditorGameState extends GameState {
 		
 		if(map==null && mapToLoad!=null) {
 			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-			map = mapSerializer.deserialize(ctx, mapToLoad, true, true);
+			map = mapSerializer.deserialize(ctx, mapToLoad, null, true, true);
 			mapToLoad = null;
 		}
 		
@@ -312,7 +318,7 @@ public final class EditorGameState extends GameState {
 			break;
 
 		case F9: // load
-			map = new JsonGameMapSerializer().deserialize(ctx, map.getMapId(), true,
+			map = new JsonGameMapSerializer().deserialize(ctx, map.getMapId(), null, false, 
 					true);
 			break;
 

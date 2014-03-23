@@ -38,9 +38,7 @@ public final class MainMenuState extends GameState {
 	private final MenuButton editorBt = new MenuButton(515, 190, "EDITOR", new IOnClickListener() {
 		
 		@Override public void onClick() {
-			setNextState(new EditorGameState(MainMenuState.this,
-					new JsonGameMapSerializer().deserialize(null, "test01",
-							true, true)));
+			setNextState(EditorGameState.create(MainMenuState.this, "test01"));
 		}
 	});
 	

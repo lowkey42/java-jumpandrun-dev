@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import javax.script.ScriptException;
+
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 import org.json.simple.JSONObject;
@@ -41,6 +43,8 @@ public final class GameEntityManager implements IGameEntityManager {
 
 	private static final Path ARCHETYPE_PATH = Paths.get("assets", "entities");
 	
+	private final boolean overrideOptionalCreation;
+	
 	private final Map<UUID, IGameEntity> entities = new HashMap<>();
 	@SuppressWarnings("unchecked")
 	private final List<IGameEntity>[] orderedEntities = new ArrayList[256];
@@ -54,8 +58,9 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	final IGameMap map;
 	
-	public GameEntityManager(IGameMap map) {
+	public GameEntityManager(IGameMap map, boolean overrideOptionalCreation) {
 		this.map = map;
+		this.overrideOptionalCreation = overrideOptionalCreation;
 	}
 	
 	@Override
@@ -75,6 +80,18 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public IGameEntity create(UUID uuid, String type, Map<String, Object> attr) {
+		if( overrideOptionalCreation ) {
+			final Object createCondition = attr.get("createIf");
+			if( createCondition!=null )
+				try {
+					if( !Boolean.valueOf(map.getScriptEnv().eval(createCondition.toString()).toString()) )
+						return null;
+					
+				} catch (ScriptException e) {
+					e.printStackTrace();
+				}
+		}
+		
 		if( uuid==null )
 			uuid = UUID.randomUUID();
 			
