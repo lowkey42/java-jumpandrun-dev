@@ -18,13 +18,17 @@ public final class FunctionTimer extends Timer {
 
 	@Override
 	protected void call() {
-		try {
-			env.eval("f()", new Attribute("f", callable));
-			
-		} catch (ScriptException e) {
-			System.err.println("Error calling function: "+e.getMessage());
-			e.printStackTrace();
-		}
+		if( callable instanceof Runnable )
+			((Runnable) callable).run();
+		
+		else
+			try {
+				env.eval("f()", new Attribute("f", callable));
+				
+			} catch (ScriptException e) {
+				System.err.println("Error calling function: "+e.getMessage());
+				e.printStackTrace();
+			}
 	}
 
 }

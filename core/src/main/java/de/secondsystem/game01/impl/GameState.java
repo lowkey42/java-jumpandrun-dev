@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl;
 
+import java.io.IOException;
+
 import org.jsfml.graphics.View;
 import org.jsfml.system.Clock;
 import org.jsfml.system.Vector2f;
@@ -7,6 +9,8 @@ import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.fsm.IContext;
 import de.secondsystem.game01.fsm.IState;
+import de.secondsystem.game01.impl.game.debug.ClockHUD;
+import de.secondsystem.game01.impl.game.debug.FrameClock;
 
 /**
  * Basis-Klasse für alle grafischen Zustände der Anwendung
@@ -20,12 +24,26 @@ public abstract class GameState implements IState {
 	private final Clock frameClock = new Clock();
 	private boolean firstFrame = false;
 
+	private final FrameClock debugFrameClock = new FrameClock();
+	private final ClockHUD debugFcHud;
+	private boolean displayFrameClock = false;
+
 	protected abstract void onStart(GameContext ctx);
 	protected abstract void onStop(GameContext ctx);
 	protected abstract void onFrame(GameContext ctx, long frameTime);
 	
 	protected final void setNextState(IState state) {
 		nextState = state;
+	}
+	
+	public GameState() {
+		ClockHUD clock = null;
+		try {
+			clock = new ClockHUD(debugFrameClock);
+		} catch (IOException e) {
+		}
+
+		debugFcHud = clock;
 	}
 	
 	@Override
@@ -51,6 +69,8 @@ public abstract class GameState implements IState {
 		if( !ctx.window.isOpen() )
 			return new FinalizeState();
 		
+		debugFrameClock.beginFrame();
+		
 	//	ctx.window.clear();
 
 		long frameTime = frameClock.restart().asMilliseconds();
@@ -66,13 +86,29 @@ public abstract class GameState implements IState {
 		for(Event event : ctx.window.pollEvents()) {
 	        if(event.type == Event.Type.CLOSED)
 	            ctx.window.close();
+	        else if( event.type == Event.Type.KEY_RELEASED )
+	        	switch( event.asKeyEvent().key ) {
+	        		case F11:
+	        			displayFrameClock = !displayFrameClock;
+	        			break;
+	        		case F10:
+	        			debugFrameClock.clear();
+	        			break;
+	        		default:
+	        			break;
+	        	}
 
 	        processEvent(ctx, event);
 	    }
 		
 		onFrame(ctx, frameTime);
 
+		if( displayFrameClock )
+			ctx.window.draw(debugFcHud);
+		
 		ctx.window.display();
+		
+		debugFrameClock.endFrame();
 		
 		if( nextState!=null ) { 
 			IState r = nextState;

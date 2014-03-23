@@ -5,7 +5,9 @@ importPackage(Packages.de.secondsystem.game01.impl.game.entities);
 importPackage(Packages.de.secondsystem.game01.impl.timer);
 importPackage(Packages.de.secondsystem.game01.impl.game.entities.events);
 
-println("Ich bin ein Script für die map "+mapId);
+function init() {
+	println("Ich bin ein Script für die map "+mapId);
+}
 
 function touchFunc(entity) {
 	entity.jump();

@@ -19,7 +19,8 @@ public abstract class IndexedMoveable implements IMoveable {
 	}
 	
 	protected final void positionUpdated(Vector2f oldPosition) {
-		index.update(this, oldPosition);
+		if( index!=null )
+			index.update(this, oldPosition);
 	}
 	
 	protected abstract void doSetPosition(Vector2f pos);

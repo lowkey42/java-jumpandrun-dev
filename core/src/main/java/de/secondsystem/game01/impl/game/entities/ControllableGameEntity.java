@@ -216,7 +216,20 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	@Override
 	public void switchWorlds() {
-		setWorld(getWorldId()==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN);
+		WorldId newWorldId = getWorldId()==WorldId.MAIN ? WorldId.OTHER : WorldId.MAIN;
+		
+		if( !setWorld(newWorldId) )
+			return;
+		
+		if( physicsBody instanceof IHumanoidPhysicsBody && ((IHumanoidPhysicsBody) physicsBody).isLiftingSomething() ) {
+			IPhysicsBody body = ((IHumanoidPhysicsBody) physicsBody).getLiftedBody();
+			if( !(body.getOwner() instanceof IGameEntity) 
+					|| !((IGameEntity)body.getOwner()).setWorld(newWorldId) ) {
+				final float xMove = hDirection==HDirection.RIGHT ? 1.f : -1.f;
+				final float yMove = vDirection==VDirection.DOWN ? 1.f : -1.f;
+				((IHumanoidPhysicsBody) physicsBody).throwLiftedBody(3, new Vector2f(xMove, yMove));
+			}
+		}
 	}
 
 	@Override

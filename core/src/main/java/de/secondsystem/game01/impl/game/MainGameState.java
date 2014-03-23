@@ -6,9 +6,14 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
+import org.jsfml.audio.Sound;
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
+import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
@@ -33,6 +38,7 @@ import de.secondsystem.game01.impl.game.entities.events.KillEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.PingPongEventHandler;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -73,6 +79,10 @@ public class MainGameState extends GameState {
 	}
 	
 	private final class PlayerDeathEventHandler extends KillEventHandler {
+
+		public PlayerDeathEventHandler(IGameMap map) {
+			super(map, new Attributes());
+		}
 
 		@Override
 		public Object handle(Object... args) {
@@ -161,6 +171,7 @@ public class MainGameState extends GameState {
 	}
 	
 	private ThreadedMapLoader activeMapLoader;
+	public final Set<Sprite> sprites = new HashSet<>();
 	public class ScriptApi {
 		private final GameContext ctx;
 		private JSONObject storedValues;
@@ -199,6 +210,47 @@ public class MainGameState extends GameState {
 		public Object load(String key) {
 			return storedValues.get(key);
 		}
+		public Sound playSound(String name) {
+			try {
+				Sound s = new Sound(ResourceManager.sound.get(name));
+				s.setRelativeToListener(false);
+				s.play();
+				return s;
+				
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				return null;
+			}
+		}
+		public Sprite createSprite(String texture, float x, float y) {
+			try {
+				Sprite s = new Sprite(ResourceManager.texture_gui.get(texture));
+				s.setPosition(x, y);
+				sprites.add(s);
+				return s;
+				
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+				return null;
+			}
+		}
+		public void deleteSprite(Sprite sprite) {
+			sprites.remove(sprite);
+		}
+		public void updateSpriteTex(Sprite sprite, String texture) {
+			try {
+				sprite.setTexture(ResourceManager.texture_gui.get(texture));
+				
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		public void updateSpriteColor(Sprite sprite, int r, int g, int b, int a) {
+			sprite.setColor(new Color(r, g, b, a));
+		}
 	}
 	
 	protected Object createScriptApi(GameContext ctx) {
@@ -232,15 +284,15 @@ public class MainGameState extends GameState {
 		mapRenderer = new EffectMapRenderer(ctx, map);
 
 		// lets kick the JIT in his ass
-		for(int i=0; i<100; i++) {
-			mapRenderer.update(1);
+		for(int i=0; i<5*60; i++) {
+			mapRenderer.update(18);
 		}
 		
 		player = (IControllableGameEntity) map.getEntityManager().get(PLAYER_UUID);
 		if( player == null )
 			player = (IControllableGameEntity) map.getEntityManager().create(PLAYER_UUID, "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
-		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler() );
+		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler(map) );
 		player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
 
 		camera = new Camera(player);
@@ -253,6 +305,8 @@ public class MainGameState extends GameState {
 		controller.addGE(player);
 		
 		console.setScriptEnvironment(map.getScriptEnv());
+		
+		map.getScriptEnv().exec("init");
 	}
 	
 	@Override
@@ -260,11 +314,15 @@ public class MainGameState extends GameState {
 		init(ctx);
 		
 		backgroundMusic.play();
+		
+		map.getScriptEnv().exec("onStart");
 	}
 	
 	@Override
 	protected void onStop(GameContext ctx) {
 		backgroundMusic.pause();
+		
+		map.getScriptEnv().exec("onStop");
 	}
 
 	@Override
@@ -297,6 +355,9 @@ public class MainGameState extends GameState {
 		ctx.window.setView(cView);
 		
 		monologueTextBox.draw(ctx.window);
+		
+		for( Sprite s : sprites )
+			ctx.window.draw(s);
 		
 		if( System.currentTimeMillis()>=ignoreDamageTimer ) {
 			ignoreDamageEntity=null;

@@ -1,6 +1,6 @@
 {"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"ghost.anim", 
 "width":70, "height":70, "shape":"CIRCLE", "density":0.1, "physicsType":"KINEMATIC", "physicsWidth":50, "physicsHeight":50,
 "verticalMovementAllowed":true, "moveAcceleration":0.01, "jumpAcceleration":0.01, "maxMoveSpeed":2, "maxJumpSpeed":2
-"controller":{"factory":".FlyingHunterAiControllerFactory", "maxDistance":400}, "onDAMAGED":{"factory":".KillEHF"},
+"controller":{"factory":".FlyingHunterAiControllerFactory", "maxDistance":400}, "onDAMAGED":{"factory":".KillEHF", "noAfterlife":true},
 "onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".DelayEHF", "delay":50, "sub":{"factory":".PPEHF", "out":"DAMAGED"}}},
 "effects":[{"factory":".LightFactory", "x":0, "y":0, "rotation":0, "color":"#ff00ff66", "radius":400, "degree":360}]}

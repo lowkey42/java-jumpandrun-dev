@@ -18,6 +18,9 @@ public class TimerManager implements IUpdateable{
 	public void createTimer(long intervalMs, boolean repeated, IGameEntity sender, IEventHandler handler, Object[] args) {
 		timers.add(new EventTimer(intervalMs, repeated, sender, handler, args));
 	}
+	public void createTimer(long intervalMs, boolean repeated, Runnable runnable) {
+		timers.add(new FunctionTimer(env, intervalMs, repeated, runnable));
+	}
 	public void createTimer(long intervalMs, boolean repeated, Object callable) {
 		timers.add(new FunctionTimer(env, intervalMs, repeated, callable));
 	}

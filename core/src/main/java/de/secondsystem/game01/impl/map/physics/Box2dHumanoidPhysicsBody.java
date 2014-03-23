@@ -386,6 +386,10 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 	public boolean isLiftingSomething() {
 		return liftedBody!=null;
 	}
+	@Override
+	public IPhysicsBody getLiftedBody() {
+		return liftedBody;
+	}
 	
 	@Override
 	public void setIdle(boolean idle) {

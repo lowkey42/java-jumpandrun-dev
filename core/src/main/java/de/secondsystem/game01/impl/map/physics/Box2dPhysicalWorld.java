@@ -17,8 +17,8 @@ import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 
 public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	
-	private static final int velocityIterations = 8;
-	private static final int positionIterations = 3;
+	private static final int velocityIterations = 4;
+	private static final int positionIterations = 2;
 
 	World physicsWorld;
 	
@@ -27,17 +27,33 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		physicsWorld = new World(new Vec2(gravity.x, gravity.y));
 		physicsWorld.setSleepingAllowed(true);
 		physicsWorld.setContactListener(new Box2dContactListener());
+		physicsWorld.setContinuousPhysics(false);
 	}
 
+	private long accFt;
+	private static final long STEP_SIZE = 8;
+	private static final int MIN_STEPS = 1;
+	private static final int MAX_STEPS = 6;
 	@Override
 	public void update(long frameTime) {
-		float dt = frameTime/1000.f;
-		float max = 1.f/60;
-		while (dt>=max) {
-			physicsWorld.step(max/2, velocityIterations, positionIterations);
-			dt -= max/2;
-		}
-		physicsWorld.step(dt, velocityIterations, positionIterations);
+		accFt+=frameTime;
+		int steps = (int) (accFt/STEP_SIZE);
+		if(steps<-1)
+			return;
+		
+		int stepsClamped = Math.min(Math.max(steps, MIN_STEPS), MAX_STEPS);
+		accFt-=stepsClamped*STEP_SIZE;
+		
+		for(;stepsClamped>0; --stepsClamped)
+			physicsWorld.step(STEP_SIZE/1000.f, velocityIterations, positionIterations);
+		
+//		float dt = frameTime/1000.f;
+//		float max = 1.f/60;
+//		while (dt>=max) {
+//			physicsWorld.step(max/2, velocityIterations, positionIterations);
+//			dt -= max/2;
+//		}
+//		physicsWorld.step(dt, velocityIterations, positionIterations);
 	}
 
 	private static final class RaycastCbClosure {

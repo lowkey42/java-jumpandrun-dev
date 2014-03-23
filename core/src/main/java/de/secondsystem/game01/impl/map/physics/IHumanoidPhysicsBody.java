@@ -15,6 +15,7 @@ public interface IHumanoidPhysicsBody extends IDynamicPhysicsBody {
 
 	boolean liftBody(IPhysicsBody other);
 	boolean isLiftingSomething();
+	IPhysicsBody getLiftedBody();
 	IPhysicsBody throwLiftedBody(float strength, Vector2f direction);
 	
 	/**
