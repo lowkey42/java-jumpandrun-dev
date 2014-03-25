@@ -79,6 +79,14 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	@Override
+	public IGameEntity createEntity(String type, Map<String, Object> attributes) {
+		// create entity without adding it to the set (editor requirement)
+		IGameEntity e = create(type, attributes);
+		entitiesToAdd.remove(e);
+		return e;
+	}
+	
+	@Override
 	public IGameEntity create(UUID uuid, String type, Map<String, Object> attr) {
 		if( overrideOptionalCreation ) {
 			final Object createCondition = attr.get("createIf");
@@ -112,6 +120,25 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	@Override
+	public void addEntity(IGameEntity entity) {
+		entitiesToAdd.add(entity);
+	}
+	
+	@Override
+	public void destroyEntity(UUID eId) {
+		// editor requirement
+		IGameEntity entity = entities.get(eId);
+		if( entity!=null ) {
+			entity.onDestroy();
+			entities.remove(eId);
+			List<IGameEntity> sg = orderedEntities[entity.orderId()+128];
+			if( sg!=null ) {
+				sg.remove(entity);
+			}
+		}
+	}
+	
+	@Override
 	public void destroy( UUID eId ) {
 		entitiesToDestroy.add(eId);
 	}
@@ -135,15 +162,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		entitiesToAdd.clear();
 		
 		for( UUID eId : entitiesToDestroy ) {
-			IGameEntity entity = entities.get(eId);
-			if( entity!=null ) {
-				entity.onDestroy();
-				entities.remove(eId);
-				List<IGameEntity> sg = orderedEntities[entity.orderId()+128];
-				if( sg!=null ) {
-					sg.remove(entity);
-				}
-			}
+			destroyEntity(eId);
 		}
 		entitiesToDestroy.clear();
 	}
@@ -275,7 +294,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 		return new Attributes(
 				new Attribute("entities", entityAttributes)
-		);
+		); 
 	}
 	
 	private static final Attributes filterEntityAttributes( Attributes attributes, String archetype ) {

@@ -12,7 +12,6 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.Tileset;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
-import de.secondsystem.game01.util.Tools;
 
 /**
  * TODO: tinting

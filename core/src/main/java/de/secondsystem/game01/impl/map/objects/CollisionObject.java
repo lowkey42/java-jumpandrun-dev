@@ -15,7 +15,6 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
-import de.secondsystem.game01.util.Tools;
 
 public class CollisionObject implements ILayerObject {
 

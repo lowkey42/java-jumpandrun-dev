@@ -11,8 +11,10 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IUpdateable;
 
-public class EntityLayerObject implements ILayerObject {
+public class EntityLayerObject implements ILayerObject, IUpdateable {
 
 	public final UUID uuid;
 	
@@ -29,6 +31,7 @@ public class EntityLayerObject implements ILayerObject {
 		this.attributes = entity.getEditableState()!=null ? entity.getEditableState().getAttributes() : null;
 		this.entity = entity;
 	}
+	
 	public EntityLayerObject(UUID uuid, String type, Attributes attributes) {
 		this.uuid = uuid;
 		this.type = type;
@@ -36,8 +39,18 @@ public class EntityLayerObject implements ILayerObject {
 		this.entity = null;
 	}
 
+	public EntityLayerObject(IGameMap map, String archetype, Attributes attributes) {
+		this( map.getEntityManager().createEntity(archetype, attributes) );
+	}
+	
+	public void remove(IGameMap map) {
+		map.getEntityManager().destroyEntity(uuid);
+		entity.onDestroy();
+	}
+	
 	@Override
 	public void draw(RenderTarget renderTarget) {
+		entity.draw(renderTarget);
 	}
 
 	@Override
@@ -109,5 +122,11 @@ public class EntityLayerObject implements ILayerObject {
 	
 	public IGameEntity getEntity() {
 		return entity;
+	}
+	@Override
+	public void update(long frameTimeMs) {
+		IDrawable rep = entity.getRepresentation();
+		if( rep instanceof IUpdateable )
+			((IUpdateable) rep).update(frameTimeMs);	
 	}
 }

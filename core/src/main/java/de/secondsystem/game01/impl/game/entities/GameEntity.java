@@ -325,6 +325,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			e.onDestroy(map);
 		
 		effects.clear();
+		
+		// TODO: destroy physics body
 	}
 	
 	@Override
@@ -356,8 +358,9 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( representation instanceof IScalable )
 			((IScalable) representation).setDimensions(width, height);
 		else
-			System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
-								+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
+			if( representation != null )
+				System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
+									+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
 		
 	}
 

@@ -17,9 +17,13 @@ public interface IGameEntityManager extends IUpdateable, ISerializable {
 
 	Set<String> listArchetypes();
 	
+	IGameEntity createEntity(String type, Map<String, Object> attributes);
 	IGameEntity create(String type, Map<String, Object> attributes);
 	IGameEntity create(UUID uuid, String type, Map<String, Object> attributes);
 	IControllableGameEntity createControllable(String type, Map<String, Object> attributes);
+	
+	void addEntity(IGameEntity entity);
+	void destroyEntity(UUID eId);
 	
 	void destroy(UUID eId);
 	IGameEntity findEntity(Vector2f pos);
