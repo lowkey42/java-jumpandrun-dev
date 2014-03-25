@@ -99,6 +99,11 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		
 		return c.foundBody;
 	}
+	
+	@Override
+	public void destroyBody(Body body) {
+		physicsWorld.destroyBody(body);
+	}
 
 	Body createBody(BodyDef def) {
 		return physicsWorld.createBody(def);

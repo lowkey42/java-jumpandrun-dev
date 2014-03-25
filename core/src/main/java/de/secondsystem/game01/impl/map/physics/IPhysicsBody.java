@@ -38,4 +38,7 @@ public interface IPhysicsBody extends IMoveable, IDimensioned {
 	boolean isBound();
 	
 	IPhysicsBody raycastSolid(Vector2f target);
+	
+	void onDestroy();
+	boolean isDestroyed();
 }

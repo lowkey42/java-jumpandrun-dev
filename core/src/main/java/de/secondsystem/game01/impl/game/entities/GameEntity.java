@@ -326,7 +326,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		
 		effects.clear();
 		
-		// TODO: destroy physics body
+		physicsBody.onDestroy();
 	}
 	
 	@Override

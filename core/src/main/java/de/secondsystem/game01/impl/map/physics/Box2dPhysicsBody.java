@@ -55,6 +55,8 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	
 	protected Box2dPhysicsBody liftingBody;
 	
+	boolean destroyed = false;
+	
 	Box2dPhysicsBody(Box2dPhysicalWorld world, int worldIdMask, float width, float height, boolean interactive, boolean liftable, 
 			CollisionHandlerType type, boolean kinematic, boolean flying ) {
 		this.worldIdMask = worldIdMask;
@@ -419,6 +421,18 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 				return false;
 			}
 		});
+	}
+	
+	@Override
+	public void onDestroy() {
+		destroyed = true;
+		
+		parent.destroyBody(body);
+	}
+	
+	@Override
+	public boolean isDestroyed() {
+		return destroyed;
 	}
 	
 }
