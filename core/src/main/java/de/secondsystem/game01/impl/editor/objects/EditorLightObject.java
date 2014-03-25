@@ -5,6 +5,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.objects.LightLayerObject;
 import de.secondsystem.game01.model.Attributes;
@@ -14,6 +15,18 @@ import de.secondsystem.game01.util.SerializationUtil;
 public class EditorLightObject extends EditorLayerObject {
 	private LightLayerObject lightLayerObject;
 	private IGameMap map;
+	private float radius;
+	private float degree;
+	
+	public EditorLightObject(Color outlineColor, float outlineThickness, Color fillColor, IGameMap map) {
+		super(outlineColor, outlineThickness, fillColor, map);
+	}
+	
+	@Override
+	public void setLayerObject(ILayerObject layerObject) {
+		super.setLayerObject(layerObject);
+		lightLayerObject = (LightLayerObject) layerObject;
+	}
 	
 	public EditorLightObject() {
 		mouseState = true;
@@ -22,7 +35,8 @@ public class EditorLightObject extends EditorLayerObject {
 	@Override
 	public void refresh() {
 		lightLayerObject.setRotation(rotation);
-		lightLayerObject.setDimensions(width*zoom, height*zoom);
+		lightLayerObject.setRadius(radius);
+		lightLayerObject.setDegree(degree);
 	}
 
 	@Override
@@ -32,7 +46,8 @@ public class EditorLightObject extends EditorLayerObject {
 	@Override
 	public void create(IGameMap map) {
 		this.map = map;	
-
+		
+		// temporary
 		Attribute radius = new Attribute("radius", 40.f);
 		Attribute rotation = new Attribute("rotation", 0.f);
 		Attribute x = new Attribute("x", 0.f);
@@ -46,8 +61,11 @@ public class EditorLightObject extends EditorLayerObject {
 		this.rotation = lightLayerObject.getRotation();
 		
 		zoom = 1.f;
-		width  = lightLayerObject.getWidth();
-		height = lightLayerObject.getHeight();
+		width  = 20.f;
+		height = 20.f;
+		
+		this.radius = lightLayerObject.getRadius();
+		this.degree = lightLayerObject.getDegree();
 	}
 
 	@Override
@@ -63,13 +81,19 @@ public class EditorLightObject extends EditorLayerObject {
 
 	@Override
 	public void update(boolean movedObj, RenderTarget rt, int mousePosX, int mousePosY, float zoom, long frameTimeMs) {
-		setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
-		lightLayerObject.setPosition(pos);
+		if( !mouseState ) {
+			super.update(movedObj, rt, mousePosX, mousePosY, zoom, frameTimeMs);
+		}
+		else {
+			setPosition(rt.mapPixelToCoords(new Vector2i(mousePosX, mousePosY)));
+			lightLayerObject.setPosition(pos);
+		}
 	}
 
 	@Override
 	public void deselect() {
-		map.getLightMap().destroyLight(lightLayerObject.getLight());	
+		if( mouseState )
+			map.getLightMap().destroyLight(lightLayerObject.getLight());	
 	}
 
 }

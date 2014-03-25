@@ -32,6 +32,22 @@ public class LightLayerObject implements ILayerObject {
 	public Light getLight() {
 		return light;
 	}
+	
+	public void setDegree(float degree) {
+		light.setDegree(degree);
+	}
+	
+	public void setRadius(float radius) {
+		light.setRadius(radius);
+	}
+	
+	public float getDegree() {
+		return light.getDegree();
+	}
+	
+	public float getRadius() {
+		return light.getRadius();
+	}
 
 	@Override
 	public void draw(RenderTarget renderTarget) {

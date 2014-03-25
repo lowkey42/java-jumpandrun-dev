@@ -82,9 +82,9 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 		this.radius = radius;
 	}
 	public void setDegree(float degree) {
-		float nDegree = (float) Math.toRadians(degree);
-		this.dirty |= !Tools.nearEqual(nDegree, this.degree);
-		this.degree = nDegree;
+//		float nDegree = (float) Math.toRadians(degree); // ?
+		this.dirty |= !Tools.nearEqual(degree, this.degree);
+		this.degree = degree;
 	}
 
 	public Color getColor() {
@@ -142,6 +142,6 @@ public class Light extends IndexedMoveable implements IMoveable, IInsideCheck, I
 	@Override
 	public void setDimensions(float width, float height) {
 		setRadius(width/2);
-		setRotation(height);
+//		setRotation(height);
 	}
 }

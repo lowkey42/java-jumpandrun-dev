@@ -31,7 +31,10 @@ import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.impl.map.objects.CollisionObject;
 import de.secondsystem.game01.impl.map.objects.EntityLayerObject;
+import de.secondsystem.game01.impl.map.objects.LightLayerObject;
+import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 /**
  * 
@@ -231,8 +234,10 @@ public final class EditorGameState extends GameState {
 					
 					if( layerObject instanceof EntityLayerObject )
 						editorObject = new EditorEntity(Color.BLUE, 2.f, Color.TRANSPARENT, map);
-					else
+					else if( layerObject instanceof SpriteLayerObject || layerObject instanceof CollisionObject )
 						editorObject = new EditorLayerObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
+					else if( layerObject instanceof LightLayerObject )
+ 						editorObject = new EditorLayerObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
 					
 					editorObject.setLayerObject( layerObject );
 				}
