@@ -202,8 +202,9 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 		else 
 			lastWidth  = width;
 		
-		if( scalingY != 0 ) {	
+		if( scalingY != 0 ) {		
 			Vector3 v;
+			Vector2f lastPos = scalingX != 0 ? pos : this.lastPos;
 			if( scalingY == -1 ) 
 				v = mouseScaling(scaleMarkers[1], 0, 1, scalingY, lastPos, lastHeight, false); 
 			else 
