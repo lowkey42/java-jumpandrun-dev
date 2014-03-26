@@ -16,15 +16,15 @@ import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 import de.secondsystem.game01.util.Tools;
 
 public class EditorLayerObject extends AbstractEditorLayerObject {
-	private EditorMarker marker;
-	private EditorMarker [] scaleMarkers  = new EditorMarker[4];
-	private Vector2f mappedMousePos;
-	private Vector2f lastMappedMousePos = new Vector2f(0.f, 0.f);
-	private float lastWidth, lastHeight;
-	private Vector2f lastPos = new Vector2f(0.f, 0.f);
-	private int scalingX = 0;
-	private int scalingY = 0;	
-	private boolean scaling = false;
+	protected EditorMarker marker;
+	protected EditorMarker [] scaleMarkers  = new EditorMarker[4];
+	protected Vector2f mappedMousePos;
+	protected Vector2f lastMappedMousePos = new Vector2f(0.f, 0.f);
+	protected float lastWidth, lastHeight;
+	protected Vector2f lastPos = new Vector2f(0.f, 0.f);
+	protected int scalingX = 0;
+	protected int scalingY = 0;	
+	protected boolean scaling = false;
 	protected IGameMap map;
 	
 	private Tileset tileset;
@@ -32,6 +32,18 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 	private boolean isPhysicsObject;
 	
 	protected boolean mouseState;
+	
+	protected class Vector3 {	
+		public float x;
+		public float y;
+		public float z;
+		
+		public Vector3(float x, float y, float z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+	}
 	
 	public EditorLayerObject() {
 		
@@ -160,37 +172,45 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 		lastMappedMousePos = pos;
 	}
 	
-	private void mouseScaling() {
+	protected Vector3 mouseScaling(EditorMarker marker, int vertex1, int vertex2, float scalingDir, Vector2f lastPos, float lastSize, boolean xDir) {
 		Vector2f dir = new Vector2f(0.f, 0.f);
+
+		dir = Vector2f.sub( Tools.distanceVector(marker.getShape(), vertex1, vertex2, mappedMousePos), 
+					Tools.distanceVector(marker.getShape(), vertex1, vertex2, lastMappedMousePos) );
+		
+		float t = xDir  ? dir.x : dir.y;
+		float d = Tools.vectorLength(dir);
+		float size = lastSize + ( d * (scalingDir == -1 ? 1 : -1) ) * ( t < 0 ? -1 : 1 );
+		Vector2f v = Vector2f.sub( lastPos, Vector2f.div(dir, 2.f) );
+		
+		return new Vector3(v.x, v.y, size);
+	}
 	
+	protected void mouseScaling() {
+		// TODO: fix bug: simultaneous scaling of width and height
+		
 		if( scalingX != 0 ) {
+			Vector3 v;
 			if( scalingX == -1 )
-				dir = Vector2f.sub( Tools.distanceVector(scaleMarkers[0].getShape(), 3, 0, mappedMousePos), 
-							Tools.distanceVector(scaleMarkers[0].getShape(), 3, 0, lastMappedMousePos) );
+				v = mouseScaling(scaleMarkers[0], 3, 0, scalingX, lastPos, lastWidth, true); 
 			else
-				dir = Vector2f.sub( Tools.distanceVector(scaleMarkers[2].getShape(), 1, 2, mappedMousePos), 
-							Tools.distanceVector(scaleMarkers[2].getShape(), 1, 2, lastMappedMousePos) );
+				v = mouseScaling(scaleMarkers[2], 1, 2, scalingX, lastPos, lastWidth, true); 
 			
-			float d = Tools.vectorLength(dir);
-			setWidth( lastWidth + ( d * (scalingX == -1 ? 1 : -1) ) * ( dir.x < 0 ? -1 : 1 ) );
-			Vector2f v = Vector2f.sub( lastPos, Vector2f.div(dir, 2.f) );
-			setPosition(v);
+			setWidth( v.z );
+			setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 
 			lastWidth  = width;
 		
-		if( scalingY != 0 ) {		
+		if( scalingY != 0 ) {	
+			Vector3 v;
 			if( scalingY == -1 ) 
-				dir = Vector2f.sub( Tools.distanceVector(scaleMarkers[1].getShape(), 0, 1, mappedMousePos), 
-						Tools.distanceVector(scaleMarkers[1].getShape(), 0, 1, lastMappedMousePos) );
+				v = mouseScaling(scaleMarkers[1], 0, 1, scalingY, lastPos, lastHeight, false); 
 			else 
-				dir = Vector2f.sub( Tools.distanceVector(scaleMarkers[3].getShape(), 2, 3, mappedMousePos), 
-							Tools.distanceVector(scaleMarkers[3].getShape(), 2, 3, lastMappedMousePos) );
+				v = mouseScaling(scaleMarkers[3], 2, 3, scalingY, lastPos, lastHeight, false); 
 			
-			float d = Tools.vectorLength(dir);
-			setHeight( lastHeight + ( d * (scalingY == -1 ? 1 : -1) ) * ( dir.y < 0 ? -1 : 1 ) );
-			Vector2f v = Vector2f.sub( lastPos, Vector2f.div(dir, 2.f) );
-			setPosition(v);
+			setHeight( v.z );
+			setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 
 			lastHeight = height;

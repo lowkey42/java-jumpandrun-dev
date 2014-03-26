@@ -14,9 +14,10 @@ import de.secondsystem.game01.util.SerializationUtil;
 
 public class EditorLightObject extends EditorLayerObject {
 	private LightLayerObject lightLayerObject;
-	private IGameMap map;
 	private float radius;
 	private float degree;
+	private float lastRadius;
+	private float lastDegree;
 	
 	public EditorLightObject(Color outlineColor, float outlineThickness, Color fillColor, IGameMap map) {
 		super(outlineColor, outlineThickness, fillColor, map);
@@ -26,10 +27,34 @@ public class EditorLightObject extends EditorLayerObject {
 	public void setLayerObject(ILayerObject layerObject) {
 		super.setLayerObject(layerObject);
 		lightLayerObject = (LightLayerObject) layerObject;
+		
+		radius = lightLayerObject.getRadius();
+		degree = lightLayerObject.getDegree();
+		lastRadius = radius;
+		lastDegree = degree;
+		
+		width  = 50.f;
+		height = 50.f;
 	}
 	
 	public EditorLightObject() {
 		mouseState = true;
+	}
+	
+	public float getRadius() {
+		return radius;
+	}
+	
+	public void setRadius(float radius) {
+		this.radius = radius;
+	}
+	
+	public float getDegree() {
+		return degree;
+	}
+	
+	public void setDegree(float degree) {
+		this.degree = degree;
 	}
 	
 	@Override
@@ -41,6 +66,8 @@ public class EditorLightObject extends EditorLayerObject {
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
+		if( !mouseState )
+			super.draw(renderTarget);
 	}
 	
 	@Override
@@ -92,8 +119,50 @@ public class EditorLightObject extends EditorLayerObject {
 
 	@Override
 	public void deselect() {
-		if( mouseState )
+ 		if( mouseState )
 			map.getLightMap().destroyLight(lightLayerObject.getLight());	
 	}
+	
+	@Override
+	protected void mouseScaling() {
+		if( scalingX != 0 ) {
+			Vector3 v;
+			if( scalingX == -1 )
+				v = mouseScaling(scaleMarkers[0], 3, 0, scalingX, lastPos, lastRadius, true); 
+			else
+				v = mouseScaling(scaleMarkers[2], 1, 2, scalingX, lastPos, lastRadius, true); 
+			
+			setRadius( v.z );
+		}
+		else 
+			lastRadius  = radius;
+		
+		if( scalingY != 0 ) {	
+			Vector3 v;
+			if( scalingY == -1 ) 
+				v = mouseScaling(scaleMarkers[1], 0, 1, scalingY, lastPos, lastDegree, false); 
+			else 
+				v = mouseScaling(scaleMarkers[3], 2, 3, scalingY, lastPos, lastDegree, false); 
+			
+			setDegree( v.z );
+		}
+		else 
+			lastDegree = degree;
+		
+		if( scalingX == 0 && scalingY == 0 )
+			lastPos = pos;
+		else
+			scaling = true;
+		
+		if( radius < 5.f )
+			setRadius( 5.f );
+		
+		if( degree < 5.f )
+			setDegree( 5.f );
+		
+		if( degree > 360.f )
+			setDegree( 360.f );
+	}
+	
 
 }

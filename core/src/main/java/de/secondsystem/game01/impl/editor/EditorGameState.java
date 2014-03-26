@@ -237,7 +237,7 @@ public final class EditorGameState extends GameState {
 					else if( layerObject instanceof SpriteLayerObject || layerObject instanceof CollisionObject )
 						editorObject = new EditorLayerObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
 					else if( layerObject instanceof LightLayerObject )
- 						editorObject = new EditorLayerObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
+ 						editorObject = new EditorLightObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
 					
 					editorObject.setLayerObject( layerObject );
 				}
@@ -303,10 +303,24 @@ public final class EditorGameState extends GameState {
 		if (Keyboard.isKeyPressed(Key.D))
 			cameraX += CAM_MOVE_SPEED;
 
-		if (Keyboard.isKeyPressed(Key.LEFT) && editorObject.getWidth() > 0)
-			editorObject.setWidth(editorObject.getWidth() -1);
+		if (Keyboard.isKeyPressed(Key.LEFT)) 
+			if( editorObject instanceof EditorLightObject) {
+				float r = ((EditorLightObject) editorObject).getRadius();
+				if( r > 0 )
+					((EditorLightObject) editorObject).setRadius(r - 1);
+			}
+			else
+				if( editorObject.getWidth() > 0 )
+					editorObject.setWidth(editorObject.getWidth() -1);
+		
 		if (Keyboard.isKeyPressed(Key.RIGHT))
-			editorObject.setWidth(editorObject.getWidth() +1);
+			if( editorObject instanceof EditorLightObject) {
+				float r = ((EditorLightObject) editorObject).getRadius();
+				((EditorLightObject) editorObject).setRadius(r + 1);
+			}
+			else
+				editorObject.setWidth(editorObject.getWidth() +1);
+		
 		if (Keyboard.isKeyPressed(Key.UP))
 			editorObject.setHeight(editorObject.getHeight() +1);
 		if (Keyboard.isKeyPressed(Key.DOWN) && editorObject.getHeight() > 0)
