@@ -48,14 +48,17 @@ final class GameEntityHelper {
 			switch( type ) {
 			case ANIMATION:
 				repr = new AnimatedSprite(ResourceManager.animation.get(filename), width, height);
+				((AnimatedSprite) repr).setFlip(attributes.getBoolean("flipped", false));
 				break;
 			case TEXTURE:
 				repr = new SpriteWrappper(width, height);
 				((SpriteWrappper) repr).setTexture(ResourceManager.texture.get(filename));
+				((SpriteWrappper) repr).setFlip(attributes.getBoolean("flipped", false));
 				break;
 			case TILE:
 				repr = new SpriteWrappper(width, height);
 				((SpriteWrappper) repr).setTexture(ResourceManager.texture_tiles.get(filename));
+				((SpriteWrappper) repr).setFlip(attributes.getBoolean("flipped", false));
 				break;
 				
 			default:

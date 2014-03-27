@@ -10,4 +10,7 @@ public interface ISpriteWrapper extends IDrawable, IMoveable, IDimensioned, IIns
 	void setWidth(float width);
 	void setHeight(float height);
 	void setVisibility(boolean visible);
+	void flip();
+	void setFlip(boolean flip);
+	boolean isFlipped();
 }

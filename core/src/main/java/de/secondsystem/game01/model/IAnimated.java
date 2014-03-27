@@ -6,22 +6,23 @@ public interface IAnimated extends IPlayable {
 	 * Starts a new animation (the current animation (if any) will be stopped)
 	 * @param animation unique name of animation 
 	 * @param speedFactor 1.0=normal speed; <1 slower; >1 faster
+	 * @param repeated the animation is looped
 	 */
-	void play( AnimationType animation, float speedFactor, boolean repeated, boolean cancelCurrentAnimation, boolean flipTexture );
-	
+	void play( AnimationType animation, float speedFactor, boolean repeated);
+
 	void flip();
+	void setFlip(boolean flip);
 	boolean isFlipped();
+	
 	AnimationType getCurrentAnimationType();
 	
 	public enum AnimationType {
 		JUMP,
-		MOVE_LEFT,
-		MOVE_RIGHT,
+		MOVE,
 		IDLE,
 		CLIMB_UP,
 		CLIMB_DOWN,
-		CLIMB_RIGHT,
-		CLIMB_LEFT,
+		CLIMB_SIDEWAYS,
 		USED,
 		UNUSED
 	}

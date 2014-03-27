@@ -151,15 +151,13 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( representation instanceof IAnimated )
 		{
 			IAnimated anim = ((IAnimated) representation);
-		
-			if( xMove == 1 )		
-				anim.play(AnimationType.MOVE_RIGHT, 0.3f, true, false, anim.isFlipped());
-			else 
-				if( xMove == -1 ) 
-					anim.play(AnimationType.MOVE_LEFT, 0.3f, true, false, !anim.isFlipped());
-				else {
-					anim.play(AnimationType.IDLE, 1.f, true, true, false);
-				}
+
+			anim.setFlip(hDirection==HDirection.LEFT);
+			
+			if( xMove!=0 )
+				anim.play(AnimationType.MOVE, 0.3f, true);
+			else
+				anim.play(AnimationType.IDLE, 1.f, true);
 		}
 	}
 	

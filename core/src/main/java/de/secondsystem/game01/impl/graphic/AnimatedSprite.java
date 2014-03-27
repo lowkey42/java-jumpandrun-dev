@@ -24,11 +24,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	}
 	
 	@Override
-	public void setDimensions(float width, float height) {
-		float widthScale = width/currentAnimationData.frameWidth;
-		sprite.setScale(sprite.getScale().x < 0 ? widthScale*(-1) : widthScale, height/currentAnimationData.frameHeight);
-		this.width  = width;
-		this.height = height;
+	protected void updateScale() {
+		sprite.setScale(width/currentAnimationData.frameWidth * (isFlipped()?-1:1), height/currentAnimationData.frameHeight);
 	}
 
 
@@ -51,9 +48,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 
 	@Override
 	public void play(AnimationType animation, float speedFactor,
-			boolean repeated, boolean cancelCurrentAnimation,
-			boolean flipTexture) {
-		if (currentAnimationType != animation || cancelCurrentAnimation) {
+			boolean repeated) {
+		if( currentAnimationType!=animation ) {
 			AnimationData animData = animationTexture.get(animation);
 			
 			if( animData == null )
@@ -62,13 +58,11 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 			reverse = false;
 			currentAnimationData = animData;
 			sprite.setTexture(currentAnimationData.texture);
-			sprite.setOrigin(currentAnimationData.frameWidth/2.f, currentAnimationData.frameHeight/2.f);
+			sprite.setOrigin(Math.abs(currentAnimationData.frameWidth/2.f), Math.abs(currentAnimationData.frameHeight/2.f));
 			currentAnimationType = animation;
 			currentFrame = currentAnimationData.frameStart;
 			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
-			setDimensions(width, height);
-			if( flipTexture )
-				flip();			
+			updateScale();
 		}
 
 		animationSpeed = speedFactor;
@@ -78,7 +72,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 
 	@Override
 	public void play() {
-		play(currentAnimationType, animationSpeed, repeated, false, isFlipped());
+		play(currentAnimationType, animationSpeed, repeated);
 	}
 	
 	@Override
@@ -88,29 +82,14 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 		sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 	}
 
-
 	@Override
 	public void resume() {
 		playing = true;
 	}
 
-
 	@Override
 	public AnimationType getCurrentAnimationType() {
 		return currentAnimationType;
-	}
-
-
-	@Override
-	public void flip() {
-		sprite.scale(-1.f, 1.f);	
-	}
-
-
-	@Override
-	public boolean isFlipped() {
-		return sprite.getScale().x < 0;
-		
 	}
 
 	@Override

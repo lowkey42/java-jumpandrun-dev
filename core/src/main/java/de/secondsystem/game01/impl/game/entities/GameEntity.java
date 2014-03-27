@@ -91,7 +91,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		}
 		
 		if( representation instanceof IAnimated )
-			((IAnimated) representation).play(AnimationType.IDLE, 1.f, true, true, false);
+			((IAnimated) representation).play(AnimationType.IDLE, 1.f, true);
 		
 		List<Attributes> effectAttrs = attributes.getObjectList("effects");
 		if( effectAttrs!=null ) {

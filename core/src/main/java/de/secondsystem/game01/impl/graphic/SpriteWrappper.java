@@ -11,6 +11,7 @@ public class SpriteWrappper implements ISpriteWrapper {
 	protected float width;
 	protected float height;
 	protected boolean visible = true;
+	private boolean flipped;
 	
 	protected ConstTexture normalMap;
 
@@ -103,9 +104,32 @@ public class SpriteWrappper implements ISpriteWrapper {
 
 	@Override
 	public void setDimensions(float width, float height) {
-		sprite.setScale(width/sprite.getTexture().getSize().x, height/sprite.getTexture().getSize().y);
-		this.width = width;
+		this.width  = width;
 		this.height = height;
+		updateScale();
+	}
+	protected void updateScale() {
+		sprite.setScale(width/sprite.getTexture().getSize().x * (isFlipped()?-1:1), height/sprite.getTexture().getSize().y);
+	}
+
+	@Override
+	public void flip() {
+		flipped = !flipped;
+		updateScale();
+	}
+
+	@Override
+	public boolean isFlipped() {
+		return flipped;
+	}
+	
+	@Override
+	public void setFlip(boolean flip) {
+		if( this.flipped == flip )
+			return;
+		
+		this.flipped = flip;
+		updateScale();
 	}
 	
 	@Override

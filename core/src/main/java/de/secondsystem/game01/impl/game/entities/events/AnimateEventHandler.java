@@ -33,7 +33,7 @@ public class AnimateEventHandler implements IEventHandler {
 		final IGameEntity owner = (IGameEntity) args[0];
 		final IAnimated animated = (IAnimated) owner.getRepresentation();
 		
-		animated.play(animation, speed!=null ? speed : 1, repeated!=null && repeated, true, false);
+		animated.play(animation, speed!=null ? speed : 1, repeated!=null && repeated);
 		
 		return null;
 	}

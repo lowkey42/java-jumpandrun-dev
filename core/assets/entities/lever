@@ -1,1 +1,1 @@
-{"representationType":"ANIMATION", "representation":"lever.anim", "width":24, "height":22, "shape":"BOX", "physicsType":"STATIC", "sensor":true, "orderId":-100 "interactive":true}
+{"representationType":"ANIMATION", "representation":"lever.anim", "width":50, "height":39, "shape":"BOX", "physicsType":"STATIC", "sensor":true, "orderId":-100 "interactive":true}

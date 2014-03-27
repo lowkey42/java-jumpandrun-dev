@@ -110,7 +110,7 @@ public final class AnimationTexture {
 	    	
 	    	int row = (int) currentFrame / numRowFrames;
 	    	
-	    	return new IntRect(column * frameWidth, row * frameHeight, frameWidth, frameHeight);
+	    	return new IntRect(column * Math.abs(frameWidth), row * Math.abs(frameHeight), Math.abs(frameWidth), frameHeight);
 		}
 	}
 	
