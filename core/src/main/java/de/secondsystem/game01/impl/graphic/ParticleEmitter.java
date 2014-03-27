@@ -19,6 +19,7 @@ import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.util.Tools;
 
 public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpdateable, IInsideCheck, IScalable {
 	
@@ -27,14 +28,16 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	private static final class Particle {
 		final Vector2f velocity;
 		final float rotationVelocity;
+		final float angularVelocity;
 		final float width;
 		final float height;
 		float rotation;
 		Vector2f pos;
 		int ttd;
-		Particle(Vector2f velocity, float rotationVelocity, float width, float height, Vector2f pos, int ttd) {
+		Particle(Vector2f velocity, float rotationVelocity, float angularVelocity, float width, float height, Vector2f pos, int ttd) {
 			this.velocity = velocity;
 			this.rotationVelocity = rotationVelocity;
+			this.angularVelocity = angularVelocity;
 			this.height = height;
 			this.width = width;
 			this.pos = pos;
@@ -64,8 +67,12 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	public final float minRotationVelocity;
 	public final float maxRotationVelocity;
 	
+	public final float minAngularVelocity;
+	public final float maxAngularVelocity;
+	
 	private Vector2f centerPosition;
 	private Vector2f halfSize;
+	public final Float radius;
 	
 	public final float minParticleSize;
 	public final float maxParticleSize;
@@ -75,8 +82,9 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	
 	private final ConstTexture texture;
 	
-	public ParticleEmitter(String texture, int particles, Vector2f centerPosition, Vector2f size, int minTtl, int maxTtl, Vector2f minVelocity, 
-			Vector2f maxVelocity, float minRotationVelocity, float maxRotationVelocity, Color minColor, Color maxColor, float minParticleSize, float maxParticleSize) {
+	public ParticleEmitter(String texture, int particles, Vector2f centerPosition, Vector2f size, Float radius, int minTtl, int maxTtl, Vector2f minVelocity, 
+			Vector2f maxVelocity, float minRotationVelocity, float maxRotationVelocity, float minAngularVelocity, float maxAngularVelocity,
+			Color minColor, Color maxColor, float minParticleSize, float maxParticleSize) {
 		particleData = new Particle[particles];
 		vertexData = new Vertex[particles*4];
 
@@ -87,17 +95,24 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 		this.maxVelocity = maxVelocity;
 		this.minRotationVelocity = minRotationVelocity;
 		this.maxRotationVelocity = maxRotationVelocity;
+		this.minAngularVelocity = minAngularVelocity;
+		this.maxAngularVelocity = maxAngularVelocity;
 		this.centerPosition = centerPosition;
 		this.halfSize = Vector2f.div(size, 2);
+		this.radius = radius;
 		this.minParticleSize = minParticleSize;
 		this.maxParticleSize = maxParticleSize;
 		this.minColor = minColor;
 		this.maxColor = maxColor;
-		try {
-			this.texture = ResourceManager.texture.get(texture);
-		} catch (IOException e) {
-			throw new GameException(e);
-		}
+		
+		if( texture!=null && !texture.isEmpty() )
+			try {
+				this.texture = ResourceManager.texture.get(texture);
+			} catch (IOException e) {
+				throw new GameException(e);
+			}
+		else
+			this.texture = null;
 		
 		for(int i=0; i<particles; ++i)
 			resetParticle(i);
@@ -141,9 +156,19 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 	
 	@Override
 	public void draw(RenderTarget renderTarget) {
-		renderTarget.draw(vertexData, PrimitiveType.QUADS, new RenderStates(texture));
+		if( texture!=null )
+			renderTarget.draw(vertexData, PrimitiveType.QUADS, new RenderStates(texture));
+		else
+			renderTarget.draw(vertexData, PrimitiveType.QUADS);
 	}
 
+	public int getTexHeight() {
+		return texture!=null ? texture.getSize().y : 1;
+	}
+	public int getTexWeight() {
+		return texture!=null ? texture.getSize().x : 1;
+	}
+	
 	@Override
 	public void update(long frameTimeMs) {
 		gameTime+=frameTimeMs;
@@ -154,7 +179,18 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 				
 			} else {
 				particleData[i].rotation+=particleData[i].rotationVelocity*(frameTimeMs/1000.f);
-				Vector2f pos = particleData[i].pos=Vector2f.add(particleData[i].pos, Vector2f.mul(particleData[i].velocity, frameTimeMs/1000.f));
+				Vector2f pos = Vector2f.add(particleData[i].pos, Vector2f.mul(particleData[i].velocity, frameTimeMs/1000.f));
+				if( particleData[i].angularVelocity!=0 ) {
+					final float c = (float) Math.cos(Math.toRadians(particleData[i].angularVelocity*(frameTimeMs/1000.f)));
+					final float s = (float) Math.sin(Math.toRadians(particleData[i].angularVelocity*(frameTimeMs/1000.f)));
+					
+					pos = new Vector2f(
+							 (pos.x-centerPosition.x) * c + (pos.y-centerPosition.y) * s  +centerPosition.x,
+							-(pos.x-centerPosition.x) * s + (pos.y-centerPosition.y) * c  +centerPosition.y
+					);
+				}
+				
+				particleData[i].pos=pos;
 				
 				final float cosA = (float) Math.cos(particleData[i].rotation);
 				final float sinA = (float) Math.sin(particleData[i].rotation);
@@ -162,9 +198,9 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 				float w = particleData[i].width; 
 
 				vertexData[i*4 +0] = new Vertex(new Vector2f(pos.x + w/2*cosA - h/2*sinA, pos.y + h/2*cosA + w/2*sinA), vertexData[i*4].color,	new Vector2f(0,0));
-				vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x - w/2*cosA - h/2*sinA, pos.y + h/2*cosA - w/2*sinA), vertexData[i*4].color,	new Vector2f(texture.getSize().x,0));
-				vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x - w/2*cosA + h/2*sinA, pos.y - h/2*cosA - w/2*sinA), vertexData[i*4].color,	new Vector2f(texture.getSize().x,texture.getSize().y));
-				vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x + w/2*cosA + h/2*sinA, pos.y - h/2*cosA + w/2*sinA), vertexData[i*4].color,	new Vector2f(0,texture.getSize().y));
+				vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x - w/2*cosA - h/2*sinA, pos.y + h/2*cosA - w/2*sinA), vertexData[i*4].color,	new Vector2f(getTexWeight(),0));
+				vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x - w/2*cosA + h/2*sinA, pos.y - h/2*cosA - w/2*sinA), vertexData[i*4].color,	new Vector2f(getTexWeight(),getTexHeight()));
+				vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x + w/2*cosA + h/2*sinA, pos.y - h/2*cosA + w/2*sinA), vertexData[i*4].color,	new Vector2f(0,getTexHeight()));
 			}
 		}
 	}
@@ -175,20 +211,29 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 		final float sinA = (float) Math.sin(a);
 		
 		Color color = random(minColor, maxColor);
-		Vector2f pos = random(Vector2f.sub(centerPosition, halfSize), Vector2f.add(centerPosition, halfSize));
+		float angularVelocity = random(minAngularVelocity, maxAngularVelocity);
+
+		Vector2f offset;
+		do {
+			offset = random(Vector2f.sub(Vector2f.ZERO, halfSize), halfSize);
+			
+		} while( radius!=null && Tools.vectorLength(offset)>radius );
+		
+		Vector2f pos = Vector2f.add(centerPosition, offset);
 		float h = random(minParticleSize, maxParticleSize);
 		float w = random(minParticleSize, maxParticleSize); 
 		
 		particleData[i] = new Particle( random(minVelocity, maxVelocity), 
 				a, 
+				angularVelocity,
 				w, h,
 				pos,
 				gameTime+random(minTtl, maxTtl) );
 		
 		vertexData[i*4 +0] = new Vertex(new Vector2f(pos.x + w/2*cosA - h/2*sinA, pos.y + h/2*cosA + w/2*sinA), color,	new Vector2f(0,0));
-		vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x - w/2*cosA - h/2*sinA, pos.y + h/2*cosA - w/2*sinA), color,	new Vector2f(texture.getSize().x,0));
-		vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x - w/2*cosA + h/2*sinA, pos.y - h/2*cosA - w/2*sinA), color,	new Vector2f(texture.getSize().x,texture.getSize().y));
-		vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x + w/2*cosA + h/2*sinA, pos.y - h/2*cosA + w/2*sinA), color,	new Vector2f(0,texture.getSize().y));
+		vertexData[i*4 +1] = new Vertex(new Vector2f(pos.x - w/2*cosA - h/2*sinA, pos.y + h/2*cosA - w/2*sinA), color,	new Vector2f(getTexWeight(),0));
+		vertexData[i*4 +2] = new Vertex(new Vector2f(pos.x - w/2*cosA + h/2*sinA, pos.y - h/2*cosA - w/2*sinA), color,	new Vector2f(getTexWeight(),getTexHeight()));
+		vertexData[i*4 +3] = new Vertex(new Vector2f(pos.x + w/2*cosA + h/2*sinA, pos.y - h/2*cosA + w/2*sinA), color,	new Vector2f(0,getTexHeight()));
 	}
 	
 	

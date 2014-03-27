@@ -72,6 +72,11 @@ public class EventHandlerCollection implements IEventHandlerCollection {
 	}
 
 	@Override
+	public void clearEventHandlers() {
+		handlers.clear();
+	}
+	
+	@Override
 	public void removeEventHandler(EventType type) {
 		deleteRequests.add(new Tuple<EventType, IEventHandler>(type, null));
 	}

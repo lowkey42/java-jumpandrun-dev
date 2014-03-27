@@ -92,9 +92,10 @@ public class MainGameState extends GameState {
 	
 	private UUID ignoreDamageEntity;
 	private long ignoreDamageTimer=0;
-	
+
 	private IControllableGameEntity possessedEntity;
 	private IGameEntityController possessedEntityController;
+	private Vector2f fixedPlayerPos;
 	private IEventHandler possessedEntityDamagedHandler = new IEventHandler() {
 		@Override public Attributes serialize() {
 			return null;
@@ -127,18 +128,15 @@ public class MainGameState extends GameState {
 			if( possessedEntity.isLiftingSomething() )
 				possessedEntity.liftOrThrowObject(2);
 
-			if( player.setWorld(WorldId.MAIN) ) {
-				player.setPosition(possessedEntity.getPosition());
-				player.setRotation(possessedEntity.getRotation());
-				controller.addGE(player);
-				controller.removeGE(possessedEntity);
-				possessedEntity.setController(possessedEntityController);
-	
-				camera.setController(player);
-				possessedEntity = null;
-				
-			} else
-				return false;
+			player.forceWorld(WorldId.MAIN);
+			player.setPosition(fixedPlayerPos=possessedEntity.getPosition());
+			player.setRotation(possessedEntity.getRotation());
+			controller.addGE(player);
+			controller.removeGE(possessedEntity);
+			possessedEntity.setController(possessedEntityController);
+
+			camera.setController(player);
+			possessedEntity = null;
 			
 			return true;
 		}
@@ -237,6 +235,11 @@ public class MainGameState extends GameState {
 	protected void onFrame(GameContext ctx, long frameTime) {
 		if( activeMapLoader!=null && activeMapLoader.isFinished() ) {
 			setNextState(activeMapLoader.getLoadedMap());
+		}
+		
+		if( fixedPlayerPos!=null ) {
+			player.setPosition(fixedPlayerPos);
+			fixedPlayerPos = null;
 		}
 		
 		console.update(frameTime);

@@ -16,4 +16,6 @@ public interface IEventHandlerCollection {
 
 	void addEventHandler(EventType type, IEventHandler handler);
 
+	void clearEventHandlers();
+	
 }

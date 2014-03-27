@@ -1,0 +1,8 @@
+{ "width":100, "height":100, "shape":"CIRCLE", "density":1, "physicsType":"STATIC", "sensor":true,
+
+"onTOUCHED":{"factory":".PPEHF", "sub":{"factory":".ReanEHF"}},
+"effects":[{"factory":".ParticleFactory", "maxColor":"#ff00ffcc", "minColor":"#ff00ff44", "particles":200, "width":100, "height":100, "radius":100,
+	"minTtl":1000, "maxTtl":4000, "minXVelocity":0.1, "maxXVelocity":1, "minYVelocity":0.1, "maxYVelocity":1,
+	"minRotationVelocity":0, "maxRotationVelocity":10, "minAngularVelocity":45, "maxAngularVelocity":180, "minParticleSize":5, "maxParticleSize":15
+}]
+}

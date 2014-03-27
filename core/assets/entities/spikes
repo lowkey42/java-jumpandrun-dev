@@ -1,0 +1,3 @@
+{"representationType":"TEXTURE", "representation":"spikes.png", 
+"width":70, "height":35, "shape":"BOX", "density":1, "physicsType":"STATIC", "physicsWidth":70, "physicsHeight":35,
+"onTOUCHED":{"factory":".CondEHF", "if":"IS_ENTITY", "arg":1, "then":{"factory":".PPEHF", "out":"DAMAGED"}} }

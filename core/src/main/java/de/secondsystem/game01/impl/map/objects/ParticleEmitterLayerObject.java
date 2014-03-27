@@ -12,6 +12,7 @@ import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.Attributes.AttributeIf;
 import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.util.SerializationUtil;
 
@@ -23,14 +24,14 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 	
 	private int worldMask;
 	
-	public ParticleEmitterLayerObject(String texture, int particles, int worldMask, float x, float y, float width, float height, int minTtl, int maxTtl, 
-			float minXVelocity, float maxXVelocity, float minYVelocity, float maxYVelocity, float minRotationVelocity, float maxRotationVelocity, 
+	public ParticleEmitterLayerObject(String texture, int particles, int worldMask, float x, float y, float width, float height, Float radius, int minTtl, int maxTtl, 
+			float minXVelocity, float maxXVelocity, float minYVelocity, float maxYVelocity, float minRotationVelocity, float maxRotationVelocity, float minAngularVelocity, float maxAngularVelocity, 
 			Color minColor, Color maxColor, float minParticleSize, float maxParticleSize ) {
 		this.texture = texture;
 		this.worldMask = worldMask;
-		emitter = new ParticleEmitter(texture, particles, new Vector2f(x, y), new Vector2f(width, height), minTtl, maxTtl, 
+		emitter = new ParticleEmitter(texture, particles, new Vector2f(x, y), new Vector2f(width, height), radius, minTtl, maxTtl, 
 				new Vector2f(minXVelocity, minYVelocity), new Vector2f(maxXVelocity, maxYVelocity), minRotationVelocity, 
-				maxRotationVelocity, minColor, maxColor, minParticleSize, maxParticleSize);
+				maxRotationVelocity, minAngularVelocity, maxAngularVelocity, minColor, maxColor, minParticleSize, maxParticleSize);
 	}
 
 	@Override
@@ -108,6 +109,7 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 				new Attribute("rotation", getRotation()),
 				new Attribute("width", getWidth()),
 				new Attribute("height", getHeight()),
+				new AttributeIf(emitter.radius!=null, "radius", emitter.radius),
 				new Attribute("minTtl", emitter.minTtl),
 				new Attribute("maxTtl", emitter.maxTtl),
 				new Attribute("minXVelocity", emitter.minVelocity.x),
@@ -116,6 +118,8 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 				new Attribute("maxYVelocity", emitter.maxVelocity.y),
 				new Attribute("minRotationVelocity", emitter.minRotationVelocity),
 				new Attribute("maxRotationVelocity", emitter.maxRotationVelocity),
+				new Attribute("minAngularVelocity", emitter.minAngularVelocity),
+				new Attribute("maxAngularVelocity", emitter.maxAngularVelocity),
 				new Attribute("minParticleSize", emitter.minParticleSize),
 				new Attribute("maxParticleSize", emitter.maxParticleSize),
 				new Attribute("minColor", SerializationUtil.encodeColor(emitter.minColor)),
@@ -123,31 +127,36 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 		);
 	}
 	
-	public static ParticleEmitterLayerObject create(IGameMap map, Map<String, Object> attributes) {
+	public static ParticleEmitterLayerObject create(IGameMap map, Map<String, Object> args) {
 		try {
+			final Attributes attributes = new Attributes(args);
+			
 			return new ParticleEmitterLayerObject(
-					(String)attributes.get("texture"),
-					((Number)attributes.get("particles")).intValue(), 
-					((Number)attributes.get("world")).intValue(),
-					((Number)attributes.get("x")).floatValue(),
-					((Number)attributes.get("y")).floatValue(),
-					((Number)attributes.get("width")).floatValue(),
-					((Number)attributes.get("height")).floatValue(),
-					((Number)attributes.get("minTtl")).intValue(),
-					((Number)attributes.get("maxTtl")).intValue(),
-					((Number)attributes.get("minXVelocity")).floatValue(),
-					((Number)attributes.get("maxXVelocity")).floatValue(),
-					((Number)attributes.get("minYVelocity")).floatValue(),
-					((Number)attributes.get("maxYVelocity")).floatValue(),
-					((Number)attributes.get("minRotationVelocity")).floatValue(),
-					((Number)attributes.get("maxRotationVelocity")).floatValue(),
-					SerializationUtil.decodeColor((String) attributes.get("minColor")),
-					SerializationUtil.decodeColor((String) attributes.get("maxColor")),
-					((Number)attributes.get("minParticleSize")).floatValue(),
-					((Number)attributes.get("maxParticleSize")).floatValue() );
+					attributes.getString("texture"),
+					attributes.getInteger("particles"), 
+					attributes.getInteger("world"),
+					attributes.getFloat("x"),
+					attributes.getFloat("y"),
+					attributes.getFloat("width"),
+					attributes.getFloat("height"),
+					attributes.getFloat("radius"),
+					attributes.getInteger("minTtl"),
+					attributes.getInteger("maxTtl"),
+					attributes.getFloat("minXVelocity", 0),
+					attributes.getFloat("maxXVelocity", 0),
+					attributes.getFloat("minYVelocity", 0),
+					attributes.getFloat("maxYVelocity", 0),
+					attributes.getFloat("minRotationVelocity", 0),
+					attributes.getFloat("maxRotationVelocity", 0),
+					attributes.getFloat("minAngularVelocity", 0),
+					attributes.getFloat("maxAngularVelocity", 0),
+					SerializationUtil.decodeColor(attributes.getString("minColor")),
+					SerializationUtil.decodeColor(attributes.getString("maxColor")),
+					attributes.getFloat("minParticleSize"),
+					attributes.getFloat("maxParticleSize") );
 		
 		} catch( ClassCastException | NullPointerException e ) {
-			throw new Error( "Invalid attributes: "+attributes, e );
+			throw new Error( "Invalid attributes: "+args, e );
 		}
 	}
 

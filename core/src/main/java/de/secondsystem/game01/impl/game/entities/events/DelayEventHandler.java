@@ -39,7 +39,7 @@ public final class DelayEventHandler implements IEventHandler {
 	@Override
 	public Attributes serialize() {
 		return new Attributes(
-				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(PPEHF.class.getName())), 
+				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(DelayEHF.class.getName())), 
 				new AttributeIfNotNull("delay", 	delay),
 				new AttributeIfNotNull("sub", 		handler==null ? null : handler.serialize()),
 				new AttributeIfNotNull("repeat", 	repeat)

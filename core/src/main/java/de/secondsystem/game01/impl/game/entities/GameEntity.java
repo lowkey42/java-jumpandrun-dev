@@ -183,8 +183,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( physicsBody!=null ) {
 			if( newWorldMask!=0 && worldMask!=0 && physicsBody instanceof IDynamicPhysicsBody ) {
 				if( !((IDynamicPhysicsBody)physicsBody).tryWorldSwitch(newWorldMask) ) {
-					addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), 
-							100, 500, -10, 10, -10, 10, -5, 5, 
+					addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), null,
+							100, 500, -10, 10, -10, 10, -5, 5, 0,0,
 							new Color(200, 255, 255), Color.WHITE, 10, 40, 0, 0, 0), 2000);
 					return false;
 				}
@@ -319,14 +319,18 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	@Override
 	public void onDestroy() {
-		destroyed = true;
-		
-		for( IGameEntityEffect e : effects )
-			e.onDestroy(map);
-		
-		effects.clear();
-		
-		physicsBody.onDestroy();
+		if( !destroyed ) {
+			clearEventHandlers();
+			
+			destroyed = true;
+			
+			for( IGameEntityEffect e : effects )
+				e.onDestroy(map);
+			
+			effects.clear();
+			
+			physicsBody.onDestroy();
+		}
 	}
 	
 	@Override
