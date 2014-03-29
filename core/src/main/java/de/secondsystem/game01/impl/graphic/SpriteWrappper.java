@@ -4,6 +4,7 @@ import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 
 public class SpriteWrappper implements ISpriteWrapper {
@@ -140,5 +141,24 @@ public class SpriteWrappper implements ISpriteWrapper {
 	@Override
 	public void setVisibility(boolean visible) {
 		this.visible = visible;
+	}
+	
+	@Override
+	public void setRepeatedTexture(boolean repeated) {
+		if( sprite.getTexture().isRepeated() != repeated ) {
+			Texture texture = new Texture(sprite.getTexture());
+			texture.setRepeated(repeated);
+			setTexture(texture);
+		}
+	}
+	
+	@Override
+	public boolean isTextureRepeated() {
+		return sprite.getTexture().isRepeated();
+	}
+	
+	@Override
+	public void setTextureRect(IntRect rect) {
+		sprite.setTextureRect(rect);
 	}
 }

@@ -41,4 +41,6 @@ public interface IEditorLayerObject extends IDrawable, IDimensioned, IMoveable, 
 	void setLastMappedMousePos(Vector2f pos);
 	void resetScalingDirection();
 	void checkScaleMarkers(Vector2f p);
+	void setRepeatedTexture(boolean repeated);
+	void repeatTexture(boolean repeat);
 }

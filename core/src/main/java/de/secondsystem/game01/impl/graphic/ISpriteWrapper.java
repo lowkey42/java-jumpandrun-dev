@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl.graphic;
 
+import org.jsfml.graphics.IntRect;
+
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
@@ -13,4 +15,8 @@ public interface ISpriteWrapper extends IDrawable, IMoveable, IDimensioned, IIns
 	void flip();
 	void setFlip(boolean flip);
 	boolean isFlipped();
+	
+	void setRepeatedTexture(boolean repeated);
+	boolean isTextureRepeated();
+	void setTextureRect(IntRect rect);
 }

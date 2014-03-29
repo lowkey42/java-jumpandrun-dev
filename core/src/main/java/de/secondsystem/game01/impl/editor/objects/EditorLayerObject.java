@@ -79,6 +79,8 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			lastPos = pos;
 			lastWidth = width;
 			lastHeight = height;
+			textureRectWidth = width;
+			textureRectHeight = height;
 		}
 	}
 	
@@ -187,8 +189,6 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 	}
 	
 	protected void mouseScaling() {
-		// TODO: fix bug: simultaneous scaling of width and height
-		
 		if( scalingX != 0 ) {
 			Vector3 v;
 			if( scalingX == -1 )
@@ -200,7 +200,7 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 
-			lastWidth  = width;
+			lastWidth = width;
 		
 		if( scalingY != 0 ) {		
 			Vector3 v;
@@ -273,5 +273,5 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 	@Override
 	public boolean inMouseState() {
 		return mouseState;
-	} 
+	}
 }
