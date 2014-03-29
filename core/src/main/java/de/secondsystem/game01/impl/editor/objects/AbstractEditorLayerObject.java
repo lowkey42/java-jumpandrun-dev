@@ -1,9 +1,11 @@
 package de.secondsystem.game01.impl.editor.objects;
 
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 
 public abstract class AbstractEditorLayerObject implements IEditorLayerObject {	
 	protected ILayerObject layerObject = null;
@@ -16,24 +18,37 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	protected float height   = 1.f;
 	protected float width    = 1.f;
 	
+	protected boolean repeated;
+	protected boolean repeatTexture;
+	protected float textureRectWidth;
+	protected float textureRectHeight;
+	
+	// TODO: solve mystery: find out total width/height of a sprite
+	
 	@Override
-	public float getWidth() {
-		return width;
+	public float getWidth() {	
+		return width*zoom;
 	}
 	
 	@Override
 	public float getHeight() {
-		return height;
+		return height*zoom;
 	}
 	
 	@Override
 	public void setWidth(float width) {
-		this.width = width;
+		if( repeatTexture )
+			textureRectWidth = width;
+		else
+			this.width = width;
 	}
 	
 	@Override
 	public void setHeight(float height) {
-		this.height = height;
+		if( repeatTexture )
+			textureRectHeight = height;
+		else
+			this.height = height;
 	}
 	
 	@Override
@@ -68,6 +83,7 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	
 	@Override
 	public void zoom(int mouseWheelOffset, float mouseWheelDelta) {
+		// TODO: fix marker pos
 		if (mouseWheelOffset == 1)
 			zoom *= mouseWheelDelta * SCALE_FACTOR;
 		else
@@ -77,7 +93,11 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	@Override
 	public void refresh() {
 		layerObject.setRotation(rotation);
-		layerObject.setDimensions(width * zoom, height * zoom);
+		if( repeatTexture ) {
+			((SpriteLayerObject) layerObject).setTextureRect( new IntRect(0, 0, (int) (textureRectWidth), (int) (textureRectHeight)) );
+		}
+		else
+			layerObject.setDimensions(width * zoom, height * zoom);
 	}
 	
 	@Override
@@ -100,4 +120,18 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	public void deselect() {
 		// not yet used
 	}
+	
+	@Override
+	public void setRepeatedTexture(boolean repeated) {
+		if( layerObject instanceof SpriteLayerObject ) {
+			((SpriteLayerObject) layerObject).setRepeatedTexture(repeated);
+			this.repeated = repeated;
+		}
+	}
+
+	@Override
+	public void repeatTexture(boolean repeat) {
+		if( layerObject instanceof SpriteLayerObject )
+			repeatTexture = repeat;
+	} 
 }

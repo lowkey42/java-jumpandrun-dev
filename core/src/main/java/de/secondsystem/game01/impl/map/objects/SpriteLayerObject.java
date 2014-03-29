@@ -2,6 +2,7 @@ package de.secondsystem.game01.impl.map.objects;
 
 import java.util.Map;
 
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
@@ -43,6 +44,18 @@ public class SpriteLayerObject implements ILayerObject {
 	public void setTile(Tileset tileset, int tileId) {
 		this.tileId = tileId;
 		sprite.setTexture(tileset.get(tileId), tileset.getNormals(tileId), tileset.getClip(tileId));
+	}
+	
+	public boolean isTextureRepeated() {
+		return sprite.isTextureRepeated();
+	}
+	
+	public void setRepeatedTexture(boolean repeated) {
+		sprite.setRepeatedTexture(repeated);
+	}
+	
+	public void setTextureRect(IntRect rect) {
+		sprite.setTextureRect(rect);
 	}
 	
 	@Override

@@ -215,6 +215,8 @@ public final class EditorGameState extends GameState {
 				return true;
 
 			case RIGHT:
+				editorObject.repeatTexture(false);
+				
 				if( !editorObject.inMouseState() ) {
 					editorObject.resetScalingDirection();
 				
@@ -261,6 +263,10 @@ public final class EditorGameState extends GameState {
 				return true;
 			case RIGHT:
 				if( !editorObject.inMouseState() ) {
+					if( Keyboard.isKeyPressed(Key.LSHIFT) ) {
+						editorObject.setRepeatedTexture(true);
+						editorObject.repeatTexture(true);
+					}
 					editorObject.checkScaleMarkers(v);
 					editorObject.setLastMappedMousePos( new Vector2f(v.x, v.y) );
 				}

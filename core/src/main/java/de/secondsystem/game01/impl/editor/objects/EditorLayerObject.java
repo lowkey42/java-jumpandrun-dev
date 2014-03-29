@@ -79,6 +79,8 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			lastPos = pos;
 			lastWidth = width;
 			lastHeight = height;
+			textureRectWidth = width;
+			textureRectHeight = height;
 		}
 	}
 	
@@ -124,9 +126,9 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			marker.update(this);	
 			
 			EditorMarker em = scaleMarkers[2];
-			em.setRelativePos(width - em.getWidth(), height - em.getHeight());
+			em.setRelativePos(getWidth() - em.getWidth(), getHeight() - em.getHeight());
 			em = scaleMarkers[3];
-			em.setRelativePos(width - em.getWidth(), height - em.getHeight());
+			em.setRelativePos(getWidth() - em.getWidth(), getHeight() - em.getHeight());
 			
 			for(int i=0; i<4; i++) {
 				scaleMarkers[i].update(this);
@@ -187,8 +189,6 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 	}
 	
 	protected void mouseScaling() {
-		// TODO: fix bug: simultaneous scaling of width and height
-		
 		if( scalingX != 0 ) {
 			Vector3 v;
 			if( scalingX == -1 )
@@ -197,10 +197,11 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 				v = mouseScaling(scaleMarkers[2], 1, 2, scalingX, lastPos, lastWidth, true); 
 			
 			setWidth( v.z );
-			setPosition( new Vector2f(v.x, v.y) );
+			if( !repeated ) // temporary
+				setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 
-			lastWidth  = width;
+			lastWidth = width;
 		
 		if( scalingY != 0 ) {		
 			Vector3 v;
@@ -211,7 +212,8 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 				v = mouseScaling(scaleMarkers[3], 2, 3, scalingY, lastPos, lastHeight, false); 
 			
 			setHeight( v.z );
-			setPosition( new Vector2f(v.x, v.y) );
+			if( !repeated ) // temporary
+				setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 
 			lastHeight = height;
@@ -273,5 +275,5 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 	@Override
 	public boolean inMouseState() {
 		return mouseState;
-	} 
+	}
 }
