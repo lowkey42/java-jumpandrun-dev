@@ -1,0 +1,3 @@
+{"representationType":"TEXTURE", "representation":"key1.png", "width":30, "height":25, "shape":"BOX", "liftable":"true", "density":1,
+ "onTOUCHED":{"factory":".PPEHF", "out":"UNLOCKED", "onSuccess":{"factory":".DeleteEHF"} }
+}

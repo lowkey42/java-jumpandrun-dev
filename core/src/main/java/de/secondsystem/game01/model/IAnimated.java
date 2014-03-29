@@ -24,7 +24,9 @@ public interface IAnimated extends IPlayable {
 		CLIMB_DOWN,
 		CLIMB_SIDEWAYS,
 		USED,
-		UNUSED
+		UNUSED,
+		OPEN,
+		CLOSED
 	}
 	
 }

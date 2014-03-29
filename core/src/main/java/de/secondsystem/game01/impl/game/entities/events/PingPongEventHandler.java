@@ -25,6 +25,8 @@ public final class PingPongEventHandler implements IEventHandler {
 	private final IEventHandler handler;
 	
 	private final IWeakGameEntityRef targetEntity;
+	
+	private final IEventHandler onSuccessHandler;
 
 	public PingPongEventHandler(EventType out) {
 		this(out, null);
@@ -32,6 +34,7 @@ public final class PingPongEventHandler implements IEventHandler {
 	public PingPongEventHandler(EventType out, IWeakGameEntityRef targetEntity) {
 		this.out = out;
 		this.handler = null;
+		this.onSuccessHandler = null;
 		this.targetEntity = targetEntity;
 	}
 	public PingPongEventHandler(IEventHandler handler) {
@@ -41,6 +44,7 @@ public final class PingPongEventHandler implements IEventHandler {
 		this.out = null;
 		this.handler = handler;
 		this.targetEntity = targetEntity;
+		this.onSuccessHandler = null;
 	}
 	
 	public PingPongEventHandler(IGameMap map, Attributes attributes) {
@@ -51,6 +55,9 @@ public final class PingPongEventHandler implements IEventHandler {
 		
 		final String targetUuid = attributes.getString("target");
 		this.targetEntity = targetUuid!=null ? map.getEntityManager().getRef(UUID.fromString(targetUuid)) : null;
+
+		Attributes onSuccessHandlerAttributes = attributes.getObject("onSuccess");
+		this.onSuccessHandler = onSuccessHandlerAttributes==null ? null : EventUtils.createEventHandler(map, onSuccessHandlerAttributes);
 	}
 	
 	@Override
@@ -70,11 +77,18 @@ public final class PingPongEventHandler implements IEventHandler {
 		
 		newArgs.set(0, target);
 		
+		Object ret = null;
+		
 		if( handler!=null )
-			return handler.handle(newArgs.toArray());
+			ret = handler.handle(newArgs.toArray());
 		
 		else
-			return ((IEventHandlerCollection)target).notify(out, newArgs.toArray());
+			ret = ((IEventHandlerCollection)target).notify(out, newArgs.toArray());
+		
+		if( ret!=null )
+			onSuccessHandler.handle(args);
+		
+		return ret;
 	}
 	
 	@Override
@@ -83,6 +97,7 @@ public final class PingPongEventHandler implements IEventHandler {
 				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(PPEHF.class.getName())), 
 				new AttributeIfNotNull("out", 		out==null ? null : out.name()),
 				new AttributeIfNotNull("sub", 		handler==null ? null : handler.serialize()),
+				new AttributeIfNotNull("onSuccess", onSuccessHandler==null ? null : onSuccessHandler.serialize()),
 				new AttributeIfNotNull("target", 	targetEntity==null ? null : targetEntity.uuid().toString())
 		);
 	}

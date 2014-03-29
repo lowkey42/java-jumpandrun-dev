@@ -1,0 +1,2 @@
+{ "default":"IDLE",
+"IDLE":{"texture": "loading.png", "frameWidth": 78, "frameHeight":78, "numRowFrames": 4, "frameStart": 0, "frameEnd":4, "fps": 8} }

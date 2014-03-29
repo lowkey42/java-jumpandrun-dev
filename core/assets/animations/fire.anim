@@ -1,3 +1,4 @@
- { "IDLE":{"texture": "fire.png", "frameWidth": 64, "frameHeight":64, "numRowFrames": 8, "frameStart": 0, "frameEnd":64, "fps": 24},
+ { "default":"IDLE",
+ "IDLE":{"texture": "fire.png", "frameWidth": 64, "frameHeight":64, "numRowFrames": 8, "frameStart": 0, "frameEnd":64, "fps": 24},
    "USED":{"texture": "fire.png", "frameWidth": 64, "frameHeight":64, "numRowFrames": 8, "frameStart": 0, "frameEnd":64, "fps": 24},
    "UNUSED":{"texture": "nothing.png", "frameWidth": 1, "frameHeight":1, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 1} }

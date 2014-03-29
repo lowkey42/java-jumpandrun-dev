@@ -1,2 +1,3 @@
-{"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", "moveAcceleration":0.1, "jumpAcceleration":1, "maxMoveSpeed":2.5, "maxJumpSpeed":8, "maxThrowSpeed":20,
+{"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", 
+"moveAcceleration":0.1, "jumpAcceleration":1, "maxMoveSpeed":2.5, "maxJumpSpeed":8, "maxThrowSpeed":100,
 "width":50, "height":55, "shape":"HUMANOID", "maxReach":20, "orderId":100 }

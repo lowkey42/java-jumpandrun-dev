@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.map.physics;
 
-import org.jbox2d.dynamics.Body;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -18,7 +17,7 @@ public interface IPhysicsWorld extends IUpdateable {
 	
 	PhysicsBodyFactory factory();
 	
-	void destroyBody(Body body);
+	void destroyBody(IPhysicsBody body);
 	
 	public interface RaycastFilter {
 		boolean accept(IPhysicsBody body);

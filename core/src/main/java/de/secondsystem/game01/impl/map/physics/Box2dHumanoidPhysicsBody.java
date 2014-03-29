@@ -207,7 +207,7 @@ class Box2dHumanoidPhysicsBody extends Box2dDynamicPhysicsBody implements
 		if( isLiftingSomething() ) {
 			final Box2dPhysicsBody lBody = (Box2dPhysicsBody) liftedBody;
 			
-			strength = Math.min(maxThrowVel, strength);
+			strength = Math.min(1, strength) * maxThrowVel;
 			unbind(lBody);
 			lBody.body.applyForceToCenter(new Vec2(direction.x*strength, direction.y*strength));
 			lBody.liftingBody = null;

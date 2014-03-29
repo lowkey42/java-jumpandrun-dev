@@ -1,3 +1,4 @@
-{"USED":{"texture": "switch2.png", "frameWidth": -308, "frameHeight":238, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 0},
+{"default":"IDLE",
+"USED":{"texture": "switch2.png", "frameWidth": -308, "frameHeight":238, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 0},
  "UNUSED":{"texture": "switch2.png", "frameWidth": 308, "frameHeight":238, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 0},
  "IDLE":{"texture": "switch2.png", "frameWidth": 308, "frameHeight":238, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 0} }

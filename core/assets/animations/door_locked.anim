@@ -1,0 +1,3 @@
+{ "default":"CLOSED",
+"CLOSED":{"texture": "door_locked.png", "frameWidth": 199, "frameHeight":241, "numRowFrames": 2, "frameStart": 0, "frameEnd":0, "fps": 0},
+"OPEN":{"texture": "door_locked.png", "frameWidth": 199, "frameHeight":241, "numRowFrames": 2, "frameStart": 1, "frameEnd":1, "fps": 0} }

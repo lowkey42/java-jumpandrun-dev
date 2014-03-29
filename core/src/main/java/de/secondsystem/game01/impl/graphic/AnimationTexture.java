@@ -20,6 +20,7 @@ import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 public final class AnimationTexture {
 	private final Map<AnimationType, AnimationData> animations;
+	private final AnimationType defaultAnimationType; 
 	
 	public AnimationTexture(Path path) throws IOException {
 		final JSONParser parser = new JSONParser();
@@ -28,15 +29,14 @@ public final class AnimationTexture {
 			@SuppressWarnings("unchecked")
 			final Attributes obj = new Attributes( (Map<String, Object>) parser.parse(reader) );
 			
+			defaultAnimationType = AnimationType.valueOf(obj.getString("default", "IDLE"));
+			
 			final Map<AnimationType, AnimationData> tMap = new HashMap<>();
-			for( String animId : obj.keySet() ) {
-				final Attributes animAttr = obj.getObject(animId);
+			for( AnimationType at : AnimationType.values() ) {
+				final Attributes animAttr = obj.getObject(at.name());
 				
-				final AnimationType at = AnimationType.valueOf(animId);
-				if( at==null )
-					throw new IOException("Invalid AnimationType: "+animId);
-				
-				tMap.put(at, new AnimationData(animAttr));
+				if( animAttr!=null )
+					tMap.put(at, new AnimationData(animAttr));
 			}
 			
 			animations = Collections.unmodifiableMap(tMap); 
@@ -45,7 +45,17 @@ public final class AnimationTexture {
 			throw new IOException("Loading animation texture failed '"+path+"': "+e.getMessage(), e);
 		}
 	}
-	
+
+	public AnimationType getDefaultType() {
+		return defaultAnimationType;
+	}
+	public AnimationData getDefault() {
+		AnimationData ad = get(defaultAnimationType);
+		if( ad!=null )
+			return ad;
+		
+		return animations.values().iterator().next();
+	}
 	public AnimationData get(AnimationType type) {
 		return animations.get(type);
 	}

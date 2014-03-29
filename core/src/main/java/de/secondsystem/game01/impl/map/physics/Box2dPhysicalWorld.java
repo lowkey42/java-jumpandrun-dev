@@ -101,8 +101,8 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 	}
 	
 	@Override
-	public void destroyBody(Body body) {
-		physicsWorld.destroyBody(body);
+	public void destroyBody(IPhysicsBody body) {
+		body.onDestroy();
 	}
 
 	Body createBody(BodyDef def) {
@@ -323,7 +323,7 @@ public final class Box2dPhysicalWorld implements IPhysicsWorld {
 		class Box2dHumanoidPhysicsBodyFactory extends Box2dDynamicPhysicsBodyFactory implements HumanoidPhysicsBodyFactory {
 			float maxSlope = 45;
 			float maxReach = 10;
-			float maxThrowSpeed = Float.MAX_VALUE;
+			float maxThrowSpeed = 100;
 			float maxLiftWeight = Float.MAX_VALUE;
 			float maxLiftForce = 2;
 			

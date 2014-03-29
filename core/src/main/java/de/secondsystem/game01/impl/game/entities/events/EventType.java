@@ -50,6 +50,8 @@ public enum EventType {
 	 */
 	ENABLED,
 	DISABLED,
+	
+	UNLOCKED,
 
 	/**
 	 * ARGS: IGameEntity: owner, IGameEntity lifting entity
@@ -59,13 +61,6 @@ public enum EventType {
 	 * ARGS: IGameEntity: owner, IGameEntity lifting entity
 	 */
 	UNLIFTED,
-	
-	/**
-	 * The entity just appeared on the screen
-	 * ARGS: IGameEntity: owner
-	 * RETURN: unused 
-	 */
-	VIEWED,
 	
 	/**
 	 * The entity just left the screen

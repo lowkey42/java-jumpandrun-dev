@@ -35,7 +35,7 @@ public class AnimateEventHandler implements IEventHandler {
 		
 		animated.play(animation, speed!=null ? speed : 1, repeated!=null && repeated);
 		
-		return null;
+		return true;
 	}
 	
 	@Override

@@ -26,12 +26,13 @@ import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.KillEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.PingPongEventHandler;
+import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
-import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.scripting.IScriptApi;
 import de.secondsystem.game01.impl.sound.MonologueTextBox;
 import de.secondsystem.game01.impl.sound.MusicWrapper;
@@ -46,6 +47,8 @@ public class MainGameState extends GameState {
 	MonologueTextBox monologueTextBox;
 	
 	private MusicWrapper backgroundMusic;
+	
+	private AnimatedSprite loadingSprite;
 	
 	private DevConsole console = new DevConsole();
 	
@@ -63,9 +66,15 @@ public class MainGameState extends GameState {
 	
 	public MainGameState( String mapId ) {
 		this.mapId = mapId;
+		try {
+			loadingSprite = new AnimatedSprite(ResourceManager.animation.get("loading.anim"), 100, 100);
+			
+		} catch (IOException e) {
+			loadingSprite = null;
+		}
 	}
 	public MainGameState( String mapId, GameContext ctx ) {
-		this.mapId = mapId;
+		this(mapId);
 		init(ctx);
 	}
 	
@@ -233,10 +242,6 @@ public class MainGameState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		if( activeMapLoader!=null && activeMapLoader.isFinished() ) {
-			setNextState(activeMapLoader.getLoadedMap());
-		}
-		
 		if( fixedPlayerPos!=null ) {
 			player.setPosition(fixedPlayerPos);
 			fixedPlayerPos = null;
@@ -269,6 +274,18 @@ public class MainGameState extends GameState {
 		
 		for( Sprite s : sprites )
 			ctx.window.draw(s);
+		
+
+		if( activeMapLoader!=null ) {
+			if( activeMapLoader.isFinished() )
+				setNextState(activeMapLoader.getLoadedMap());
+			
+			else if( loadingSprite!=null ) {
+				loadingSprite.setPosition(new Vector2f(ctx.getViewWidth()-loadingSprite.getWidth()-10, ctx.getViewHeight()-loadingSprite.getHeight()-10));
+				loadingSprite.update(frameTime);
+				loadingSprite.draw(ctx.window);
+			}
+		}
 		
 		if( System.currentTimeMillis()>=ignoreDamageTimer ) {
 			ignoreDamageEntity=null;

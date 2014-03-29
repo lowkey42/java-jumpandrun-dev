@@ -426,8 +426,7 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 	@Override
 	public void onDestroy() {
 		destroyed = true;
-		
-		parent.destroyBody(body);
+		parent.physicsWorld.destroyBody(body);
 	}
 	
 	@Override

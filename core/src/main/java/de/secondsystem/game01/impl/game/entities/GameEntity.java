@@ -26,8 +26,6 @@ import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.Attributes.AttributeIf;
-import de.secondsystem.game01.model.IAnimated;
-import de.secondsystem.game01.model.IAnimated.AnimationType;
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
@@ -89,9 +87,6 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			((IMoveable) representation).setPosition( physicsBody.getPosition() );
 			((IMoveable) representation).setRotation( physicsBody.getRotation() );
 		}
-		
-		if( representation instanceof IAnimated )
-			((IAnimated) representation).play(AnimationType.IDLE, 1.f, true);
 		
 		List<Attributes> effectAttrs = attributes.getObjectList("effects");
 		if( effectAttrs!=null ) {
@@ -245,6 +240,17 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	public IPhysicsBody getPhysicsBody() {
 		return physicsBody;
 	}
+	@Override
+	public void setPhysicsBody(IPhysicsBody physicsBody) {
+		if( this.physicsBody!=null )
+			this.physicsBody.onDestroy();
+		
+		this.physicsBody = physicsBody;
+	}
+	@Override
+	public void setPhysicsBodyFromAttributes(Attributes attributes) {
+		setPhysicsBody(GameEntityHelper.createPhysicsBody(map, true, true, true, attributes));
+	}
 
 	@Override
 	public IEditableEntityState getEditableState() {
@@ -329,7 +335,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			
 			effects.clear();
 			
-			physicsBody.onDestroy();
+			if( physicsBody!=null )
+				physicsBody.onDestroy();
 		}
 	}
 	

@@ -17,10 +17,14 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	private float   currentFrame;
 	private float animationSpeed;
 	
+	public AnimatedSprite(AnimationTexture animationTexture) {
+		this(animationTexture, animationTexture.getDefault().frameWidth, animationTexture.getDefault().frameHeight);
+	}
 	public AnimatedSprite(AnimationTexture animationTexture, float width, float height) {
 		super(width, height);
 		
 		this.animationTexture = animationTexture;
+		play(animationTexture.getDefaultType(), 1, true);
 	}
 	
 	@Override

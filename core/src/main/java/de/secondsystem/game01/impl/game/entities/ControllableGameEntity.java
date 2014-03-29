@@ -37,11 +37,11 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private float jumpAcceleration;
 	
-	protected HDirection hDirection;
+	protected HDirection hDirection = HDirection.RIGHT;
 	
 	protected float hFactor;
 	
-	protected VDirection vDirection;
+	protected VDirection vDirection= VDirection.FORWARD;
 	
 	protected float vFactor;
 	
@@ -113,7 +113,19 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		jumpTimer += frameTimeMs;
 			
 		final float xMove = hDirection==HDirection.LEFT ? -hFactor : hFactor;
-		final float yMove = vDirection==VDirection.UP   ? -vFactor : vFactor;
+		final float yMove;
+		switch( vDirection ) {
+			case DOWN:
+				yMove = vFactor;
+				break;
+			case UP:
+				yMove = -vFactor;
+				break;
+			case FORWARD:
+			default:
+				yMove = 0;
+				break;
+		}
 		
 		processClimbing(frameTimeMs, xMove, yMove);
 			
@@ -125,6 +137,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		
 		hFactor = 0;
 		vFactor = 0;
+		vDirection = VDirection.FORWARD;
 	}
 	
 	private void processMovement(long frameTimeMs, float xMove, float yMove) {
@@ -135,7 +148,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		
 		dynPhysicsBody().move(moveAcceleration*frameTimeMs * xMove, effectiveYMove*frameTimeMs );
 	    
-	    if( hDirection!=null && hFactor!=0 )
+	    if( hFactor!=0 )
 	    	moved = true;
 	    else if( moved ) {
 	    	dynPhysicsBody().resetVelocity(true, false, false);
@@ -185,11 +198,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			return false;
 		
 		final IHumanoidPhysicsBody hBody = (IHumanoidPhysicsBody) physicsBody;
-		final float xMove = hDirection==HDirection.RIGHT ? 1.f : -1.f;
-		final float yMove = vDirection==VDirection.DOWN ? 1.f : -1.f;
 		
 		if( !hBody.isLiftingSomething() ) {
-			IPhysicsBody touchingBody = hBody.getNearestBody(new Vector2f(xMove, yMove), IHumanoidPhysicsBody.BF_LIFTABLE);
+			IPhysicsBody touchingBody = hBody.getNearestBody(createDirectionVector(), IHumanoidPhysicsBody.BF_LIFTABLE);
 
 			if( touchingBody != null && !touchingBody.isKinematic() ) {
 				if( hBody.liftBody(touchingBody) && touchingBody.getOwner() instanceof IGameEntity ) {
@@ -200,7 +211,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			}
 			
 		} else {
-			final IPhysicsBody liftedBody = hBody.throwLiftedBody(force, new Vector2f(xMove, yMove));
+			final IPhysicsBody liftedBody = hBody.throwLiftedBody(force, createDirectionVector());
 			
 			if( liftedBody!=null && liftedBody.getOwner() instanceof IGameEntity ) {
 				final IGameEntity liftedEntity = (IGameEntity) liftedBody.getOwner();
@@ -223,9 +234,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 			IPhysicsBody body = ((IHumanoidPhysicsBody) physicsBody).getLiftedBody();
 			if( !(body.getOwner() instanceof IGameEntity) 
 					|| !((IGameEntity)body.getOwner()).setWorld(newWorldId) ) {
-				final float xMove = hDirection==HDirection.RIGHT ? 1.f : -1.f;
-				final float yMove = vDirection==VDirection.DOWN ? 1.f : -1.f;
-				((IHumanoidPhysicsBody) physicsBody).throwLiftedBody(3, new Vector2f(xMove, yMove));
+				((IHumanoidPhysicsBody) physicsBody).throwLiftedBody(3, createDirectionVector());
 			}
 		}
 	}
@@ -240,18 +249,34 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		return controller;
 	}
 
+	protected Vector2f createDirectionVector() {
+		return new Vector2f(hDirection==HDirection.RIGHT ? 1.f : -1.f, vDirection==VDirection.DOWN ? 1.f : vDirection==VDirection.UP ? -1.f : 0);
+	}
+	
+	@Override
+	public boolean isUsePossible() {
+		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
+			return false;
+		
+		IPhysicsBody nearestBody = ((IHumanoidPhysicsBody) physicsBody ).getNearestBody( createDirectionVector(), IHumanoidPhysicsBody.BF_INTERACTIVE );
+		return nearestBody != null && nearestBody.getOwner() instanceof IGameEntity;
+	}
+	
 	@Override
 	public void use() {
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
 			return;
 		
-		final float xMove = hDirection==HDirection.RIGHT ? 1.f : -1.f;
-		final float yMove = vDirection==VDirection.DOWN ? 1.f : -1.f;
-		
-		IPhysicsBody nearestBody = ((IHumanoidPhysicsBody) physicsBody ).getNearestBody( new Vector2f(xMove, yMove), IHumanoidPhysicsBody.BF_INTERACTIVE );
+		IPhysicsBody nearestBody = ((IHumanoidPhysicsBody) physicsBody ).getNearestBody( createDirectionVector(), IHumanoidPhysicsBody.BF_INTERACTIVE );
 		if( nearestBody != null && nearestBody.getOwner() instanceof IGameEntity ) {
 			IGameEntity ge = (IGameEntity) nearestBody.getOwner(); 
 			ge.notify(EventType.USED, ge, this);
+			
+			IPhysicsBody body = ((IHumanoidPhysicsBody) physicsBody).getLiftedBody();
+			if( body!=null ) {
+				ge.notify(EventType.TOUCHED, ge, body.getOwner(), body);
+				((IGameEntity) body.getOwner()).notify(EventType.TOUCHED, body.getOwner(), ge, ge.getPhysicsBody());
+			}
 		}
 	}
 	
@@ -260,12 +285,9 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )
 			return;
 		
-		final float xMove = hDirection==HDirection.RIGHT ? 1.f : -1.f;
-		final float yMove = vDirection==VDirection.DOWN ? 1.f : -1.f;
-		
-		List<IPhysicsBody> bodies = ((IHumanoidPhysicsBody) physicsBody ).listNearBodies(new Vector2f(xMove, yMove), false, BODY_GO_FILTER);
+		List<IPhysicsBody> bodies = ((IHumanoidPhysicsBody) physicsBody ).listNearBodies(createDirectionVector(), false, BODY_GO_FILTER);
 		for( IPhysicsBody body : bodies ) {
-			Object result = notify(EventType.ATTACK, this, body.getOwner(), force);
+			Object result = notify(EventType.ATTACK, this, body.getOwner(), Math.min(1, force*2));
 			if( result instanceof Boolean && ((Boolean) result).booleanValue() )
 				break;
 		}

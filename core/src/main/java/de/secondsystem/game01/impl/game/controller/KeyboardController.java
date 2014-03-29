@@ -17,8 +17,8 @@ public final class KeyboardController extends AbstractGameEntityController {
 		boolean doWorldSwitch();
 	}
 	
-	private static final float THROW_FORCE_INC_PER_MS = 5/1000.f; 
-	private static final float THROW_FORCE_INI = 2;
+	private static final float THROW_FORCE_INC_PER_MS = 0.25f/1000; 
+	private static final float THROW_FORCE_INI = 0.125f;
 	
 	private final KeyMapping mapping;
 	private final IWorldSwitchInterceptor worldSwitchInterceptor;
@@ -41,8 +41,8 @@ public final class KeyboardController extends AbstractGameEntityController {
         	}
         	
         	if( event.asKeyEvent().key==mapping.lift ) {
-        		if( !proxy.liftOrThrowObject(throwForce) )
-        			proxy.attack(2.5f+ throwForce*2);
+        		if( !proxy.liftOrThrowObject(Math.min(throwForce,1)) )
+        			proxy.attack(Math.min(throwForce,1));
         		throwForce = 0;
         		
         	} else if( event.asKeyEvent().key==mapping.use )
@@ -75,8 +75,8 @@ public final class KeyboardController extends AbstractGameEntityController {
 				throwForce+= throwForce>0 ? THROW_FORCE_INC_PER_MS*frameTimeMs : THROW_FORCE_INI;
 				
 			} else if( throwForce>0 ) {
-				if( !proxy.liftOrThrowObject(throwForce) )
-					proxy.attack(5+ throwForce*2);
+				if( !proxy.liftOrThrowObject(Math.min(throwForce,1)) )
+					proxy.attack(Math.min(throwForce,1));
 				throwForce=0;
 			}
 

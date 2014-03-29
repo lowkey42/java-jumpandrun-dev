@@ -1,0 +1,6 @@
+{"representationType":"ANIMATION", "representation":"door_locked.anim", "width":100, "height":120, "shape":"BOX", "physicsType":"STATIC", "orderId":110, "interactive":true,
+ "onUNLOCKED":[
+   {"factory":".AnimateEHF", "anim":"OPEN", "repeated":false}, 
+   {"factory":".DelayEHF", "delay":0, "sub":{"factory":".ReplacePhysicsBodyEHF"}}
+ ]
+}

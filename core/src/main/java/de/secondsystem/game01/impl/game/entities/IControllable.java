@@ -7,7 +7,7 @@ public interface IControllable {
 		LEFT, RIGHT;
 	}
 	public static enum VDirection {
-		UP, DOWN;
+		UP, DOWN, FORWARD;
 	}
 	
 	void moveHorizontally(HDirection direction, float factor);
