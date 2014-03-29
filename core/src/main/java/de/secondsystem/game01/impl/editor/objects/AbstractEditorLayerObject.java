@@ -27,12 +27,12 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	
 	@Override
 	public float getWidth() {	
-		return layerObject.getWidth();
+		return width*zoom;
 	}
 	
 	@Override
 	public float getHeight() {
-		return layerObject.getHeight();
+		return height*zoom;
 	}
 	
 	@Override
@@ -131,6 +131,7 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 
 	@Override
 	public void repeatTexture(boolean repeat) {
-		repeatTexture = repeat;
+		if( layerObject instanceof SpriteLayerObject )
+			repeatTexture = repeat;
 	} 
 }
