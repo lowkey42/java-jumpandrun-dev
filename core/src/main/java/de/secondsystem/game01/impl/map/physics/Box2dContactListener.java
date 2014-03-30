@@ -82,9 +82,12 @@ class Box2dContactListener implements ContactListener {
 		Fixture fixtureB = contact.getFixtureB();
 		Box2dPhysicsBody body1 = (Box2dPhysicsBody) contact.getFixtureA().getBody().getUserData();
 		Box2dPhysicsBody body2 = (Box2dPhysicsBody) contact.getFixtureB().getBody().getUserData();
+
+		if( isMainBody(fixtureB) )
+			callEndListener(contact, body2, fixtureA, body1);
 		
-		callEndListener(contact, body2, fixtureA, body1);
-		callEndListener(contact, body1, fixtureB, body2);
+		if( isMainBody(fixtureA) )	
+			callEndListener(contact, body1, fixtureB, body2);
 	}
 
 	@Override

@@ -246,6 +246,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			this.physicsBody.onDestroy();
 		
 		this.physicsBody = physicsBody;
+		
+		if( physicsBody!=null ) {
+			physicsBody.setOwner(this);
+			physicsBody.setContactListener(this);
+		}
 	}
 	@Override
 	public void setPhysicsBodyFromAttributes(Attributes attributes) {

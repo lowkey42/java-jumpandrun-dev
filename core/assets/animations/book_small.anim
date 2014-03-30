@@ -1,0 +1,4 @@
+{ "default":"IDLE",
+"IDLE":{"texture": "book.png", "frameWidth": 340, "frameHeight":293, "numRowFrames": 8, "frameStart": 0, "frameEnd":0, "fps": 0},
+"OPEN":{"texture": "book.png", "frameWidth": 340, "frameHeight":293, "numRowFrames": 8, "frameStart": 0, "frameEnd":8, "fps": 8},
+"CLOSED":{"texture": "book.png", "frameWidth": 340, "frameHeight":293, "numRowFrames": 8, "frameStart": 8, "frameEnd":0, "fps": -8} }

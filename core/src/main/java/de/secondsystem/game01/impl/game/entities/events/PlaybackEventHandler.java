@@ -10,7 +10,7 @@ import de.secondsystem.game01.model.IPlayable;
 public class PlaybackEventHandler implements IEventHandler {
 
 	public static enum Action {
-		PLAY, PAUSE, RESUME, STOP, REVERSE;
+		PLAY, PAUSE, RESUME, STOP, REVERSE, UNREVERSE;
 	}
 	
 	public static enum Target {
@@ -44,7 +44,7 @@ public class PlaybackEventHandler implements IEventHandler {
 				playable = (IPlayable) owner.getRepresentation();
 				break;
 		}
-		
+		System.out.println("playbackEH: "+action);
 		switch( action ) {
 			case PLAY:
 				playable.play();
@@ -60,6 +60,10 @@ public class PlaybackEventHandler implements IEventHandler {
 				
 			case REVERSE:
 				playable.reverse();
+				break;
+				
+			case UNREVERSE:
+				playable.play();
 				break;
 				
 			case STOP:

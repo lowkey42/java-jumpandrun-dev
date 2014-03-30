@@ -29,7 +29,7 @@ public class AnimateEventHandler implements IEventHandler {
 	}
 
 	@Override
-	public Object handle(Object... args) {
+	public Object handle(Object... args) {System.out.println("animEH");
 		final IGameEntity owner = (IGameEntity) args[0];
 		final IAnimated animated = (IAnimated) owner.getRepresentation();
 		

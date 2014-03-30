@@ -1,0 +1,13 @@
+{ "representationType":"ANIMATION", "representation":"book_small.anim", "width":150, "height":100, "shape":"BOX", "density":1, "physicsType":"STATIC", "sensor":true,
+
+
+"onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".BlockEHF", "subs":[
+	{"factory":".PlaybackEHF", "target":"REPRESENTATION", "action":"STOP"},
+	{"factory":".AnimateEHF", "anim":"OPEN", "repeated":false}	
+]}},
+"onUNTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".PlaybackEHF", "target":"REPRESENTATION", "action":"REVERSE"}},
+"effects":[{"factory":".ParticleFactory", "maxColor":"#ff6666cc", "minColor":"#ff000044", "particles":50, "width":150, "height":100,
+	"minTtl":4000, "maxTtl":10000, "minXVelocity":-4, "maxXVelocity":4, "minYVelocity":-4, "maxYVelocity":4,
+	"minRotationVelocity":0, "maxRotationVelocity":10, "minAngularVelocity":20, "maxAngularVelocity":90, "minParticleSize":5, "maxParticleSize":15
+}]
+}

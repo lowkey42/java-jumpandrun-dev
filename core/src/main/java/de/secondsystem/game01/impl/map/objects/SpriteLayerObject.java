@@ -50,7 +50,7 @@ public class SpriteLayerObject implements ILayerObject {
 		return sprite.isTextureRepeated();
 	}
 	
-	public void setRepeatedTexture(boolean repeated) {
+	public void setRepeatedTexture(boolean repeated) {	// TODO: not serialized => temporary !
 		sprite.setRepeatedTexture(repeated);
 	}
 	

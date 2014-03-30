@@ -42,8 +42,10 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 			else
 				currentFrame = currentAnimationData.calculateNextFrame(currentFrame, frameTimeMs*animationSpeed, repeated);
 			
-			if( currentFrame < 0 )
+			if( currentFrame < 0 ) {
+				playing = false;
 				return;
+			}
 			
 			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 		}
@@ -53,13 +55,12 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	@Override
 	public void play(AnimationType animation, float speedFactor,
 			boolean repeated) {
-		if( currentAnimationType!=animation ) {
+		if( currentAnimationType!=animation || !playing ) {
 			AnimationData animData = animationTexture.get(animation);
 			
 			if( animData == null )
 				return;
 			
-			reverse = false;
 			currentAnimationData = animData;
 			sprite.setTexture(currentAnimationData.texture);
 			sprite.setOrigin(Math.abs(currentAnimationData.frameWidth/2.f), Math.abs(currentAnimationData.frameHeight/2.f));
@@ -71,6 +72,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 
 		animationSpeed = speedFactor;
 		this.repeated = repeated;
+		this.reverse = false;
 		playing = true;
 	}
 
@@ -82,6 +84,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	@Override
 	public void stop() {	
 		playing = false;
+		reverse = false;
 		currentFrame = currentAnimationData.frameStart;
 		sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 	}
@@ -99,6 +102,9 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	@Override
 	public void reverse() {
 		reverse = true;
+		playing=true;
+		if( currentFrame<=0 )
+			currentFrame = currentAnimationData.frameEnd;
 	}
 
 	@Override
