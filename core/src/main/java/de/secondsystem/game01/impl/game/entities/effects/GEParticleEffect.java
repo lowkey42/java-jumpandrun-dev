@@ -82,6 +82,11 @@ public class GEParticleEffect implements IGameEntityEffect {
 		);
 	}
 
+	@Override
+	public boolean inside(Vector2f point) {
+		return pe.inside(point);
+	}
+
 }
 
 class ParticleFactory implements IGameEntityEffectFactory {

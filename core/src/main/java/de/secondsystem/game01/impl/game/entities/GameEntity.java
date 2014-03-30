@@ -123,7 +123,6 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public void draw(RenderTarget renderTarget) {
-		Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
 		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
 		
 		if( physicsBody!=null && representation instanceof IMoveable ) {
@@ -135,12 +134,12 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			representation.draw(renderTarget);
 		
 		for( IGameEntityEffect effect : effects )
-			effect.draw(renderTarget, position, rotation, worldMask);
+			effect.draw(renderTarget, getPosition(), rotation, worldMask);
 	}
 
 	@Override
 	public Vector2f getPosition() {
-		return (representation instanceof IMoveable) ? ((IMoveable)representation).getPosition() : null;
+		return physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
 	}
 
 	@Override
@@ -286,6 +285,10 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	public boolean inside(Vector2f point) {
 		if( representation instanceof IInsideCheck )
 			return ((IInsideCheck)representation).inside(point);
+		else
+			for(IGameEntityEffect e : effects)
+				if( e.inside(point) )
+					return true;
 		
 		return false;
 	}

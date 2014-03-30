@@ -62,6 +62,11 @@ public class GELightEffect implements IGameEntityEffect {
 		);
 	}
 
+	@Override
+	public boolean inside(Vector2f point) {
+		return light.inside(point);
+	}
+
 }
 
 class LightFactory implements IGameEntityEffectFactory {
