@@ -4,21 +4,14 @@ import java.io.IOException;
 
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstTexture;
-import org.jsfml.graphics.FloatRect;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Text;
 import org.jsfml.window.Mouse;
-import org.jsfml.window.Window;
 import org.jsfml.window.event.Event;
-import org.jsfml.window.event.Event.Type;
-import org.omg.CORBA.CTX_RESTRICT_SCOPE;
-
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.gui.IOnClickListener;
-import de.secondsystem.game01.model.Settings;
 	
 	/**
 	 * This class provides a slideable button with values between 0 and 100

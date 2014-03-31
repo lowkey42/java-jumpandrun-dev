@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.gui;
 /*import org.jsfml.audio.Sound;
 import org.jsfml.audio.SoundBuffer;*/
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Window;
 
 /**
@@ -42,6 +43,13 @@ public final class MenuButton extends GUIButton {
 		if( rt instanceof Window )
 			mouseover( (Window) rt );
 		rt.draw(mySprite);
-		rt.draw(myText);
+		rt.draw(text);
+	}
+
+
+	@Override
+	public boolean inside(Vector2f point) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

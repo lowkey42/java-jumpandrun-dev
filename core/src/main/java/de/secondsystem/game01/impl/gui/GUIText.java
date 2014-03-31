@@ -27,17 +27,17 @@ public abstract class GUIText extends GUIElement{
 	
 	GUIText(int pos_x, int pos_y, int width, int height, String content, IOnClickListener clickListener){
 		super(pos_x, pos_y, width, height, content, clickListener);
-		myText.setPosition(getPos().x + 5, getPos().y);
+		text.setPosition(pos.x + 5, pos.y);
 		myBox = new RectangleShape(new Vector2f(width, height));
-		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
+		myBox.setPosition(pos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
 	}
 	
 	
 	GUIText(int pos_x, int pos_y, int width, int height, Text myText, IOnClickListener clickListener){
 		super(pos_x, pos_y, width, height, myText, clickListener);
-		myText.setPosition(getPos().x + 5, getPos().y);
+		myText.setPosition(pos.x + 5, pos.y);
 		myBox = new RectangleShape(new Vector2f(width, height));
-		myBox.setPosition(myPos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
+		myBox.setPosition(pos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
 	}
 	
 	
@@ -81,7 +81,7 @@ public abstract class GUIText extends GUIElement{
 	
 	public void draw(RenderTarget rt){
 		rt.draw(myBox); 
-		rt.draw(myText);
+		rt.draw(text);
 	}
 	
 	public void setActive(){

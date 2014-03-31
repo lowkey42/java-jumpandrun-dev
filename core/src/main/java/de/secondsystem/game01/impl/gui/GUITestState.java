@@ -84,8 +84,8 @@ public final class GUITestState extends GameState {
 			backdrop.setTexture(backdropBuffer);
 		}
 		
-		infoInputText.setPosition(testText.getPos().x, testText.getPos().y - 30);
-		infoMemoText.setPosition(testMemo.getPos().x, testMemo.getPos().y - 30);
+		infoInputText.setPosition(testText.pos.x, testText.pos.y - 30);
+		infoMemoText.setPosition(testMemo.pos.x, testMemo.pos.y - 30);
 	}
 
 	
@@ -125,12 +125,12 @@ public final class GUITestState extends GameState {
 			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
 				testButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
 				backButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-				if(ctx.getMousePosition().x >= testText.getPos().x && ctx.getMousePosition().x <= testText.getPos().x + testText.width  && 
-						ctx.getMousePosition().y >= testText.getPos().y && ctx.getMousePosition().y <= testText.getPos().y + testText.height){
+				if(ctx.getMousePosition().x >= testText.pos.x && ctx.getMousePosition().x <= testText.pos.x + testText.width  && 
+						ctx.getMousePosition().y >= testText.pos.y && ctx.getMousePosition().y <= testText.pos.y + testText.height){
 							testText.setActive();
 				} else { testText.setInactive();}
-				if(ctx.getMousePosition().x >= testMemo.getPos().x && ctx.getMousePosition().x <= testMemo.getPos().x + testMemo.width  && 
-						ctx.getMousePosition().y >= testMemo.getPos().y && ctx.getMousePosition().y <= testMemo.getPos().y + testMemo.height){
+				if(ctx.getMousePosition().x >= testMemo.pos.x && ctx.getMousePosition().x <= testMemo.pos.x + testMemo.width  && 
+						ctx.getMousePosition().y >= testMemo.pos.y && ctx.getMousePosition().y <= testMemo.pos.y + testMemo.height){
 							testMemo.setActive();
 				} else { testMemo.setInactive();}
 			}
