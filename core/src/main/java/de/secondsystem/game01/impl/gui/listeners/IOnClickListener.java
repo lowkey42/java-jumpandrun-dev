@@ -1,7 +1,4 @@
-/**
- * 
- */
-package de.secondsystem.game01.impl.gui;
+package de.secondsystem.game01.impl.gui.listeners;
 
 /**
  * @author Sebastian

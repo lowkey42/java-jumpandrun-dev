@@ -3,25 +3,24 @@ package de.secondsystem.game01.impl.intro;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.gui.IOnClickListener;
 import de.secondsystem.game01.impl.gui.MenuButton;
 import de.secondsystem.game01.impl.gui.SlideButton;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 public final class SettingsMenuState extends GameState {
 
 	private final GameState playGameState;
 	private GameState MainMenu;
 
-	MenuButton changeRes = new MenuButton(200, 120, "Resolution");
-	MenuButton vSync = new MenuButton(200, 320, "VSync");
-	MenuButton antiA = new MenuButton(200, 520, "Antialiasing");
-	MenuButton apply = new MenuButton(540, 520, "APPLY");
-	MenuButton back = new MenuButton(870, 520, "BACK", new IOnClickListener() {
+	MenuButton changeRes = new MenuButton(200, 120, "Resolution", null);
+	MenuButton vSync = new MenuButton(200, 320, "VSync", null);
+	MenuButton antiA = new MenuButton(200, 520, "Antialiasing", null);
+	MenuButton apply = new MenuButton(540, 520, "APPLY", null);
+	MenuButton back = new MenuButton(870, 520, "BACK", null, new IOnClickListener() {
 	
 		@Override public void onClick() {
 			setNextState(MainMenu);
