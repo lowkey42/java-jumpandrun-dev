@@ -43,6 +43,7 @@ public class ScriptApiImpl implements IScriptApi {
 	 */
 	@Override
 	public void loadMap(String mapId) {
+		System.out.println("load:" +mapId);
 		if( this.mainGameState.activeMapLoader==null )
 			this.mainGameState.activeMapLoader = new ThreadedMapLoader(mapId, ctx);
 	}

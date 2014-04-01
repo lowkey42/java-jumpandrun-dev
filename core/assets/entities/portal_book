@@ -1,5 +1,5 @@
 { "representationType":"ANIMATION", "representation":"book_small.anim", "width":150, "height":100, "shape":"BOX", "density":1, "physicsType":"STATIC", "sensor":true,
-
+"interactive":true,
 
 "onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".BlockEHF", "subs":[
 	{"factory":".PlaybackEHF", "target":"REPRESENTATION", "action":"STOP"},
