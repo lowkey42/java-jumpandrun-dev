@@ -74,9 +74,9 @@ public abstract class GUIButton extends GUIElement {
 			changeTextureClip(0);
 			
 			// Button inner text positioning and calibration
-			FloatRect textRect = myText.getGlobalBounds();
-			myText.setOrigin(textRect.width / 2, textRect.height / 1.5f);
-			myText.setPosition(mySprite.getPosition().x + mySprite.getGlobalBounds().width / 2, mySprite.getPosition().y + mySprite.getGlobalBounds().height / 2);
+			FloatRect textRect = text.getGlobalBounds();
+			text.setOrigin(textRect.width / 2, textRect.height / 1.5f);
+			text.setPosition(mySprite.getPosition().x + mySprite.getGlobalBounds().width / 2, mySprite.getPosition().y + mySprite.getGlobalBounds().height / 2);
 
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
@@ -97,7 +97,7 @@ public abstract class GUIButton extends GUIElement {
 	
 	public void draw(RenderTarget rt){
 		rt.draw(mySprite);
-		rt.draw(myText);
+		rt.draw(text);
 	}
 	
 	protected void changeTextureClip(int pos) {
@@ -108,11 +108,11 @@ public abstract class GUIButton extends GUIElement {
 	public void mouseover(Window window){
 		Vector2f mouse = ((RenderWindow) window).mapPixelToCoords(Mouse.getPosition(window));
 		if(this.mySprite.getGlobalBounds().contains(mouse.x, mouse.y)){
-			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); myText.setColor(Color.RED);
+			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); text.setColor(Color.RED);
 			//System.out.println("  OVER  ");
 			//buttonOver.play();
 		} else {
-			changeTextureClip(0); myText.setColor(Color.WHITE);
+			changeTextureClip(0); text.setColor(Color.WHITE);
 		}
 	}
 	

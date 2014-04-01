@@ -73,8 +73,8 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 		if( layerObject != null ) {
 			rotation = layerObject.getRotation();
 			zoom = 1.0f;
-			height = layerObject.getHeight();
-			width = layerObject.getWidth();
+			height = layerObject.getHeight() > 5.f ? layerObject.getHeight() : 40.f;
+			width = layerObject.getWidth() > 5.f ? layerObject.getWidth() : 40.f;
 			setPosition(layerObject.getPosition());
 			lastPos = pos;
 			lastWidth = width;
@@ -197,7 +197,7 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 				v = mouseScaling(scaleMarkers[2], 1, 2, scalingX, lastPos, lastWidth, true); 
 			
 			setWidth( v.z );
-			if( !repeated ) // temporary
+			if( !repeatTexture ) // temporary
 				setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 
@@ -212,7 +212,7 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 				v = mouseScaling(scaleMarkers[3], 2, 3, scalingY, lastPos, lastHeight, false); 
 			
 			setHeight( v.z );
-			if( !repeated ) // temporary
+			if( !repeatTexture ) // temporary
 				setPosition( new Vector2f(v.x, v.y) );
 		}
 		else 

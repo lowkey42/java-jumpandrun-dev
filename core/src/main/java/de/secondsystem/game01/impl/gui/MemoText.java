@@ -6,7 +6,6 @@ package de.secondsystem.game01.impl.gui;
 import java.io.IOException;
 
 import org.jsfml.graphics.ConstFont;
-import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
@@ -162,5 +161,12 @@ public final class MemoText extends GUIText {
 			System.out.println("MaxChars per Line: " + maxChars + "  Length of prevString: " + prevString.length());
 			
 		}
+	}
+
+
+	@Override
+	public boolean inside(Vector2f point) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

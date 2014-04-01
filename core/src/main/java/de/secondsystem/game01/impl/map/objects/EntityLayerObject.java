@@ -11,7 +11,6 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
 
 public class EntityLayerObject implements ILayerObject, IUpdateable {
@@ -125,8 +124,6 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	}
 	@Override
 	public void update(long frameTimeMs) {
-		IDrawable rep = entity.getRepresentation();
-		if( rep instanceof IUpdateable )
-			((IUpdateable) rep).update(frameTimeMs);	
+		entity.update(frameTimeMs);	
 	}
 }
