@@ -42,10 +42,17 @@ public class ScriptEnvironment implements IUpdateable {
 		engine = new ScriptEngineManager().getEngineByName(type.name);
 		
 		engine.put("timer", timerManager);
+		engine.put("System", this);
 		engine.put("API", scriptApi!=null ? scriptApi : new DummyScriptApi());
 		
 		for( Entry<String, Object> att : attributes.entrySet() )
 			engine.put(att.getKey(), att.getValue());
+		
+		try {
+			load("defaults.js");
+		} catch (IOException | ScriptException e) {
+			System.err.println("Unable to load defaults.js: "+e.getMessage());
+		}
 	}
 
 	public void queueLoad( String name ) throws IOException, ScriptException {
