@@ -11,6 +11,7 @@ import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
@@ -26,26 +27,19 @@ public abstract class GUIElement implements IDrawable, IDimensioned, IScalable, 
 	// shared Attributes
 	
 	protected float width, height;
-	protected Text text;
-	protected Font font;
+	protected Text caption;
+	protected ConstFont font;
 	protected Vector2f pos;
 	protected float rotation;
+	protected boolean visible;
+	final protected GUIElement owner;
 	
 	protected IOnClickListener clickListener;
 	
-	
 	// Constructors
-	
-	public GUIElement(float x, float y, int width, int height, Text text, IOnClickListener clickListener){
-		this.width = width;
-		this.height = height;
-		this.text = text;
-		this.pos = new Vector2f(x, y);
-		this.clickListener = clickListener;
-	}
 		
-		
-	public GUIElement(float x, float y, int width, int height, String content, IOnClickListener clickListener){
+	public GUIElement(float x, float y, float width, float height, String caption, GUIElement owner, IOnClickListener clickListener) {
+		this.owner = owner;
 		this.width = width;
 		this.height = height;
 		this.pos = new Vector2f(x, y);
@@ -53,19 +47,31 @@ public abstract class GUIElement implements IDrawable, IDimensioned, IScalable, 
 			
 		try {
 			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
-			font = (Font) ResourceManager.font.get("VeraMono.ttf");
-			text = new Text(content, font, (height - 5));
+			font = ResourceManager.font.get("VeraMono.ttf");
+			this.caption = new Text(caption, font, (int) (height - 5));
 			
 		} catch( IOException e ) {
 			throw new Error(e.getMessage(), e);
 		}
 	}
 	
+	public void setFont(Font font) {
+		this.font = font;
+		caption.setFont(font);
+	}
 	
 	// shared Methods
 	
-	public ConstFont getFont(){
+	public ConstFont getFont() {
 		return this.font;
+	}
+	
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 
 	@Override

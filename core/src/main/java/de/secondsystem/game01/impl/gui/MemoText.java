@@ -31,8 +31,8 @@ public final class MemoText extends GUIText {
 	
 	// Constructors
 	
-	MemoText(int pos_x, int pos_y, int width, int height){
-		super(pos_x, pos_y, width, height);
+	MemoText(float x, float y, float width, float height, String text, GUIElement owner){
+		super(x, y, width, height, text, owner);
 		
 		maxLines = (int)(this.height / 21);
 		maxChars = (int)(this.width / 12.6);
@@ -44,7 +44,7 @@ public final class MemoText extends GUIText {
 			myText = new Text[maxLines];
 				for(int i = 0; i < maxLines; i++){
 					myText[i] = new Text("", myFont, 20);
-					myText[i].setPosition(pos_x + 5, pos_y + i*21);
+					myText[i].setPosition(x + 5, y + i*21);
 					myText[i].setString("");
 					System.out.println(myText[i].getString());
 				}

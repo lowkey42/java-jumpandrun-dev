@@ -6,6 +6,8 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Window;
 
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+
 /**
  * This class provides a functional universal button with push ability
  * @author Sebastian
@@ -13,22 +15,21 @@ import org.jsfml.window.Window;
  */
 public final class MenuButton extends GUIButton {
 
-	
 	// Sound buttonOver;
 	
 	// Constructors
-	public MenuButton(int pos_x, int pos_y, String content, String file, String fonttype, IOnClickListener clickListener) {
-		super(pos_x, pos_y, content, clickListener);
+	public MenuButton(float x, float y, String caption, GUIElement owner, String file, String fonttype, IOnClickListener clickListener) {
+		super(x, y, 0, 31, caption, owner, clickListener);
 	}
 	
 	
-	public MenuButton(int pos_x, int pos_y, String text, IOnClickListener clickListener) {
-		this(pos_x, pos_y, text, "MainMenuButton.png", "FreeSansBold.otf", clickListener);
+	public MenuButton(float x, float y, String text, GUIElement owner, IOnClickListener clickListener) {
+		this(x, y, text, owner, "MainMenuButton.png", "FreeSansBold.otf", clickListener);
 	}
 	
 	
-	public MenuButton(int pos_x, int pos_y, String text) {
-		this(pos_x, pos_y, text, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
+	public MenuButton(float x, float y, String caption, GUIElement owner) {
+		this(x, y, caption, owner, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 
 
@@ -42,8 +43,8 @@ public final class MenuButton extends GUIButton {
 	public void draw(RenderTarget rt){
 		if( rt instanceof Window )
 			mouseover( (Window) rt );
-		rt.draw(mySprite);
-		rt.draw(text);
+		rt.draw(sprite);
+		rt.draw(caption);
 	}
 
 

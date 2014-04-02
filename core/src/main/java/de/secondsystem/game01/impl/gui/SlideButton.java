@@ -9,9 +9,10 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
+
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.gui.IOnClickListener;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 	
 	/**
 	 * This class provides a slideable button with values between 0 and 100

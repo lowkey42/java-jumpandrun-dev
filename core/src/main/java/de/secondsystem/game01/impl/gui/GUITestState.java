@@ -16,6 +16,7 @@ import org.jsfml.window.event.Event;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
  * @author Sebastian
@@ -31,10 +32,10 @@ public final class GUITestState extends GameState {
 	private final Text infoMemoText;
 	
 	// Object creations
-	InputText testText = new InputText(50, 50, 200);
-	MemoText testMemo = new MemoText(50, 250, 250, 90);
+	InputText testText = new InputText(50, 50, 200, 25, "", null);
+	MemoText testMemo = new MemoText(50, 250, 250, 90, "", null);
 	
-	MenuButton testButton = new MenuButton(50, 100, "TEST Button", new IOnClickListener() {
+	MenuButton testButton = new MenuButton(50, 100, "TEST Button", null, new IOnClickListener() {
 		
 		@Override
 		public void onClick() {
@@ -43,7 +44,7 @@ public final class GUITestState extends GameState {
 	});
 	
 
-	MenuButton backButton = new MenuButton(1000, 655, "BACK", new IOnClickListener(){
+	MenuButton backButton = new MenuButton(1000, 655, "BACK", null, new IOnClickListener(){
 		@Override
 		public void onClick() {
 			setNextState(MainMenu);

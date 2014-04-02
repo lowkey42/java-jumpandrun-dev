@@ -12,13 +12,12 @@ import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderWindow;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.impl.gui.IOnClickListener;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
  * @author Sebastian
@@ -30,12 +29,12 @@ public abstract class GUIButton extends GUIElement {
 	
 	protected int textureWidth, textureHeight;
 	
-	protected Sprite mySprite;
+	protected Sprite sprite;
 	
 	// Constructors
 	
-	GUIButton(int pos_x, int pos_y, Text myText, IOnClickListener clickListener){
-		super(pos_x, pos_y, 0, 31, myText, clickListener);
+	GUIButton(float x, float y, float width, float height, String caption, GUIElement owner, IOnClickListener clickListener){
+		super(x, y, width, height, caption, owner, clickListener);
 		
 		try {
 			// Loading Standard Texture for MenuButtons
@@ -44,80 +43,47 @@ public abstract class GUIButton extends GUIElement {
 			textureHeight = myTexture.getSize().y / 3; textureWidth = myTexture.getSize().x;
 						
 			// Button Sprite generation and positioning
-			mySprite = new Sprite(myTexture);
-			mySprite.setPosition(pos_x, pos_y);
+			sprite = new Sprite(myTexture);
+			sprite.setPosition(x, y);
 			changeTextureClip(0);
 			
 			// Button inner text positioning and calibration
-			FloatRect textRect = myText.getGlobalBounds();
-			myText.setOrigin(textRect.width / 2, textRect.height / 1.5f);
-			myText.setPosition(mySprite.getPosition().x + mySprite.getGlobalBounds().width / 2, mySprite.getPosition().y + mySprite.getGlobalBounds().height / 2);
+			FloatRect textRect = this.caption.getGlobalBounds();
+			this.caption.setOrigin(textRect.width / 2.f, textRect.height / 2.f);
+			this.caption.setPosition(sprite.getPosition().x + sprite.getGlobalBounds().width / 2, sprite.getPosition().y + sprite.getGlobalBounds().height / 2);
 
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
 			}
 	
-	}
-	
-	GUIButton(int pos_x, int pos_y, String content, IOnClickListener clickListener){
-		super(pos_x, pos_y, 0, 31, content, clickListener);
-		
-		try {
-			// Loading Standard Texture for MenuButtons
-			ConstTexture myTexture = ResourceManager.texture_gui.get("MainMenuButton.png");
-			
-			textureHeight = myTexture.getSize().y / 3; textureWidth = myTexture.getSize().x;
-						
-			// Button Sprite generation and positioning
-			mySprite = new Sprite(myTexture);
-			mySprite.setPosition(pos_x, pos_y);
-			changeTextureClip(0);
-			
-			// Button inner text positioning and calibration
-			FloatRect textRect = text.getGlobalBounds();
-			text.setOrigin(textRect.width / 2, textRect.height / 1.5f);
-			text.setPosition(mySprite.getPosition().x + mySprite.getGlobalBounds().width / 2, mySprite.getPosition().y + mySprite.getGlobalBounds().height / 2);
-
-			} catch( IOException e ) {
-				throw new Error(e.getMessage(), e);
-			}
-	
-	}
-	
-	GUIButton(int pos_x, int pos_y, Text myText){
-		this(pos_x, pos_y, myText, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
-	}
-	
-	GUIButton(int pos_x, int pos_y, String content){
-		this(pos_x, pos_y, content, new IOnClickListener(){@Override public void onClick(){System.out.println("pressed");}});
 	}
 		
 	
 	// shared Methods
 	
 	public void draw(RenderTarget rt){
-		rt.draw(mySprite);
-		rt.draw(text);
+		rt.draw(sprite);
+		rt.draw(caption);
 	}
 	
 	protected void changeTextureClip(int pos) {
-		mySprite.setTextureRect(new IntRect(0,textureHeight*pos,textureWidth,textureHeight));
+		sprite.setTextureRect(new IntRect(0,textureHeight*pos,textureWidth,textureHeight));
 	}
 	
 	
 	public void mouseover(Window window){
 		Vector2f mouse = ((RenderWindow) window).mapPixelToCoords(Mouse.getPosition(window));
-		if(this.mySprite.getGlobalBounds().contains(mouse.x, mouse.y)){
-			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); text.setColor(Color.RED);
+		if(this.sprite.getGlobalBounds().contains(mouse.x, mouse.y)){
+			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); caption.setColor(Color.RED);
 			//System.out.println("  OVER  ");
 			//buttonOver.play();
 		} else {
-			changeTextureClip(0); text.setColor(Color.WHITE);
+			changeTextureClip(0); caption.setColor(Color.WHITE);
 		}
 	}
 	
 	public boolean onButtonReleased(float x, float y) {
-		if( mySprite.getGlobalBounds().contains(x, y) ) {
+		if( sprite.getGlobalBounds().contains(x, y) ) {
 			clickListener.onClick();
 			return true;
 		}
