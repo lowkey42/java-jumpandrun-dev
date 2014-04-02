@@ -9,6 +9,19 @@ function init() {
 	println("Ich bin ein Script für die map "+mapId);
 }
 
+
+var page_01_collected_icon = API.createSprite("page_chaos.png", 10,10);
+API.updateSpriteColor(page_01_collected_icon, 255, 255, 255, 100);
+if( !API.exists("page_01_collected") ) {
+	API.updateSpriteTex(page_01_collected_icon, "page_chaos_disabled.png");
+	entities.create("collectable_page", {"representation":"page_chaos.png", "x":1600, "y":250, "onTOUCHED":{
+		"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".BlockEHF", "subs":[
+			{"factory":".ScriptEHF", "body":"API.store('page_01_collected', true); API.updateSpriteTex(page_01_collected_icon, 'page_chaos.png');API.updateSpriteColor(page_01_collected_icon, 255, 255, 255, 200)" },
+			{"factory":".DeleteEHF"}
+		]}
+	}});
+}
+
 function touchFunc(entity) {
 	entity.jump();
 }

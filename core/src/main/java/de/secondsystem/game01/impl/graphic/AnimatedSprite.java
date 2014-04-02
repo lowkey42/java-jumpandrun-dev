@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl.graphic;
 
+import org.jsfml.audio.Sound;
+
 import de.secondsystem.game01.impl.graphic.AnimationTexture.AnimationData;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IUpdateable;
@@ -16,6 +18,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	private AnimationType currentAnimationType;
 	private float   currentFrame;
 	private float animationSpeed;
+	private final Sound playingSound = new Sound();
 	
 	public AnimatedSprite(AnimationTexture animationTexture) {
 		this(animationTexture, animationTexture.getDefault().frameWidth, animationTexture.getDefault().frameHeight);
@@ -24,6 +27,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 		super(width, height);
 		
 		this.animationTexture = animationTexture;
+		playingSound.setMinDistance(400);
+		playingSound.setVolume(100);
 		play(animationTexture.getDefaultType(), 1, true);
 	}
 	
@@ -47,6 +52,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 				return;
 			}
 			
+			playingSound.setPosition(getPosition().x, getPosition().y, 0.5f);
+			
 			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 		}
 	}
@@ -68,8 +75,15 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 			currentFrame = currentAnimationData.frameStart;
 			sprite.setTextureRect(currentAnimationData.calculateTextureFrame(currentFrame));
 			updateScale();
+			
+			if( animData.sound!=null ) {
+				playingSound.setBuffer(animData.sound);
+				playingSound.play();
+			}
 		}
 
+		playingSound.setPitch(speedFactor);
+		playingSound.setLoop(repeated);
 		animationSpeed = speedFactor;
 		this.repeated = repeated;
 		this.reverse = false;
@@ -82,7 +96,8 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	}
 	
 	@Override
-	public void stop() {	
+	public void stop() {
+		playingSound.stop();
 		playing = false;
 		reverse = false;
 		currentFrame = currentAnimationData.frameStart;
@@ -92,6 +107,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	@Override
 	public void resume() {
 		playing = true;
+		playingSound.play();
 	}
 
 	@Override
@@ -103,6 +119,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	public void reverse() {
 		reverse = true;
 		playing=true;
+		playingSound.play();
 		if( currentFrame<=0 )
 			currentFrame = currentAnimationData.frameEnd;
 	}
@@ -110,6 +127,7 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 	@Override
 	public void pause() {
 		playing = false;
+		playingSound.pause();
 	}
 
 }

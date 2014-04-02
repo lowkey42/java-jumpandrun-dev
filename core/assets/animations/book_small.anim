@@ -1,4 +1,5 @@
 { "default":"IDLE",
 "IDLE":{"texture": "book.png", "frameWidth": 369, "frameHeight":293, "numRowFrames": 8, "frameStart": 0, "frameEnd":0, "fps": 0},
-"OPEN":{"texture": "book.png", "frameWidth": 369, "frameHeight":293, "numRowFrames": 8, "frameStart": 0, "frameEnd":7, "fps": 7},
-"CLOSED":{"texture": "book.png", "frameWidth": 369, "frameHeight":293, "numRowFrames": 8, "frameStart": 7, "frameEnd":0, "fps": -7} }
+"OPEN":{"texture": "book.png", "frameWidth": 369, "frameHeight":293, "numRowFrames": 8, "frameStart": 0, "frameEnd":7, "fps": 7, "sound":"FlippingPages_0.ogg"},
+"CLOSED":{"texture": "book.png", "frameWidth": 369, "frameHeight":293, "numRowFrames": 8, "frameStart": 7, "frameEnd":0, "fps": -7, "sound":"FlippingPages_0.ogg"}
+}

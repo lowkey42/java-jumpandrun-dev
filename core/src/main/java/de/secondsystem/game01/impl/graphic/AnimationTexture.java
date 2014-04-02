@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jsfml.audio.ConstSoundBuffer;
 import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.IntRect;
 import org.json.simple.parser.JSONParser;
@@ -68,6 +69,7 @@ public final class AnimationTexture {
 	 */
 	public static final class AnimationData {
 		public final ConstTexture texture;
+		public final ConstSoundBuffer sound;
 		public final int frameWidth;
 		public final int frameHeight;
 		public final int numRowFrames;
@@ -76,13 +78,14 @@ public final class AnimationTexture {
 		public final float fps;
 		
 		public AnimationData(Attributes animAttr) throws IOException {
-			this.texture 	  = ResourceManager.texture.get(animAttr.getString("texture"));
-			this.frameWidth   = animAttr.getInteger("frameWidth");
-			this.frameHeight  = animAttr.getInteger("frameHeight");
-			this.numRowFrames = animAttr.getInteger("numRowFrames");
-			this.frameStart   = animAttr.getInteger("frameStart");
-			this.frameEnd     = animAttr.getInteger("frameEnd");
-			this.fps          = animAttr.getFloat("fps");
+			this.texture		= ResourceManager.texture.get(animAttr.getString("texture"));
+			this.sound			= !animAttr.containsKey("sound") ? null : ResourceManager.sound.getNullable(animAttr.getString("sound"));
+			this.frameWidth		= animAttr.getInteger("frameWidth");
+			this.frameHeight	= animAttr.getInteger("frameHeight");
+			this.numRowFrames	= animAttr.getInteger("numRowFrames");
+			this.frameStart		= animAttr.getInteger("frameStart");
+			this.frameEnd		= animAttr.getInteger("frameEnd");
+			this.fps			= animAttr.getFloat("fps");
 			
 		}
 		

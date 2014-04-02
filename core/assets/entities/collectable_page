@@ -1,0 +1,7 @@
+{ "representationType":"TEXTURE", "representation":"page_blank.png", "width":80, "height":60, "shape":"BOX", "density":1, "physicsType":"STATIC", "sensor":true,
+
+"effects":[{"factory":".ParticleFactory", "maxColor":"#ffffffff", "minColor":"#ffaaaaff", "particles":50, "width":160, "height":120,
+	"minTtl":10000, "maxTtl":30000, "minXVelocity":-100, "maxXVelocity":100, "minYVelocity":-100, "maxYVelocity":100, "texture":"page_blank.png"
+	"minRotationVelocity":-20, "maxRotationVelocity":20, "minAngularVelocity":90, "maxAngularVelocity":180, "minParticleSize":10, "maxParticleSize":20
+}]
+}
