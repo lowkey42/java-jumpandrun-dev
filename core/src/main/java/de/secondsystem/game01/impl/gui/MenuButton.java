@@ -19,7 +19,7 @@ public final class MenuButton extends GUIButton {
 	
 	// Constructors
 	public MenuButton(float x, float y, String caption, GUIElement owner, String file, String fonttype, IOnClickListener clickListener) {
-		super(x, y, 0, 31, caption, owner, clickListener);
+		super(x, y, 250, 100, caption, owner, clickListener);
 	}
 	
 	
@@ -43,14 +43,7 @@ public final class MenuButton extends GUIButton {
 	public void draw(RenderTarget rt){
 		if( rt instanceof Window )
 			mouseover( (Window) rt );
-		rt.draw(sprite);
+		sprite.draw(rt);
 		rt.draw(caption);
-	}
-
-
-	@Override
-	public boolean inside(Vector2f point) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

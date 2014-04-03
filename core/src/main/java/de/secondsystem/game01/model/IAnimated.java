@@ -26,7 +26,11 @@ public interface IAnimated extends IPlayable {
 		USED,
 		UNUSED,
 		OPEN,
-		CLOSED
+		CLOSED,
+		
+		// GUI animations
+		MOUSE_OVER,
+		CLICKED
 	}
 	
 }

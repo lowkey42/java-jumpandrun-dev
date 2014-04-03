@@ -27,8 +27,8 @@ public abstract class GUIElement implements IDrawable, IDimensioned, IScalable, 
 	// shared Attributes
 	
 	protected float width, height;
-	protected Text caption;
-	protected ConstFont font;
+//	protected Text caption;
+//	protected ConstFont font;
 	protected Vector2f pos;
 	protected float rotation;
 	protected boolean visible;
@@ -38,33 +38,19 @@ public abstract class GUIElement implements IDrawable, IDimensioned, IScalable, 
 	
 	// Constructors
 		
-	public GUIElement(float x, float y, float width, float height, String caption, GUIElement owner, IOnClickListener clickListener) {
+	public GUIElement(float x, float y, float width, float height, GUIElement owner, IOnClickListener clickListener) {
 		this.owner = owner;
 		this.width = width;
 		this.height = height;
 		this.pos = new Vector2f(x, y);
 		this.clickListener = clickListener;		
-			
-		try {
-			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
-			font = ResourceManager.font.get("VeraMono.ttf");
-			this.caption = new Text(caption, font, (int) (height - 5));
-			
-		} catch( IOException e ) {
-			throw new Error(e.getMessage(), e);
-		}
 	}
 	
-	public void setFont(Font font) {
-		this.font = font;
-		caption.setFont(font);
+	public GUIElement(float x, float y, float width, float height) {
+		this(x, y, width, height, null, null);
 	}
 	
 	// shared Methods
-	
-	public ConstFont getFont() {
-		return this.font;
-	}
 	
 	public boolean isVisible() {
 		return visible;

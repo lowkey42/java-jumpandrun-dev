@@ -6,51 +6,47 @@ package de.secondsystem.game01.impl.gui;
 import java.io.IOException;
 
 import org.jsfml.graphics.Color;
-import org.jsfml.graphics.ConstTexture;
-import org.jsfml.graphics.FloatRect;
-import org.jsfml.graphics.IntRect;
+import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderWindow;
-import org.jsfml.graphics.Sprite;
+import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.Window;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
  * @author Sebastian
  *
  */
-public abstract class GUIButton extends GUIElement {
+public class GUIButton extends GUIElement {
 
 	// shared Attributes
 	
 	protected int textureWidth, textureHeight;
 	
-	protected Sprite sprite;
+	protected AnimatedSprite sprite;
+	protected Text caption;
 	
 	// Constructors
 	
 	GUIButton(float x, float y, float width, float height, String caption, GUIElement owner, IOnClickListener clickListener){
-		super(x, y, width, height, caption, owner, clickListener);
+		super(x, y, width, height, owner, clickListener);
 		
 		try {
-			// Loading Standard Texture for MenuButtons
-			ConstTexture myTexture = ResourceManager.texture_gui.get("MainMenuButton.png");
+
+			// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
+			ConstFont font = ResourceManager.font.get("VeraMono.ttf");
+			this.caption = new Text(caption, font, (int) (height/4.f));
+			this.caption.setOrigin(this.caption.getGlobalBounds().width / 2.f, this.caption.getGlobalBounds().height / 2.f);
+
+			sprite = new AnimatedSprite(ResourceManager.animation.get("MainMenuButton.anim"), width, height);
+			sprite.setPosition(new Vector2f(x, y));
 			
-			textureHeight = myTexture.getSize().y / 3; textureWidth = myTexture.getSize().x;
-						
-			// Button Sprite generation and positioning
-			sprite = new Sprite(myTexture);
-			sprite.setPosition(x, y);
-			changeTextureClip(0);
-			
-			// Button inner text positioning and calibration
-			FloatRect textRect = this.caption.getGlobalBounds();
-			this.caption.setOrigin(textRect.width / 2.f, textRect.height / 2.f);
-			this.caption.setPosition(sprite.getPosition().x + sprite.getGlobalBounds().width / 2, sprite.getPosition().y + sprite.getGlobalBounds().height / 2);
+			this.caption.setPosition(sprite.getPosition().x, sprite.getPosition().y - this.caption.getGlobalBounds().height / 3.f);
 
 			} catch( IOException e ) {
 				throw new Error(e.getMessage(), e);
@@ -62,18 +58,18 @@ public abstract class GUIButton extends GUIElement {
 	// shared Methods
 	
 	public void draw(RenderTarget rt){
-		rt.draw(sprite);
+		sprite.draw(rt);
 		rt.draw(caption);
 	}
 	
 	protected void changeTextureClip(int pos) {
-		sprite.setTextureRect(new IntRect(0,textureHeight*pos,textureWidth,textureHeight));
+//		sprite.setTextureRect(new IntRect(0,textureHeight*pos,textureWidth,textureHeight));
 	}
 	
 	
 	public void mouseover(Window window){
 		Vector2f mouse = ((RenderWindow) window).mapPixelToCoords(Mouse.getPosition(window));
-		if(this.sprite.getGlobalBounds().contains(mouse.x, mouse.y)){
+		if( inside(mouse) ){
 			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); caption.setColor(Color.RED);
 			//System.out.println("  OVER  ");
 			//buttonOver.play();
@@ -83,11 +79,17 @@ public abstract class GUIButton extends GUIElement {
 	}
 	
 	public boolean onButtonReleased(float x, float y) {
-		if( sprite.getGlobalBounds().contains(x, y) ) {
+		if( inside(new Vector2f(x, y)) ) {
 			clickListener.onClick();
 			return true;
 		}
 		return false;
+	}
+
+
+	@Override
+	public boolean inside(Vector2f point) {
+		return sprite.inside(point);
 	}
 	
 }

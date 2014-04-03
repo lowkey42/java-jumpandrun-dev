@@ -35,7 +35,7 @@ public final class GUITestState extends GameState {
 	InputText testText = new InputText(50, 50, 200, 25, "", null);
 	MemoText testMemo = new MemoText(50, 250, 250, 90, "", null);
 	
-	MenuButton testButton = new MenuButton(50, 100, "TEST Button", null, new IOnClickListener() {
+	MenuButton testButton = new MenuButton(150, 150, "TEST Button", null, new IOnClickListener() {
 		
 		@Override
 		public void onClick() {

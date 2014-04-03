@@ -1,0 +1,4 @@
+{ "default":"IDLE",
+"IDLE":{"texture_gui": "MainMenuButton.png", "frameWidth": 250, "frameHeight":100, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 8},
+"MOUSE_OVER":{"texture_gui": "MainMenuButton.png", "frameWidth": 250, "frameHeight":100, "numRowFrames": 1, "frameStart": 1, "frameEnd":1, "fps": 8},
+"CLICKED":{"texture_gui": "MainMenuButton.png", "frameWidth": 250, "frameHeight":100, "numRowFrames": 1, "frameStart": 2, "frameEnd":2, "fps": 8} }
