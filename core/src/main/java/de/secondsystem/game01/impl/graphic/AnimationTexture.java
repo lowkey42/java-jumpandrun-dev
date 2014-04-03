@@ -78,7 +78,10 @@ public final class AnimationTexture {
 		public final float fps;
 		
 		public AnimationData(Attributes animAttr) throws IOException {
-			this.texture		= ResourceManager.texture.get(animAttr.getString("texture"));
+			String texPath = animAttr.getString("texture");
+			String guiTexPath = animAttr.getString("texture_gui");
+			
+			this.texture		= texPath != null ? ResourceManager.texture.get(texPath) : ResourceManager.texture_gui.get(guiTexPath);
 			this.sound			= !animAttr.containsKey("sound") ? null : ResourceManager.sound.getNullable(animAttr.getString("sound"));
 			this.frameWidth		= animAttr.getInteger("frameWidth");
 			this.frameHeight	= animAttr.getInteger("frameHeight");

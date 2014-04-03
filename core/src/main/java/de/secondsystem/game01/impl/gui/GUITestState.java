@@ -56,7 +56,6 @@ public final class GUITestState extends GUIGameStateSimpleLayout {
 	private final GameState MainMenu;
 	private Sprite backdrop = new Sprite();
 	
-	
 	public GUITestState(GameState MainMenu, GameState playGameState,
 			Sprite backdrop) {
 		// Transfering last State into playGameState
