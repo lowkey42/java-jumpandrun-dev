@@ -4,13 +4,13 @@
 package de.secondsystem.game01.impl.gui;
 
 import org.jsfml.graphics.FloatRect;
-import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 /**
  * @author Sebastian
@@ -18,7 +18,7 @@ import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
  */
 public class Button extends Element {
 
-	protected final Sprite sprite;
+	protected final AnimatedSprite sprite;
 	
 	protected final Text caption;
 	
@@ -26,14 +26,13 @@ public class Button extends Element {
 	
 	
 	public Button(float x, float y, String caption, ElementContainer owner, IOnClickListener clickListener){
-		super(x, y, getParentStyle(owner).buttonTexture.getSize().x, getParentStyle(owner).buttonTexture.getSize().y/3, owner);
+		super(x, y, getParentStyle(owner).buttonTexture.getDefault().frameWidth, getParentStyle(owner).buttonTexture.getDefault().frameHeight, owner);
 		
 		this.clickListener = clickListener;
 		
 		// Button Sprite generation and positioning
-		sprite = new Sprite(getStyle().buttonTexture);
-		sprite.setPosition(x, y);
-		changeTextureClip(0);
+		sprite = new AnimatedSprite(getStyle().buttonTexture);
+		sprite.setPosition(new Vector2f(x+getWidth() / 2, y + getHeight() / 2));
 		
 		// Button inner text positioning and calibration
 		this.caption = new Text(caption, getStyle().buttonFont, getStyle().buttonFontSize);
@@ -44,35 +43,31 @@ public class Button extends Element {
 	
 	@Override
 	protected void drawImpl(RenderTarget rt) {
-		rt.draw(sprite);
+		sprite.draw(rt);
 		rt.draw(caption);
-	}
-	
-	protected void changeTextureClip(int pos) {
-		sprite.setTextureRect(new IntRect(0, (int) getHeight()*pos, (int) getWidth(), (int) getHeight()));
 	}
 	
 	@Override
 	protected void onMouseOver(Vector2f mp) {
-		changeTextureClip(1);
+		sprite.play(AnimationType.MOUSE_OVER, 1, true);
 	}
 	@Override
 	protected void onMouseOut() {
-		changeTextureClip(0);
+		sprite.play(AnimationType.IDLE, 1, true);
 	}
 	@Override
 	protected void onUnFocus() {
-		changeTextureClip(0);
+		sprite.play(AnimationType.IDLE, 1, true);
 	}
 	@Override
 	protected void onFocus(Vector2f mp) {
-		changeTextureClip(1);
+		sprite.play(AnimationType.MOUSE_OVER, 1, true);
 	}
 	
 	@Override
 	protected void onKeyPressed(KeyType type) {
 		if( type==KeyType.ENTER )
-			changeTextureClip(2);
+			sprite.play(AnimationType.CLICKED, 1, true);
 	}
 	
 	@Override

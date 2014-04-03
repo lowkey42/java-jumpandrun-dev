@@ -6,6 +6,7 @@ import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstTexture;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.graphic.AnimationTexture;
 import de.secondsystem.game01.model.GameException;
 
 public final class Style {
@@ -22,14 +23,14 @@ public final class Style {
 	
 	public final int textFontSize;
 	
-	public final ConstTexture buttonTexture;
+	public final AnimationTexture buttonTexture;
 	
 	public final ConstTexture sliderTexture;
 	
 	public final boolean autoFocus;
 
 	public Style(ConstFont labelFont, int labelFontSize, ConstFont textFont, int textFontSize, 
-			ConstFont buttonFont, int buttonFontSize, ConstTexture buttonTexture, 
+			ConstFont buttonFont, int buttonFontSize, AnimationTexture buttonTexture, 
 			ConstTexture sliderTexture, boolean autoFocus) {
 		super();
 		this.labelFont = labelFont;
@@ -49,7 +50,7 @@ public final class Style {
 			return new Style(
 					ResourceManager.font.get("FreeSans.otf"), 20, // label
 					ResourceManager.font.get("FreeSans.otf"), 20, // text
-					ResourceManager.font.get("FreeSans.otf"), 26, ResourceManager.texture_gui.get("CoolButton.png"), // button 
+					ResourceManager.font.get("FreeSans.otf"), 26, ResourceManager.animation.get("coolButton.anim"), // button 
 					ResourceManager.texture_gui.get("VolumeButton.png"), // slider
 					false);
 			
