@@ -3,74 +3,71 @@
  */
 package de.secondsystem.game01.impl.gui;
 
-import java.io.IOException;
-
-import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Text;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
-import org.jsfml.window.Keyboard.Key;
-import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
  * @author Sebastian
  *
  */
-public final class GUITestState extends GameState {
+public final class GUITestState extends GUIGameStateSimpleLayout {
 
 	
-	private final GameState playGameState, MainMenu;
+
+	@Override
+	protected int getElementSpacing() {
+		return 50;
+	}
+
+	@Override
+	protected int getXPosition() {
+		return 50;
+	}
+
+	@Override
+	protected int getYPosition() {
+		return 200;
+	}
+
+	@Override
+	protected void initGui(GameContext ctx) {
+		createLabel("Input Text").setFor(createInputField(200, ""));
+		createLabel("Memo Editor").setFor(createInputField(200, "")); // TODO: memo
+		
+		createButton("TEST Button", new IOnClickListener() {
+			@Override public void onClick() {
+				System.out.println("Test Button works!");
+			}
+		});
+		
+		createButton(1000, 655, "BACK", new IOnClickListener(){
+			@Override public void onClick() {
+				setNextState(MainMenu);
+			}
+		});
+	}
+	
+	
+	private final GameState MainMenu;
 	private Sprite backdrop = new Sprite();
 	
-	private final Text infoInputText;
-	private final Text infoMemoText;
-	
-	// Object creations
-	InputText testText = new InputText(50, 50, 200, 25, "", null);
-	MemoText testMemo = new MemoText(50, 250, 250, 90, "", null);
-	
-	MenuButton testButton = new MenuButton(50, 100, "TEST Button", null, new IOnClickListener() {
-		
-		@Override
-		public void onClick() {
-			System.out.println("Test Button works!");
-		}
-	});
-	
-
-	MenuButton backButton = new MenuButton(1000, 655, "BACK", null, new IOnClickListener(){
-		@Override
-		public void onClick() {
-			setNextState(MainMenu);
-		}
-	});
-		
 	
 	public GUITestState(GameState MainMenu, GameState playGameState,
 			Sprite backdrop) {
 		// Transfering last State into playGameState
-		this.playGameState = playGameState;
 		this.MainMenu = MainMenu;
 		this.backdrop = backdrop;
-		try {
-			// Loading standard Font
-			ConstFont myFont = ResourceManager.font.get("VeraMono.ttf");
-			infoInputText = new Text("Input Text", myFont, 20);
-			infoMemoText = new Text("Memo Editor", myFont, 20);
-			} catch( IOException e ) {
-				throw new Error(e.getMessage(), e);
-			}
 	}
 	
 	
 	@Override
 	protected void onStart(GameContext ctx) {
+		super.onStart(ctx);
 
 		if (backdrop.getTexture() == null) {
 			Texture backdropBuffer = new Texture();
@@ -84,77 +81,20 @@ public final class GUITestState extends GameState {
 			backdropBuffer.update(ctx.window);
 			backdrop.setTexture(backdropBuffer);
 		}
-		
-		infoInputText.setPosition(testText.pos.x, testText.pos.y - 30);
-		infoMemoText.setPosition(testMemo.pos.x, testMemo.pos.y - 30);
 	}
 
 	
 	@Override
 	protected void onStop(GameContext ctx) {
-		// TODO
 	}
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		
 		ctx.window.clear();
-		
 		ctx.window.draw(backdrop);
 
-		ctx.window.draw(infoInputText);
-		ctx.window.draw(infoMemoText);
+		super.onFrame(ctx, frameTime);
 		
-		testText.draw(ctx.window);
-		testButton.draw(ctx.window);
-		testMemo.draw(ctx.window);
-		backButton.draw(ctx.window);
-		
-	}	
+	}
 	
-	@SuppressWarnings("incomplete-switch")
-	@Override
-	protected void processEvent(GameContext ctx, Event event) {
-		switch (event.type) {
-		case CLOSED:
-			ctx.window.close();
-			break;
-		case MOUSE_WHEEL_MOVED:
-			testMemo.scrollText(event);
-			break;
-		case MOUSE_BUTTON_RELEASED:
-			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-				testButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-				backButton.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-				if(ctx.getMousePosition().x >= testText.pos.x && ctx.getMousePosition().x <= testText.pos.x + testText.width  && 
-						ctx.getMousePosition().y >= testText.pos.y && ctx.getMousePosition().y <= testText.pos.y + testText.height){
-							testText.setActive();
-				} else { testText.setInactive();}
-				if(ctx.getMousePosition().x >= testMemo.pos.x && ctx.getMousePosition().x <= testMemo.pos.x + testMemo.width  && 
-						ctx.getMousePosition().y >= testMemo.pos.y && ctx.getMousePosition().y <= testMemo.pos.y + testMemo.height){
-							testMemo.setActive();
-				} else { testMemo.setInactive();}
-			}
-			break;
-		case TEXT_ENTERED:
-			if(event.asTextEvent().unicode <= 127 && event.asTextEvent().unicode >= 32){
-				//System.out.println("TEXT ENTERED UNICODE: " + event.asTextEvent().unicode);
-				testText.newKey(event);
-				testMemo.newKey(event);
-			// Backspace pushed
-			} else if (event.asTextEvent().unicode == 8){
-				testText.removeKey();
-				testMemo.removeKey();
-			// Return pushed
-			} else if (event.asTextEvent().unicode == 13){
-				System.out.println("Sent Input Text: " + testText.finalizeInput());
-				System.out.println("Sent Memo Text: " + testMemo.finalizeInput());
-			}
-			break;
-		case KEY_RELEASED:
-			if (event.asKeyEvent().key == Key.ESCAPE)
-				testText.setInactive();
-			if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
-				setNextState(playGameState);
-		}	}
 }
