@@ -19,7 +19,6 @@ public class Label extends Element {
 
 		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
 		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
-		this.text.setPosition(x, y + height / 2);
 		setDimensions(this.text.getGlobalBounds().width, this.text.getGlobalBounds().height);
 	}
 	
@@ -43,6 +42,8 @@ public class Label extends Element {
 
 	@Override
 	protected void drawImpl(RenderTarget renderTarget) {
+		text.setPosition(getPosition());
+		
 		renderTarget.draw(text);
 	}
 

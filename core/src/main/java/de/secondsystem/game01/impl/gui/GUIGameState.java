@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.gui;
 
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
@@ -18,10 +19,12 @@ public abstract class GUIGameState extends GameState {
 	
 	protected abstract void initGui(GameContext ctx);
 	
+	protected abstract Vector2f getPosition();
+	
 	@Override
 	protected void onStart(GameContext ctx) {
 		if( !guiInitialized ) {
-			baseContainer = new ElementContainer(0, 0, ctx.getViewWidth(), ctx.getViewHeight(), Style.createDefaultStyle());
+			baseContainer = new ElementContainer(getPosition().x, getPosition().y, ctx.getViewWidth(), ctx.getViewHeight(), Style.createDefaultStyle());
 			initGui(ctx);
 			guiInitialized = true;
 		}

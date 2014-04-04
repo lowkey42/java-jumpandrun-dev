@@ -28,8 +28,6 @@ public final class Slider extends Element {
 	
 		foregroundSprite = new Sprite(getParentStyle(owner).sliderTexture);
 		backgroundSprite = new Sprite(getParentStyle(owner).sliderTexture);
-		foregroundSprite.setPosition(x, y);
-		backgroundSprite.setPosition(x, y);
 		updateTextureClip();
 	}
 	
@@ -86,6 +84,9 @@ public final class Slider extends Element {
 
 	@Override
 	protected void drawImpl(RenderTarget rt) {
+		foregroundSprite.setPosition(getPosition());
+		backgroundSprite.setPosition(getPosition());
+		
 		rt.draw(backgroundSprite);
 		rt.draw(foregroundSprite);
 	}

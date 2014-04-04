@@ -6,6 +6,7 @@ package de.secondsystem.game01.impl.gui;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
+import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
@@ -23,13 +24,8 @@ public final class GUITestState extends GUIGameStateSimpleLayout {
 	}
 
 	@Override
-	protected int getXPosition() {
-		return 50;
-	}
-
-	@Override
-	protected int getYPosition() {
-		return 200;
+	protected Vector2f getPosition() {
+		return new Vector2f(50, 50);
 	}
 
 	@Override

@@ -10,7 +10,7 @@ public class AttributesDataTable extends DataTable {
 
 	public AttributesDataTable(float x, float y, float width, float height, AttributesSource attributesSource,
 			ElementContainer owner) {
-		super(x, y, width, height, owner);
+		super(x, y, width, owner, null, null);
 	}
 	
 	public Attributes getModifiedAttributes() {

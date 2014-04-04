@@ -81,8 +81,8 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 	
 	@Override
 	public boolean inside(Vector2f point) {
-		return point.x>=pos.x && point.x<=pos.x+width 
-			&& point.y>=pos.y && point.y<=pos.y+height;
+		return point.x>=getPosition().x && point.x<=getPosition().x+width 
+			&& point.y>=getPosition().y && point.y<=getPosition().y+height;
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 
 	@Override
 	public Vector2f getPosition() {
-		return pos;
+		return owner!=null ? Vector2f.add(pos, owner.getPosition()) : pos;
 	}
 
 

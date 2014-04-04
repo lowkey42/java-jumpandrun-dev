@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.graphics.Sprite;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
@@ -17,13 +18,8 @@ public final class SettingsMenuState extends GUIGameStateSimpleLayout {
 	}
 
 	@Override
-	protected int getXPosition() {
-		return 800;
-	}
-
-	@Override
-	protected int getYPosition() {
-		return 50;
+	protected Vector2f getPosition() {
+		return new Vector2f(800, 50);
 	}
 
 	@Override

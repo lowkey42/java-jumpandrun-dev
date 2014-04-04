@@ -13,7 +13,6 @@ public class Panel extends ElementContainer {
 		
 		shape = new RectangleShape(new Vector2f(width, height));
 		shape.setOrigin(new Vector2f(width / 2.f, height / 2.f));
-		shape.setPosition(pos);
 		shape.setOutlineThickness(2.f);
 		shape.setOutlineColor(Color.WHITE);
 		shape.setFillColor(Color.BLACK);
@@ -21,6 +20,7 @@ public class Panel extends ElementContainer {
 
 	@Override
 	protected void drawImpl(RenderTarget renderTarget) {
+		shape.setPosition(getPosition());
 		renderTarget.draw(shape);
 		
 		super.drawImpl(renderTarget);

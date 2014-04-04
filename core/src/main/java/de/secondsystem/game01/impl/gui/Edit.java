@@ -40,13 +40,11 @@ public class Edit extends Element implements TextElement {
 
 		this.text = new Text(""+CURSER_CHAR_2, getStyle().textFont, getStyle().textFontSize);
 		this.text.setOrigin(0, this.text.getLocalBounds().height / 2);
-		this.text.setPosition(x + TEXT_X_OFFSET, y + (this.text.getLocalBounds().height+10) / 2);
 		setDimensions(width, this.text.getLocalBounds().height*2+10);
 		this.text.setString(text);
 		
 		buffer = new StringBuilder(text);
 		box = new RectangleShape(new Vector2f(width, height));
-		box.setPosition(pos);
 		box.setFillColor(new Color(0, 0, 0, 0));
 		box.setOutlineColor(Color.WHITE);
 		box.setOutlineThickness(BORDER_SIZE);
@@ -63,6 +61,9 @@ public class Edit extends Element implements TextElement {
 	
 	@Override
 	protected void drawImpl(RenderTarget renderTarget) {
+		text.setPosition( Vector2f.add(getPosition(), new Vector2f(TEXT_X_OFFSET, (this.text.getLocalBounds().height+10) / 2)) );
+		box.setPosition(getPosition());
+		
 		renderTarget.draw(box);
 		renderTarget.draw(text);
 	}

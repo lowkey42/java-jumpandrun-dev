@@ -32,17 +32,18 @@ public class Button extends Element {
 		
 		// Button Sprite generation and positioning
 		sprite = new AnimatedSprite(getStyle().buttonTexture);
-		sprite.setPosition(new Vector2f(x+getWidth() / 2, y + getHeight() / 2));
 		
 		// Button inner text positioning and calibration
 		this.caption = new Text(caption, getStyle().buttonFont, getStyle().buttonFontSize);
 		FloatRect textRect = this.caption.getLocalBounds();
 		this.caption.setOrigin(textRect.width / 2.f, textRect.height );
-		this.caption.setPosition(x + getWidth() / 2, y + getHeight() / 2);
 	}
 	
 	@Override
 	protected void drawImpl(RenderTarget rt) {
+		sprite.setPosition(Vector2f.add(getPosition(), new Vector2f(getWidth() / 2, getHeight() / 2)));
+		caption.setPosition(sprite.getPosition());
+		
 		sprite.draw(rt);
 		rt.draw(caption);
 	}

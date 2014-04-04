@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.intro;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
+import org.jsfml.system.Vector2f;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
@@ -31,13 +32,8 @@ public final class MainMenuState extends GUIGameStateSimpleLayout {
 	}
 
 	@Override
-	protected int getXPosition() {
-		return 800;
-	}
-
-	@Override
-	protected int getYPosition() {
-		return 200;
+	protected Vector2f getPosition() {
+		return new Vector2f(800, 200);
 	}
 
 	@Override
