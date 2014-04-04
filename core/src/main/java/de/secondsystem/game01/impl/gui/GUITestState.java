@@ -3,6 +3,8 @@
  */
 package de.secondsystem.game01.impl.gui;
 
+import java.util.Arrays;
+
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
@@ -10,17 +12,19 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
  * @author Sebastian
  *
  */
-public final class GUITestState extends GUIGameStateSimpleLayout {
+public final class GUITestState extends GUIGameState {
 
 	@Override
-	protected int getElementSpacing() {
-		return 50;
+	protected Layout getLayout() {
+		return new Layout(LayoutDirection.VERTICAL, 50);
 	}
 
 	@Override
@@ -29,21 +33,46 @@ public final class GUITestState extends GUIGameStateSimpleLayout {
 	}
 
 	@Override
-	protected void initGui(GameContext ctx) {
-		createLabel("Input Text").setFor(createInputField(200, ""));
-		createLabel("Memo Editor").setFor(createInputField(200, "")); // TODO: memo
+	protected void initGui(GameContext ctx, LayoutElementContainer c) {
+		c.createLabel("Input Text").setFor(c.createInputField(200, ""));
+		c.createLabel("Memo Editor").setFor(c.createInputField(200, "")); // TODO: memo
 		
-		createButton("TEST Button", new IOnClickListener() {
+		c.createButton("TEST Button", new IOnClickListener() {
 			@Override public void onClick() {
 				System.out.println("Test Button works!");
 			}
 		});
 		
-		createButton(1000, 655, "BACK", new IOnClickListener(){
+		c.createButton(1000, 655, "BACK", new IOnClickListener(){
 			@Override public void onClick() {
 				setNextState(MainMenu);
 			}
 		});
+		
+		c.createDataTable(1000, 100, 400,
+				Arrays.asList("test-2", "asd-42", "zzz-23", "hjkl-vim"),
+				Arrays.asList(
+					new DataTable.ColumnDef<String>() {
+						@Override public String getName() {				return "first Column"; }
+
+						@Override public float getWidthPercentage() {	return 0.5f; }
+
+						@Override public Element createValueElement(float width,
+								String data, LayoutElementContainer row) {
+							return row.createLabel(data.split("-")[0], width, 1);
+						}
+					},
+					new DataTable.ColumnDef<String>() {
+						@Override public String getName() {				return "another Column"; }
+
+						@Override public float getWidthPercentage() {	return 0.5f; }
+
+						@Override public Element createValueElement(float width,
+								String data, LayoutElementContainer row) {
+							return row.createInputField(width, data.split("-")[1]);
+						}
+					}
+				));
 	}
 	
 	

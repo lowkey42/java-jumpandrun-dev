@@ -7,14 +7,17 @@ import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.gui.GUIGameStateSimpleLayout;
+import de.secondsystem.game01.impl.gui.GUIGameState;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
-public final class SettingsMenuState extends GUIGameStateSimpleLayout {
+public final class SettingsMenuState extends GUIGameState {
 
 	@Override
-	protected int getElementSpacing() {
-		return 25;
+	protected Layout getLayout() {
+		return new Layout(LayoutDirection.VERTICAL, 25);
 	}
 
 	@Override
@@ -23,34 +26,34 @@ public final class SettingsMenuState extends GUIGameStateSimpleLayout {
 	}
 
 	@Override
-	protected void initGui(GameContext ctx) {
-		createButton("Resolution", new IOnClickListener() {
+	protected void initGui(GameContext ctx, LayoutElementContainer c) {
+		c.createButton("Resolution", new IOnClickListener() {
 			@Override public void onClick() {
 				// TODO
 			}
 		});
-		createButton("VSync", new IOnClickListener() {
+		c.createButton("VSync", new IOnClickListener() {
 			@Override public void onClick() {
 				// TODO
 			}
 		});
-		createButton("Antialiasing", new IOnClickListener() {
+		c.createButton("Antialiasing", new IOnClickListener() {
 			@Override public void onClick() {
 				// TODO
 			}
 		});
 
 
-		createLabel("Volume").setFor(createSlider());
-		createLabel("Brightness").setFor(createSlider());
+		c.createLabel("Volume").setFor(c.createSlider());
+		c.createLabel("Brightness").setFor(c.createSlider());
 		
 
-		createButton("Apply", new IOnClickListener() {
+		c.createButton("Apply", new IOnClickListener() {
 			@Override public void onClick() {
 				// TODO: save
 			}
 		});
-		createButton("Back", new IOnClickListener() {
+		c.createButton("Back", new IOnClickListener() {
 			@Override public void onClick() {
 				setNextState(MainMenu);
 			}

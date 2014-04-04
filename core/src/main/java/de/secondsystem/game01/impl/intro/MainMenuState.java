@@ -12,23 +12,26 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
-import de.secondsystem.game01.impl.gui.GUIGameStateSimpleLayout;
+import de.secondsystem.game01.impl.gui.GUIGameState;
 import de.secondsystem.game01.impl.gui.GUITestState;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
  * TODO
  * 
  */
-public final class MainMenuState extends GUIGameStateSimpleLayout {
+public final class MainMenuState extends GUIGameState {
 
 	private final GameState playGameState; 
 
 	private final Sprite backdrop = new Sprite();
 
 	@Override
-	protected int getElementSpacing() {
-		return 100;
+	protected Layout getLayout() {
+		return new Layout(LayoutDirection.VERTICAL, 100);
 	}
 
 	@Override
@@ -37,32 +40,32 @@ public final class MainMenuState extends GUIGameStateSimpleLayout {
 	}
 
 	@Override
-	protected void initGui(GameContext ctx) {
-		createButton("NEW GAME", new IOnClickListener() {
+	protected void initGui(GameContext ctx, LayoutElementContainer c) {
+		c.createButton("NEW GAME", new IOnClickListener() {
 			@Override public void onClick() {
 				setNextState(new MainGameState("test01"));
 			}
 		});
 
-		createButton("EDITOR", new IOnClickListener() {
+		c.createButton("EDITOR", new IOnClickListener() {
 			@Override public void onClick() {
 				setNextState(EditorGameState.create(MainMenuState.this, "test01"));
 			}
 		});
 
-		createButton("GUI TEST SITE", new IOnClickListener() {
+		c.createButton("GUI TEST SITE", new IOnClickListener() {
 			@Override public void onClick() {
 				setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
 			}
 		});
 
-		createButton("SETTINGS", new IOnClickListener() {
+		c.createButton("SETTINGS", new IOnClickListener() {
 			@Override public void onClick() {
 				setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
 			}
 		});
 
-		createButton("EXIT GAME", new IOnClickListener() {
+		c.createButton("EXIT GAME", new IOnClickListener() {
 			@Override public void onClick() {
 				setNextState(new FinalizeState());
 			}

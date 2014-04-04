@@ -6,6 +6,10 @@ import java.util.List;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
+import de.secondsystem.game01.impl.gui.DataTable.ColumnDef;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+
 public class ElementContainer extends Element {
 	
 	private final List<Element> children = new ArrayList<>();
@@ -17,21 +21,18 @@ public class ElementContainer extends Element {
 	private final Style style;
 	
 	public ElementContainer(float x, float y, float width, float height) {
-		this(x, y, width, height, null, null);
+		super(x, y, width, height, null);
+		this.style = null;
 	}
 	
 	public ElementContainer(float x, float y, float width, float height, Style style) {
-		this(x, y, width, height, style, null);
-	}
-
-	public ElementContainer(float x, float y, float width, float height, Style style,
-			ElementContainer owner) {
-		super(x, y, width, height, owner);
+		super(x, y, width, height, null);
 		this.style = style;
 	}
-	public ElementContainer(float x, float y, float width, float height,
-			ElementContainer owner) {
-		this(x, y, width, height, null, owner);
+
+	public ElementContainer(float x, float y, float width, float height, ElementContainer owner) {
+		super(x, y, width, height, owner);
+		this.style = null;
 	}
 	
 	@Override
@@ -39,10 +40,10 @@ public class ElementContainer extends Element {
 		return style!=null ? style : super.getStyle();
 	}
 
-	public void addElement( Element element ) {
+	void addElement( Element element ) {
 		children.add(element);
 	}
-	public void removeElement( Element element ) {
+	void removeElement( Element element ) {
 		children.remove(element);
 	}
 	
@@ -77,15 +78,13 @@ public class ElementContainer extends Element {
 	@Override
 	public void onFocus(Vector2f mp) {
 		Element e = getByPos(mp);
+
+		if( focus!=null && e!=focus )
+			focus.onUnFocus();
 		
-		if( e==null || e!=focus ) {
-			if( focus!=null )
-				focus.onUnFocus();
-			
-			focus = e;
-			if( focus!=null )
-				focus.onFocus(mp);
-		}
+		focus = e;
+		if( focus!=null )
+			focus.onFocus(mp);
 	}
 	
 	@Override
@@ -122,4 +121,37 @@ public class ElementContainer extends Element {
 			c.update(frameTimeMs);
 	}
 
+
+	public final <T> DataTable<T> createDataTable(float x, float y, float width, Iterable<T> rowData, 
+			List<ColumnDef<T>> columns) {
+		return new DataTable<>(x, y, width, this, rowData, columns);
+	}
+	public final AttributesDataTable createAttributesDataTable(float x, float y, float width, AttributesSource attributesSource) {
+		return new AttributesDataTable(x, y, width, attributesSource, this);
+	}
+	public final Panel createPanel(float x, float y, float width, float height) {
+		return new Panel(x, y, width, height, this);
+	}
+	public final Slider createSlider(float x, float y) {
+		return new Slider(x, y, this);
+	}
+	public final Label createLabel(float x, float y, String text, Element forElem) {
+		return new Label(x, y, text, this, forElem);
+	}
+	public final Label createLabel(float x, float y, String text) {
+		return new Label(x, y, text, this);
+	}
+	public final Label createLabel(float x, float y, String text, float width, float height, Element forElem) {
+		return new Label(x, y, text, width, height, this, forElem);
+	}
+	public final Label createLabel(float x, float y, String text, float width, float height) {
+		return new Label(x, y, text, width, height, this);
+	}
+	public final Button createButton(float x, float y, String caption, IOnClickListener clickListener) {
+		return new Button(x, y, caption, this, clickListener);
+	}
+	public final Edit createInputField(float x, float y, float width, String text) {
+		return new Edit(x, y, width, text, this);
+	}
+	
 }

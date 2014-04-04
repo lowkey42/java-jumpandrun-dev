@@ -9,23 +9,27 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.gui.Element.KeyType;
-import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 
 public abstract class GUIGameState extends GameState {
 
-	private ElementContainer baseContainer;
+	private LayoutElementContainer baseContainer;
 	
 	private boolean guiInitialized = false;
 	
-	protected abstract void initGui(GameContext ctx);
+	protected abstract void initGui(GameContext ctx, LayoutElementContainer container);
 	
 	protected abstract Vector2f getPosition();
+	
+	protected abstract Layout getLayout();
 	
 	@Override
 	protected void onStart(GameContext ctx) {
 		if( !guiInitialized ) {
-			baseContainer = new ElementContainer(getPosition().x, getPosition().y, ctx.getViewWidth(), ctx.getViewHeight(), Style.createDefaultStyle());
-			initGui(ctx);
+			baseContainer = new LayoutElementContainer(getPosition().x, getPosition().y, 
+					ctx.getViewWidth()-getPosition().x, ctx.getViewHeight()-getPosition().y, 
+					Style.createDefaultStyle(), getLayout());
+			initGui(ctx, baseContainer);
 			guiInitialized = true;
 		}
 	}
@@ -104,21 +108,4 @@ public abstract class GUIGameState extends GameState {
 		}
 	}
 
-	
-	// factory-methods
-	protected final Slider createSlider(float x, float y) {
-		return new Slider(x, y, baseContainer);
-	}
-	protected final Label createLabel(float x, float y, String text, Element forElem) {
-		return new Label(x, y, text, baseContainer, forElem);
-	}
-	protected final Label createLabel(float x, float y, String text) {
-		return new Label(x, y, text, baseContainer);
-	}
-	protected final Button createButton(float x, float y, String caption, IOnClickListener clickListener) {
-		return new Button(x, y, caption, baseContainer, clickListener);
-	}
-	protected final Edit createInputField(float x, float y, float width, String text) {
-		return new Edit(x, y, width, text, baseContainer);
-	}
 }

@@ -93,7 +93,18 @@ public class Edit extends Element implements TextElement {
 	@Override
 	protected void onFocus(Vector2f mp) {
 		box.setOutlineColor(Color.RED);
-		curserPosition = buffer.length();
+		
+		boolean curserSet = false;
+		for( int i=0; i<text.getString().length(); ++i ) {
+			if(	text.findCharacterPos(i).x>mp.x ) {
+				curserPosition = Math.max(curserPosition>=i ? i-2 : i-1, 0);
+				curserSet = true;
+				break;
+			}
+		}
+		if( !curserSet )
+			curserPosition = buffer.length();
+		
 		updateText();
 	}
 	@Override
@@ -106,8 +117,11 @@ public class Edit extends Element implements TextElement {
 	protected void onKeyPressed(KeyType type) {
 		switch (type) {
 			case BACKSPACE:
-				curserPosition-=getCharCount(curserPosition-1);
-				// fallthrough
+				if( curserPosition>=getCharCount(curserPosition-1) )
+					curserPosition-=getCharCount(curserPosition-1);
+					// fallthrough
+				else
+					break;
 				
 			case DEL:
 				if( buffer.length()>0 ) {
