@@ -1,37 +1,71 @@
 package de.secondsystem.game01.impl.intro;
 
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
 import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.gui.GUIButton;
-import de.secondsystem.game01.impl.gui.SlideButton;
+import de.secondsystem.game01.impl.gui.GUIGameStateSimpleLayout;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
-public final class SettingsMenuState extends GameState {
+public final class SettingsMenuState extends GUIGameStateSimpleLayout {
+
+	@Override
+	protected int getElementSpacing() {
+		return 25;
+	}
+
+	@Override
+	protected int getXPosition() {
+		return 800;
+	}
+
+	@Override
+	protected int getYPosition() {
+		return 50;
+	}
+
+	@Override
+	protected void initGui(GameContext ctx) {
+		createButton("Resolution", new IOnClickListener() {
+			@Override public void onClick() {
+				// TODO
+			}
+		});
+		createButton("VSync", new IOnClickListener() {
+			@Override public void onClick() {
+				// TODO
+			}
+		});
+		createButton("Antialiasing", new IOnClickListener() {
+			@Override public void onClick() {
+				// TODO
+			}
+		});
+
+
+		createLabel("Volume").setFor(createSlider());
+		createLabel("Brightness").setFor(createSlider());
+		
+
+		createButton("Apply", new IOnClickListener() {
+			@Override public void onClick() {
+				// TODO: save
+			}
+		});
+		createButton("Back", new IOnClickListener() {
+			@Override public void onClick() {
+				setNextState(MainMenu);
+			}
+		});
+	}
+
 
 	private final GameState playGameState;
 	private GameState MainMenu;
-
-	GUIButton changeRes = new GUIButton(200, 120, "Resolution", null);
-	GUIButton vSync = new GUIButton(200, 320, "VSync", null);
-	GUIButton antiA = new GUIButton(200, 520, "Antialiasing", null);
-	GUIButton apply = new GUIButton(540, 520, "APPLY", null);
-	GUIButton back = new GUIButton(870, 520, "BACK", null, new IOnClickListener() {
 	
-		@Override public void onClick() {
-			setNextState(MainMenu);
-		}
-	});
-
-	SlideButton sliderOne = new SlideButton("Volume", 620, 100);
-	SlideButton sliderTwo = new SlideButton("Brightness", 620, 300);
-
-	Texture backdropBuffer = new Texture();
-	Sprite backdrop = new Sprite();
+	private final Sprite backdrop;
 
 	public SettingsMenuState(GameState MainMenu, GameState playGameState,
 			Sprite backdrop) {
@@ -43,7 +77,7 @@ public final class SettingsMenuState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
-
+		super.onStart(ctx);
 	}
 
 	@Override
@@ -53,55 +87,25 @@ public final class SettingsMenuState extends GameState {
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		// TODO
 		ctx.window.clear();
 		
 		ctx.window.draw(backdrop);
 
-		//sliderOneBack.draw(ctx.window);
-		sliderOne.draw(ctx.window);
-		//sliderTwoBack.draw(ctx.window);
-		sliderTwo.draw(ctx.window);
-
-		changeRes.draw(ctx.window);
-		vSync.draw(ctx.window);
-		antiA.draw(ctx.window);
-		back.draw(ctx.window);
-		apply.draw(ctx.window);
-
+		super.onFrame(ctx, frameTime);
 	}
 
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void processEvent(GameContext ctx, Event event) {
+		super.processEvent(ctx, event);
+		
 		switch (event.type) {
-		case CLOSED:
-			ctx.window.close();
-			break;
-		case MOUSE_BUTTON_RELEASED:
-			// Checking if the current mouse position is inside the Button
-			// and only the left mouse button is pressed
-			// if(sliderOne.sliderSprite.getGlobalBounds().contains(Mouse.getPosition(ctx.window).x,
-			// (Mouse.getPosition(ctx.window).y)) &&
-			// event.asMouseButtonEvent().button ==
-			// org.jsfml.window.Mouse.Button.LEFT)
-			// setNextState(new MainGameState("test01"));
-			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-				back.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-			}
-
-			break;
-		case KEY_RELEASED:
-			if (event.asKeyEvent().key == Key.ESCAPE) {
-				ctx.window.draw(backdrop);
-				setNextState(playGameState);
-			}
-		case MOUSE_BUTTON_PRESSED:
-		case MOUSE_MOVED:
-			sliderOne.mouseover(ctx, event);
-			sliderTwo.mouseover(ctx, event);
-
-			break;
+			case KEY_RELEASED:
+				if (event.asKeyEvent().key == Key.ESCAPE) {
+					ctx.window.draw(backdrop);
+					setNextState(playGameState);
+				}
+				break;
 		}
 	}
 	

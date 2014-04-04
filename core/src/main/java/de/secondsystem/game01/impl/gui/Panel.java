@@ -5,38 +5,25 @@ import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.util.Tools;
-
-public class Panel extends GUIElement {
-	private RectangleShape shape = new RectangleShape();
+public class Panel extends ElementContainer {
+	private final RectangleShape shape;
 	
-	public Panel(float x, float y, float width, float height, GUIElement parent) {
+	public Panel(float x, float y, float width, float height, ElementContainer parent) {
 		super(x, y, width, height, parent);
 		
+		shape = new RectangleShape(new Vector2f(width, height));
 		shape.setOrigin(new Vector2f(width / 2.f, height / 2.f));
+		shape.setPosition(pos);
 		shape.setOutlineThickness(2.f);
 		shape.setOutlineColor(Color.WHITE);
 		shape.setFillColor(Color.BLACK);
-		refresh();
 	}
 
 	@Override
-	public void draw(RenderTarget renderTarget) {
+	protected void drawImpl(RenderTarget renderTarget) {
 		renderTarget.draw(shape);
 		
-		super.draw(renderTarget);
-	}
-
-	@Override
-	public boolean inside(Vector2f point) {
-		return Tools.isInside(shape, point);
-	}
-	
-	public void refresh() {
-		super.refresh();
-		
-		shape.setSize(new Vector2f(width, height));
-		shape.setPosition(pos);
+		super.drawImpl(renderTarget);
 	}
 
 }

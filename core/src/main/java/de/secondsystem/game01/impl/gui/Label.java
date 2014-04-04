@@ -1,67 +1,49 @@
 package de.secondsystem.game01.impl.gui;
 
-import java.io.IOException;
-
-import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Text;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.ResourceManager;
+public class Label extends Element {
 
-public class Label extends GUIElement {
+	private final Text text;
+	
+	private Element forElem;
 
-	protected Text text;
-	
-	public Label(float x, float y, String text, GUIElement parent) {
-		super(x, y, 0.f, 0.f, parent);
-		
-		width  = this.text.getGlobalBounds().width;
-		height = this.text.getGlobalBounds().height;
-		// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
-		this.text = new Text(text, loadFont("VeraMono.ttf"), (int) (height/4.f));
-		this.text.setOrigin(width / 2.f, height / 2.f);
-		this.text.setPosition(x, y);
+	public Label(float x, float y, String text, ElementContainer parent) {
+		this(x, y, text, parent, null);
+	}
+	public Label(float x, float y, String text, ElementContainer parent, Element forElem) {
+		super(x, y, 1, 1, parent);
+		this.forElem = forElem;
+
+		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
+		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
+		this.text.setPosition(x, y + height / 2);
+		setDimensions(this.text.getGlobalBounds().width, this.text.getGlobalBounds().height);
 	}
 	
-	public Label(float x, float y, GUIElement parent) {
-		this(x, y, "label", parent);
+	public void setFor(Element forElem) {
+		this.forElem = forElem;
 	}
+
+	@Override protected void onFocus(Vector2f mp){forElem.onFocus(mp);}
+	@Override protected void onUnFocus(){forElem.onUnFocus();}
 	
-	public void setFont(ConstFont font) {
-		text.setFont(font);
-	}
+	@Override protected void onMouseOver(Vector2f mp){forElem.onMouseOver(mp);}
+	@Override protected void onMouseOut(){forElem.onMouseOut();}
 	
-	public void setFont(String filename) {
-		text.setFont(loadFont(filename));
-	}
+	@Override protected void onTextInput(int character){forElem.onTextInput(character);}
+	@Override protected void onKeyPressed(KeyType type){forElem.onKeyPressed(type);}
+	@Override protected void onKeyReleased(KeyType type){forElem.onKeyReleased(type);}
 	
-	private ConstFont loadFont(String filename) {
-		try {
-			ConstFont font = ResourceManager.font.get(filename);
-			return font;
-		} catch( IOException e ) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
+	@Override
+	public void update(long frameTimeMs) {
 	}
 
 	@Override
-	public void draw(RenderTarget renderTarget) {
-		super.draw(renderTarget);
-		
+	protected void drawImpl(RenderTarget renderTarget) {
 		renderTarget.draw(text);
-	}
-
-	@Override
-	public boolean inside(Vector2f point) {
-		return text.getGlobalBounds().contains(point);
-	}
-
-	@Override
-	public void refresh() {
-		text.setScale(width/text.getGlobalBounds().width, height/text.getGlobalBounds().height/height);
-		text.setPosition(pos);
-		text.setRotation(rotation);
 	}
 
 }

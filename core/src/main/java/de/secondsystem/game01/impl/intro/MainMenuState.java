@@ -11,7 +11,7 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
-import de.secondsystem.game01.impl.gui.GUIButton;
+import de.secondsystem.game01.impl.gui.GUIGameStateSimpleLayout;
 import de.secondsystem.game01.impl.gui.GUITestState;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
@@ -19,48 +19,59 @@ import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
  * TODO
  * 
  */
-public final class MainMenuState extends GameState {
+public final class MainMenuState extends GUIGameStateSimpleLayout {
 
 	private final GameState playGameState; 
 
 	private final Sprite backdrop = new Sprite();
 
-	
-	// --> TODO Abfragen der Fensterbreite bereits beim Erschaffen des Buttons um diesen richtig zu positionieren
-	private final GUIButton newGameBt = new GUIButton(515, 40, "NEW GAME", null, new IOnClickListener() {
-		
-		@Override public void onClick() {
-			setNextState(new MainGameState("test01"));
-		}
-	});
-	
-	private final GUIButton editorBt = new GUIButton(515, 190, "EDITOR", null, new IOnClickListener() {
-		
-		@Override public void onClick() {
-			setNextState(EditorGameState.create(MainMenuState.this, "test01"));
-		}
-	});
-	
-	private final GUIButton loadGameBt = new GUIButton(515, 340, "GUI TEST SITE", null, new IOnClickListener() {
-		
-		@Override public void onClick() {
-			setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
-		}
-	});
-	
-	private final GUIButton settingsBt = new GUIButton(515, 490, "SETTINGS", null, new IOnClickListener() {
-		
-		@Override public void onClick() {
-			setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
-		}
-	});
-	
-	private final GUIButton exitGameBt = new GUIButton(515, 640, "EXIT GAME", null, new IOnClickListener() {
-		
-		@Override public void onClick() {
-			setNextState(new FinalizeState());
-		}
-	});
+	@Override
+	protected int getElementSpacing() {
+		return 100;
+	}
+
+	@Override
+	protected int getXPosition() {
+		return 800;
+	}
+
+	@Override
+	protected int getYPosition() {
+		return 200;
+	}
+
+	@Override
+	protected void initGui(GameContext ctx) {
+		createButton("NEW GAME", new IOnClickListener() {
+			@Override public void onClick() {
+				setNextState(new MainGameState("test01"));
+			}
+		});
+
+		createButton("EDITOR", new IOnClickListener() {
+			@Override public void onClick() {
+				setNextState(EditorGameState.create(MainMenuState.this, "test01"));
+			}
+		});
+
+		createButton("GUI TEST SITE", new IOnClickListener() {
+			@Override public void onClick() {
+				setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
+			}
+		});
+
+		createButton("SETTINGS", new IOnClickListener() {
+			@Override public void onClick() {
+				setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
+			}
+		});
+
+		createButton("EXIT GAME", new IOnClickListener() {
+			@Override public void onClick() {
+				setNextState(new FinalizeState());
+			}
+		});
+	}
 	
 	// Constructors
 	public MainMenuState() {
@@ -74,6 +85,7 @@ public final class MainMenuState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
+		super.onStart(ctx);
 
 		if (backdrop.getTexture() == null) {
 			Texture backdropBuffer = new Texture();
@@ -100,34 +112,19 @@ public final class MainMenuState extends GameState {
 
 		ctx.window.draw(backdrop);
 
-		newGameBt.draw(ctx.window);
-		editorBt.draw(ctx.window);
-		settingsBt.draw(ctx.window);
-		loadGameBt.draw(ctx.window);
-		exitGameBt.draw(ctx.window);
+		super.onFrame(ctx, frameTime);
 
 	}
 	
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void processEvent(GameContext ctx, Event event) {
+		super.processEvent(ctx, event);
+		
 		switch (event.type) {
-		case CLOSED:
-			ctx.window.close();
-			break;
-		case MOUSE_BUTTON_RELEASED:
-			if( event.asMouseButtonEvent().button == org.jsfml.window.Mouse.Button.LEFT ) {
-				boolean dummy =
-				newGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-				loadGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-				editorBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-				settingsBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y) ||
-				exitGameBt.onButtonReleased(ctx.getMousePosition().x, ctx.getMousePosition().y);
-			}
-			break;
-		case KEY_RELEASED:
-			if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
-				setNextState(playGameState);
+			case KEY_RELEASED:
+				if ( playGameState!=null && event.asKeyEvent().key == Key.ESCAPE)
+					setNextState(playGameState);
 		}
 	}
 }
