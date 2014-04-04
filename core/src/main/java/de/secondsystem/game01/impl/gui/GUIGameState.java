@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.gui;
 
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.window.Mouse;
 import org.jsfml.window.event.Event;
 import org.jsfml.window.event.KeyEvent;
 
@@ -26,7 +27,13 @@ public abstract class GUIGameState extends GameState {
 		}
 	}
 
-	protected final void updateGui(long frameTime) {
+	protected final void updateGui(GameContext ctx, long frameTime) {
+		if( Mouse.isButtonPressed(Mouse.Button.LEFT) ) {
+			baseContainer.onFocus(ctx.getMousePosition());
+			baseContainer.onKeyPressed(KeyType.ENTER);
+			baseContainer.onMouseOver(ctx.getMousePosition());
+		}
+		
 		baseContainer.update(frameTime);
 	}
 
@@ -36,7 +43,7 @@ public abstract class GUIGameState extends GameState {
 	
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		updateGui(frameTime);
+		updateGui(ctx, frameTime);
 		drawGui(ctx.window);
 	}
 
@@ -50,21 +57,21 @@ public abstract class GUIGameState extends GameState {
 			case MOUSE_BUTTON_PRESSED:
 				baseContainer.onFocus(ctx.getMousePosition());
 				baseContainer.onKeyPressed(KeyType.ENTER);
+				
+			case MOUSE_MOVED:
+				baseContainer.onMouseOver(ctx.getMousePosition());
 				break;
 				
 			case MOUSE_BUTTON_RELEASED:
 				baseContainer.onKeyReleased(KeyType.ENTER);
 				break;
 				
-			case MOUSE_MOVED:
-				baseContainer.onMouseOver(ctx.getMousePosition());
-				break;
-				
 			case KEY_PRESSED: {
 				final KeyType kt = determineKeyType(event.asKeyEvent());
 				if( kt!=null )
 					baseContainer.onKeyPressed(kt);
-				break; }
+				break;
+			}
 				
 			case KEY_RELEASED: {
 				final KeyType kt = determineKeyType(event.asKeyEvent());

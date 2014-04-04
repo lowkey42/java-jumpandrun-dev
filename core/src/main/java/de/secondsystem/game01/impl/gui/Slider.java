@@ -11,10 +11,8 @@ import org.jsfml.system.Vector2f;
 	 * 
 	 */
 public final class Slider extends Element {
-
-	private static final int BORDER = 5;
 	
-	private static final float STEP_SIZE = 0.01f / 500;
+	private static final float STEP_SIZE = 0.01f;
 	
 	private float value = 0;
 	
@@ -26,7 +24,7 @@ public final class Slider extends Element {
 	
 	
 	public Slider(float x, float y, ElementContainer owner) {
-		super(x, y, getParentStyle(owner).sliderTexture.getSize().x, getParentStyle(owner).sliderTexture.getSize().y, owner);
+		super(x, y, getParentStyle(owner).sliderTexture.getSize().x, getParentStyle(owner).sliderTexture.getSize().y/2, owner);
 	
 		foregroundSprite = new Sprite(getParentStyle(owner).sliderTexture);
 		backgroundSprite = new Sprite(getParentStyle(owner).sliderTexture);
@@ -46,7 +44,7 @@ public final class Slider extends Element {
 	@Override
 	protected void onMouseOver(Vector2f mp) {
 		if( active ) {
-			value = Math.max(0,Math.min(1, (mp.x-getPosition().x+BORDER) / (getWidth()-BORDER*2)));
+			value = Math.max(0,Math.min(1, (mp.x-getPosition().x) / getWidth()));
 			updateTextureClip();
 			active = false;
 		}
@@ -60,10 +58,14 @@ public final class Slider extends Element {
 				break;
 
 			case LEFT:
-				value-=STEP_SIZE;
+				value = Math.max(0,Math.min(1, value-STEP_SIZE));
+				updateTextureClip();
+				break;
 				
 			case RIGHT:
-				value+=STEP_SIZE;
+				value = Math.max(0,Math.min(1, value+STEP_SIZE));
+				updateTextureClip();
+				break;
 				
 			default:
 				break;
@@ -71,8 +73,9 @@ public final class Slider extends Element {
 	}
 	
 	private void updateTextureClip() {
-		foregroundSprite.setTextureRect(new IntRect(0, (int)getHeight()	, (int) getWidth(), 							(int)getHeight()));
-		backgroundSprite.setTextureRect(new IntRect(0, 0          		, (int)((getWidth()-BORDER) * value)+BORDER, 	(int)getHeight()));
+		System.out.println(value);
+		foregroundSprite.setTextureRect(new IntRect(0, (int)getHeight(), (int)(getWidth() * value), (int)getHeight()));
+		backgroundSprite.setTextureRect(new IntRect(0, 0, 				 (int) getWidth(), 			(int)getHeight()));
 	}
 
 

@@ -13,7 +13,7 @@ public final class SettingsMenuState extends GUIGameStateSimpleLayout {
 
 	@Override
 	protected int getElementSpacing() {
-		return 100;
+		return 25;
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public final class SettingsMenuState extends GUIGameStateSimpleLayout {
 
 	@Override
 	protected int getYPosition() {
-		return 200;
+		return 50;
 	}
 
 	@Override
@@ -97,6 +97,8 @@ public final class SettingsMenuState extends GUIGameStateSimpleLayout {
 	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void processEvent(GameContext ctx, Event event) {
+		super.processEvent(ctx, event);
+		
 		switch (event.type) {
 			case KEY_RELEASED:
 				if (event.asKeyEvent().key == Key.ESCAPE) {
