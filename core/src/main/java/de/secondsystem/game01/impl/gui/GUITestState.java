@@ -32,28 +32,15 @@ public final class GUITestState extends GameState {
 	private final Text infoMemoText;
 	
 	// Object creations
-	InputText testText = new InputText(50, 50, 200, 25, "", null);
-	MemoText testMemo = new MemoText(50, 250, 250, 90, "", null);
+	private InputText testText;
+	private MemoText testMemo;
+	private Panel panel;
 	
-	MenuButton testButton = new MenuButton(150, 150, "TEST Button", null, new IOnClickListener() {
-		
-		@Override
-		public void onClick() {
-			System.out.println("Test Button works!");
-		}
-	});
-	
-
-	MenuButton backButton = new MenuButton(1000, 655, "BACK", null, new IOnClickListener(){
-		@Override
-		public void onClick() {
-			setNextState(MainMenu);
-		}
-	});
+	GUIButton testButton;
+	GUIButton backButton;
 		
 	
-	public GUITestState(GameState MainMenu, GameState playGameState,
-			Sprite backdrop) {
+	public GUITestState(GameState MainMenu, GameState playGameState, Sprite backdrop) {
 		// Transfering last State into playGameState
 		this.playGameState = playGameState;
 		this.MainMenu = MainMenu;
@@ -71,7 +58,6 @@ public final class GUITestState extends GameState {
 	
 	@Override
 	protected void onStart(GameContext ctx) {
-
 		if (backdrop.getTexture() == null) {
 			Texture backdropBuffer = new Texture();
 			// Creating Backdrop Texture via monitor screenshot of the stage
@@ -85,8 +71,30 @@ public final class GUITestState extends GameState {
 			backdrop.setTexture(backdropBuffer);
 		}
 		
+		float width  = ctx.getViewWidth();
+		float height = ctx.getViewHeight();
+		panel = new Panel(width / 2.f, height / 2.f, width, height, null);
+		
+		testText = new InputText(50, 50, 200, 25, "", panel);
+		testMemo = new MemoText(50, 250, 250, 90, "", panel);
+		
 		infoInputText.setPosition(testText.pos.x, testText.pos.y - 30);
 		infoMemoText.setPosition(testMemo.pos.x, testMemo.pos.y - 30);
+		
+		testButton = new GUIButton(150, 150, "TEST Button", panel, new IOnClickListener() {
+			@Override
+			public void onClick() {
+				System.out.println("Test Button works!");
+			}
+		});
+		
+
+		backButton = new GUIButton(1000, 655, "BACK", panel, new IOnClickListener(){
+			@Override
+			public void onClick() {
+				setNextState(MainMenu);
+			}
+		});
 	}
 
 	
@@ -96,19 +104,15 @@ public final class GUITestState extends GameState {
 	}
 
 	@Override
-	protected void onFrame(GameContext ctx, long frameTime) {
-		
+	protected void onFrame(GameContext ctx, long frameTime) {	
 		ctx.window.clear();
 		
 		ctx.window.draw(backdrop);
-
+		
+		panel.draw(ctx.window);
+		
 		ctx.window.draw(infoInputText);
 		ctx.window.draw(infoMemoText);
-		
-		testText.draw(ctx.window);
-		testButton.draw(ctx.window);
-		testMemo.draw(ctx.window);
-		backButton.draw(ctx.window);
 		
 	}	
 	

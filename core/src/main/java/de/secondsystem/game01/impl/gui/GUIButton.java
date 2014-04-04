@@ -17,6 +17,7 @@ import org.jsfml.window.Window;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.model.IAnimated.AnimationType;
 
 /**
  * @author Sebastian
@@ -26,15 +27,15 @@ public class GUIButton extends GUIElement {
 
 	// shared Attributes
 	
-	protected int textureWidth, textureHeight;
-	
 	protected AnimatedSprite sprite;
 	protected Text caption;
 	
 	// Constructors
 	
-	GUIButton(float x, float y, float width, float height, String caption, GUIElement owner, IOnClickListener clickListener){
-		super(x, y, width, height, owner, clickListener);
+	public GUIButton(float x, float y, float width, float height, String caption, GUIElement parent, IOnClickListener clickListener){
+		super(x, y, width, height, parent);
+		
+		this.clickListener = clickListener;
 		
 		try {
 
@@ -49,32 +50,44 @@ public class GUIButton extends GUIElement {
 			this.caption.setPosition(sprite.getPosition().x, sprite.getPosition().y - this.caption.getGlobalBounds().height / 3.f);
 
 			} catch( IOException e ) {
-				throw new Error(e.getMessage(), e);
+				throw new RuntimeException(e.getMessage(), e);
 			}
 	
 	}
-		
+	
+	public GUIButton(float x, float y, String caption, GUIElement parent, IOnClickListener clickListener) {
+		this(x, y, 250, 100, caption, parent, clickListener);
+	}
+	
+	public GUIButton(float x, float y, GUIElement parent, IOnClickListener clickListener) {
+		this(x, y, "button", parent, clickListener);
+	}
+	
+	public GUIButton(float x, float y, String caption, GUIElement parent) {
+		this(x, y, caption, parent, null);
+	}
+	
+	public GUIButton(float x, float y, GUIElement parent) {
+		this(x, y, parent, null);
+	}	
 	
 	// shared Methods
 	
 	public void draw(RenderTarget rt){
+		if( rt instanceof Window )
+			mouseover( (Window) rt );
 		sprite.draw(rt);
 		rt.draw(caption);
+		
+		super.draw(rt);
 	}
-	
-	protected void changeTextureClip(int pos) {
-//		sprite.setTextureRect(new IntRect(0,textureHeight*pos,textureWidth,textureHeight));
-	}
-	
 	
 	public void mouseover(Window window){
 		Vector2f mouse = ((RenderWindow) window).mapPixelToCoords(Mouse.getPosition(window));
 		if( inside(mouse) ){
-			changeTextureClip(Mouse.isButtonPressed(org.jsfml.window.Mouse.Button.LEFT) ? 2 : 1); caption.setColor(Color.RED);
-			//System.out.println("  OVER  ");
-			//buttonOver.play();
+			caption.setColor(Color.RED);
 		} else {
-			changeTextureClip(0); caption.setColor(Color.WHITE);
+			caption.setColor(Color.WHITE);
 		}
 	}
 	
@@ -83,6 +96,7 @@ public class GUIButton extends GUIElement {
 			clickListener.onClick();
 			return true;
 		}
+		
 		return false;
 	}
 
@@ -91,5 +105,32 @@ public class GUIButton extends GUIElement {
 	public boolean inside(Vector2f point) {
 		return sprite.inside(point);
 	}
+
+	@Override
+	public void refresh() {
+		sprite.setDimensions(width, height);
+		sprite.setRotation(rotation);
+		sprite.setPosition(pos);
+	}
 	
+	@Override
+	public void onMouseLeave() {
+		super.onMouseLeave();
+		
+		sprite.play(AnimationType.IDLE, 1.f, true);
+	}
+
+	@Override
+	public void onMouseEnter() {
+		super.onMouseEnter();
+		
+		sprite.play(AnimationType.MOUSE_OVER, 1.f, true);
+	}
+	
+	@Override
+	public void onClick() {
+		super.onClick();
+		
+		sprite.play(AnimationType.CLICKED, 1.f, true);
+	}
 }

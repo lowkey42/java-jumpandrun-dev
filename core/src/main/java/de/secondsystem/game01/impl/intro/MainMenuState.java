@@ -11,8 +11,8 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
 import de.secondsystem.game01.impl.game.MainGameState;
+import de.secondsystem.game01.impl.gui.GUIButton;
 import de.secondsystem.game01.impl.gui.GUITestState;
-import de.secondsystem.game01.impl.gui.MenuButton;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 /**
@@ -27,35 +27,35 @@ public final class MainMenuState extends GameState {
 
 	
 	// --> TODO Abfragen der Fensterbreite bereits beim Erschaffen des Buttons um diesen richtig zu positionieren
-	private final MenuButton newGameBt = new MenuButton(515, 40, "NEW GAME", null, new IOnClickListener() {
+	private final GUIButton newGameBt = new GUIButton(515, 40, "NEW GAME", null, new IOnClickListener() {
 		
 		@Override public void onClick() {
 			setNextState(new MainGameState("test01"));
 		}
 	});
 	
-	private final MenuButton editorBt = new MenuButton(515, 190, "EDITOR", null, new IOnClickListener() {
+	private final GUIButton editorBt = new GUIButton(515, 190, "EDITOR", null, new IOnClickListener() {
 		
 		@Override public void onClick() {
 			setNextState(EditorGameState.create(MainMenuState.this, "test01"));
 		}
 	});
 	
-	private final MenuButton loadGameBt = new MenuButton(515, 340, "GUI TEST SITE", null, new IOnClickListener() {
+	private final GUIButton loadGameBt = new GUIButton(515, 340, "GUI TEST SITE", null, new IOnClickListener() {
 		
 		@Override public void onClick() {
 			setNextState(new GUITestState(MainMenuState.this, playGameState, backdrop));
 		}
 	});
 	
-	private final MenuButton settingsBt = new MenuButton(515, 490, "SETTINGS", null, new IOnClickListener() {
+	private final GUIButton settingsBt = new GUIButton(515, 490, "SETTINGS", null, new IOnClickListener() {
 		
 		@Override public void onClick() {
 			setNextState(new SettingsMenuState(MainMenuState.this, playGameState, backdrop));
 		}
 	});
 	
-	private final MenuButton exitGameBt = new MenuButton(515, 640, "EXIT GAME", null, new IOnClickListener() {
+	private final GUIButton exitGameBt = new GUIButton(515, 640, "EXIT GAME", null, new IOnClickListener() {
 		
 		@Override public void onClick() {
 			setNextState(new FinalizeState());

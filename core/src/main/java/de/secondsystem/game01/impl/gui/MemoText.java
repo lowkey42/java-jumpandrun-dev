@@ -169,4 +169,11 @@ public final class MemoText extends GUIText {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+	@Override
+	public void refresh() {
+		// TODO Auto-generated method stub
+		
+	}
 }

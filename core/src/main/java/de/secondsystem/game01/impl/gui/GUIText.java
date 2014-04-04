@@ -31,8 +31,8 @@ public abstract class GUIText extends GUIElement{
 	
 	// Constructors
 	
-	GUIText(float x, float y, float width, float height, String text, GUIElement owner, IOnClickListener clickListener){
-		super(x, y, width, height, owner, clickListener);
+	GUIText(float x, float y, float width, float height, String text, GUIElement owner){
+		super(x, y, width, height, owner);
 		
 		// Loading standard Font (12.5 pixel width & 21 pixel height per char --> Monospace VeraMono)
 		ConstFont font;
@@ -47,18 +47,6 @@ public abstract class GUIText extends GUIElement{
 		this.text.setPosition(pos.x + 5, pos.y);
 		myBox = new RectangleShape(new Vector2f(width, height));
 		myBox.setPosition(pos); myBox.setFillColor(new Color(0, 0, 0, 0)); myBox.setOutlineThickness(2);
-	}
-	
-
-	
-	
-	GUIText(float x, float y, float width, float height, String text, GUIElement owner){
-		this(x, y, width, height, text, owner, new IOnClickListener() {
-			
-			@Override
-			public void onClick() {
-			}
-		});
 	}
 		
 	
