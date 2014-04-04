@@ -12,7 +12,6 @@ public class Panel extends ElementContainer {
 		super(x, y, width, height, parent);
 		
 		shape = new RectangleShape(new Vector2f(width, height));
-		shape.setOrigin(new Vector2f(width / 2.f, height / 2.f));
 		shape.setOutlineThickness(2.f);
 		shape.setOutlineColor(Color.WHITE);
 		shape.setFillColor(Color.BLACK);

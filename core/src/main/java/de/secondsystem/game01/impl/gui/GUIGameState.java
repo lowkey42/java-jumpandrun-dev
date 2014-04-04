@@ -121,4 +121,7 @@ public abstract class GUIGameState extends GameState {
 	protected final Edit createInputField(float x, float y, float width, String text) {
 		return new Edit(x, y, width, text, baseContainer);
 	}
+	protected final StringGrid createStringGrid(float x, float y, int rowCount, int colCount, float cellWidth) {
+		return new StringGrid(x, y, rowCount, colCount, cellWidth, 44.f, baseContainer);
+	}
 }

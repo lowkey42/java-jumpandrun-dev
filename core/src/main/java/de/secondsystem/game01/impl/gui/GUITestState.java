@@ -44,6 +44,8 @@ public final class GUITestState extends GUIGameStateSimpleLayout {
 				setNextState(MainMenu);
 			}
 		});
+		
+		createStringGrid(500, 200, 5, 2, 300);
 	}
 	
 	
