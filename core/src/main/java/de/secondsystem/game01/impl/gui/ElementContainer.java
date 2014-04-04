@@ -153,5 +153,8 @@ public class ElementContainer extends Element {
 	public final Edit createInputField(float x, float y, float width, String text) {
 		return new Edit(x, y, width, text, this);
 	}
+	public final StringGrid createStringGrid(float x, float y, int rowCount, int colCount, float cellWidth, float cellHeight) {
+		return new StringGrid(x, y, rowCount, colCount, cellWidth, cellHeight, this);
+	}
 	
 }

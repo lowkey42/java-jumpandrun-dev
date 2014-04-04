@@ -49,6 +49,8 @@ public final class GUITestState extends GUIGameState {
 			}
 		});
 		
+		// Datatable-Test
+		//  später folgt noch eine Spezialisierung "AttributesDataTable" für den Editor 
 		c.createDataTable(1000, 100, 400,
 				Arrays.asList("test-2", "asd-42", "zzz-23", "hjkl-vim"),
 				Arrays.asList(
@@ -59,7 +61,7 @@ public final class GUITestState extends GUIGameState {
 
 						@Override public Element createValueElement(float width,
 								String data, LayoutElementContainer row) {
-							return row.createLabel(data.split("-")[0], width, 1);
+							return row.createInputField(width, data.split("-")[0]);
 						}
 					},
 					new DataTable.ColumnDef<String>() {
@@ -73,6 +75,8 @@ public final class GUITestState extends GUIGameState {
 						}
 					}
 				));
+
+		c.createStringGrid(300, 200, 5, 2, 200, 44);
 	}
 	
 	
