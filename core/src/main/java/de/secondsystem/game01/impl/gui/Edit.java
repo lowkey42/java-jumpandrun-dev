@@ -23,11 +23,11 @@ public class Edit extends Element implements TextElement {
 	private static final int BORDER_SIZE = 2;
 	private static final int TEXT_X_OFFSET = 4;
 	
-	private final RwValueRef<String> textRef;
+	protected final RwValueRef<String> textRef;
 	
 	private final StringBuilder buffer;
 	
-	private final Text text;
+	protected final Text text;
 	
 	private final RectangleShape box;
 	
@@ -74,12 +74,13 @@ public class Edit extends Element implements TextElement {
 		renderTarget.draw(text);
 	}
 	
-	private void updateText(boolean modified) {
+	protected void updateText(boolean modified) {
 		if( modified )
 			textRef.setValue(getText());
 		else if( !buffer.toString().equals(textRef.getValue()) ) {
 			buffer.setLength(0);
 			buffer.append(textRef.getValue());
+			curserPosition = Math.min(curserPosition, buffer.length());
 		}
 			
 		

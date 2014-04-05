@@ -17,26 +17,47 @@ public class DataTable<T> extends LayoutElementContainer {
 		float getWidthPercentage();
 		Element createValueElement(float width, T data, LayoutElementContainer row);
 	}
+	public static abstract class AbstractColumnDef<T> implements ColumnDef<T> {
+		private final String name;
+		private final float widthPercentage;
+		public AbstractColumnDef(String name, float widthPercentage) {
+			this.name = name;
+			this.widthPercentage = widthPercentage;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		public float getWidthPercentage() {
+			return widthPercentage;
+		}
+	}
 	
-	private final List<ColumnDef<T>> columnDefs;
+	private List<ColumnDef<T>> columnDefs;
 	
 	private final List<DataRow> dataRows = new ArrayList<>();
-	
+
+	protected DataTable(float x, float y, float width, ElementContainer owner) {
+		super(x, y, width, 1, owner, new Layout(LayoutDirection.VERTICAL, ROW_SPACING));
+	}
 	public DataTable(float x, float y, float width, ElementContainer owner, Iterable<T> rowData, List<ColumnDef<T>> columns) {
 		super(x, y, width, 1, owner, new Layout(LayoutDirection.VERTICAL, ROW_SPACING));
+		init(rowData, columns);
+	}
+	protected void init(Iterable<T> rowData, List<ColumnDef<T>> columns) {
 		columnDefs = columns;
 
 		updateOffset(new HeadRow(getXOffset(), getYOffset(), width, columns));
 		
 		for( T row : rowData )
-			dataRows.add(updateOffset(new DataRow(getXOffset(), getYOffset(), width, row, columns)));
-		
-		setDimensions(width, getYOffset());
+			addRow(row);
 	}
 	
 	public LayoutElementContainer addRow( T rowData ) {
 		final DataRow row;
 		dataRows.add(row = updateOffset(new DataRow(getXOffset(), getYOffset(), getWidth(), rowData, columnDefs)));
+		
+		setDimensions(width, getYOffset());
 		return row;
 	}
 	public boolean deleteRow(LayoutElementContainer row) {
@@ -71,6 +92,7 @@ public class DataTable<T> extends LayoutElementContainer {
 	protected Color getRowBackgroundColor(T data) {
 		return dataRows.size()%2==0 ? Color.BLACK : new Color(50, 50, 50);
 	}
+	
 	
 	private final class HeadRow extends Panel {
 		public HeadRow(float x, float y, float width, List<ColumnDef<T>> columns) {

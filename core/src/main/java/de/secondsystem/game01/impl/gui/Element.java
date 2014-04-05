@@ -52,8 +52,9 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 	protected void onTextInput(int character){}
 	protected void onKeyPressed(KeyType type){}
 	protected void onKeyReleased(KeyType type){}
-	
+
 	protected abstract void drawImpl(RenderTarget renderTarget);
+	protected void drawOverlaysImpl(RenderTarget renderTarget){}
 
 	protected Style getStyle() {
 		return getParentStyle(owner);
@@ -69,6 +70,10 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 	public final void draw(RenderTarget renderTarget) {
 		if(visible)
 			drawImpl(renderTarget);
+	}
+	public final void drawOverlays(RenderTarget renderTarget) {
+		if(visible)
+			drawOverlaysImpl(renderTarget);
 	}
 	
 	public boolean isVisible() {

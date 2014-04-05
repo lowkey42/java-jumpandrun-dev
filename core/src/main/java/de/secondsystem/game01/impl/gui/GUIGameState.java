@@ -46,6 +46,7 @@ public abstract class GUIGameState extends GameState {
 
 	protected final void drawGui(RenderTarget rt) {
 		baseContainer.draw(rt);
+		baseContainer.drawOverlays(rt);
 	}
 	
 	@Override

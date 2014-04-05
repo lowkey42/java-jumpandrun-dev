@@ -29,11 +29,14 @@ public final class Style {
 	
 	public final AnimationTexture checkBoxTexture;
 	
+	public final int dropDownSuggestionsFontSize;
+	
 	public final boolean autoFocus;
 
 	public Style(ConstFont labelFont, int labelFontSize, ConstFont textFont, int textFontSize, 
 			ConstFont buttonFont, int buttonFontSize, AnimationTexture buttonTexture, 
-			ConstTexture sliderTexture, AnimationTexture checkBoxTexture, boolean autoFocus) {
+			ConstTexture sliderTexture, AnimationTexture checkBoxTexture, int dropDownSuggestionsFontSize,
+			boolean autoFocus) {
 		super();
 		this.labelFont = labelFont;
 		this.labelFontSize = labelFontSize;
@@ -45,6 +48,7 @@ public final class Style {
 		this.sliderTexture = sliderTexture;
 		this.autoFocus = autoFocus;
 		this.checkBoxTexture = checkBoxTexture;
+		this.dropDownSuggestionsFontSize = dropDownSuggestionsFontSize;
 	}
 	
 	
@@ -56,6 +60,7 @@ public final class Style {
 					ResourceManager.font.get("FreeSans.otf"), 26, ResourceManager.animation.get("coolButton.anim"), // button 
 					ResourceManager.texture_gui.get("VolumeButton.png"), // slider
 					ResourceManager.animation.get("coolCheckBox.anim"), // checkBox
+					14, // dropdown
 					false);
 			
 		} catch (IOException e) {

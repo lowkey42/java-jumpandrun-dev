@@ -12,6 +12,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
@@ -36,6 +37,8 @@ public final class GUITestState extends GUIGameState {
 	protected void initGui(GameContext ctx, LayoutElementContainer c) {
 		c.createLabel("Input Text").setFor(c.createInputField(200, ""));
 		c.createLabel("Memo Editor").setFor(c.createInputField(200, "")); // TODO: memo
+		
+		new DropDownField<>(400, 0, 300, EventType.class, new SimpleRwValueRef<EventType>(null), c);
 		
 		c.createButton("TEST Button", new IOnClickListener() {
 			@Override public void onClick() {

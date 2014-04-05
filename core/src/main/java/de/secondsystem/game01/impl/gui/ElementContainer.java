@@ -114,6 +114,11 @@ public class ElementContainer extends Element {
 		for( Element c : children )
 			c.draw(renderTarget);
 	}
+	@Override
+	protected void drawOverlaysImpl(RenderTarget renderTarget) {
+		for( Element c : children )
+			c.drawOverlaysImpl(renderTarget);
+	}
 
 	@Override
 	public void update(long frameTimeMs) {
