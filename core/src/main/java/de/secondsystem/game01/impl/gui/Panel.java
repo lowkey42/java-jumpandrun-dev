@@ -20,6 +20,12 @@ public class Panel extends LayoutElementContainer {
 		shape.setOutlineColor(Color.WHITE);
 		shape.setFillColor(Color.BLACK);
 	}
+	
+	@Override
+	public void setDimensions(float width, float height) {
+		super.setDimensions(width, height);
+		shape.setSize(new Vector2f(width, height));
+	}
 
 	@Override
 	protected void drawImpl(RenderTarget renderTarget) {

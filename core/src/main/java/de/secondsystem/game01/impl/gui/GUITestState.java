@@ -61,7 +61,7 @@ public final class GUITestState extends GUIGameState {
 
 						@Override public Element createValueElement(float width,
 								String data, LayoutElementContainer row) {
-							return row.createInputField(width, data.split("-")[0]);
+							return row.createLabel(data.split("-")[0], width, 1);
 						}
 					},
 					new DataTable.ColumnDef<String>() {

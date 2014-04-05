@@ -33,12 +33,12 @@ public class Label extends Element {
 
 		setText(text);
 		
-		setDimensions(Math.max(width, this.text.getGlobalBounds().width), Math.max(height, this.text.getGlobalBounds().height));
+		setDimensions(Math.max(width, this.text.getLocalBounds().width), Math.max(height, this.text.getLocalBounds().height*2));
 	}
 	
 	public void setText(String text) {
 		this.text.setString(text);
-		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
+		this.text.setOrigin(0, this.text.getLocalBounds().height / 2.f);
 	}
 	
 	public void setFor(Element forElem) {
@@ -86,7 +86,7 @@ public class Label extends Element {
 
 	@Override
 	protected void drawImpl(RenderTarget renderTarget) {
-		text.setPosition(getPosition());
+		text.setPosition(Vector2f.add(new Vector2f(0, getHeight()/2), getPosition()));
 		
 		renderTarget.draw(text);
 	}

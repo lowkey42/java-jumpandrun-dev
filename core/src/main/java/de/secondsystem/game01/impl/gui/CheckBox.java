@@ -26,7 +26,7 @@ public class CheckBox extends ElementContainer {
 		
 		sprite = new AnimatedSprite(getStyle().checkBoxTexture);
 		
-		this.caption = new Label(width -5, height/2.f -11, caption, this, null); 
+		this.caption = new Label(width -5, 0, caption, this, null); 
 		// TODO: eventuell nicht die günstigste Lösung, das Label als Unterelement der Checkbox zu behandeln
 		//  - weniger flexibel (eine Checkbox muss immer ein Label an der selben Position haben?)
 		//  - labeledElem-Funktionalität funktioniert so nicht mehr, d.h. ein Klick auf das Label ändert nicht die Checkbox
