@@ -23,6 +23,8 @@ public class Edit extends Element implements TextElement {
 	private static final int BORDER_SIZE = 2;
 	private static final int TEXT_X_OFFSET = 4;
 	
+	private final RwValueRef<String> textRef;
+	
 	private final StringBuilder buffer;
 	
 	private final Text text;
@@ -34,16 +36,20 @@ public class Edit extends Element implements TextElement {
 	private boolean curserBlinkState;
 	
 	private int curserBlinkDelayAcc;
-	
-	Edit(float x, float y, float width, String text, ElementContainer owner){
-		super(x, y, width, 1, owner);
 
-		this.text = new Text(""+CURSER_CHAR_2, getStyle().textFont, getStyle().textFontSize);
-		this.text.setOrigin(0, this.text.getLocalBounds().height / 2);
-		setDimensions(width, this.text.getLocalBounds().height*2+10);
-		this.text.setString(text);
+	Edit(float x, float y, float width, String text, ElementContainer owner){
+		this(x, y, width, new SimpleRwValueRef<>(text), owner);
+	}
+	Edit(float x, float y, float width, RwValueRef<String> textRef, ElementContainer owner){
+		super(x, y, width, 1, owner);
+		this.textRef = textRef;
 		
-		buffer = new StringBuilder(text);
+		text = new Text(""+CURSER_CHAR_2, getStyle().textFont, getStyle().textFontSize);
+		text.setOrigin(0, this.text.getLocalBounds().height / 2);
+		setDimensions(width, this.text.getLocalBounds().height*2+10);
+		text.setString(textRef!=null ? textRef.getValue() : null);
+		
+		buffer = new StringBuilder(textRef!=null ? textRef.getValue() : null);
 		box = new RectangleShape(new Vector2f(width, height));
 		box.setFillColor(new Color(0, 0, 0, 0));
 		box.setOutlineColor(Color.WHITE);
@@ -56,7 +62,7 @@ public class Edit extends Element implements TextElement {
 	public void setText(String text) {
 		buffer.setLength(0);
 		buffer.append(text);
-		updateText();
+		updateText(true);
 	}
 	
 	@Override
@@ -68,7 +74,15 @@ public class Edit extends Element implements TextElement {
 		renderTarget.draw(text);
 	}
 	
-	private void updateText() {
+	private void updateText(boolean modified) {
+		if( modified )
+			textRef.setValue(getText());
+		else if( !buffer.toString().equals(textRef.getValue()) ) {
+			buffer.setLength(0);
+			buffer.append(textRef.getValue());
+		}
+			
+		
 		if( curserPosition>=0 )
 			text.setString(buffer.toString().substring(0, curserPosition)
 					+ (curserBlinkState ? CURSER_CHAR_1 : CURSER_CHAR_2)
@@ -105,13 +119,13 @@ public class Edit extends Element implements TextElement {
 		if( !curserSet )
 			curserPosition = buffer.length();
 		
-		updateText();
+		updateText(false);
 	}
 	@Override
 	protected void onUnFocus() {
 		box.setOutlineColor(Color.WHITE);
 		curserPosition = -1;
-		updateText();
+		updateText(false);
 	}
 	@Override
 	protected void onKeyPressed(KeyType type) {
@@ -126,7 +140,7 @@ public class Edit extends Element implements TextElement {
 			case DEL:
 				if( buffer.length()>0 ) {
 					buffer.delete(curserPosition, curserPosition+getCharCount(curserPosition));
-					updateText();
+					updateText(true);
 				}
 				break;
 				
@@ -152,7 +166,7 @@ public class Edit extends Element implements TextElement {
 		if( !Character.isISOControl(character) && Character.isDefined(character) ) {
 			buffer.insert(curserPosition, Character.toChars(character));
 			curserPosition+=Character.charCount(character);
-			updateText();
+			updateText(true);
 		}
 	}
 
@@ -162,7 +176,7 @@ public class Edit extends Element implements TextElement {
 		while( curserBlinkDelayAcc>=CURSER_BLINK_DELAY ) {
 			curserBlinkState=!curserBlinkState;
 			curserBlinkDelayAcc-=CURSER_BLINK_DELAY;
-			updateText();
+			updateText(false);
 		}
 	}
 	

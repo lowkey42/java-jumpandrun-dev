@@ -6,7 +6,7 @@ import org.jsfml.system.Vector2f;
 
 public class Label extends Element {
 
-	private Text text;
+	private final Text text;
 	
 	private Element labeledElem;
 
@@ -29,6 +29,7 @@ public class Label extends Element {
 			throw new IllegalArgumentException("Labeled element can't be the owner/parent of the label due to a potential stack overflow.");
 		
 		this.labeledElem = labeledElem;
+		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
 
 		setText(text);
 		
@@ -36,7 +37,7 @@ public class Label extends Element {
 	}
 	
 	public void setText(String text) {
-		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
+		this.text.setString(text);
 		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
 	}
 	

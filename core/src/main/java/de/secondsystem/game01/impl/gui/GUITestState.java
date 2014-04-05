@@ -71,6 +71,22 @@ public final class GUITestState extends GUIGameState {
 
 						@Override public Element createValueElement(float width,
 								String data, LayoutElementContainer row) {
+							if( "42".equals(data.split("-")[1]) ) {
+								return row.createInputField(width, new RwValueRef<String>() {
+									
+									private String prefix = "test";
+									
+									@Override
+									public void setValue(String value) {
+										prefix = value.split("-")[0];
+									}
+									
+									@Override
+									public String getValue() {
+										return prefix + "-" + (System.currentTimeMillis()/1000/10);
+									}
+								});
+							}
 							return row.createInputField(width, data.split("-")[1]);
 						}
 					}

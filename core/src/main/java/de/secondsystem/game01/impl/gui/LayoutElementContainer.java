@@ -83,6 +83,9 @@ public class LayoutElementContainer extends ElementContainer {
 	public final Edit createInputField(float width, String text) {
 		return updateOffset( createInputField(getXOffset(), getYOffset(), width, text) );
 	}
+	public final Edit createInputField(float width, RwValueRef<String> text) {
+		return updateOffset( createInputField(getXOffset(), getYOffset(), width, text) );
+	}
 	public final StringGrid createStringGrid(int rowCount, int colCount, float cellWidth, float cellHeight) {
 		return updateOffset( createStringGrid(getXOffset(), getYOffset(), rowCount, colCount, cellWidth, cellHeight) );
 	}
