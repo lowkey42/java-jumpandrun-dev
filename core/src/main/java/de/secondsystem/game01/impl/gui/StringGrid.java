@@ -9,7 +9,7 @@ public class StringGrid extends Panel {
 	private int colCount;
 	private int rowCount;
 	private float cellWidth;
-	private float cellHeight; // 44.f
+	private float cellHeight;
 	
 	public StringGrid(float x, float y, int rowCount, int colCount, float cellWidth, float cellHeight, ElementContainer owner) {
 		super(x, y, cellWidth*colCount, cellHeight*rowCount, owner);

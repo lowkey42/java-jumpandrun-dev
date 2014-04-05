@@ -8,20 +8,27 @@ public class Label extends Element {
 
 	private final Text text;
 	
-	private Element forElem;
+	private Element labeledElem;
 
 	public Label(float x, float y, String text, ElementContainer parent) {
 		this(x, y, text, parent, null);
 	}
+	
 	public Label(float x, float y, String text, float width, float height, ElementContainer parent) {
 		this(x, y, text, width, height, parent, null);
 	}
-	public Label(float x, float y, String text, ElementContainer parent, Element forElem) {
-		this(x, y, text, 1, 1, parent, forElem);
+	
+	public Label(float x, float y, String text, ElementContainer parent, Element labeledElem) {
+		this(x, y, text, 1, 1, parent, labeledElem);
 	}
-	public Label(float x, float y, String text, float width, float height, ElementContainer parent, Element forElem) {
+	
+	public Label(float x, float y, String text, float width, float height, ElementContainer parent, Element labeledElem) {
 		super(x, y, width, height, parent);
-		this.forElem = forElem;
+		
+		if( parent == labeledElem )
+			throw new IllegalArgumentException("Labeled element can't be the owner/parent of the label due to a potential stack overflow.");
+		
+		this.labeledElem = labeledElem;
 
 		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
 		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
@@ -30,18 +37,43 @@ public class Label extends Element {
 	}
 	
 	public void setFor(Element forElem) {
-		this.forElem = forElem;
+		this.labeledElem = forElem;
 	}
 
-	@Override protected void onFocus(Vector2f mp){if(forElem!=null) forElem.onFocus(mp);}
-	@Override protected void onUnFocus(){if(forElem!=null) forElem.onUnFocus();}
+	@Override protected void onFocus(Vector2f mp) {
+		if(labeledElem!=null) 
+			labeledElem.onFocus(mp);
+	}
 	
-	@Override protected void onMouseOver(Vector2f mp){if(forElem!=null) forElem.onMouseOver(mp);}
-	@Override protected void onMouseOut(){if(forElem!=null) forElem.onMouseOut();}
+	@Override protected void onUnFocus() {
+		if(labeledElem!=null) 
+			labeledElem.onUnFocus();
+	}
 	
-	@Override protected void onTextInput(int character){if(forElem!=null) forElem.onTextInput(character);}
-	@Override protected void onKeyPressed(KeyType type){if(forElem!=null) forElem.onKeyPressed(type);}
-	@Override protected void onKeyReleased(KeyType type){if(forElem!=null) forElem.onKeyReleased(type);}
+	@Override protected void onMouseOver(Vector2f mp) {
+		if(labeledElem!=null) 
+			labeledElem.onMouseOver(mp);
+	}
+	
+	@Override protected void onMouseOut() {
+		if(labeledElem!=null) 
+			labeledElem.onMouseOut();
+	}
+	
+	@Override protected void onTextInput(int character) {
+		if(labeledElem!=null) 
+			labeledElem.onTextInput(character);
+	}
+	
+	@Override protected void onKeyPressed(KeyType type) {
+		if(labeledElem!=null) 
+			labeledElem.onKeyPressed(type);
+	}
+	
+	@Override protected void onKeyReleased(KeyType type) {
+		if(labeledElem!=null) 
+			labeledElem.onKeyReleased(type);
+	}
 	
 	@Override
 	public void update(long frameTimeMs) {

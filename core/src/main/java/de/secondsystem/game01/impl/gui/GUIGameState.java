@@ -13,7 +13,7 @@ import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 
 public abstract class GUIGameState extends GameState {
 
-	private LayoutElementContainer baseContainer;
+	protected LayoutElementContainer baseContainer;
 	
 	private boolean guiInitialized = false;
 	

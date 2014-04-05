@@ -77,6 +77,8 @@ public final class GUITestState extends GUIGameState {
 				));
 
 		c.createStringGrid(300, 200, 5, 2, 200, 44);
+		
+		new CheckBox(300, 100, "checkBox", baseContainer);
 	}
 	
 	

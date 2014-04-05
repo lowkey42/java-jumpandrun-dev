@@ -1,0 +1,3 @@
+{ "default":"IDLE",
+"IDLE":{"texture_gui": "cool_checkbox.png", "frameWidth": 35, "frameHeight":44, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 0},
+"CLICKED":{"texture_gui": "cool_checkbox.png", "frameWidth": 35, "frameHeight":44, "numRowFrames": 1, "frameStart": 1, "frameEnd":1, "fps": 0} }
