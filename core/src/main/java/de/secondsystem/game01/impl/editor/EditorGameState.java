@@ -1,13 +1,9 @@
 package de.secondsystem.game01.impl.editor;
 
-import java.io.IOException;
-
 import org.jsfml.graphics.Color;
-import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderWindow;
-import org.jsfml.graphics.Text;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
@@ -19,7 +15,6 @@ import org.jsfml.window.event.KeyEvent;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
-import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.editor.objects.IEditorLayerObject;
 import de.secondsystem.game01.impl.editor.objects.EditorEntity;
 import de.secondsystem.game01.impl.editor.objects.EditorLayerObject;
@@ -55,9 +50,6 @@ public final class EditorGameState extends GameState {
 	private final GameState playGameState;
 	private GameMap map;
 	private Tileset tileset;
-
-	private Text editorHint;
-	private Text layerHint;
 	
 	private IEditorLayerObject editorObject;
 	
@@ -71,6 +63,8 @@ public final class EditorGameState extends GameState {
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
 
 	private String mapToLoad=null;
+	
+	private EditorGUI editorInterface;
 	
 	private EditorGameState(GameState playGameState, GameMap map, String mapId) {
 		this.playGameState = playGameState;
@@ -99,23 +93,11 @@ public final class EditorGameState extends GameState {
 		
 		this.tileset = map.getTileset();
 		
-		ConstFont freeSans;
-		try {
-			freeSans = ResourceManager.font.get("FreeSans.otf");
-
-		} catch (IOException ex) {
-			throw new Error(ex);
-		}
-
-		layerHint = new Text(generateLayerHintStr(), freeSans);
-		layerHint.setPosition(0, 25);
-		layerHint.setColor(Color.WHITE);
-
-		editorHint = new Text("EDITOR: ${mapName}", freeSans);
-		editorHint.setPosition(0, 0);
-		editorHint.setColor(Color.RED);
+		editorObject = new EditorLayerObject(map, tileset, false);
 		
-		editorObject = new EditorLayerObject(map, tileset, false);	
+		editorInterface = new EditorGUI(0, 0, ctx.getViewWidth(), ctx.getViewHeight());
+		
+		editorInterface.setLayerHint(map, currentLayer);
 	}
 
 	@Override
@@ -149,10 +131,7 @@ public final class EditorGameState extends GameState {
 		ctx.window.setView(cView);
 		
 		drawMap(ctx.window);
-
-		ctx.window.draw(editorHint);
-		ctx.window.draw(layerHint);
-
+		
 		processInputKeyboard();
 	}
 	
@@ -181,6 +160,8 @@ public final class EditorGameState extends GameState {
 		editorObject.draw(rt);
 
 		rt.setView(cView);
+		
+		editorInterface.draw(rt);
 	}
 
 	private final boolean processInput(GameContext ctx, Event event) {
@@ -449,29 +430,10 @@ public final class EditorGameState extends GameState {
 		default:
 		}
 
-		layerHint.setString(generateLayerHintStr());
-
+		editorInterface.setLayerHint(map, currentLayer);
+		
 		return true;
 		
-	}
-
-	private String generateLayerHintStr() {
-		boolean[] s = map.getShownLayer();
-
-		StringBuilder str = new StringBuilder();
-
-		for (LayerType l : LayerType.values()) {
-			if (currentLayer == l)
-				str.append("=").append(l.name).append("=");
-			else
-				str.append(l.name);
-
-			str.append(s[l.layerIndex] ? "[X]" : "[ ]");
-
-			str.append("\t");
-		}
-
-		return str.toString();
 	}
 
 }

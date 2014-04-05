@@ -6,7 +6,7 @@ import org.jsfml.system.Vector2f;
 
 public class Label extends Element {
 
-	private final Text text;
+	private Text text;
 	
 	private Element labeledElem;
 
@@ -30,10 +30,14 @@ public class Label extends Element {
 		
 		this.labeledElem = labeledElem;
 
-		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
-		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
+		setText(text);
 		
 		setDimensions(Math.max(width, this.text.getGlobalBounds().width), Math.max(height, this.text.getGlobalBounds().height));
+	}
+	
+	public void setText(String text) {
+		this.text = new Text(text, getStyle().textFont, getStyle().textFontSize);
+		this.text.setOrigin(0, this.text.getGlobalBounds().height / 2.f);
 	}
 	
 	public void setFor(Element forElem) {

@@ -11,6 +11,7 @@ public class Panel extends LayoutElementContainer {
 	public Panel(float x, float y, float width, float height, ElementContainer parent) {
 		this(x, y, width, height, new Layout(LayoutDirection.VERTICAL, 0), parent);
 	}
+	
 	public Panel(float x, float y, float width, float height, Layout layout, ElementContainer parent) {
 		super(x, y, width, height, parent, layout);
 		
@@ -28,4 +29,11 @@ public class Panel extends LayoutElementContainer {
 		super.drawImpl(renderTarget);
 	}
 
+	public void setFillColor(Color color) {
+		shape.setFillColor(color);
+	}
+	
+	public void setOutlineColor(Color color) {
+		shape.setOutlineColor(color);
+	}
 }
