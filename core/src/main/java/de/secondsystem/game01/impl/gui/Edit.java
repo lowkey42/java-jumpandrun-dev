@@ -80,9 +80,9 @@ public class Edit extends Element implements TextElement {
 		else if( !buffer.toString().equals(textRef.getValue()) ) {
 			buffer.setLength(0);
 			buffer.append(textRef.getValue());
-			curserPosition = Math.min(curserPosition, buffer.length());
 		}
-			
+
+		curserPosition = Math.min(curserPosition, buffer.length());	
 		
 		if( curserPosition>=0 )
 			text.setString(buffer.toString().substring(0, curserPosition)

@@ -6,9 +6,9 @@ import java.util.List;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.gui.DataTable.ColumnDef;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.model.Attributes;
 
 public class ElementContainer extends Element {
 	
@@ -77,6 +77,13 @@ public class ElementContainer extends Element {
 	
 	@Override
 	public void onFocus(Vector2f mp) {
+		if( overlays!=null )
+			for( Overlay o : overlays )
+				if( o.inside(mp) ) {
+					o.onFocus(mp);
+					return;
+				}
+		
 		Element e = getByPos(mp);
 
 		if( focus!=null && e!=focus )
@@ -114,11 +121,6 @@ public class ElementContainer extends Element {
 		for( Element c : children )
 			c.draw(renderTarget);
 	}
-	@Override
-	protected void drawOverlaysImpl(RenderTarget renderTarget) {
-		for( Element c : children )
-			c.drawOverlaysImpl(renderTarget);
-	}
 
 	@Override
 	public void update(long frameTimeMs) {
@@ -131,8 +133,8 @@ public class ElementContainer extends Element {
 			List<ColumnDef<T>> columns) {
 		return new DataTable<>(x, y, width, this, rowData, columns);
 	}
-	public final AttributesDataTable createAttributesDataTable(float x, float y, float width, AttributesSource attributesSource) {
-		return new AttributesDataTable(x, y, width, attributesSource, this);
+	public final AttributesDataTable createAttributesDataTable(float x, float y, float width, Attributes attributes) {
+		return new AttributesDataTable(x, y, width, attributes, this);
 	}
 	public final Panel createPanel(float x, float y, float width, float height) {
 		return new Panel(x, y, width, height, this);
@@ -163,6 +165,12 @@ public class ElementContainer extends Element {
 	}
 	public final StringGrid createStringGrid(float x, float y, int rowCount, int colCount, float cellWidth, float cellHeight) {
 		return new StringGrid(x, y, rowCount, colCount, cellWidth, cellHeight, this);
+	}
+	public final CheckBox createCheckbox(float x, float y, RwValueRef<Boolean> state) {
+		return new CheckBox(x, y, state, "", this);
+	}
+	public final <T extends Enum<T>> DropDownField<T> createDropDown(float x, float y, float width, Class<T> valueEnum, RwValueRef<T> value) {
+		return new DropDownField<>(x, y, width, valueEnum, value, this);
 	}
 	
 }

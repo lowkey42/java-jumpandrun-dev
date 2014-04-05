@@ -21,6 +21,8 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 	
 	private final List<Suggestion> suggestions;
 	
+	private final SuggestionOverlay suggestionOverlay = new SuggestionOverlay();
+	
 	private boolean active = false;
 
 	public DropDownField(float x, float y, float width, Class<T> valueEnum, RwValueRef<T> value, ElementContainer owner) {
@@ -45,23 +47,20 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 	protected void onFocus(Vector2f mp) {
 		active = true;
 		super.onFocus(mp);
-		for( Suggestion s : suggestions )
-			if( s.inside(mp) ) {
-				setText(s.value.name());
-				break;
-			}
+		registerOverlay(suggestionOverlay);
 	}
 	
 	@Override
 	protected void onUnFocus() {
 		active = false;
 		super.onUnFocus();
+		unregisterOverlay(suggestionOverlay);
 	}
 	
 	@Override
 	public boolean inside(Vector2f point) {
 		return point.x>=getPosition().x && point.x<=getPosition().x+width 
-				&& point.y>=getPosition().y && point.y<=getPosition().y+height+(active ? suggestions.size()*height/2 : 0);
+				&& point.y>=getPosition().y && point.y<=getPosition().y+height;
 	}
 	
 	@Override
@@ -86,13 +85,6 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 		super.drawImpl(renderTarget);
 	}
 	
-	@Override
-	protected void drawOverlaysImpl(RenderTarget renderTarget) {
-		if( active )
-			for( Suggestion s : suggestions )
-				s.draw(renderTarget);
-	}
-
 	private static final class ToStringValueRef<T extends Enum<T>> implements RwValueRef<String> {
 		private final Class<T> valueEnum;
 		private final RwValueRef<T> ref;
@@ -101,6 +93,8 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 		public ToStringValueRef(Class<T> valueEnum, RwValueRef<T> ref) {
 			this.valueEnum = valueEnum;
 			this.ref = ref;
+			this.strVal = ref.getValue()!=null ? ref.getValue().name() : "";
+			this.prevValue = ref.getValue();
 		}
 		@Override
 		public String getValue() {
@@ -132,6 +126,34 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 		}
 	}
 	
+	private final class SuggestionOverlay implements Overlay {
+
+		@Override
+		public void draw(RenderTarget renderTarget) {
+			for( Suggestion s : suggestions )
+				s.draw(renderTarget);
+		}
+
+		@Override
+		public boolean inside(Vector2f point) {
+			for( Suggestion s : suggestions )
+				if( s.inside(point) )
+					return true;
+			
+			return false;
+		}
+
+		@Override
+		public void onFocus(Vector2f mp) {
+			for( Suggestion s : suggestions )
+				if( s.inside(mp) ) {
+					setText(s.value.name());
+					break;
+				}
+		}
+		
+	}
+	
 	private final class Suggestion implements IInsideCheck, IDrawable {
 		private final Text text;
 		private final RectangleShape box;
@@ -145,7 +167,7 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 			text.setOrigin(0, this.text.getLocalBounds().height / 2);
 			
 			box = new RectangleShape(new Vector2f(width, height/2));
-			box.setFillColor(new Color(150, 150, 150, 100));
+			box.setFillColor(new Color(50, 50, 50, 200));
 			box.setOutlineColor(Color.WHITE);
 			box.setOutlineThickness(1);
 		}

@@ -3,8 +3,6 @@
  */
 package de.secondsystem.game01.impl.gui;
 
-import java.util.Arrays;
-
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
@@ -16,6 +14,8 @@ import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;;
 
 /**
  * @author Sebastian
@@ -52,48 +52,56 @@ public final class GUITestState extends GUIGameState {
 			}
 		});
 		
+		
+		c.createAttributesDataTable(1000, new Attributes(
+				new Attribute("interactive", false),
+				new Attribute("x", 555),
+				new Attribute("y", 42.23),
+				new Attribute("objTest", new Attributes(new Attribute("asd", "fgh"), new Attribute("vim", "hjkl")))
+		));
+		
 		// Datatable-Test
 		//  später folgt noch eine Spezialisierung "AttributesDataTable" für den Editor 
-		c.createDataTable(1000, 100, 400,
-				Arrays.asList("test-2", "asd-42", "zzz-23", "hjkl-vim"),
-				Arrays.asList(
-					new DataTable.ColumnDef<String>() {
-						@Override public String getName() {				return "first Column"; }
-
-						@Override public float getWidthPercentage() {	return 0.5f; }
-
-						@Override public Element createValueElement(float width,
-								String data, LayoutElementContainer row) {
-							return row.createLabel(data.split("-")[0], width, 1);
-						}
-					},
-					new DataTable.ColumnDef<String>() {
-						@Override public String getName() {				return "another Column"; }
-
-						@Override public float getWidthPercentage() {	return 0.5f; }
-
-						@Override public Element createValueElement(float width,
-								String data, LayoutElementContainer row) {
-							if( "42".equals(data.split("-")[1]) ) {
-								return row.createInputField(width, new RwValueRef<String>() {
-									
-									private String prefix = "test";
-									
-									@Override
-									public void setValue(String value) {
-										prefix = value.split("-")[0];
-									}
-									
-									@Override
-									public String getValue() {
-										return prefix + "-" + (System.currentTimeMillis()/1000/10);
-									}
-								});
-							}
-							return row.createInputField(width, data.split("-")[1]);
-						}
-					}
-				));
+//		c.createDataTable(1000, 100, 400,
+//				Arrays.asList("test-2", "asd-42", "zzz-23", "hjkl-vim"),
+//				Arrays.asList(
+//					new DataTable.ColumnDef<String>() {
+//						@Override public String getName() {				return "first Column"; }
+//
+//						@Override public float getWidthPercentage() {	return 0.5f; }
+//
+//						@Override public Element createValueElement(float width,
+//								String data, LayoutElementContainer row) {
+//							return row.createLabel(data.split("-")[0], width, 1);
+//						}
+//					},
+//					new DataTable.ColumnDef<String>() {
+//						@Override public String getName() {				return "another Column"; }
+//
+//						@Override public float getWidthPercentage() {	return 0.5f; }
+//
+//						@Override public Element createValueElement(float width,
+//								String data, LayoutElementContainer row) {
+//							if( "42".equals(data.split("-")[1]) ) {
+//								return row.createInputField(width, new RwValueRef<String>() {
+//									
+//									private String prefix = "test";
+//									
+//									@Override
+//									public void setValue(String value) {
+//										prefix = value.split("-")[0];
+//									}
+//									
+//									@Override
+//									public String getValue() {
+//										return prefix + "-" + (System.currentTimeMillis()/1000/10);
+//									}
+//								});
+//							}
+//							return row.createInputField(width, data.split("-")[1]);
+//						}
+//					}
+//				));
 
 		c.createStringGrid(300, 200, 5, 2, 200, 44);
 		

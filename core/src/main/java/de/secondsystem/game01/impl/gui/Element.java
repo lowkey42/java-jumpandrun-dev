@@ -3,6 +3,9 @@
  */
 package de.secondsystem.game01.impl.gui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
@@ -25,12 +28,17 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 		BACKSPACE, DEL, TAB
 	}
 	
+	public interface Overlay extends IDrawable, IInsideCheck {
+		void onFocus(Vector2f mp);
+	}
+	
 	// shared Attributes
 	
 	protected float width, height;
 	protected Vector2f pos;
 	protected boolean visible = true;
 	protected final ElementContainer owner;
+	protected final Set<Overlay> overlays;
 	
 	public Element(float x, float y, float width, float height, ElementContainer owner) {
 		this.owner = owner;
@@ -40,7 +48,9 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 		
 		if( owner!=null ) {
 			owner.addElement(this);
-		}
+			overlays = null;
+		} else
+			overlays = new HashSet<>();
 	}
 	
 	protected void onFocus(Vector2f mp){}
@@ -54,7 +64,6 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 	protected void onKeyReleased(KeyType type){}
 
 	protected abstract void drawImpl(RenderTarget renderTarget);
-	protected void drawOverlaysImpl(RenderTarget renderTarget){}
 
 	protected Style getStyle() {
 		return getParentStyle(owner);
@@ -66,14 +75,27 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 		throw new GameException("No GUI-Style found (rechead top-level)");
 	}
 	
+	protected void registerOverlay( Overlay overlay ) {
+		if( overlays!=null )
+			overlays.add(overlay);
+		else
+			owner.registerOverlay(overlay);
+	}
+	protected void unregisterOverlay( Overlay overlay ) {
+		if( overlays!=null )
+			overlays.remove(overlay);
+		else
+			owner.unregisterOverlay(overlay);
+	}
+	
 	@Override
 	public final void draw(RenderTarget renderTarget) {
 		if(visible)
 			drawImpl(renderTarget);
-	}
-	public final void drawOverlays(RenderTarget renderTarget) {
-		if(visible)
-			drawOverlaysImpl(renderTarget);
+		
+		if( overlays!=null )
+			for( Overlay o : overlays )
+				o.draw(renderTarget);
 	}
 	
 	public boolean isVisible() {

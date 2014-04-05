@@ -5,6 +5,7 @@ import java.util.List;
 import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.gui.DataTable.ColumnDef;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.model.Attributes;
 
 public class LayoutElementContainer extends ElementContainer {
 	
@@ -56,8 +57,8 @@ public class LayoutElementContainer extends ElementContainer {
 			List<ColumnDef<T>> columns) {
 		return updateOffset( createDataTable(getXOffset(), getYOffset(), width, rowData, columns) );
 	}
-	public final AttributesDataTable createAttributesDataTable(float width, AttributesSource attributesSource) {
-		return updateOffset( createAttributesDataTable(getXOffset(), getYOffset(), width, attributesSource) );
+	public final AttributesDataTable createAttributesDataTable(float width, Attributes attributes) {
+		return updateOffset( createAttributesDataTable(getXOffset(), getYOffset(), width, attributes) );
 	}
 	public final Panel createPanel(float width, float height) {
 		return updateOffset( createPanel(getXOffset(), getYOffset(), width, height) );
@@ -88,5 +89,11 @@ public class LayoutElementContainer extends ElementContainer {
 	}
 	public final StringGrid createStringGrid(int rowCount, int colCount, float cellWidth, float cellHeight) {
 		return updateOffset( createStringGrid(getXOffset(), getYOffset(), rowCount, colCount, cellWidth, cellHeight) );
+	}
+	public final CheckBox createCheckbox(RwValueRef<Boolean> state) {
+		return updateOffset(createCheckbox(getXOffset(), getYOffset(), state));
+	}
+	public final <T extends Enum<T>> DropDownField<T> createDropDown(float width, Class<T> valueEnum, RwValueRef<T> value) {
+		return updateOffset(createDropDown(getXOffset(), getYOffset(), width, valueEnum, value));
 	}
 }
