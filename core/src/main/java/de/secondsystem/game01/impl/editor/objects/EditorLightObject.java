@@ -60,7 +60,7 @@ public class EditorLightObject extends EditorLayerObject {
 	@Override
 	public void refresh() {
 		lightLayerObject.setRotation(rotation);
-		lightLayerObject.setRadius(radius * zoom);
+		lightLayerObject.setRadius(radius);
 		lightLayerObject.setDegree(degree);
 	}
 
@@ -87,7 +87,6 @@ public class EditorLightObject extends EditorLayerObject {
 		
 		this.rotation = lightLayerObject.getRotation();
 		
-		zoom = 1.f;
 		width  = 20.f;
 		height = 20.f;
 		

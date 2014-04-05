@@ -72,7 +72,6 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 		
 		if( layerObject != null ) {
 			rotation = layerObject.getRotation();
-			zoom = 1.0f;
 			height = layerObject.getHeight() > 5.f ? layerObject.getHeight() : 40.f;
 			width = layerObject.getWidth() > 5.f ? layerObject.getWidth() : 40.f;
 			setPosition(layerObject.getPosition());
@@ -240,7 +239,6 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			layerObject = new SpriteLayerObject(tileset, map.getActiveWorldId().id, currentTile, 0, 0, 0);
 
 		rotation = 0.f;
-		zoom = 1.f;
 		height = layerObject.getHeight();
 		width = layerObject.getWidth();
 	}

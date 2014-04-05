@@ -14,7 +14,6 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	protected Vector2f pos;
 	
 	protected float rotation = 0.f;
-	protected float zoom     = 1.f;
 	protected float height   = 1.f;
 	protected float width    = 1.f;
 	
@@ -27,12 +26,12 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	
 	@Override
 	public float getWidth() {	
-		return width*zoom;
+		return width;
 	}
 	
 	@Override
 	public float getHeight() {
-		return height*zoom;
+		return height;
 	}
 	
 	@Override
@@ -78,16 +77,20 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	
 	@Override
 	public void zoom(float factor) {
-		this.zoom *= factor;
+		width  *= factor;
+		height *= factor;
 	}
 	
 	@Override
 	public void zoom(int mouseWheelOffset, float mouseWheelDelta) {
-		// TODO: fix marker pos
-		if (mouseWheelOffset == 1)
-			zoom *= mouseWheelDelta * SCALE_FACTOR;
-		else
-			zoom /= mouseWheelDelta * SCALE_FACTOR * -1;
+		if (mouseWheelOffset == 1) {
+			width  *= mouseWheelDelta * SCALE_FACTOR;
+			height *= mouseWheelDelta * SCALE_FACTOR;
+		}
+		else {
+			width /= mouseWheelDelta * SCALE_FACTOR * -1;
+			height /= mouseWheelDelta * SCALE_FACTOR * -1;
+		}
 	}
 	
 	@Override
@@ -97,7 +100,7 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 			((SpriteLayerObject) layerObject).setTextureRect( new IntRect(0, 0, (int) (textureRectWidth), (int) (textureRectHeight)) );
 		}
 		else
-			layerObject.setDimensions(width * zoom, height * zoom);
+			layerObject.setDimensions(width, height);
 	}
 	
 	@Override

@@ -14,11 +14,7 @@ import de.secondsystem.game01.impl.map.objects.EntityLayerObject;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 
-// TODO: duplicated code (from gameEntity) => throws because of missing checks (e.g. no representation)
 public class EditorEntity extends EditorLayerObject {
-//	private IGameEntity entity;
-//	private IPhysicsBody entityBody;
-//	private IDrawable entityRepresentation;
 	private String currentArchetype;
 	private ArrayList<String> archetypes;
 	private int currentArchetypeIndex = 0;
@@ -65,7 +61,6 @@ public class EditorEntity extends EditorLayerObject {
 		layerObject = new EntityLayerObject(map, currentArchetype, new Attributes(new Attribute("x", 0), new Attribute("y", 0)));
 		
 		rotation = 0.f;
-		zoom = 1.f;
 		
 		width  = layerObject.getWidth();
 		height = layerObject.getHeight();	
@@ -110,8 +105,8 @@ public class EditorEntity extends EditorLayerObject {
 	}
 	
 	private void addToMap(String archetype, UUID uuid) {
-		Attribute width = new Attribute("width", this.width*zoom);
-		Attribute height = new Attribute("height", this.height*zoom);
+		Attribute width = new Attribute("width", this.width);
+		Attribute height = new Attribute("height", this.height);
 		Attribute rotation = new Attribute("rotation", this.rotation);
 		Attribute x = new Attribute("x", pos.x);
 		Attribute y = new Attribute("y", pos.y);
