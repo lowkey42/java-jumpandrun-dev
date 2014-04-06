@@ -2,10 +2,12 @@ package de.secondsystem.game01.impl.gui;
 
 import java.util.Arrays;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.gui.AttributeDataCollection.AttributeVal;
 import de.secondsystem.game01.impl.gui.AttributeDataCollection.ColumnType;
+import de.secondsystem.game01.impl.gui.AttributeDataCollection.IRedrawable;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 import de.secondsystem.game01.model.Attributes;
 
@@ -37,7 +39,7 @@ import de.secondsystem.game01.model.Attributes;
  * -----------------------------------------
  * 
  */
-public final class AttributesDataTable extends DataTable<AttributeVal> {
+public final class AttributesDataTable extends DataTable<AttributeVal> implements IRedrawable {
 
 	public interface AttributesSource {
 		Attributes getAttributes();
@@ -52,9 +54,14 @@ public final class AttributesDataTable extends DataTable<AttributeVal> {
 	public AttributesDataTable(float x, float y, float width, AttributesSource attributesSource, ElementContainer owner) {
 		super(x, y, width, owner);
 		this.attributesSource = attributesSource;
-		attributeMap = new AttributeDataCollection(attributesSource.getAttributes());
+		attributeMap = new AttributeDataCollection(attributesSource.getAttributes(), this);
 		init(attributeMap, Arrays.<ColumnDef<AttributeVal>>asList(new KeyColumn(), new TypeColumn(), new ValueColumn(), new ActionsColumn()));
 		createButtonPanel();
+	}
+	
+	@Override
+	public void redraw() {
+		recreateDataRows(attributeMap);
 	}
 	
 	protected void createButtonPanel() {
@@ -67,7 +74,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> {
 		});
 		buttonPanel.createButton("Reset", new IOnClickListener() {
 			@Override public void onClick() {
-				recreateDataRows(attributeMap = new AttributeDataCollection(attributesSource.getAttributes()));
+				recreateDataRows(attributeMap = new AttributeDataCollection(attributesSource.getAttributes(), AttributesDataTable.this));
 			}
 		});
 
@@ -141,6 +148,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> {
 			if( data.type==ColumnType.BOOL ) {
 				Panel p = row.createPanel(width, 40);
 				p.createCheckbox(new ToBooleanRwValueRef(data.new ValueRef()));
+				p.setFillColor(Color.TRANSPARENT);
 				return p;
 			} else
 				return row.createInputField(width, data.new ValueRef());

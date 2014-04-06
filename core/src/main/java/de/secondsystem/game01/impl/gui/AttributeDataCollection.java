@@ -13,8 +13,12 @@ import java.util.Stack;
 
 import de.secondsystem.game01.model.Attributes;
 
-class AttributeDataCollection implements Iterable<AttributeDataCollection.AttributeVal> {
+final class AttributeDataCollection implements Iterable<AttributeDataCollection.AttributeVal> {
 
+	public static interface IRedrawable {
+		void redraw();
+	}
+	
 	public static enum ColumnType {
 		NUM, STR, BOOL, SEQ, OBJ;
 	}
@@ -99,12 +103,19 @@ class AttributeDataCollection implements Iterable<AttributeDataCollection.Attrib
 			public ColumnType getValue() {
 				return type;
 			}
+			@SuppressWarnings("unchecked")
 			@Override
 			public void setValue(ColumnType ntype) {
 				if( type!=ntype ) {
-					
-//					if( type==ColumnType.SEQ || type==ColumnType.OBJ )
-//						deleteAllSubElements(AttributeVal.this);
+					if( type==null ) {
+						if( parent!=null ) {
+							if( parent.val instanceof Collection )
+								((Collection<AttributeVal>) parent.val).add(createPlaceholderValue(genUniqueId(), parent, depth));
+							else if( parent.val instanceof Map )
+								((Map<String, AttributeVal>) parent.val).put("+", createPlaceholderValue("+", parent, depth));
+						}else
+							roots.add(createPlaceholderValue("+", parent, depth));
+					}
 					
 					switch( ntype ) {
 						case STR:
@@ -137,7 +148,7 @@ class AttributeDataCollection implements Iterable<AttributeDataCollection.Attrib
 					}
 					
 					type = ntype;
-				// TODO:	recreateDataRows(attributeMap.values());
+					redrawable.redraw();
 				}
 			}
 		}
@@ -147,11 +158,17 @@ class AttributeDataCollection implements Iterable<AttributeDataCollection.Attrib
 	
 	private final Set<AttributeVal> roots = new LinkedHashSet<>();
 
+	private final IRedrawable redrawable;
 	
-	public AttributeDataCollection(Attributes attributes) {
+	public AttributeDataCollection(Attributes attributes, IRedrawable redrawable) {
+		this.redrawable = redrawable;
 		roots.addAll(addToAttributeMap(attributes, null, 0).values());
 	}
 
+	protected String genUniqueId() {
+		return Long.toString(uniqueIdSource++);
+	}
+	
 	private Map<String, AttributeVal> addToAttributeMap(Map<String, Object> obj, AttributeVal parent, int depth) {
 		Map<String, AttributeVal> values = new LinkedHashMap<>(obj.size());
 		
@@ -163,13 +180,7 @@ class AttributeDataCollection implements Iterable<AttributeDataCollection.Attrib
 			initAttributeVal(val, e.getKey(), e.getValue(), parent, depth);
 		}
 		
-		AttributeVal nullVal = new AttributeVal();
-		nullVal.depth = depth;
-		nullVal.key = "+";
-		nullVal.parent = parent;
-		nullVal.type = null;
-		
-		values.put("+", nullVal);
+		values.put("+", createPlaceholderValue("+", parent, depth));
 		
 		return values;
 	}
@@ -177,7 +188,7 @@ class AttributeDataCollection implements Iterable<AttributeDataCollection.Attrib
 		List<AttributeVal> values = new ArrayList<>(seq.size());
 		
 		for( Object o : seq ) {
-			String key = Long.toString(uniqueIdSource++);
+			String key = genUniqueId();
 			AttributeVal val = new AttributeVal();
 			
 			values.add(val);
@@ -185,15 +196,18 @@ class AttributeDataCollection implements Iterable<AttributeDataCollection.Attrib
 			initAttributeVal(val, key, o, parent, depth);
 		}
 		
+		values.add(createPlaceholderValue(genUniqueId(), parent, depth));
+		
+		return values;
+	}
+	private AttributeVal createPlaceholderValue(String key, AttributeVal parent, int depth) {
 		AttributeVal nullVal = new AttributeVal();
 		nullVal.depth = depth;
-		nullVal.key = Long.toString(uniqueIdSource++);
+		nullVal.key = key;
 		nullVal.parent = parent;
 		nullVal.type = null;
 		
-		values.add(nullVal);
-		
-		return values;
+		return nullVal;
 	}
 	@SuppressWarnings("unchecked")
 	private void initAttributeVal(AttributeVal val, String key, Object value, AttributeVal parent, int depth) {
