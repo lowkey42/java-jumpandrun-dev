@@ -6,9 +6,10 @@ import java.util.List;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.gui.DataTable.ColumnDef;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
-import de.secondsystem.game01.model.Attributes;
 
 public class ElementContainer extends Element {
 	
@@ -133,11 +134,14 @@ public class ElementContainer extends Element {
 			List<ColumnDef<T>> columns) {
 		return new DataTable<>(x, y, width, this, rowData, columns);
 	}
-	public final AttributesDataTable createAttributesDataTable(float x, float y, float width, Attributes attributes) {
-		return new AttributesDataTable(x, y, width, attributes, this);
+	public final AttributesDataTable createAttributesDataTable(float x, float y, float width, AttributesSource attributesSource) {
+		return new AttributesDataTable(x, y, width, attributesSource, this);
 	}
 	public final Panel createPanel(float x, float y, float width, float height) {
 		return new Panel(x, y, width, height, this);
+	}
+	public final Panel createPanel(float x, float y, float width, float height, Layout layout) {
+		return new Panel(x, y, width, height, layout, this);
 	}
 	public final Slider createSlider(float x, float y) {
 		return new Slider(x, y, this);

@@ -23,6 +23,10 @@ public class CheckBox extends Element {
 		this.checked = checked;
 		
 		sprite = new AnimatedSprite(getStyle().checkBoxTexture);
+		if( checked.getValue() )
+			sprite.play(AnimationType.CLICKED, 1, true);
+		else
+			sprite.play(AnimationType.IDLE, 1, true);
 	}
 
 	@Override

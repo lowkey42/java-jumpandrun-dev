@@ -8,9 +8,9 @@ import org.jsfml.system.Vector2f;
 
 public class DataTable<T> extends LayoutElementContainer {
 
-	private static final int COLUMN_PADDING = 0;
-	private static final int ROW_SPACING = 0;
-	private static final int ROW_PADDING = 0;
+	protected static final int COLUMN_PADDING = 0;
+	protected static final int ROW_SPACING = 0;
+	protected static final int ROW_PADDING = 0;
 	
 	public interface ColumnDef<T> {
 		String getName();
@@ -49,6 +49,19 @@ public class DataTable<T> extends LayoutElementContainer {
 
 		updateOffset(new HeadRow(getXOffset(), getYOffset(), width, columns));
 		
+		storeOffset();
+		
+		for( T row : rowData )
+			addRow(row);
+	}
+	protected void recreateDataRows(Iterable<T> rowData) {
+		for( DataRow d : dataRows )
+			removeElement(d);
+		
+		dataRows.clear();
+			
+		restoreOffset();
+		
 		for( T row : rowData )
 			addRow(row);
 	}
@@ -69,7 +82,7 @@ public class DataTable<T> extends LayoutElementContainer {
 		removeElement(row);
 		
 		for( int i=index; i<dataRows.size(); ++i ) {
-			dataRows.get(i).setPosition(Vector2f.sub(dataRows.get(i).getPosition(), new Vector2f(0, row.height+ROW_SPACING)));
+			dataRows.get(i).setPosition(Vector2f.sub(Vector2f.sub(dataRows.get(i).getPosition(),getPosition()), new Vector2f(0, row.height+ROW_SPACING)));
 			dataRows.get(i).setFillColor(getRowBackgroundColor(dataRows.get(i).data));
 			dataRows.get(i).setOutlineColor(getRowOutlineColor(dataRows.get(i).data));
 		}

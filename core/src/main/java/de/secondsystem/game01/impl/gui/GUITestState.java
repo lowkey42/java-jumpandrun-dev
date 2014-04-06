@@ -3,6 +3,8 @@
  */
 package de.secondsystem.game01.impl.gui;
 
+import java.util.Arrays;
+
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Texture;
 import org.jsfml.graphics.TextureCreationException;
@@ -11,6 +13,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
+import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
@@ -53,12 +56,18 @@ public final class GUITestState extends GUIGameState {
 		});
 		
 		
-		c.createAttributesDataTable(1000, new Attributes(
-				new Attribute("interactive", false),
-				new Attribute("x", 555),
-				new Attribute("y", 42.23),
-				new Attribute("objTest", new Attributes(new Attribute("asd", "fgh"), new Attribute("vim", "hjkl")))
-		));
+		c.createAttributesDataTable( ctx.getViewWidth()-600, 0, 500, new AttributesSource() {
+			
+			@Override public Attributes getAttributes() {
+				return new Attributes(
+						new Attribute("interactive", true),
+						new Attribute("x", 555),
+						new Attribute("y", 42.23),
+						new Attribute("seqTest", Arrays.asList("qwertz", "asd", "test")),
+						new Attribute("objTest", new Attributes(new Attribute("asd", "fgh"), new Attribute("vim", "hjkl")))
+				);
+			}
+		});
 		
 		// Datatable-Test
 		//  später folgt noch eine Spezialisierung "AttributesDataTable" für den Editor 

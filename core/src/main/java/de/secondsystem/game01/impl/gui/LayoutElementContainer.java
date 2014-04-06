@@ -5,7 +5,6 @@ import java.util.List;
 import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.gui.DataTable.ColumnDef;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
-import de.secondsystem.game01.model.Attributes;
 
 public class LayoutElementContainer extends ElementContainer {
 	
@@ -25,6 +24,8 @@ public class LayoutElementContainer extends ElementContainer {
 	private final Layout layout;
 	
 	private float offset;
+	
+	private float storedOffset;
 
 	public LayoutElementContainer(float x, float y, float width, float height, Layout layout) {
 		super(x, y, width, height);
@@ -39,6 +40,13 @@ public class LayoutElementContainer extends ElementContainer {
 	public LayoutElementContainer(float x, float y, float width, float height, ElementContainer owner, Layout layout) {
 		super(x, y, width, height, owner);
 		this.layout = layout;
+	}
+	
+	protected void storeOffset() {
+		storedOffset = offset;
+	}
+	protected void restoreOffset() {
+		offset = storedOffset;
 	}
 	
 	protected float getXOffset() {
@@ -57,11 +65,14 @@ public class LayoutElementContainer extends ElementContainer {
 			List<ColumnDef<T>> columns) {
 		return updateOffset( createDataTable(getXOffset(), getYOffset(), width, rowData, columns) );
 	}
-	public final AttributesDataTable createAttributesDataTable(float width, Attributes attributes) {
-		return updateOffset( createAttributesDataTable(getXOffset(), getYOffset(), width, attributes) );
+	public final AttributesDataTable createAttributesDataTable(float width, AttributesSource attributesSource) {
+		return updateOffset( createAttributesDataTable(getXOffset(), getYOffset(), width, attributesSource) );
 	}
 	public final Panel createPanel(float width, float height) {
 		return updateOffset( createPanel(getXOffset(), getYOffset(), width, height) );
+	}
+	public final Panel createPanel(float width, float height, Layout layout) {
+		return updateOffset( createPanel(getXOffset(), getYOffset(), width, height, layout) );
 	}
 	public final Slider createSlider() {
 		return updateOffset( createSlider(getXOffset(), getYOffset()) );
