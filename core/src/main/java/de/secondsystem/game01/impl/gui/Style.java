@@ -51,6 +51,10 @@ public final class Style {
 		this.dropDownSuggestionsFontSize = dropDownSuggestionsFontSize;
 	}
 	
+	public Style setButtonTexture( AnimationTexture tex ) {
+		return new Style(labelFont, labelFontSize, textFont, textFontSize, buttonFont, buttonFontSize, tex, sliderTexture, checkBoxTexture, 
+				dropDownSuggestionsFontSize, autoFocus);
+	}
 	
 	public static Style createDefaultStyle() {
 		try {

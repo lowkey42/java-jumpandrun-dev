@@ -55,17 +55,24 @@ public final class GUITestState extends GUIGameState {
 			}
 		});
 		
+		final Attributes ichBinFastEinEntity = new Attributes(
+				new Attribute("interactive", true),
+				new Attribute("x", 555),
+				new Attribute("y", 42.23),
+				new Attribute("seqTest", Arrays.asList("qwertz", "asd", "test")),
+				new Attribute("objTest", new Attributes(new Attribute("asd", "fgh"), new Attribute("vim", "hjkl")))
+		);
 		
 		c.createAttributesDataTable( ctx.getViewWidth()-600, 0, 500, new AttributesSource() {
 			
 			@Override public Attributes getAttributes() {
-				return new Attributes(
-						new Attribute("interactive", true),
-						new Attribute("x", 555),
-						new Attribute("y", 42.23),
-						new Attribute("seqTest", Arrays.asList("qwertz", "asd", "test")),
-						new Attribute("objTest", new Attributes(new Attribute("asd", "fgh"), new Attribute("vim", "hjkl")))
-				);
+				return ichBinFastEinEntity;
+			}
+
+			@Override
+			public void applyAttributes(Attributes newAttributes) {
+				ichBinFastEinEntity.clear();
+				ichBinFastEinEntity.putAll(newAttributes);
 			}
 		});
 		

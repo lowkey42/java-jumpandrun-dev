@@ -1,15 +1,19 @@
 package de.secondsystem.game01.impl.gui;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.gui.AttributeDataCollection.AttributeVal;
 import de.secondsystem.game01.impl.gui.AttributeDataCollection.ColumnType;
 import de.secondsystem.game01.impl.gui.AttributeDataCollection.IRedrawable;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.GameException;
 
 /**
  * 
@@ -43,6 +47,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 
 	public interface AttributesSource {
 		Attributes getAttributes();
+		void applyAttributes(Attributes newAttributes);
 	}
 	
 	private final AttributesSource attributesSource;
@@ -69,7 +74,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 				new Layout(LayoutDirection.VERTICAL, 0));
 		buttonPanel.createButton("Apply", new IOnClickListener() {
 			@Override public void onClick() {
-				System.out.println("TODO: ADT-Apply");
+				attributesSource.applyAttributes(attributeMap.getAttributes());
 			}
 		});
 		buttonPanel.createButton("Reset", new IOnClickListener() {
@@ -101,10 +106,6 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 		LayoutElementContainer row = super.addRow(rowData);
 		rowData.row = row;
 		return row;
-	}
-	
-	public Attributes patchAttributes( Attributes orgAttributes ) {
-		return orgAttributes; // TODO
 	}
 	
 	private final class KeyColumn extends AbstractColumnDef<AttributeVal> {
@@ -150,6 +151,9 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 				p.createCheckbox(new ToBooleanRwValueRef(data.new ValueRef()));
 				p.setFillColor(Color.TRANSPARENT);
 				return p;
+			} else if( data.type==ColumnType.EVENT ) {
+				return row.createDropDown(width, EventType.class, data.new ValueEventRef());
+			
 			} else
 				return row.createInputField(width, data.new ValueRef());
 		}
@@ -175,10 +179,33 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 		public ActionsColumn() {
 			super("Actions", 0.1f);
 		}
-
+		
 		@Override
-		public Element createValueElement(float width, AttributeVal data, LayoutElementContainer row) {
-			return row.createLabel("[X]", width, 1);
+		public Element createValueElement(float width, final AttributeVal data, LayoutElementContainer row) {
+			Panel e;
+			
+			row.updateOffset(e=new Panel(row.getXOffset(), row.getYOffset(), width, 50, row) {
+				@Override
+				protected Style getStyle() {
+					try {
+						return super.getStyle().setButtonTexture(ResourceManager.animation.get("smallButton.anim"));
+					} catch (IOException e) {
+						throw new GameException(e.getMessage(),e);
+					}
+				}
+			});
+			
+			if( data.type!=null )
+				e.createButton("X", new IOnClickListener() {
+					
+					@Override
+					public void onClick() {
+						attributeMap.deleteAttribute(data);
+						redraw();
+					}
+				});
+			
+			return  e;
 		}
 	}
 }

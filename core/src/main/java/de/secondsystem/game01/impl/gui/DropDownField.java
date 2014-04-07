@@ -167,7 +167,7 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 			text.setOrigin(0, this.text.getLocalBounds().height / 2);
 			
 			box = new RectangleShape(new Vector2f(width, height/2));
-			box.setFillColor(new Color(50, 50, 50, 200));
+			box.setFillColor(new Color(50, 50, 50));
 			box.setOutlineColor(Color.WHITE);
 			box.setOutlineThickness(1);
 		}

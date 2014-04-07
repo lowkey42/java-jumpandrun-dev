@@ -3,14 +3,14 @@ package de.secondsystem.game01.impl.gui;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Stack;
 
+import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.model.Attributes;
 
 final class AttributeDataCollection implements Iterable<AttributeDataCollection.AttributeVal> {
@@ -20,7 +20,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 	}
 	
 	public static enum ColumnType {
-		NUM, STR, BOOL, SEQ, OBJ;
+		STR, BOOL, FLOAT, INT, EVENT, SEQ, OBJ;
 	}
 	
 	public class AttributeVal {
@@ -34,7 +34,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 		public class KeyRef implements RwValueRef<String> {
 			@Override
 			public String getValue() {
-				return key;
+				return key!=null ? key : "";
 			}
 
 			@SuppressWarnings("unchecked")
@@ -45,12 +45,25 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 						((Map<String, AttributeVal>) parent.val).remove(key);
 						((Map<String, AttributeVal>) parent.val).put(nkey, AttributeVal.this);
 					}
-					
-					key = nkey;
 				}
+				
+				key = nkey;
 			}
 		}
-		
+
+		public class ValueEventRef implements RwValueRef<EventType> {
+
+			@Override
+			public EventType getValue() {
+				return (EventType) val;
+			}
+
+			@Override
+			public void setValue(EventType value) {
+				val = value;
+			}
+			
+		}
 		public class ValueRef implements RwValueRef<String> {
 
 			@Override
@@ -60,10 +73,14 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 				
 				switch (type) {
 					case BOOL:
-					case NUM:
 					case STR:
+					case FLOAT:
+					case INT:
 						return val.toString();
-	
+
+					case EVENT:
+						throw new UnsupportedOperationException();
+						
 					case OBJ:
 					case SEQ:
 					default:
@@ -81,9 +98,20 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 						val = Boolean.valueOf(value);
 						break;
 						
-					case NUM:
-						val = Double.valueOf(value);
+					case FLOAT:
+						try {
+							val = Double.valueOf(value);
+						} catch( NumberFormatException e ){}
 						break;
+						
+					case INT:
+						try {
+							val = Long.valueOf(value);
+						} catch( NumberFormatException e ){}
+						break;
+
+					case EVENT:
+						throw new UnsupportedOperationException();
 						
 					case STR:
 						val = value;
@@ -110,16 +138,25 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 					if( type==null ) {
 						if( parent!=null ) {
 							if( parent.val instanceof Collection )
-								((Collection<AttributeVal>) parent.val).add(createPlaceholderValue(genUniqueId(), parent, depth));
+								((Collection<AttributeVal>) parent.val).add(createPlaceholderValue(null, parent, depth));
 							else if( parent.val instanceof Map )
-								((Map<String, AttributeVal>) parent.val).put("+", createPlaceholderValue("+", parent, depth));
+								((Map<String, AttributeVal>) parent.val).put("", createPlaceholderValue("", parent, depth));
 						}else
-							roots.add(createPlaceholderValue("+", parent, depth));
+							roots.add(createPlaceholderValue("", parent, depth));
+						
+						key="NEW";
 					}
 					
 					switch( ntype ) {
+						case EVENT:
+							try {
+								val = EventType.valueOf(val.toString());
+								
+							} catch( IllegalArgumentException e ) {val=null;}
+							break;
+							
 						case STR:
-							if( type==ColumnType.NUM || type==ColumnType.BOOL )
+							if( val!=null && (type==ColumnType.FLOAT || type==ColumnType.INT || type==ColumnType.EVENT || type==ColumnType.BOOL) )
 								val = val.toString();
 							else
 								val = "";
@@ -132,18 +169,38 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 								val = Boolean.valueOf(true);
 							break;
 							
-						case NUM:
+						case FLOAT:
+							try {
+								val = Double.valueOf(val.toString());
+								break;
+							} catch( NumberFormatException e ) {}
+						
+							val = Double.valueOf(0);
+							break;
+							
+						case INT:
 							if( type==ColumnType.STR )
-								val = Double.valueOf((String) val);
-							else
-								val = Double.valueOf(0);
+								try {
+									val = Long.valueOf((String) val);
+									break;
+								} catch( NumberFormatException e ) {}
+							
+							else if( type==ColumnType.FLOAT ) {
+								val = ((Number)val).intValue();
+								break;
+							}
+							
+							val = Long.valueOf(0);
 							break;
 							
 						case OBJ:
-							val = new LinkedHashMap<>();
+							val = new ArrayList<>();
+							((Collection<AttributeVal>) val).add(createPlaceholderValue("", AttributeVal.this, depth+1));
+							break;
 							
 						case SEQ:
 							val = new ArrayList<>();
+							((Collection<AttributeVal>) val).add(createPlaceholderValue(null, AttributeVal.this, depth+1));
 							break;
 					}
 					
@@ -154,33 +211,27 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 		}
 	}
 	
-	private long uniqueIdSource = 1;
-	
 	private final Set<AttributeVal> roots = new LinkedHashSet<>();
 
 	private final IRedrawable redrawable;
 	
 	public AttributeDataCollection(Attributes attributes, IRedrawable redrawable) {
 		this.redrawable = redrawable;
-		roots.addAll(addToAttributeMap(attributes, null, 0).values());
-	}
-
-	protected String genUniqueId() {
-		return Long.toString(uniqueIdSource++);
+		roots.addAll(addToAttributeMap(attributes, null, 0));
 	}
 	
-	private Map<String, AttributeVal> addToAttributeMap(Map<String, Object> obj, AttributeVal parent, int depth) {
-		Map<String, AttributeVal> values = new LinkedHashMap<>(obj.size());
+	private List<AttributeVal> addToAttributeMap(Map<String, Object> obj, AttributeVal parent, int depth) {
+		List<AttributeVal> values = new ArrayList<>(obj.size());
 		
 		for( Entry<String, Object> e : obj.entrySet() ) {
 			AttributeVal val = new AttributeVal();
 			
-			values.put(e.getKey(), val);
+			values.add(val);
 			
 			initAttributeVal(val, e.getKey(), e.getValue(), parent, depth);
 		}
 		
-		values.put("+", createPlaceholderValue("+", parent, depth));
+		values.add(createPlaceholderValue("", parent, depth));
 		
 		return values;
 	}
@@ -188,15 +239,14 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 		List<AttributeVal> values = new ArrayList<>(seq.size());
 		
 		for( Object o : seq ) {
-			String key = genUniqueId();
 			AttributeVal val = new AttributeVal();
 			
 			values.add(val);
 					
-			initAttributeVal(val, key, o, parent, depth);
+			initAttributeVal(val, "", o, parent, depth);
 		}
 		
-		values.add(createPlaceholderValue(genUniqueId(), parent, depth));
+		values.add(createPlaceholderValue("", parent, depth));
 		
 		return values;
 	}
@@ -215,8 +265,12 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 		val.key = key;
 		val.parent = parent;
 		
-		if( value instanceof Number ) {
-			val.type = ColumnType.NUM;
+		if( value instanceof Float || value instanceof Double ) {
+			val.type = ColumnType.FLOAT;
+			val.val = ((Number) value).doubleValue();
+			
+		} else if( value instanceof Integer || value instanceof Long ) {
+			val.type = ColumnType.INT;
 			val.val = ((Number) value).doubleValue();
 			
 		} else if( value instanceof Boolean ) {
@@ -238,40 +292,76 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 		} else {
 			val.type = ColumnType.STR;
 			val.val = value.toString();
+			
+			try {
+				val.val = EventType.valueOf((String) val.val);
+				val.type = ColumnType.EVENT;
+				
+			} catch( IllegalArgumentException e ) {}
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void deleteAttribute(AttributeVal val) {
-		deleteAllSubElements(val);
-		
 		if( val.parent!=null ) {
-			if( val.parent.val instanceof Map )
-				((Map<String, AttributeVal>) val.parent.val).remove(val.key);
-			else if( val.parent.val instanceof Collection )
-				((Collection<AttributeVal>) val.parent.val).remove(val);
+			((Collection<AttributeVal>) val.parent.val).remove(val);
 				
 		} else {
 			roots.remove(val);
 		}
 	}
 	
+	public Attributes getAttributes() {
+		return createAttributesMap(roots);
+	}
+	private static Attributes createAttributesMap(Collection<AttributeVal> c) {
+		Attributes attributes = new Attributes();
+		
+
+		for( AttributeVal v : c ) {
+			Object a = getAttributeValue(v);
+			
+			if( a!=null )
+				attributes.put(v.key, a);
+		}
+		
+		return attributes;
+	}
+	private static List<?> createAttributesList(Collection<AttributeVal> c) {
+		List<Object> values = new ArrayList<>(c.size());
+
+		for( AttributeVal v : c ) {
+			Object a = getAttributeValue(v);
+			
+			if( a!=null )
+				values.add(a);
+		}
+		
+		return values;
+	}
 	@SuppressWarnings("unchecked")
-	protected void deleteAllSubElements(AttributeVal val) {
-		switch( val.type ) {
+	private static Object getAttributeValue( AttributeVal v ) {
+		if( v.type==null || v.val==null || v.key==null )
+			return null;
+
+		switch (v.type) {
+			case BOOL:
+			case FLOAT:
+			case INT:
+			case STR:
+				return v.val;
+				
+			case EVENT:
+				return v.val.toString();
+				
 			case OBJ:
-				for( AttributeVal e : ((Map<String, AttributeVal>)val.val).values() )
-					deleteAttribute(e);
-				break;
+				return createAttributesMap((Collection<AttributeVal>) v.val);
 				
 			case SEQ:
-				for( AttributeVal e : ((List<AttributeVal>)val.val) )
-					deleteAttribute(e);
-				break;
-				
-			default:
-				break;
+				return createAttributesList((Collection<AttributeVal>) v.val);
 		}
+		
+		return null;
 	}
 
 	@Override

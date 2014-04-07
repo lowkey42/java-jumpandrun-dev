@@ -47,9 +47,9 @@ public class Edit extends Element implements TextElement {
 		text = new Text(""+CURSER_CHAR_2, getStyle().textFont, getStyle().textFontSize);
 		text.setOrigin(0, this.text.getLocalBounds().height / 2);
 		setDimensions(width, this.text.getLocalBounds().height*2+10);
-		text.setString(textRef!=null ? textRef.getValue() : null);
+		text.setString(textRef!=null && textRef.getValue()!=null ? textRef.getValue() : "");
 		
-		buffer = new StringBuilder(textRef!=null ? textRef.getValue() : null);
+		buffer = new StringBuilder(textRef!=null && textRef.getValue()!=null ? textRef.getValue() : "");
 		box = new RectangleShape(new Vector2f(width, height));
 		box.setFillColor(new Color(0, 0, 0, 0));
 		box.setOutlineColor(Color.WHITE);
