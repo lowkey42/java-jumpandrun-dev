@@ -1,0 +1,4 @@
+{ "default":"IDLE",
+"IDLE":{"texture_gui": "keyTooltipBox.png", "frameWidth": 56, "frameHeight":55, "numRowFrames": 1, "frameStart": 0, "frameEnd":0, "fps": 0},
+"MOUSE_OVER":{"texture_gui": "keyTooltipBox.png", "frameWidth": 56, "frameHeight":55, "numRowFrames": 1, "frameStart": 0, "frameEnd":1, "fps": 0},
+"CLICKED":{"texture_gui": "keyTooltipBox.png", "frameWidth": 56, "frameHeight":55, "numRowFrames": 1, "frameStart": 0, "frameEnd":2, "fps": 0} }

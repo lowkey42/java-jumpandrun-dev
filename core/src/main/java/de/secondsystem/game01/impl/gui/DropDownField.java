@@ -28,7 +28,6 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 	public DropDownField(float x, float y, float width, Class<T> valueEnum, RwValueRef<T> value, ElementContainer owner) {
 		super(x, y, width, new ToStringValueRef<>(valueEnum, value), owner);
 		valueRef = value;
-		text.setColor(Color.GREEN);
 		
 		suggestions = Collections.unmodifiableList(createSuggestions(valueEnum.getEnumConstants()));
 	}
@@ -38,7 +37,7 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 		
 		int index = 0;
 		for( T o : options )
-			s.add(new Suggestion(getHeight() + (index++)*getHeight()/2, o, getWidth(), getHeight()));
+			s.add(new Suggestion(getHeight() + (index++)*(getHeight()/2+2), o, getWidth(), getHeight()));
 		
 		return s;
 	}
@@ -180,7 +179,7 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 		@Override
 		public void draw(RenderTarget rt) {
 			box.setPosition(Vector2f.add(new Vector2f(0,yPos), getPosition()));
-			text.setPosition(Vector2f.add(new Vector2f(0,yPos+box.getSize().y/2), getPosition()));
+			text.setPosition(Vector2f.add(new Vector2f(5,yPos+box.getSize().y/2), getPosition()));
 			
 			rt.draw(box);
 			rt.draw(text);

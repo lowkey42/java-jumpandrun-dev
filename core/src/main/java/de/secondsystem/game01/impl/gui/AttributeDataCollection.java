@@ -271,7 +271,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			
 		} else if( value instanceof Integer || value instanceof Long ) {
 			val.type = ColumnType.INT;
-			val.val = ((Number) value).doubleValue();
+			val.val = ((Number) value).longValue();
 			
 		} else if( value instanceof Boolean ) {
 			val.type = ColumnType.BOOL;

@@ -64,7 +64,7 @@ public final class Style {
 					ResourceManager.font.get("FreeSans.otf"), 26, ResourceManager.animation.get("coolButton.anim"), // button 
 					ResourceManager.texture_gui.get("VolumeButton.png"), // slider
 					ResourceManager.animation.get("coolCheckBox.anim"), // checkBox
-					14, // dropdown
+					16, // dropdown
 					false);
 			
 		} catch (IOException e) {
