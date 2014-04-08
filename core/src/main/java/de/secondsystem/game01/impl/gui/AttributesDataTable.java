@@ -68,6 +68,9 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 	public void redraw() {
 		recreateDataRows(attributeMap);
 	}
+	public void reset() {
+		recreateDataRows(attributeMap = new AttributeDataCollection(attributesSource.getAttributes(), AttributesDataTable.this));
+	}
 	
 	protected void createButtonPanel() {
 		buttonPanel = createPanel(getWidth(), getParentStyle(owner).buttonTexture.getDefault().frameHeight*2+5, 
@@ -75,11 +78,12 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 		buttonPanel.createButton("Apply", new IOnClickListener() {
 			@Override public void onClick() {
 				attributesSource.applyAttributes(attributeMap.getAttributes());
+				reset();
 			}
 		});
 		buttonPanel.createButton("Reset", new IOnClickListener() {
 			@Override public void onClick() {
-				recreateDataRows(attributeMap = new AttributeDataCollection(attributesSource.getAttributes(), AttributesDataTable.this));
+				reset();
 			}
 		});
 
@@ -106,6 +110,11 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 		LayoutElementContainer row = super.addRow(rowData);
 		rowData.row = row;
 		return row;
+	}
+	
+	@Override
+	protected Color getRowBackgroundColorBase(AttributeVal data) {
+		return data.modified ? new Color(140, 140, 0) : super.getRowBackgroundColorBase(data);
 	}
 	
 	private final class KeyColumn extends AbstractColumnDef<AttributeVal> {
@@ -147,7 +156,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 		@Override
 		public Element createValueElement(float width, AttributeVal data, LayoutElementContainer row) {
 			if( data.type==ColumnType.BOOL ) {
-				Panel p = row.createPanel(width, 40);
+				Panel p = row.createPanel(width, 50);
 				p.createCheckbox(new ToBooleanRwValueRef(data.new ValueRef()));
 				p.setFillColor(Color.TRANSPARENT);
 				return p;
@@ -177,7 +186,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 	private final class ActionsColumn extends AbstractColumnDef<AttributeVal> {
 
 		public ActionsColumn() {
-			super("Actions", 0.1f);
+			super("Delete", 0.1f);
 		}
 		
 		@Override

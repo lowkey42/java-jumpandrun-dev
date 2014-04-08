@@ -30,6 +30,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 		AttributeVal parent;
 		Object val;
 		LayoutElementContainer row;
+		boolean modified = false;
 		
 		public class KeyRef implements RwValueRef<String> {
 			@Override
@@ -37,15 +38,10 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 				return key!=null ? key : "";
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public void setValue(String nkey) {
-				if( !key.equals(nkey) && parent!=null ) {
-					if( parent.val instanceof Map ) {
-						((Map<String, AttributeVal>) parent.val).remove(key);
-						((Map<String, AttributeVal>) parent.val).put(nkey, AttributeVal.this);
-					}
-				}
+				if( !nkey.equals(key) )
+					modified = true;
 				
 				key = nkey;
 			}
@@ -60,6 +56,11 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 
 			@Override
 			public void setValue(EventType value) {
+				if( !modified && value!=val ) {
+					modified = true;
+					redrawable.redraw();
+				}
+				
 				val = value;
 			}
 			
@@ -92,7 +93,9 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			public void setValue(String value) {
 				if( type==null )
 					return;
-					
+				
+				Object orgVal = val;
+				
 				switch (type) {
 					case BOOL:
 						val = Boolean.valueOf(value);
@@ -122,6 +125,11 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 					default:
 						break;
 				}
+				
+				if( !modified && val!=null && !val.equals(orgVal) ) {
+					modified = true;
+					redrawable.redraw();
+				}
 			}
 			
 		}
@@ -135,17 +143,21 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			@Override
 			public void setValue(ColumnType ntype) {
 				if( type!=ntype ) {
+					modified = true;
+					
 					if( type==null ) {
 						if( parent!=null ) {
+							parent.modified = true;
 							if( parent.val instanceof Collection )
-								((Collection<AttributeVal>) parent.val).add(createPlaceholderValue(null, parent, depth));
-							else if( parent.val instanceof Map )
-								((Map<String, AttributeVal>) parent.val).put("", createPlaceholderValue("", parent, depth));
+								((Collection<AttributeVal>) parent.val).add(createPlaceholderValue(parent, depth));
 						}else
-							roots.add(createPlaceholderValue("", parent, depth));
+							roots.add(createPlaceholderValue(parent, depth));
 						
 						key="NEW";
 					}
+					
+					if( val==null )
+						val = "";
 					
 					switch( ntype ) {
 						case EVENT:
@@ -192,15 +204,11 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 							
 							val = Long.valueOf(0);
 							break;
-							
+
+						case SEQ:
 						case OBJ:
 							val = new ArrayList<>();
-							((Collection<AttributeVal>) val).add(createPlaceholderValue("", AttributeVal.this, depth+1));
-							break;
-							
-						case SEQ:
-							val = new ArrayList<>();
-							((Collection<AttributeVal>) val).add(createPlaceholderValue(null, AttributeVal.this, depth+1));
+							((Collection<AttributeVal>) val).add(createPlaceholderValue(AttributeVal.this, depth+1));
 							break;
 					}
 					
@@ -231,7 +239,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			initAttributeVal(val, e.getKey(), e.getValue(), parent, depth);
 		}
 		
-		values.add(createPlaceholderValue("", parent, depth));
+		values.add(createPlaceholderValue(parent, depth));
 		
 		return values;
 	}
@@ -246,14 +254,14 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			initAttributeVal(val, "", o, parent, depth);
 		}
 		
-		values.add(createPlaceholderValue("", parent, depth));
+		values.add(createPlaceholderValue(parent, depth));
 		
 		return values;
 	}
-	private AttributeVal createPlaceholderValue(String key, AttributeVal parent, int depth) {
+	private AttributeVal createPlaceholderValue(AttributeVal parent, int depth) {
 		AttributeVal nullVal = new AttributeVal();
 		nullVal.depth = depth;
-		nullVal.key = key;
+		nullVal.key = "";
 		nullVal.parent = parent;
 		nullVal.type = null;
 		
@@ -304,6 +312,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 	@SuppressWarnings("unchecked")
 	public void deleteAttribute(AttributeVal val) {
 		if( val.parent!=null ) {
+			val.parent.modified = true;
 			((Collection<AttributeVal>) val.parent.val).remove(val);
 				
 		} else {
@@ -394,9 +403,6 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			
 			if( val.val instanceof Collection )
 				iterators.push(((Collection<AttributeVal>) val.val).iterator());
-			
-			else if( val.val instanceof Map )
-				iterators.push(((Map<String, AttributeVal>) val.val).values().iterator());
 			
 			return val;
 		}

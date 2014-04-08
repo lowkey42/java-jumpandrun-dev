@@ -103,7 +103,11 @@ public class DataTable<T> extends LayoutElementContainer {
 		return Color.WHITE;
 	}
 	protected Color getRowBackgroundColor(T data) {
-		return dataRows.size()%2==0 ? Color.BLACK : new Color(50, 50, 50);
+		Color c = getRowBackgroundColorBase(data);
+		return dataRows.size()%2==0 ? c : new Color(c.r+50, c.g+50, c.b+50);
+	}
+	protected Color getRowBackgroundColorBase(T data) {
+		return Color.BLACK;
 	}
 	
 	
