@@ -8,6 +8,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.graphic.ParticleEmitter;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.model.Attributes;
@@ -17,6 +18,8 @@ import de.secondsystem.game01.model.IUpdateable;
 import de.secondsystem.game01.util.SerializationUtil;
 
 public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
+	
+	private LayerType layerType;
 
 	private final ParticleEmitter emitter;
 	
@@ -33,7 +36,16 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 				new Vector2f(minXVelocity, minYVelocity), new Vector2f(maxXVelocity, maxYVelocity), minRotationVelocity, 
 				maxRotationVelocity, minAngularVelocity, maxAngularVelocity, minColor, maxColor, minParticleSize, maxParticleSize);
 	}
-
+	
+	@Override
+	public LayerType getLayerType() {
+		return layerType;
+	}
+	@Override
+	public void setLayerType(LayerType layerType) {
+		this.layerType = layerType;
+	}
+	
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		emitter.draw(renderTarget);

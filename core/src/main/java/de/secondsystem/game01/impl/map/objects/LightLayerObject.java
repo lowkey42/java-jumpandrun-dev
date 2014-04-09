@@ -9,6 +9,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.graphic.Light;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.model.Attributes;
@@ -27,6 +28,14 @@ public class LightLayerObject implements ILayerObject {
 		light = lightMap.createLight(worldMask, new Vector2f(x, y), color, radius, sizeDegree, rotation);
 		this.worldMask = worldMask;
 		this.lightMap = lightMap;
+	}
+	
+	@Override
+	public void setLayerType(LayerType layerType) {
+	}
+	@Override
+	public LayerType getLayerType() {
+		return LayerType.LIGHTS;
 	}
 	
 	public Light getLight() {

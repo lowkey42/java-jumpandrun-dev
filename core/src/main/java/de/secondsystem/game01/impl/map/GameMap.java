@@ -15,6 +15,7 @@ import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.objects.EntityLayer;
+import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.impl.map.objects.LightLayer;
 import de.secondsystem.game01.impl.map.objects.SimpleLayer;
 import de.secondsystem.game01.impl.map.physics.Box2dPhysicalWorld;
@@ -244,6 +245,23 @@ public class GameMap implements IGameMap {
 			switchWorlds();
 	}
 
+	@Override
+	public ILayerObject createNode(LayerObjectType type, Attributes attributes) {
+		return type.create(this, attributes);
+	}
+	
+	@Override
+	public ILayerObject updateNode(ILayerObject obj, Attributes attributes) {
+		LayerType layer = obj.getLayerType();
+		
+		ILayerObject nObj = createNode(obj.typeUuid(), attributes);
+
+		for( GameWorld world : gameWorld )
+			world.graphicLayer[layer.layerIndex].replaceNode(obj, nObj);
+		
+		return nObj;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#addNode(int, de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */

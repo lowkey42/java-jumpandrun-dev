@@ -11,6 +11,8 @@ public interface ILayer extends IDrawable, IUpdateable {
 
 	void addNode(ILayerObject obj);
 
+	void replaceNode(ILayerObject obj, ILayerObject nObj);
+
 	ILayerObject findNode(Vector2f point);
 
 	void remove(ILayerObject s);

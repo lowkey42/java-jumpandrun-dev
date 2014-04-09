@@ -9,6 +9,7 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IUpdateable;
@@ -40,6 +41,14 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 
 	public EntityLayerObject(IGameMap map, String archetype, Attributes attributes) {
 		this( map.getEntityManager().createEntity(archetype, attributes) );
+	}
+	
+	@Override
+	public LayerType getLayerType() {
+		return LayerType.OBJECTS;
+	}
+	@Override
+	public void setLayerType(LayerType layerType) {
 	}
 	
 	public void remove(IGameMap map) {
@@ -104,10 +113,6 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	public LayerObjectType typeUuid() {
 		return LayerObjectType.ENTITY;
 	}
-
-	public static ILayerObject create(IGameMap map, Map<String, Object> attributes) {
-		throw new UnsupportedOperationException();
-	}
 	
 	@Override
 	public boolean isInWorld(WorldId worldId) {
@@ -133,5 +138,10 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	@Override
 	public void update(long frameTimeMs) {
 		entity.update(frameTimeMs);	
+	}
+	
+
+	public static ILayerObject create(IGameMap map, Map<String, Object> attributes) {
+		return new EntityLayerObject(map.getEntityManager().create(UUID.fromString((String)attributes.get("uuid")), (String)attributes.get("archetype"), attributes));
 	}
 }

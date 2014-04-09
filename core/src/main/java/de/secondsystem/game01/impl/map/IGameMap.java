@@ -6,8 +6,10 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.graphic.LightMap;
+import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
+import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -51,6 +53,10 @@ public interface IGameMap extends IDrawable, IUpdateable {
 
 	WorldId getActiveWorldId();
 
+	ILayerObject createNode(LayerObjectType type, Attributes attributes);
+	
+	ILayerObject updateNode(ILayerObject obj, Attributes attributes);
+	
 	void addNode(WorldId worldId, LayerType layer, ILayerObject sprite);
 
 	void addNode(LayerType layer, ILayerObject sprite);

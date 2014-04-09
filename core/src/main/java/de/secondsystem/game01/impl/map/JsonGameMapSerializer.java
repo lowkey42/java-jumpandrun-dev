@@ -151,7 +151,7 @@ public class JsonGameMapSerializer implements IGameMapSerializer {
 		if( type==null )
 			throw new FormatErrorException("Unknown LayerObjectType: "+attributes.get("$type"));
 		
-		return type.create(map, attributes);
+		return map.createNode(type, attributes);
 	}
 
 

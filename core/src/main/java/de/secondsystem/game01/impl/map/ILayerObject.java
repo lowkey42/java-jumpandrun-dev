@@ -14,5 +14,8 @@ public interface ILayerObject extends IDrawable, IInsideCheck, IMoveable, IDimen
 	boolean isInWorld(WorldId worldId);
 	void setWorld(WorldId worldId, boolean exists);
 	
+	LayerType getLayerType();
+	void setLayerType(LayerType layerType);
+	
 	LayerObjectType typeUuid();
 }

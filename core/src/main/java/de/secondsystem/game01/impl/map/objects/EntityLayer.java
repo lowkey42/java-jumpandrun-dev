@@ -34,6 +34,11 @@ public class EntityLayer implements ILayer {
 	}
 
 	@Override
+	public void replaceNode(ILayerObject obj, ILayerObject nObj) {
+		// can be ignored, safely. The replacement has already been handled by entityManager.
+	}
+	
+	@Override
 	public void addNode(ILayerObject obj) {
 		if( obj instanceof EntityLayerObject && ((EntityLayerObject)obj).entity==null ) {
 			manager.create(((EntityLayerObject)obj).uuid, ((EntityLayerObject)obj).type, ((EntityLayerObject)obj).attributes);

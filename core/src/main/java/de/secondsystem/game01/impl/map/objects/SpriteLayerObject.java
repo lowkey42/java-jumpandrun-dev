@@ -10,6 +10,7 @@ import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
@@ -22,6 +23,8 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 public class SpriteLayerObject implements ILayerObject {
 
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(SpriteLayerObject.class);
+	
+	private LayerType layerType;
 	
 	private SpriteWrappper sprite;
 	
@@ -39,6 +42,15 @@ public class SpriteLayerObject implements ILayerObject {
 		sprite.setPosition(new Vector2f(x, y));
 		sprite.setRotation(rotation);
 		sprite.setDimensions(width>0?width:sprite.getWidth(), height>0?height:sprite.getHeight());
+	}
+	
+	@Override
+	public LayerType getLayerType() {
+		return layerType;
+	}
+	@Override
+	public void setLayerType(LayerType layerType) {
+		this.layerType = layerType;
 	}
 	
 	public void setTile(Tileset tileset, int tileId) {

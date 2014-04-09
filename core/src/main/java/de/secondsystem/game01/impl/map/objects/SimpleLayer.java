@@ -38,10 +38,24 @@ public class SimpleLayer implements ILayer {
 	 * @see de.secondsystem.game01.impl.map.ILayer#addNode(de.secondsystem.game01.impl.map.ILayerObject)
 	 */
 	@Override
-	public void addNode( ILayerObject obj ) {
+	public final void addNode( ILayerObject obj ) {
 		obj.setWorld(worldId, true);
+		obj.setLayerType(type);
 		objects.add(obj);
 	}
+	
+	@Override
+	public void replaceNode(ILayerObject obj, ILayerObject nObj) {
+		int index = objects.indexOf(obj);
+		if( index>=0 ) {
+			remove(obj);
+			
+			obj.setWorld(worldId, true);
+			obj.setLayerType(type);
+			objects.add(index, nObj);
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.ILayer#findNode(org.jsfml.system.Vector2f)
 	 */

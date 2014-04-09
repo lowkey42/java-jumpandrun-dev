@@ -8,6 +8,7 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
@@ -81,6 +82,14 @@ public class CollisionObject implements ILayerObject {
 				.create();
 		else
 			physicsBody = null;
+	}
+	
+	@Override
+	public LayerType getLayerType() {
+		return LayerType.PHYSICS;
+	}
+	@Override
+	public void setLayerType(LayerType layerType) {
 	}
 	
 	public void setType(CollisionType type) {
