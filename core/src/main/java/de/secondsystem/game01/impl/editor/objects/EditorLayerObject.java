@@ -81,7 +81,7 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			textureRectHeight = height;
 		}
 		
-		refresh();
+		updateAttributes();
 	}
 	
 	@Override

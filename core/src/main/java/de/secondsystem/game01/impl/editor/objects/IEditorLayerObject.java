@@ -33,6 +33,8 @@ public interface IEditorLayerObject extends IDrawable, IDimensioned, IMoveable, 
 	
 	void removeFromMap(GameMap map, LayerType currentLayer);
 	
+	void updateAttributes();
+	
 	// used in mouse state
 	void create(IGameMap map);
 	void changeSelection(int offset);

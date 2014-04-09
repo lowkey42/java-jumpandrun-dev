@@ -19,6 +19,10 @@ import de.secondsystem.game01.impl.editor.objects.IEditorLayerObject;
 import de.secondsystem.game01.impl.editor.objects.EditorEntity;
 import de.secondsystem.game01.impl.editor.objects.EditorLayerObject;
 import de.secondsystem.game01.impl.editor.objects.EditorLightObject;
+import de.secondsystem.game01.impl.gui.GUIGameState;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
+import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -42,7 +46,7 @@ import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
  * @author lowkey
  * 
  */
-public final class EditorGameState extends GameState {
+public final class EditorGameState extends GUIGameState {
 
 	private static final float CAM_MOVE_SPEED = 5.f;
 	private RenderWindow window;
@@ -83,8 +87,18 @@ public final class EditorGameState extends GameState {
 
 	@Override
 	protected void onStart(GameContext ctx) {
-		window = ctx.window;
+		super.onStart(ctx);
 		
+		window = ctx.window;
+	}
+
+	@Override
+	protected void onStop(GameContext ctx) {
+		editorObject.deselect();
+	}
+	
+	@Override
+	protected void initGui(GameContext ctx, LayoutElementContainer container) {
 		if(map==null && mapToLoad!=null) {
 			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
 			map = mapSerializer.deserialize(ctx, mapToLoad, null, true, true);
@@ -95,14 +109,18 @@ public final class EditorGameState extends GameState {
 		
 		editorObject = new EditorLayerObject(map, tileset, false);
 		
-		editorInterface = new EditorGUI(0, 0, ctx.getViewWidth(), ctx.getViewHeight());
-		
+		editorInterface = new EditorGUI(0, 0, ctx.getViewWidth(), ctx.getViewHeight(), container);
 		editorInterface.setLayerHint(map, currentLayer);
 	}
-
+	
 	@Override
-	protected void onStop(GameContext ctx) {
-		editorObject.deselect();
+	protected Vector2f getPosition() {
+		return new Vector2f(0.f, 0.f);
+	}
+	
+	@Override
+	protected Layout getLayout() {
+		return new Layout(LayoutDirection.HORIZONTAL, 50);
 	}
 
 	private View getTransformedView(GameContext ctx) {
@@ -133,6 +151,8 @@ public final class EditorGameState extends GameState {
 		drawMap(ctx.window);
 		
 		processInputKeyboard();
+		
+		super.onFrame(ctx, frameTime);
 	}
 	
 	@Override

@@ -105,13 +105,6 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 		}
 		else
 			layerObject.setDimensions(width, height);
-		
-		attributes.put("width", width);
-		attributes.put("height", height);
-		attributes.put("x", pos.x);
-		attributes.put("y", pos.y);
-		attributes.put("rotation", rotation);
-		attributes.put("worldId", map.getActiveWorldId());
 	}
 	
 	@Override
@@ -152,6 +145,7 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 
 	@Override
 	public Attributes getAttributes() {
+		updateAttributes();
 		return attributes;
 	}
 
@@ -164,5 +158,15 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 		height = attributes.getFloat("height");
 		pos = new Vector2f(attributes.getFloat("x"), attributes.getFloat("y"));
 		rotation = attributes.getFloat("rotation");
+	}
+	
+	@Override
+	public void updateAttributes() {
+		attributes.put("width", width);
+		attributes.put("height", height);
+		attributes.put("x", pos.x);
+		attributes.put("y", pos.y);
+		attributes.put("rotation", rotation);
+		attributes.put("worldId", map.getActiveWorldId());
 	}
 }
