@@ -186,7 +186,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 	private final class ActionsColumn extends AbstractColumnDef<AttributeVal> {
 
 		public ActionsColumn() {
-			super("Delete", 0.1f);
+			super("Del", 0.1f);
 		}
 		
 		@Override

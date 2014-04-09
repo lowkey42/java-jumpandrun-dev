@@ -214,7 +214,7 @@ public final class EditorGameState extends GameState {
 				if( layerObject != null ) {
 					if( editorObject.inMouseState() )
 						editorObject.deselect();
-					
+
 					if( layerObject instanceof EntityLayerObject )
 						editorObject = new EditorEntity(Color.BLUE, 2.f, Color.TRANSPARENT, map);
 					else if( layerObject instanceof SpriteLayerObject || layerObject instanceof CollisionObject )
@@ -223,6 +223,8 @@ public final class EditorGameState extends GameState {
  						editorObject = new EditorLightObject(Color.BLUE, 2.f, Color.TRANSPARENT, map);
 					
 					editorObject.setLayerObject( layerObject );
+					
+					editorInterface.onObjectSelection(editorObject);
 				}
 				else {
 					deselectSprite();

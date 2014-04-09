@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
@@ -113,5 +114,11 @@ public class EditorEntity extends EditorLayerObject {
 		Attribute worldId = new Attribute("worldId", map.getActiveWorldId().id);
 		
 		map.getEntityManager().create(uuid, archetype, new Attributes(width, height, rotation, x, y, worldId));
+	}
+	
+	@Override
+	public Attributes getAttributes() {
+		((EntityLayerObject) layerObject).updateAttributes();
+		return ((EntityLayerObject) layerObject).attributes;
 	}
 }

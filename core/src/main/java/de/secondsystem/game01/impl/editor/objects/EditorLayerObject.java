@@ -25,7 +25,6 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 	protected int scalingX = 0;
 	protected int scalingY = 0;	
 	protected boolean scaling = false;
-	protected IGameMap map;
 	
 	private Tileset tileset;
 	private int currentTile = 0;
@@ -81,6 +80,8 @@ public class EditorLayerObject extends AbstractEditorLayerObject {
 			textureRectWidth = width;
 			textureRectHeight = height;
 		}
+		
+		refresh();
 	}
 	
 	@Override

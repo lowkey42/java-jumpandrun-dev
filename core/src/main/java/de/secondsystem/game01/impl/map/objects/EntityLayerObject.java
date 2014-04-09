@@ -47,6 +47,14 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 		entity.onDestroy();
 	}
 	
+	public void updateAttributes() {
+		attributes.put("width", getWidth());
+		attributes.put("height", getHeight());
+		attributes.put("x", getPosition().x);
+		attributes.put("y", getPosition().y);
+		attributes.put("rotation", getRotation());
+	}
+	
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		entity.draw(renderTarget);

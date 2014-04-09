@@ -4,8 +4,10 @@ import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
+import de.secondsystem.game01.model.Attributes;
 
 public abstract class AbstractEditorLayerObject implements IEditorLayerObject {	
 	protected ILayerObject layerObject = null;
@@ -21,6 +23,8 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	protected boolean repeatTexture;
 	protected float textureRectWidth;
 	protected float textureRectHeight;
+	protected Attributes attributes = new Attributes();
+	protected IGameMap map;
 	
 	// TODO: solve mystery: find out total width/height of a sprite
 	
@@ -101,6 +105,13 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 		}
 		else
 			layerObject.setDimensions(width, height);
+		
+		attributes.put("width", width);
+		attributes.put("height", height);
+		attributes.put("x", pos.x);
+		attributes.put("y", pos.y);
+		attributes.put("rotation", rotation);
+		attributes.put("worldId", map.getActiveWorldId());
 	}
 	
 	@Override
@@ -137,4 +148,21 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 		if( layerObject instanceof SpriteLayerObject )
 			repeatTexture = repeat;
 	} 
+	
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	@Override
+	public void applyAttributes(Attributes newAttributes) {
+		attributes.clear();
+		attributes.putAll(newAttributes);
+		
+		width  = attributes.getFloat("width");
+		height = attributes.getFloat("height");
+		pos = new Vector2f(attributes.getFloat("x"), attributes.getFloat("y"));
+		rotation = attributes.getFloat("rotation");
+	}
 }

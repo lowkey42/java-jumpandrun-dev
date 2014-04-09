@@ -44,7 +44,8 @@ public class ElementContainer extends Element {
 	void addElement( Element element ) {
 		children.add(element);
 	}
-	void removeElement( Element element ) {
+	
+	public void removeElement( Element element ) {
 		children.remove(element);
 	}
 	

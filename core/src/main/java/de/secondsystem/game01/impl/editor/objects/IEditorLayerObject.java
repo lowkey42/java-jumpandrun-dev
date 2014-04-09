@@ -3,6 +3,7 @@ package de.secondsystem.game01.impl.editor.objects;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
@@ -12,7 +13,7 @@ import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 
-public interface IEditorLayerObject extends IDrawable, IDimensioned, IMoveable, IInsideCheck {
+public interface IEditorLayerObject extends IDrawable, IDimensioned, IMoveable, IInsideCheck, AttributesSource {
 	void setWidth(float width);
 	void setHeight(float height);
 	void rotate(float rotation);
