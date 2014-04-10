@@ -142,6 +142,9 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	
 
 	public static ILayerObject create(IGameMap map, Map<String, Object> attributes) {
-		return new EntityLayerObject(map.getEntityManager().create(UUID.fromString((String)attributes.get("uuid")), (String)attributes.get("archetype"), attributes));
+		return new EntityLayerObject(map.getEntityManager().create(
+				attributes.containsKey("uuid") ? UUID.fromString((String)attributes.get("uuid")) : null, 
+				(String)attributes.get("archetype"), 
+				attributes));
 	}
 }

@@ -11,7 +11,6 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
-import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.objects.EntityLayer;
@@ -341,21 +340,6 @@ public class GameMap implements IGameMap {
 	@Override
 	public ScriptEnvironment getScriptEnv() {
 		return scripts;
-	}
-
-	@Override
-	public IGameEntity findEntity(Vector2f pos) {
-		IGameEntity entity = entityManager.findEntity(pos);
-		if( entity != null && entity.isInWorld(activeWorldId))
-			return entity;
-		
-		return null;
-	}
-
-	@Override
-	public void removeEntity(IGameEntity entity) {
-		if( entity.isInWorld(activeWorldId) )
-			entityManager.destroy(entity.uuid());
 	}
 
 	@Override
