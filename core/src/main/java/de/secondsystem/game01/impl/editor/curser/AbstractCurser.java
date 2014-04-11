@@ -77,7 +77,6 @@ abstract class AbstractCurser implements IEditorCurser {
 	@Override
 	public void draw(RenderTarget renderTarget) {
 		if( getLayerObject()!=null ) {
-			// TODO
 			shapeMarker.setSize(new Vector2f(getLayerObject().getWidth(), getLayerObject().getHeight()));
 			shapeMarker.setOrigin(getLayerObject().getWidth()/2.f, getLayerObject().getHeight()/2.f);
 			shapeMarker.setRotation(getLayerObject().getRotation());
