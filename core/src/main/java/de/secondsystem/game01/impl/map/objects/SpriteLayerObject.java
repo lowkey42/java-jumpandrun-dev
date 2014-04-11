@@ -58,6 +58,10 @@ public class SpriteLayerObject implements ILayerObject {
 		sprite.setTexture(tileset.get(tileId), tileset.getNormals(tileId), tileset.getClip(tileId));
 	}
 	
+	public int getTile() {
+		return tileId;
+	}
+	
 	public boolean isTextureRepeated() {
 		return sprite.isTextureRepeated();
 	}

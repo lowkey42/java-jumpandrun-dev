@@ -56,6 +56,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	
 	ILayerObject updateNode(ILayerObject obj, Attributes attributes);
 	
+	void replaceNode(ILayerObject obj, ILayerObject newObj);
+	
 	void addNode(WorldId worldId, LayerType layer, ILayerObject sprite);
 
 	void addNode(LayerType layer, ILayerObject sprite);

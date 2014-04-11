@@ -1,4 +1,4 @@
-package de.secondsystem.game01.impl.editor;
+package de.secondsystem.game01.impl.editor.curser;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,6 +7,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.editor.LayerPanel.IOnLayerChangedListener;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.LayerType;
 
 public final class CurserManager implements IOnLayerChangedListener {
@@ -18,6 +19,8 @@ public final class CurserManager implements IOnLayerChangedListener {
 	private final Set<ISelectionChangedListener> listeners = new HashSet<>();
 	
 	private final IMapProvider mapProvider;
+	
+	private final BrushPalette brushes = new BrushPalette();
 	
 	private LayerType layer;
 	
@@ -31,6 +34,20 @@ public final class CurserManager implements IOnLayerChangedListener {
 		listeners.add(listener);
 		listener.onSelectionChanged(get());
 	}
+	protected void callListeners() {
+		for( ISelectionChangedListener l : listeners )
+			l.onSelectionChanged(curser);
+	}
+	protected void setCurser( IEditorCurser newCurser ) {
+		if( curser!=newCurser ) {
+			if( curser!=null )
+				curser.onDestroy();
+			
+			curser = newCurser;
+		}
+		
+		callListeners();
+	}
 	
 	public IEditorCurser get() {
 		return curser;
@@ -39,11 +56,13 @@ public final class CurserManager implements IOnLayerChangedListener {
 	@Override
 	public void onLayerChanged(LayerType layer) {
 		this.layer = layer;
+		// TODO: change brush
 	}
 	
 	public void deleteSelected() {
 		if( curser instanceof SelectionCurser ) {
-			mapProvider.getMap().remove(layer, ((SelectionCurser)curser).layerObject);
+			mapProvider.getMap().remove(layer, ((SelectionCurser)curser).getLayerObject());
+			curser=null;
 			setToBrush();
 		}
 	}
@@ -51,22 +70,31 @@ public final class CurserManager implements IOnLayerChangedListener {
 	public void setSelectionFromCurser(Vector2f mouse, LayerType layer) {
 		ILayerObject obj = mapProvider.getMap().findNode(layer, mouse);
 		
-		if( obj!=null )
-			curser = new SelectionCurser(mapProvider, obj);
+		if( obj!=null ) {
+			setCurser(new SelectionCurser(mapProvider, obj));
 		
-		else if( curser instanceof SelectionCurser )
+		} else if( curser instanceof AbstractCurser )
 			setToBrush();
 	}
 	
 	public void setToNull() {
 		if( curser!=null )
-			curser.preDestroy();
+			curser.onDestroy();
 		
 		curser=null;
 	}
 	
 	public void setToBrush() {
-	//TODO:	curser = new BrushCurser(mapProvider, layer);
+		setCurser(new BrushCurser(mapProvider, brushes.getBrush(mapProvider.getMap(), layer)));
 	}
 
+
+	public void scrollBrushes(boolean up) {
+		if( curser instanceof BrushCurser ) {
+			((BrushCurser) curser).brush.cirlce(up);
+			callListeners();
+		}
+		// TODO
+	}
+	
 }

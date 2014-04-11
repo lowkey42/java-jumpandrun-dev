@@ -9,6 +9,7 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.gui.ElementContainer;
 import de.secondsystem.game01.impl.gui.Label;
 import de.secondsystem.game01.impl.gui.Panel;
+import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.LayerType;
 
 public class LayerPanel extends Panel {	
@@ -21,13 +22,15 @@ public class LayerPanel extends Panel {
 	
 	private final IMapProvider mapProvider;
 	
-	private Label layerHint;
+	private Label layerHint;	// TODO: create a nice panel with toggleButtons, etc.
 	
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
 	
 	public LayerPanel(float x, float y, float width, ElementContainer owner, IMapProvider mapProvider) {
-		super(x, y, width, 100, owner);
+		super(x, y, width, 50, owner);
 		this.mapProvider = mapProvider;
+		
+		setLayoutOffset(10, 10);
 		
 		setFillColor(new Color(0, 0, 0, 200));
 		

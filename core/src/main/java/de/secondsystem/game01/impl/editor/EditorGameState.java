@@ -13,6 +13,7 @@ import org.jsfml.window.event.KeyEvent;
 
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
+import de.secondsystem.game01.impl.editor.curser.CurserManager;
 import de.secondsystem.game01.impl.gui.GUIGameState;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
@@ -21,6 +22,7 @@ import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
+import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
 
 /**
@@ -102,8 +104,10 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 	@Override
 	protected void initGui(GameContext ctx, LayoutElementContainer c) {
 		layerPanel = c.updateOffset(new LayerPanel(c.getXOffset(), c.getYOffset(), c.getWidth()-ObjectPanel.WIDTH, c, this));
-		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c, this));
+		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c));
 		layerPanel.addListener(curser);
+		curser.addListerner(objectPanel);
+		curser.setToBrush();
 	}
 	
 	private final boolean isCurserInGuiArea(GameContext ctx) {
@@ -128,8 +132,10 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 		getMap().update(0);	///< update everything, but freeze time 
 		drawMap(ctx.window);
 		
-		if( !isCurserInGuiArea(ctx) )
+		if( !isCurserInGuiArea(ctx) ) {
 			processInputKeyboard();
+			curser.get().onMouseMoved(getWorldMousePosition());
+		}
 		
 		super.onFrame(ctx, frameTime);
 	}
@@ -166,7 +172,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 		switch (event.type) {
 			case KEY_PRESSED:
 				return processInputKey(ctx, event.asKeyEvent());
-	
+				
 			case MOUSE_WHEEL_MOVED:
 				if (event.asMouseWheelEvent().delta == 0)
 					return true;
@@ -175,7 +181,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 					curser.get().zoom(event.asMouseWheelEvent().delta);
 					
 				else
-					objectPanel.scrollObjectTemplates(event.asMouseWheelEvent().delta > 0);
+					curser.scrollBrushes(event.asMouseWheelEvent().delta > 0);
 	
 				return true;
 	
@@ -192,7 +198,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 				return false;
 	
 			case MOUSE_BUTTON_PRESSED:
-				if( event.asMouseButtonEvent().button==Button.LEFT && curser.get().inside(getWorldMousePosition()) ) {
+				if( event.asMouseButtonEvent().button==Button.LEFT ) {
 					curser.get().onDragged(getWorldMousePosition());
 				
 					return true;
