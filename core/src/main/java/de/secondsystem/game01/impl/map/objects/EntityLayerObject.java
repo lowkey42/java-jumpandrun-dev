@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
@@ -8,9 +7,9 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -25,13 +24,19 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	final IGameEntity entity;
 	
 
-	public EntityLayerObject(IGameEntity entity) {
+	EntityLayerObject(IGameEntity entity) {
 		this.uuid = entity.uuid();
 		this.type = entity.getEditableState()!=null ? entity.getEditableState().getArchetype() : null;
 		this.attributes = entity.getEditableState()!=null ? entity.getEditableState().getAttributes() : null;
 		this.entity = entity;
 	}
-	
+
+	public EntityLayerObject(String type, Attributes attributes) {
+		this.uuid = null;
+		this.type = type;
+		this.attributes = attributes;
+		this.entity = null;
+	}
 	public EntityLayerObject(UUID uuid, String type, Attributes attributes) {
 		this.uuid = uuid;
 		this.type = type;
@@ -40,7 +45,7 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	}
 
 	public EntityLayerObject(IGameMap map, String archetype, Attributes attributes) {
-		this( map.getEntityManager().createEntity(archetype, attributes) );
+		this( map.getEntityManager().create(archetype, attributes) );
 	}
 	
 	@Override
@@ -51,17 +56,12 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	public void setLayerType(LayerType layerType) {
 	}
 	
+	@Deprecated
 	public void remove(IGameMap map) {
-		map.getEntityManager().destroyEntity(uuid);
-		entity.onDestroy();
 	}
 	
+	@Deprecated
 	public void updateAttributes() {
-		attributes.put("width", getWidth());
-		attributes.put("height", getHeight());
-		attributes.put("x", getPosition().x);
-		attributes.put("y", getPosition().y);
-		attributes.put("rotation", getRotation());
 	}
 	
 	@Override
@@ -129,7 +129,7 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	
 	@Override
 	public Attributes serialize() {
-		return attributes;
+		return entity.serialize();
 	}
 	
 	public IGameEntity getEntity() {
@@ -141,10 +141,7 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	}
 	
 
-	public static ILayerObject create(IGameMap map, Map<String, Object> attributes) {
-		return new EntityLayerObject(map.getEntityManager().create(
-				attributes.containsKey("uuid") ? UUID.fromString((String)attributes.get("uuid")) : null, 
-				(String)attributes.get("archetype"), 
-				attributes));
+	public static ILayerObject create(IGameMap map, Attributes attributes) {
+		return new EntityLayerObject(map, attributes.getString("archetype"), attributes);
 	}
 }

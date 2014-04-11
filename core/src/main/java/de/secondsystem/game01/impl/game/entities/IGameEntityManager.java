@@ -1,8 +1,8 @@
 package de.secondsystem.game01.impl.game.entities;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.jsfml.graphics.RenderTarget;
@@ -15,14 +15,18 @@ import de.secondsystem.game01.model.IUpdateable;
 
 public interface IGameEntityManager extends IUpdateable, ISerializable {
 
-	Set<String> listArchetypes();
+	List<String> listArchetypes();
 	
+	@Deprecated
 	IGameEntity createEntity(String type, Map<String, Object> attributes);
 	IGameEntity create(String type, Map<String, Object> attributes);
 	IGameEntity create(UUID uuid, String type, Map<String, Object> attributes);
 	IControllableGameEntity createControllable(String type, Map<String, Object> attributes);
 	
+
+	@Deprecated
 	void addEntity(IGameEntity entity);
+	@Deprecated
 	void destroyEntity(UUID eId);
 	
 	void destroy(UUID eId);
@@ -32,7 +36,8 @@ public interface IGameEntityManager extends IUpdateable, ISerializable {
 	IWeakGameEntityRef getRef(UUID eId);
 	
 	void deserialize(Attributes attributes);
-	
+
+	@Deprecated
 	ArrayList<String> getArchetypes();
 
 	void draw(WorldId worldId, RenderTarget rt);

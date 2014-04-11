@@ -23,7 +23,7 @@ public class ObjectPanel extends Panel implements AttributesSource, ISelectionCh
 	@SuppressWarnings("unused")
 	private final Panel objectSelection;	// TODO: Brush-Selections
 	
-	private final AttributesDataTable attributeTable;
+	private final AttributesDataTable attributeTable;	// TODO: scrollable
 	
 	public ObjectPanel(float x, float y, float height, ElementContainer owner) {
 		super(x, y, WIDTH, height, new Layout(LayoutDirection.VERTICAL, SPACING), owner);

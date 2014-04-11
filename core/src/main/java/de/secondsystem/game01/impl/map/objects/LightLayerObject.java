@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.Map;
-
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
@@ -9,9 +7,9 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.graphic.Light;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.SerializationUtil;
@@ -89,12 +87,12 @@ public class LightLayerObject implements ILayerObject {
 
 	@Override
 	public float getHeight() {
-		return light.getRadius()*2;
+		return light.getHeight();
 	}
 
 	@Override
 	public float getWidth() {
-		return light.getRadius()*2;
+		return light.getWidth();
 	}
 
 	@Override
@@ -137,17 +135,17 @@ public class LightLayerObject implements ILayerObject {
 		);
 	}
 
-	public static LightLayerObject create(IGameMap map, Map<String, Object> attributes) {
+	public static LightLayerObject create(IGameMap map, Attributes attributes) {
 		try {
 			return new LightLayerObject(
 					map.getLightMap(),
-					((Number)attributes.get("world")).intValue(),
-					((Number)attributes.get("x")).floatValue(),
-					((Number)attributes.get("y")).floatValue(),
-					((Number)attributes.get("rotation")).floatValue(),
-					((Number)attributes.get("radius")).floatValue(),
-					((Number)attributes.get("sizeDegree")).floatValue(),
-					SerializationUtil.decodeColor((String) attributes.get("color")) );
+					attributes.getInteger("world"),
+					attributes.getFloat("x"),
+					attributes.getFloat("y"),
+					attributes.getFloat("rotation"),
+					attributes.getFloat("radius"),
+					attributes.getFloat("sizeDegree"),
+					SerializationUtil.decodeColor(attributes.getString("color")) );
 		
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );

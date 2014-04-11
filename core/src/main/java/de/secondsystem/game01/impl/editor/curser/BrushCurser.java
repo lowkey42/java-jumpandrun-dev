@@ -26,6 +26,14 @@ class BrushCurser extends AbstractCurser {
 	public void setAttributes(Attributes attributes) {
 		brush.setAttributes(attributes);
 	}
+	
+	@Override
+	public void onDragFinished(Vector2f point) {
+		super.onDragFinished(point);
+		// copy current brush to map
+		mapProvider.getMap().addNode(brush.getObject().getLayerType(), 
+				mapProvider.getMap().createNode(brush.getObject().typeUuid(), brush.getObject().serialize()));
+	}
 
 	@Override
 	public void onDestroy() {

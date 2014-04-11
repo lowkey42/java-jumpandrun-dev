@@ -35,13 +35,17 @@ public class EntityLayer implements ILayer {
 
 	@Override
 	public void replaceNode(ILayerObject obj, ILayerObject nObj) {
+		remove(obj);
+		addNode(nObj);
 		// can be ignored, safely. The replacement has already been handled by entityManager.
 	}
 	
 	@Override
 	public void addNode(ILayerObject obj) {
-		if( obj instanceof EntityLayerObject && ((EntityLayerObject)obj).entity==null ) {
-			manager.create(((EntityLayerObject)obj).uuid, ((EntityLayerObject)obj).type, ((EntityLayerObject)obj).attributes);
+		if( obj instanceof EntityLayerObject ) {
+			if( ((EntityLayerObject)obj).entity==null )
+				manager.create(((EntityLayerObject)obj).uuid, ((EntityLayerObject)obj).type, ((EntityLayerObject)obj).attributes);
+			
 		} else
 			throw new GameException("Unable to add something other than an entity to the EntityLayer.");
 	}

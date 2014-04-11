@@ -5,10 +5,13 @@ import org.jsfml.graphics.Color;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
-import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.impl.map.objects.CollisionObject;
+import de.secondsystem.game01.impl.map.objects.EntityLayerObject;
+import de.secondsystem.game01.impl.map.objects.LightLayerObject;
 import de.secondsystem.game01.impl.map.objects.ParticleEmitterLayerObject;
 import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.Attributes.Attribute;
 
 final class BrushPalette {
 
@@ -23,52 +26,49 @@ final class BrushPalette {
 	}
 	
 	public IBrush getBrush( IGameMap map, LayerType layer ) {
-		return new GraphicLayerBrush(map, layer);
+		switch(layer) {
+			case LIGHTS:
+				return new LightLayerBrush(map, layer);
+				
+			case OBJECTS:
+				return new EntityLayerBrush(map, layer);
+				
+			case PHYSICS:
+				return new PhysicsLayerBrush(map, layer);
+				
+
+			case BACKGROUND_0:
+			case BACKGROUND_1:
+			case BACKGROUND_2:
+			case FOREGROUND_0:
+			case FOREGROUND_1:
+			default:
+				return new GraphicLayerBrush(map, layer);
+		}
 	}
 
-	private static final class GraphicLayerBrush implements IBrush {
-
-		private Tileset tileset;
-		private IGameMap map;
-		private ILayerObject obj;
+	private static abstract class AbstractBrush<T extends ILayerObject> implements IBrush {
+		protected IGameMap map;
+		protected T obj;
 		
-		public GraphicLayerBrush(IGameMap map, LayerType layer) {
+		public AbstractBrush(IGameMap map, LayerType layer, T obj) {
 			this.map = map;
-			this.tileset = map.getTileset();
-			this.obj = new SpriteLayerObject(tileset, map.getActiveWorldId().id, 0, 0, 0, 0);
+			this.obj = obj;
 			map.addNode(layer, obj);
 		}
 		
-		@Override
-		public ILayerObject cirlce(boolean up) {
-			int tileIndex = -1;
-			
-			if( obj instanceof SpriteLayerObject )
-				tileIndex = ((SpriteLayerObject)obj).getTile();
-			
+		protected int circleIndex( int cIndex, boolean up, int minIndex, int maxIndex ) {
 			if( up )
-				tileIndex++;
+				cIndex++;
 			else
-				tileIndex--;
+				cIndex--;
 			
-			if( tileIndex<-1 )
-				tileIndex = tileset.size()-1;
-			else if( tileIndex>=tileset.size() )
-				tileIndex=-1;
-			
-			if( tileIndex>=0 ) {
-				if( obj instanceof SpriteLayerObject )
-					((SpriteLayerObject)obj).setTile(tileset, tileIndex);
-				
-				else
-					obj = update(new SpriteLayerObject(tileset, map.getActiveWorldId().id, tileIndex, obj.getPosition().x, obj.getPosition().y, obj.getRotation()));
-				
-			} else {
-				obj = update(new ParticleEmitterLayerObject("", 100, map.getActiveWorldId().id, obj.getPosition().x, obj.getPosition().y, 100, 100, null, 1000, 1000, 
-						0, 0, 0, 0, 0, 0, 0, 0, Color.WHITE, Color.WHITE, 5, 5));
-			}
-			
-			return obj;
+			if( cIndex<minIndex )
+				return maxIndex;
+			else if( cIndex>maxIndex )
+				return minIndex;
+			else
+				return cIndex;
 		}
 		
 		@Override
@@ -76,14 +76,16 @@ final class BrushPalette {
 			map.remove(obj.getLayerType(), obj);
 		}
 		
+		@SuppressWarnings("unchecked")
 		@Override
 		public void setAttributes(Attributes attributes) {
-			map.updateNode(obj, attributes);
+			obj = (T) map.updateNode(obj, attributes);
 		}
 		
-		private ILayerObject update(ILayerObject nObj) {
+		@SuppressWarnings("unchecked")
+		protected ILayerObject update(ILayerObject nObj) {
 			map.replaceNode(obj, nObj);
-			obj = nObj;
+			obj = (T) nObj;
 			return obj;
 		}
 
@@ -92,6 +94,75 @@ final class BrushPalette {
 			return obj;
 		}
 		
+	}
+	
+	private static final class GraphicLayerBrush extends AbstractBrush<ILayerObject> {
+		
+		public GraphicLayerBrush(IGameMap map, LayerType layer) {
+			super(map, layer, new SpriteLayerObject(map.getTileset(), map.getActiveWorldId().id, 0, 0, 0, 0));
+		}
+		
+		@Override
+		public ILayerObject cirlce(boolean up) {
+			final int tileIndex = circleIndex(obj instanceof SpriteLayerObject ? ((SpriteLayerObject)obj).getTile() : -1, up, -1, map.getTileset().size()-1);
+			
+			return tileIndex>=0 ?
+					update(new SpriteLayerObject(map.getTileset(), map.getActiveWorldId().id, tileIndex, obj.getPosition().x, obj.getPosition().y, obj.getRotation()))
+				: //else
+					update(new ParticleEmitterLayerObject("", 100, map.getActiveWorldId().id, obj.getPosition().x, obj.getPosition().y, 100, 100, null, 1000, 1000, 
+							0, 0, 0, 0, 0, 0, 0, 0, Color.WHITE, Color.WHITE, 5, 5));
+		}
+	}
+	
+	private static final class PhysicsLayerBrush extends AbstractBrush<CollisionObject> {
+		
+		public PhysicsLayerBrush(IGameMap map, LayerType layer) {
+			super(map, layer, new CollisionObject(map, map.getActiveWorldId().id, CollisionObject.CollisionType.NORMAL, 0, 0, 200, 200, 0));
+		}
+		
+		@Override
+		public ILayerObject cirlce(boolean up) {
+			obj.setType(CollisionObject.CollisionType.values()[circleIndex(obj.getType().ordinal(), up, 0, CollisionObject.CollisionType.values().length-1)]);
+			return obj;
+		}
+	}
+	
+	private static final class LightLayerBrush extends AbstractBrush<LightLayerObject> {
+
+		private static final int DEGREE_STEPS = 8;
+		private static final float DEGREE_STEP_SIZE = 360.f/DEGREE_STEPS;
+		
+		public LightLayerBrush(IGameMap map, LayerType layer) {
+			super(map, layer, new LightLayerObject(map.getLightMap(), map.getActiveWorldId().id, 0, 0, 0, 200, 360, Color.WHITE));
+		}
+		
+		@Override
+		public ILayerObject cirlce(boolean up) {
+			obj.setDegree(circleIndex((int)(obj.getDegree()/DEGREE_STEP_SIZE), up, 0, (int)DEGREE_STEPS)*DEGREE_STEP_SIZE);
+			return obj;
+		}
+	}
+	
+	private static final class EntityLayerBrush extends AbstractBrush<EntityLayerObject> {
+		
+		private int index = 0;
+		
+		public EntityLayerBrush(IGameMap map, LayerType layer) {
+			super(map, layer, new EntityLayerObject(map, map.getEntityManager().listArchetypes().get(0), 
+					new Attributes(new Attribute("x", 0), new Attribute("y", 0))
+			));
+		}
+		
+		@Override
+		public ILayerObject cirlce(boolean up) {
+			index = circleIndex(index, up, 0, map.getEntityManager().listArchetypes().size()-1);
+			
+			EntityLayerObject e = new EntityLayerObject(map, map.getEntityManager().listArchetypes().get(index), 
+					new Attributes(new Attribute("x", obj.getPosition().x), new Attribute("y", obj.getPosition().y))
+			);
+			update( e );
+			return obj;
+		}
 	}
 	
 }

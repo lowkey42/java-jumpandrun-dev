@@ -1,16 +1,14 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.Map;
-
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.graphic.ParticleEmitter;
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.Attributes.AttributeIf;
@@ -139,9 +137,8 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 		);
 	}
 	
-	public static ParticleEmitterLayerObject create(IGameMap map, Map<String, Object> args) {
+	public static ParticleEmitterLayerObject create(IGameMap map, Attributes attributes) {
 		try {
-			final Attributes attributes = new Attributes(args);
 			
 			return new ParticleEmitterLayerObject(
 					attributes.getString("texture"),
@@ -168,7 +165,7 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 					attributes.getFloat("maxParticleSize") );
 		
 		} catch( ClassCastException | NullPointerException e ) {
-			throw new Error( "Invalid attributes: "+args, e );
+			throw new Error( "Invalid attributes: "+attributes, e );
 		}
 	}
 

@@ -3,14 +3,16 @@ package de.secondsystem.game01.impl.editor.curser;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.editor.LayerPanel.IOnLayerChangedListener;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.LayerType;
+import de.secondsystem.game01.model.IDrawable;
 
-public final class CurserManager implements IOnLayerChangedListener {
+public final class CurserManager implements IOnLayerChangedListener, IDrawable {
 	
 	public static interface ISelectionChangedListener {
 		void onSelectionChanged(IEditorCurser newSelection);
@@ -56,7 +58,7 @@ public final class CurserManager implements IOnLayerChangedListener {
 	@Override
 	public void onLayerChanged(LayerType layer) {
 		this.layer = layer;
-		// TODO: change brush
+		setToBrush();
 	}
 	
 	public void deleteSelected() {
@@ -94,7 +96,10 @@ public final class CurserManager implements IOnLayerChangedListener {
 			((BrushCurser) curser).brush.cirlce(up);
 			callListeners();
 		}
-		// TODO
 	}
 	
+	@Override
+	public void draw(RenderTarget renderTarget) {
+		curser.draw(renderTarget);
+	}
 }

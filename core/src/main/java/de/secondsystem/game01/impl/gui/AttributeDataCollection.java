@@ -299,7 +299,7 @@ final class AttributeDataCollection implements Iterable<AttributeDataCollection.
 			
 		} else {
 			val.type = ColumnType.STR;
-			val.val = value.toString();
+			val.val = value!=null ? value.toString() : "";
 			
 			try {
 				val.val = EventType.valueOf((String) val.val);

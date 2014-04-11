@@ -147,7 +147,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 		getMap().draw(rt);
 
 		rt.setView(new View(Vector2f.mul(rt.getView().getCenter(), layerPanel.getLayer().parallax), rt.getView().getSize()));
-		curser.get().draw(rt);
+		curser.draw(rt);
 		rt.setView(cView);
 	}
 	
