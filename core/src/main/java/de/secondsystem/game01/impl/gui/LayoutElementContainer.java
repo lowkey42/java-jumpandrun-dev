@@ -23,6 +23,10 @@ public class LayoutElementContainer extends ElementContainer {
 	
 	private final Layout layout;
 	
+	private float xOffset = 0;
+	
+	private float yOffset = 0;
+	
 	private float offset;
 	
 	private float storedOffset;
@@ -42,6 +46,11 @@ public class LayoutElementContainer extends ElementContainer {
 		this.layout = layout;
 	}
 	
+	protected void setLayoutOffset(float x, float y) {
+		xOffset=x;
+		yOffset=y;
+	}
+	
 	protected void storeOffset() {
 		storedOffset = offset;
 	}
@@ -49,13 +58,13 @@ public class LayoutElementContainer extends ElementContainer {
 		offset = storedOffset;
 	}
 	
-	protected float getXOffset() {
-		return layout.direction==LayoutDirection.HORIZONTAL ? offset : 0;
+	public float getXOffset() {
+		return xOffset+ (layout.direction==LayoutDirection.HORIZONTAL ? offset : 0);
 	}
-	protected float getYOffset() {
-		return layout.direction==LayoutDirection.VERTICAL ? offset : 0;
+	public float getYOffset() {
+		return yOffset + (layout.direction==LayoutDirection.VERTICAL ? offset : 0);
 	}
-	protected <E extends Element> E updateOffset(E e) {
+	public <E extends Element> E updateOffset(E e) {
 		offset+= layout.spacing + (layout.direction==LayoutDirection.HORIZONTAL ? e.getWidth() : e.getHeight());
 		return e;
 	}

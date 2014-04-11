@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.Map;
-
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
@@ -56,6 +54,10 @@ public class SpriteLayerObject implements ILayerObject {
 	public void setTile(Tileset tileset, int tileId) {
 		this.tileId = tileId;
 		sprite.setTexture(tileset.get(tileId), tileset.getNormals(tileId), tileset.getClip(tileId));
+	}
+	
+	public int getTile() {
+		return tileId;
 	}
 	
 	public boolean isTextureRepeated() {
@@ -147,17 +149,17 @@ public class SpriteLayerObject implements ILayerObject {
 		);
 	}
 	
-	public static SpriteLayerObject create(IGameMap map, Map<String, Object> attributes) {
+	public static SpriteLayerObject create(IGameMap map, Attributes attributes) {
 		try {
 			return new SpriteLayerObject(
 					map.getTileset(),
-					((Number)attributes.get("world")).intValue(),
-					((Number)attributes.get("tile")).intValue(), 
-					((Number)attributes.get("x")).floatValue(),
-					((Number)attributes.get("y")).floatValue(),
-					((Number)attributes.get("rotation")).floatValue(),
-					((Number)attributes.get("width")).floatValue(),
-					((Number)attributes.get("height")).floatValue());
+					attributes.getInteger("world"),
+					attributes.getInteger("tile"), 
+					attributes.getFloat("x"),
+					attributes.getFloat("y"),
+					attributes.getFloat("rotation"),
+					attributes.getFloat("width"),
+					attributes.getFloat("height") );
 		
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );

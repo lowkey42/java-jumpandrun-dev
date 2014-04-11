@@ -1,16 +1,14 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.util.Map;
-
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.physics.CollisionHandlerType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
@@ -181,18 +179,17 @@ public class CollisionObject implements ILayerObject {
 		);
 	}
 	
-	public static CollisionObject create(IGameMap map, Map<String, Object> attributes) {
+	public static CollisionObject create(IGameMap map, Attributes attributes) {
 		try {
 			return new CollisionObject(
 					map,
-					((Number)attributes.get("world")).intValue(),
-					CollisionType.valueOf((String)attributes.get("type")), 
-					((Number)attributes.get("x")).floatValue(),
-					((Number)attributes.get("y")).floatValue(),
-					((Number)attributes.get("width")).floatValue(),
-					((Number)attributes.get("height")).floatValue(),
-					((Number)attributes.get("rotation")).floatValue() );
-
+					attributes.getInteger("world"),
+					CollisionType.valueOf(attributes.getString("type")), 
+					attributes.getFloat("x"),
+					attributes.getFloat("y"),
+					attributes.getFloat("width"),
+					attributes.getFloat("height"),
+					attributes.getFloat("rotation") );
 		
 		} catch( ClassCastException | NullPointerException e ) {
 			throw new Error( "Invalid attributes: "+attributes, e );

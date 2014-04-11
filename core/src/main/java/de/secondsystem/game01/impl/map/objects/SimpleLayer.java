@@ -50,8 +50,8 @@ public class SimpleLayer implements ILayer {
 		if( index>=0 ) {
 			remove(obj);
 			
-			obj.setWorld(worldId, true);
-			obj.setLayerType(type);
+			nObj.setWorld(worldId, true);
+			nObj.setLayerType(type);
 			objects.add(index, nObj);
 		}
 	}

@@ -64,8 +64,8 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	@Override
-	public Set<String> listArchetypes() {
-		return Collections.unmodifiableSet( new HashSet<String>(Arrays.asList(ARCHETYPE_PATH.toFile().list())) );
+	public List<String> listArchetypes() {
+		return Collections.unmodifiableList( new ArrayList<String>(Arrays.asList(ARCHETYPE_PATH.toFile().list())) );
 	}
 	
 	@Override
@@ -80,10 +80,7 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public IGameEntity createEntity(String type, Map<String, Object> attributes) {
-		// create entity without adding it to the set (editor requirement)
-		IGameEntity e = create(type, attributes);
-		entitiesToAdd.remove(e);
-		return e;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
@@ -121,21 +118,13 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public void addEntity(IGameEntity entity) {
-		entitiesToAdd.add(entity);
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public void destroyEntity(UUID eId) {
+		throw new UnsupportedOperationException();
 		// editor requirement
-		IGameEntity entity = entities.get(eId);
-		if( entity!=null ) {
-			entity.onDestroy();
-			entities.remove(eId);
-			List<IGameEntity> sg = orderedEntities[entity.orderId()+128];
-			if( sg!=null ) {
-				sg.remove(entity);
-			}
-		}
 	}
 	
 	@Override
@@ -162,7 +151,15 @@ public final class GameEntityManager implements IGameEntityManager {
 		entitiesToAdd.clear();
 		
 		for( UUID eId : entitiesToDestroy ) {
-			destroyEntity(eId);
+			IGameEntity entity = entities.get(eId);
+			if( entity!=null ) {
+				entity.onDestroy();
+				entities.remove(eId);
+				List<IGameEntity> sg = orderedEntities[entity.orderId()+128];
+				if( sg!=null ) {
+					sg.remove(entity);
+				}
+			}
 		}
 		entitiesToDestroy.clear();
 	}
