@@ -1,12 +1,15 @@
 package de.secondsystem.game01.impl.editor.curser;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.editor.LayerPanel.IOnLayerChangedListener;
+import de.secondsystem.game01.impl.gui.ThumbnailButton;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.LayerType;
@@ -96,6 +99,20 @@ public final class CurserManager implements IOnLayerChangedListener, IDrawable {
 			((BrushCurser) curser).brush.cirlce(up);
 			callListeners();
 		}
+	}
+	
+	public void setBrush(int index) {
+		if( curser instanceof BrushCurser ) {
+			((BrushCurser) curser).brush.set(index);
+			callListeners();
+		}
+	}
+	
+	public List<ThumbnailButton.ThumbnailData> generateBrushThumbnail() {
+		if( curser instanceof BrushCurser )
+			return ((BrushCurser) curser).brush.generateThumbnails();
+		
+		return Collections.emptyList();
 	}
 	
 	@Override

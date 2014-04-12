@@ -10,26 +10,36 @@ public class LayoutElementContainer extends ElementContainer {
 	
 	public static enum LayoutDirection {
 		HORIZONTAL,
-		VERTICAL
+		VERTICAL,
+		BOTH
 	}
 	public static final class Layout {
 		public final int spacing;
 		public final LayoutDirection direction;
+		public final int columnWidth;
 		public Layout(LayoutDirection direction, int spacing) {
 			this.direction = direction;
 			this.spacing = spacing;
+			this.columnWidth = 0;
+		}
+		public Layout(int spacing, int columnWidth) {
+			this.direction = LayoutDirection.BOTH;
+			this.spacing = spacing;
+			this.columnWidth = columnWidth;
 		}
 	}
 	
 	private final Layout layout;
 	
-	private float xOffset = 0;
+	private float xLayoutOffset = 0;
 	
-	private float yOffset = 0;
+	private float yLayoutOffset = 0;
 	
-	private float offset;
+	private float xOffset, yOffset;
 	
-	private float storedOffset;
+	private float storedXOffset;
+	
+	private float storedYOffset;
 
 	public LayoutElementContainer(float x, float y, float width, float height, Layout layout) {
 		super(x, y, width, height);
@@ -47,25 +57,51 @@ public class LayoutElementContainer extends ElementContainer {
 	}
 	
 	protected void setLayoutOffset(float x, float y) {
-		xOffset=x;
-		yOffset=y;
+		xLayoutOffset=x;
+		yLayoutOffset=y;
+	}
+	
+	@Override
+	public void clear() {
+		super.clear();
+		xOffset = 0;
+		yOffset = 0;
 	}
 	
 	protected void storeOffset() {
-		storedOffset = offset;
+		storedXOffset = xOffset;
+		storedYOffset = yOffset;
 	}
 	protected void restoreOffset() {
-		offset = storedOffset;
+		xOffset = storedXOffset;
+		yOffset = storedYOffset;
 	}
 	
 	public float getXOffset() {
-		return xOffset+ (layout.direction==LayoutDirection.HORIZONTAL ? offset : 0);
+		return xLayoutOffset+xOffset;
 	}
 	public float getYOffset() {
-		return yOffset + (layout.direction==LayoutDirection.VERTICAL ? offset : 0);
+		return yLayoutOffset+yOffset;
 	}
 	public <E extends Element> E updateOffset(E e) {
-		offset+= layout.spacing + (layout.direction==LayoutDirection.HORIZONTAL ? e.getWidth() : e.getHeight());
+		switch (layout.direction) {
+			case HORIZONTAL:
+				xOffset+=layout.spacing + e.getWidth();
+				break;
+				
+			case VERTICAL:
+				yOffset+=layout.spacing + e.getHeight();
+				break;
+			
+			case BOTH:
+				xOffset+=layout.spacing + e.getWidth();
+				if( xOffset>=layout.columnWidth ) {
+					xOffset = 0;
+					yOffset+=layout.spacing + e.getHeight();
+				}
+				break;
+		}
+		
 		return e;
 	}
 

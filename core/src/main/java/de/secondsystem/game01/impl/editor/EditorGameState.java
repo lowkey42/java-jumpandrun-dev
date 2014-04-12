@@ -104,9 +104,8 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 	@Override
 	protected void initGui(GameContext ctx, LayoutElementContainer c) {
 		layerPanel = c.updateOffset(new LayerPanel(c.getXOffset(), c.getYOffset(), c.getWidth()-ObjectPanel.WIDTH, c, this));
-		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c));
 		layerPanel.addListener(curser);
-		curser.addListerner(objectPanel);
+		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c, curser));
 		curser.setToBrush();
 	}
 	

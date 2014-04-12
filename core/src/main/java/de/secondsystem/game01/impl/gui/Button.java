@@ -79,6 +79,7 @@ public class Button extends Element {
 
 	@Override
 	public void update(long frameTimeMs) {
+		sprite.update(frameTimeMs);
 	}
 	
 }

@@ -1,7 +1,13 @@
 package de.secondsystem.game01.impl.editor.curser;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.jsfml.graphics.Color;
 
+import de.secondsystem.game01.impl.gui.ThumbnailButton;
+import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
@@ -23,6 +29,10 @@ final class BrushPalette {
 		void setAttributes(Attributes attributes);
 		
 		ILayerObject getObject();
+		
+		List<ThumbnailButton.ThumbnailData> generateThumbnails();
+
+		ILayerObject set(int index);
 	}
 	
 	public IBrush getBrush( IGameMap map, LayerType layer ) {
@@ -104,13 +114,26 @@ final class BrushPalette {
 		
 		@Override
 		public ILayerObject cirlce(boolean up) {
-			final int tileIndex = circleIndex(obj instanceof SpriteLayerObject ? ((SpriteLayerObject)obj).getTile() : -1, up, -1, map.getTileset().size()-1);
-			
-			return tileIndex>=0 ?
-					update(new SpriteLayerObject(map.getTileset(), map.getActiveWorldId().id, tileIndex, obj.getPosition().x, obj.getPosition().y, obj.getRotation()))
+			return set( circleIndex(obj instanceof SpriteLayerObject ? ((SpriteLayerObject)obj).getTile() : map.getTileset().size(), up, 0, map.getTileset().size()) );
+		}
+		
+		@Override
+		public ILayerObject set(int index) {
+			return index<map.getTileset().size() ?
+					update(new SpriteLayerObject(map.getTileset(), map.getActiveWorldId().id, index, obj.getPosition().x, obj.getPosition().y, obj.getRotation()))
 				: //else
 					update(new ParticleEmitterLayerObject("", 100, map.getActiveWorldId().id, obj.getPosition().x, obj.getPosition().y, 100, 100, null, 1000, 1000, 
 							0, 0, 0, 0, 0, 0, 0, 0, Color.WHITE, Color.WHITE, 5, 5));
+		}
+
+		@Override
+		public List<ThumbnailData> generateThumbnails() {
+			List<ThumbnailData> td = new ArrayList<>(map.getTileset().size()+1);
+			for(int i=0; i<map.getTileset().size(); ++i ) {
+				td.add(new ThumbnailData(""+i, map.getTileset().get(i), map.getTileset().getClip(i)));
+			}
+			
+			return td;
 		}
 	}
 	
@@ -122,8 +145,19 @@ final class BrushPalette {
 		
 		@Override
 		public ILayerObject cirlce(boolean up) {
-			obj.setType(CollisionObject.CollisionType.values()[circleIndex(obj.getType().ordinal(), up, 0, CollisionObject.CollisionType.values().length-1)]);
+			return set( circleIndex(obj.getType().ordinal(), up, 0, CollisionObject.CollisionType.values().length-1) );
+		}
+		
+		@Override
+		public ILayerObject set(int index) {
+			obj.setType(CollisionObject.CollisionType.values()[index]);
 			return obj;
+		}
+
+		@Override
+		public List<ThumbnailData> generateThumbnails() {
+			// TODO Auto-generated method stub
+			return Collections.emptyList();
 		}
 	}
 	
@@ -138,8 +172,19 @@ final class BrushPalette {
 		
 		@Override
 		public ILayerObject cirlce(boolean up) {
-			obj.setDegree(circleIndex((int)(obj.getDegree()/DEGREE_STEP_SIZE), up, 0, (int)DEGREE_STEPS)*DEGREE_STEP_SIZE);
+			return set( circleIndex((int)(obj.getDegree()/DEGREE_STEP_SIZE), up, 0, (int)DEGREE_STEPS) );
+		}
+
+		@Override
+		public ILayerObject set(int index) {
+			obj.setDegree(index*DEGREE_STEP_SIZE);
 			return obj;
+		}
+		
+		@Override
+		public List<ThumbnailData> generateThumbnails() {
+			// TODO Auto-generated method stub
+			return Collections.emptyList();
 		}
 	}
 	
@@ -155,13 +200,24 @@ final class BrushPalette {
 		
 		@Override
 		public ILayerObject cirlce(boolean up) {
-			index = circleIndex(index, up, 0, map.getEntityManager().listArchetypes().size()-1);
+			return set( circleIndex(index, up, 0, map.getEntityManager().listArchetypes().size()-1) );
+		}
+		
+		@Override
+		public ILayerObject set(int index) {
+			this.index = index;
 			
 			EntityLayerObject e = new EntityLayerObject(map, map.getEntityManager().listArchetypes().get(index), 
 					new Attributes(new Attribute("x", obj.getPosition().x), new Attribute("y", obj.getPosition().y))
 			);
 			update( e );
 			return obj;
+		}
+
+		@Override
+		public List<ThumbnailData> generateThumbnails() {
+			// TODO Auto-generated method stub
+			return Collections.emptyList();
 		}
 	}
 	

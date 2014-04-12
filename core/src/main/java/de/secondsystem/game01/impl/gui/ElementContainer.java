@@ -49,6 +49,10 @@ public class ElementContainer extends Element {
 		children.remove(element);
 	}
 	
+	public void clear() {
+		children.clear();
+	}
+	
 	protected Element getByPos(Vector2f mp) {
 		for( Element c : children ) {
 			if( c.inside(mp) ) {
