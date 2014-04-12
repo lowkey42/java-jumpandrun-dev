@@ -18,6 +18,7 @@ abstract class AbstractCurser implements IEditorCurser {
 	private Float height;
 	protected float zoom = 1.f;
 	protected boolean dragged = false;
+	protected Vector2f dragOffset = Vector2f.ZERO;
 	
 	protected final RectangleShape shapeMarker = new RectangleShape();
 
@@ -94,11 +95,13 @@ abstract class AbstractCurser implements IEditorCurser {
 	@Override
 	public void onDragged(Vector2f point) {
 		dragged = true;
-		getLayerObject().setPosition(point);
+		dragOffset = Vector2f.sub(getLayerObject().getPosition(), point);
 	}
 	
 	@Override
 	public void onMouseMoved(Vector2f point) {
+		if( dragged )
+			getLayerObject().setPosition(Vector2f.add(point, dragOffset));
 	}
 
 	@Override
