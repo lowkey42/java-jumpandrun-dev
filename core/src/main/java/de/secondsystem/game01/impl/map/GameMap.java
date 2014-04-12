@@ -330,6 +330,15 @@ public class GameMap implements IGameMap {
 		
 		return s;
 	}
+	
+	@Override
+	public boolean isLayerShown(LayerType layer) {
+		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].isVisible();
+	}
+	@Override
+	public void setShowLayer(LayerType layer, boolean show) {
+		gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].setVisible(show);
+	}
 
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getPhysicalWorld()

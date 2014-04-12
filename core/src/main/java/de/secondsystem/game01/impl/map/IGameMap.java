@@ -70,6 +70,9 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	boolean flipShowLayer(LayerType layer);
 
 	boolean[] getShownLayer();
+	
+	boolean isLayerShown(LayerType layer);
+	void setShowLayer(LayerType layer, boolean show);
 
 	IPhysicsWorld getPhysicalWorld();
 	

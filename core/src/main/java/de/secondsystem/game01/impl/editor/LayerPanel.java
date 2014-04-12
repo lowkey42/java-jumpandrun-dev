@@ -7,12 +7,12 @@ import org.jsfml.graphics.Color;
 import org.jsfml.window.event.KeyEvent;
 
 import de.secondsystem.game01.impl.gui.ElementContainer;
-import de.secondsystem.game01.impl.gui.Label;
 import de.secondsystem.game01.impl.gui.Panel;
+import de.secondsystem.game01.impl.gui.RwValueRef;
 import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.LayerType;
 
-public class LayerPanel extends Panel {	
+public class LayerPanel extends Panel implements RwValueRef<LayerType> {	
 	
 	public static interface IOnLayerChangedListener {
 		void onLayerChanged(LayerType layer);
@@ -22,26 +22,44 @@ public class LayerPanel extends Panel {
 	
 	private final IMapProvider mapProvider;
 	
-	private Label layerHint;	// TODO: create a nice panel with toggleButtons, etc.
-	
 	private LayerType currentLayer = LayerType.FOREGROUND_0;
 	
-	public LayerPanel(float x, float y, float width, ElementContainer owner, IMapProvider mapProvider) {
-		super(x, y, width, 50, owner);
-		this.mapProvider = mapProvider;
+	public LayerPanel(float x, float y, float width, ElementContainer owner, IMapProvider mp) {
+		super(x, y, width, 60, new Layout(LayoutDirection.HORIZONTAL, 0), owner);
+		this.mapProvider = mp;
 		
-		setLayoutOffset(10, 10);
+		for( LayerType l : LayerType.values() ) {
+			final LayerType layer = l;
+			Panel p = createPanel(width/LayerType.values().length, 60, new Layout(LayoutDirection.VERTICAL, 5));
+			p.setFillColor(Color.TRANSPARENT);
+			p.setOutlineColor(new Color(100, 100, 100));
+			
+			Panel topPanel = p.createPanel(p.getWidth(), 25, new Layout(LayoutDirection.HORIZONTAL, 20));
+			topPanel.setLayoutOffset(50, 0);
+			topPanel.setFillColor(Color.TRANSPARENT);
+			topPanel.setOutlineColor(Color.TRANSPARENT);
+			topPanel.createLabel(layer.name).setFor(			
+					topPanel.createCheckbox(new RwValueRef<Boolean>() {
+					
+					@Override public void setValue(Boolean value) {
+						mapProvider.getMap().setShowLayer(layer, value);
+					}
+					
+					@Override public Boolean getValue() {
+						return mapProvider.getMap().isLayerShown(layer);
+					}
+				})
+			);
+			
+			p.createRadiobox(p.getXOffset()+width/LayerType.values().length/2.5f, p.getYOffset(), this, layer);
+		}
 		
 		setFillColor(new Color(0, 0, 0, 200));
-		
-		layerHint = createLabel("");	
-		updateLayerHint();
 	}
 	
 	public void setLayer(LayerType layer) {
 		if( layer!=currentLayer ) {
 			currentLayer = layer;
-			updateLayerHint();
 			for(IOnLayerChangedListener l : listeners)
 				l.onLayerChanged(layer);
 		}
@@ -54,25 +72,6 @@ public class LayerPanel extends Panel {
 	public void addListener( IOnLayerChangedListener listener ) {
 		listeners.add(listener);
 		listener.onLayerChanged(currentLayer);
-	}
-	
-	protected void updateLayerHint() {
-		boolean[] s = mapProvider.getMap().getShownLayer();
-
-		StringBuilder str = new StringBuilder();
-
-		for (LayerType l : LayerType.values()) {
-			if (currentLayer == l)
-				str.append("=").append(l.name).append("=");
-			else
-				str.append(l.name);
-
-			str.append(s[l.layerIndex] ? "[X]" : "[ ]");
-
-			str.append("\t");
-		}
-
-		layerHint.setText(str.toString());
 	}
 	
 	public boolean handleKeyCommands(KeyEvent event) {
@@ -137,6 +136,16 @@ public class LayerPanel extends Panel {
 			default:
 				return false;
 		}
+	}
+
+	@Override
+	public LayerType getValue() {
+		return getLayer();
+	}
+
+	@Override
+	public void setValue(LayerType value) {
+		setLayer(value);
 	}
 	
 }

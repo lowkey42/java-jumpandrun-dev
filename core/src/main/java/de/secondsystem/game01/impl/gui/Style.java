@@ -29,13 +29,15 @@ public final class Style {
 	
 	public final AnimationTexture checkBoxTexture;
 	
+	public final AnimationTexture radioBoxTexture;
+	
 	public final int dropDownSuggestionsFontSize;
 	
 	public final boolean autoFocus;
 
 	public Style(ConstFont labelFont, int labelFontSize, ConstFont textFont, int textFontSize, 
 			ConstFont buttonFont, int buttonFontSize, AnimationTexture buttonTexture, 
-			ConstTexture sliderTexture, AnimationTexture checkBoxTexture, int dropDownSuggestionsFontSize,
+			ConstTexture sliderTexture, AnimationTexture checkBoxTexture, AnimationTexture radioBoxTexture, int dropDownSuggestionsFontSize,
 			boolean autoFocus) {
 		super();
 		this.labelFont = labelFont;
@@ -48,12 +50,13 @@ public final class Style {
 		this.sliderTexture = sliderTexture;
 		this.autoFocus = autoFocus;
 		this.checkBoxTexture = checkBoxTexture;
+		this.radioBoxTexture = radioBoxTexture;
 		this.dropDownSuggestionsFontSize = dropDownSuggestionsFontSize;
 	}
 	
 	public Style setButtonTexture( AnimationTexture tex ) {
 		return new Style(labelFont, labelFontSize, textFont, textFontSize, buttonFont, buttonFontSize, tex, sliderTexture, checkBoxTexture, 
-				dropDownSuggestionsFontSize, autoFocus);
+				radioBoxTexture, dropDownSuggestionsFontSize, autoFocus);
 	}
 	
 	public static Style createDefaultStyle() {
@@ -64,6 +67,7 @@ public final class Style {
 					ResourceManager.font.get("FreeSans.otf"), 26, ResourceManager.animation.get("coolButton.anim"), // button 
 					ResourceManager.texture_gui.get("VolumeButton.png"), // slider
 					ResourceManager.animation.get("coolCheckBox.anim"), // checkBox
+					ResourceManager.animation.get("coolRadioBox.anim"), // radioBox
 					16, // dropdown
 					false);
 			

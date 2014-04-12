@@ -64,6 +64,8 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 	private float cameraX = 0.f;
 	private float cameraY = 0.f;
 	
+	private float timeFactor = 0;
+	
 	
 	private EditorGameState(GameState playGameState, GameMap map, String mapId) {
 		this.playGameState = playGameState;
@@ -143,7 +145,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		getMap().update(0);	///< update everything, but freeze time 
+		getMap().update((long) (frameTime*timeFactor));	///< update everything, but freeze/slow down time 
 		drawMap(ctx.window);
 		
 		if( !isCurserInGuiArea(ctx) ) {
@@ -360,6 +362,11 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 						case "bg":
 						case "background":
 							map.setBackgroundColor(SerializationUtil.decodeColor(args.get(1)));
+							break;
+							
+						case "time":
+						case "tf":
+							timeFactor = Float.valueOf(args.get(1));
 							break;
 					}
 					break;

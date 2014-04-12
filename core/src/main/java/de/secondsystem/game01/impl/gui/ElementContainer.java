@@ -182,7 +182,10 @@ public class ElementContainer extends Element {
 		return new StringGrid(x, y, rowCount, colCount, cellWidth, cellHeight, this);
 	}
 	public final CheckBox createCheckbox(float x, float y, RwValueRef<Boolean> state) {
-		return new CheckBox(x, y, state, "", this);
+		return new CheckBox(x, y, state, this);
+	}
+	public final <T> RadioBox<T> createRadiobox(float x, float y, RwValueRef<T> groupState, T val) {
+		return new RadioBox<T>(x, y, groupState, val, this);
 	}
 	public final <T extends Enum<T>> DropDownField<T> createDropDown(float x, float y, float width, Class<T> valueEnum, RwValueRef<T> value) {
 		return new DropDownField<>(x, y, width, valueEnum, value, this);

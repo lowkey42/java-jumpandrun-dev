@@ -56,7 +56,7 @@ public class LayoutElementContainer extends ElementContainer {
 		this.layout = layout;
 	}
 	
-	protected void setLayoutOffset(float x, float y) {
+	public void setLayoutOffset(float x, float y) {
 		xLayoutOffset=x;
 		yLayoutOffset=y;
 	}
@@ -148,6 +148,9 @@ public class LayoutElementContainer extends ElementContainer {
 	}
 	public final CheckBox createCheckbox(RwValueRef<Boolean> state) {
 		return updateOffset(createCheckbox(getXOffset(), getYOffset(), state));
+	}
+	public final <T> RadioBox<T> createRadiobox(RwValueRef<T> groupState, T val) {
+		return updateOffset(createRadiobox(getXOffset(), getYOffset(), groupState, val));
 	}
 	public final <T extends Enum<T>> DropDownField<T> createDropDown(float width, Class<T> valueEnum, RwValueRef<T> value) {
 		return updateOffset(createDropDown(getXOffset(), getYOffset(), width, valueEnum, value));
