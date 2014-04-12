@@ -16,7 +16,5 @@ public interface ISpriteWrapper extends IDrawable, IMoveable, IDimensioned, IIns
 	void setFlip(boolean flip);
 	boolean isFlipped();
 	
-	void setRepeatedTexture(boolean repeated);
-	boolean isTextureRepeated();
 	void setTextureRect(IntRect rect);
 }

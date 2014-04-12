@@ -117,6 +117,12 @@ public class Tileset {
 			this.texture = texture;
 			this.normals = normals;
 			this.clip = clip;
+			
+			if( clip==null && (name.contains("tileable") || name.contains("_ta_")) ) {
+				((Texture) texture).setRepeated(true);
+				if( normals!=null )
+					((Texture) normals).setRepeated(true);
+			}
 		}
 	}
 }

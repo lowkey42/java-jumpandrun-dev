@@ -131,7 +131,7 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	@Override
 	public void setRepeatedTexture(boolean repeated) {
 		if( layerObject instanceof SpriteLayerObject ) {
-			((SpriteLayerObject) layerObject).setRepeatedTexture(repeated);
+		//	((SpriteLayerObject) layerObject).setRepeatedTexture(repeated);
 			this.repeated = repeated;
 		}
 	}

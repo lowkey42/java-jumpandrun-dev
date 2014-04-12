@@ -60,14 +60,6 @@ public class SpriteLayerObject implements ILayerObject {
 		return tileId;
 	}
 	
-	public boolean isTextureRepeated() {
-		return sprite.isTextureRepeated();
-	}
-	
-	public void setRepeatedTexture(boolean repeated) {	// TODO: not serialized => temporary !
-		sprite.setRepeatedTexture(repeated);
-	}
-	
 	public void setTextureRect(IntRect rect) {
 		sprite.setTextureRect(rect);
 	}

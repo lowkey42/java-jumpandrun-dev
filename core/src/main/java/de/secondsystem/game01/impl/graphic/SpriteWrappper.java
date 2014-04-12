@@ -4,7 +4,6 @@ import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
-import org.jsfml.graphics.Texture;
 import org.jsfml.system.Vector2f;
 
 public class SpriteWrappper implements ISpriteWrapper {
@@ -44,15 +43,11 @@ public class SpriteWrappper implements ISpriteWrapper {
 	}
 	public void setTexture(ConstTexture tex, IntRect clip) {
 		sprite.setTexture(tex, true);
-		float texWidth=tex.getSize().x, texHeight=tex.getSize().y;
 		if( clip!=null ) {
 			sprite.setTextureRect(clip);
-			texWidth = clip.width;
-			texHeight = clip.height;
 		}
-		
-		sprite.setOrigin(texWidth/2, texHeight/2);
-		sprite.setScale(width/texWidth, height/texHeight);
+
+		updateScale();
 	}
 	
 	@Override
@@ -114,7 +109,14 @@ public class SpriteWrappper implements ISpriteWrapper {
 		updateScale();
 	}
 	protected void updateScale() {
-		sprite.setScale(width/sprite.getTexture().getSize().x * (isFlipped()?-1:1), height/sprite.getTexture().getSize().y);
+		if( sprite.getTexture().isRepeated() ) {
+			sprite.setTextureRect(new IntRect(0, 0, (int)width, (int)height));
+			sprite.setOrigin(width/2, height/2);
+			
+		} else {
+			sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
+			sprite.setScale(width/sprite.getTexture().getSize().x * (isFlipped()?-1:1), height/sprite.getTexture().getSize().y);
+		}
 	}
 
 	@Override
@@ -145,20 +147,6 @@ public class SpriteWrappper implements ISpriteWrapper {
 	@Override
 	public void setVisibility(boolean visible) {
 		this.visible = visible;
-	}
-	
-	@Override
-	public void setRepeatedTexture(boolean repeated) {
-		if( sprite.getTexture().isRepeated() != repeated ) {
-			Texture texture = new Texture(sprite.getTexture());
-			texture.setRepeated(repeated);
-			setTexture(texture);
-		}
-	}
-	
-	@Override
-	public boolean isTextureRepeated() {
-		return sprite.getTexture().isRepeated();
 	}
 	
 	@Override
