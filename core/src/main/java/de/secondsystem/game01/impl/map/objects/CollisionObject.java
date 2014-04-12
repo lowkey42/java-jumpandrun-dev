@@ -20,9 +20,9 @@ public class CollisionObject implements ILayerObject {
 	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(CollisionObject.class);
 	
 	public static enum CollisionType {
-		NORMAL	(CollisionHandlerType.SOLID, new Color(255, 100, 100, 150)), 
-		ONE_WAY	(CollisionHandlerType.ONE_WAY, new Color(180, 180, 180, 150)), 
-		NO_GRAV	(CollisionHandlerType.CLIMBABLE, new Color(100, 100, 255, 150));
+		NORMAL	(CollisionHandlerType.SOLID, new Color(255, 10, 10, 100)), 
+		ONE_WAY	(CollisionHandlerType.ONE_WAY, new Color(10, 10, 255, 100)), 
+		NO_GRAV	(CollisionHandlerType.CLIMBABLE, new Color(10, 255, 10, 100));
 
 		final CollisionHandlerType handlerType;
 		final Color fillColor;

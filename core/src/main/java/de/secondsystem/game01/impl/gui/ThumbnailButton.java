@@ -47,22 +47,22 @@ public class ThumbnailButton extends Element {
 			textRect = this.caption.getLocalBounds();
 		}
 		
-		this.caption.setOrigin(textRect.width / 2.f, 0 );
+		this.caption.setOrigin(textRect.width / 2.f, textRect.height );
 		
 		float captSpacing = CAPTION_DISTANCE + textRect.height*2;
 		
 		sprite = new Sprite(thumbnailData.texture, thumbnailData.clip);
+		sprite.setOrigin(thumbnailData.clip.width/2.f, thumbnailData.clip.height/2.f);
 		if( thumbnailData.clip.width-captSpacing >= thumbnailData.clip.height )
 			sprite.setScale(width / thumbnailData.clip.width, width / thumbnailData.clip.width);
 		else 
 			sprite.setScale((height-captSpacing) / thumbnailData.clip.height, (height-captSpacing) / thumbnailData.clip.height);
-	
 	}
 
 	@Override
 	protected void drawImpl(RenderTarget rt) {
-		sprite.setPosition(getPosition());
-		caption.setPosition(new Vector2f(getPosition().x+sprite.getGlobalBounds().width/2, getPosition().y+CAPTION_DISTANCE+sprite.getGlobalBounds().height));
+		sprite.setPosition(new Vector2f(getPosition().x+getWidth()/2, getPosition().y+getHeight()/2));
+		caption.setPosition(new Vector2f(getPosition().x+getWidth()/2, getPosition().y+ getHeight()));
 		
 		rt.draw(sprite);
 		rt.draw(caption);

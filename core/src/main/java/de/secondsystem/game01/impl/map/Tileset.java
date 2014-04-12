@@ -53,6 +53,10 @@ public class Tileset {
 	public IntRect getClip(int index) {
 		return tiles.get( index % tiles.size() ).clip;
 	}
+	
+	public String getName(int index) {
+		return tiles.get( index % tiles.size() ).name;
+	}
 
 	/** 
 	 * Load each tile as a new {@link Texture}
@@ -80,7 +84,7 @@ public class Tileset {
 		} else
 			clip = null;
 		
-		return new Tile( ResourceManager.texture_tiles.get(fn.trim()), ResourceManager.texture_tiles.getNullable(toNormalTextureName(fn.trim())), clip );
+		return new Tile(fn, ResourceManager.texture_tiles.get(fn.trim()), ResourceManager.texture_tiles.getNullable(toNormalTextureName(fn.trim())), clip );
 	}
 	
 	private static String toNormalTextureName(String name) {
@@ -104,10 +108,12 @@ public class Tileset {
 	}
 	
 	private static final class Tile {
+		public final String name;
 		public final ConstTexture texture;
 		public final ConstTexture normals;
 		public final IntRect clip;
-		public Tile(ConstTexture texture, ConstTexture normals, IntRect clip) {
+		public Tile(String name, ConstTexture texture, ConstTexture normals, IntRect clip) {
+			this.name = name;
 			this.texture = texture;
 			this.normals = normals;
 			this.clip = clip;

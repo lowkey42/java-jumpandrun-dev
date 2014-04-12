@@ -216,7 +216,8 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public void update(long frameTimeMs) {
-		scripts.update(frameTimeMs);
+		if( playable )
+			scripts.update(frameTimeMs);
 		
 		for( LayerType l : LayerType.values() )
 			if( l.updated )

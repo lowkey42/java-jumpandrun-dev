@@ -1,11 +1,13 @@
 package de.secondsystem.game01.impl.editor.curser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.jsfml.graphics.Color;
 
+import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.gui.ThumbnailButton;
 import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -18,6 +20,7 @@ import de.secondsystem.game01.impl.map.objects.ParticleEmitterLayerObject;
 import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.GameException;
 
 final class BrushPalette {
 
@@ -130,7 +133,13 @@ final class BrushPalette {
 		public List<ThumbnailData> generateThumbnails() {
 			List<ThumbnailData> td = new ArrayList<>(map.getTileset().size()+1);
 			for(int i=0; i<map.getTileset().size(); ++i ) {
-				td.add(new ThumbnailData(""+i, map.getTileset().get(i), map.getTileset().getClip(i)));
+				td.add(new ThumbnailData(map.getTileset().getName(i), map.getTileset().get(i), map.getTileset().getClip(i)));
+			}
+			
+			try {
+				td.add(new ThumbnailData("Particles", ResourceManager.texture_gui.get("icon_particles.png")));
+			} catch (IOException e) {
+				throw new GameException(e);
 			}
 			
 			return td;
@@ -156,8 +165,18 @@ final class BrushPalette {
 
 		@Override
 		public List<ThumbnailData> generateThumbnails() {
-			// TODO Auto-generated method stub
-			return Collections.emptyList();
+			List<ThumbnailData> td = new ArrayList<>(3);
+			
+			try {
+				td.add(new ThumbnailData("Normal", ResourceManager.texture_gui.get("icon_grav_full_color.png")));
+				td.add(new ThumbnailData("Half", ResourceManager.texture_gui.get("icon_grav_half_color.png")));
+				td.add(new ThumbnailData("Climb", ResourceManager.texture_gui.get("icon_grav_climb_color.png")));
+				
+			} catch (IOException e) {
+				throw new GameException(e);
+			}
+			
+			return td;
 		}
 	}
 	
@@ -172,19 +191,33 @@ final class BrushPalette {
 		
 		@Override
 		public ILayerObject cirlce(boolean up) {
-			return set( circleIndex((int)(obj.getDegree()/DEGREE_STEP_SIZE), up, 0, (int)DEGREE_STEPS) );
+			return set( circleIndex((int)(obj.getDegree()/DEGREE_STEP_SIZE), up, 1, (int)DEGREE_STEPS)-1 );
 		}
 
 		@Override
 		public ILayerObject set(int index) {
-			obj.setDegree(index*DEGREE_STEP_SIZE);
+			obj.setDegree((index+1)*DEGREE_STEP_SIZE);
 			return obj;
 		}
 		
 		@Override
 		public List<ThumbnailData> generateThumbnails() {
-			// TODO Auto-generated method stub
-			return Collections.emptyList();
+			List<ThumbnailData> td = new ArrayList<>(DEGREE_STEPS);
+			try {
+				td.add(new ThumbnailData("12%",  ResourceManager.texture_gui.get("icon_light_012.png")));
+				td.add(new ThumbnailData("25%",  ResourceManager.texture_gui.get("icon_light_025.png")));
+				td.add(new ThumbnailData("37%",  ResourceManager.texture_gui.get("icon_light_037.png")));
+				td.add(new ThumbnailData("50%",  ResourceManager.texture_gui.get("icon_light_050.png")));
+				td.add(new ThumbnailData("62%",  ResourceManager.texture_gui.get("icon_light_062.png")));
+				td.add(new ThumbnailData("75%",  ResourceManager.texture_gui.get("icon_light_075.png")));
+				td.add(new ThumbnailData("87%",  ResourceManager.texture_gui.get("icon_light_087.png")));
+				td.add(new ThumbnailData("100%", ResourceManager.texture_gui.get("icon_light_100.png")));
+				
+			} catch (IOException e) {
+				throw new GameException(e);
+			}
+			
+			return td;
 		}
 	}
 	
