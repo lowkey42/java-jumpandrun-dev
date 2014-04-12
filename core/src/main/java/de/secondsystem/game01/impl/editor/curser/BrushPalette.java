@@ -2,7 +2,6 @@ package de.secondsystem.game01.impl.editor.curser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jsfml.graphics.Color;
@@ -249,8 +248,7 @@ final class BrushPalette {
 
 		@Override
 		public List<ThumbnailData> generateThumbnails() {
-			// TODO Auto-generated method stub
-			return Collections.emptyList();
+			return map.getEntityManager().generateThumbnails();
 		}
 	}
 	

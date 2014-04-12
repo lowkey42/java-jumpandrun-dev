@@ -24,7 +24,13 @@ import java.util.concurrent.ExecutionException;
 
 import javax.script.ScriptException;
 
+import org.jsfml.graphics.Color;
+import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
+import org.jsfml.graphics.RenderTexture;
+import org.jsfml.graphics.Texture;
+import org.jsfml.graphics.TextureCreationException;
+import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,10 +40,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.GameException;
 
 public final class GameEntityManager implements IGameEntityManager {
 
@@ -66,6 +74,59 @@ public final class GameEntityManager implements IGameEntityManager {
 	@Override
 	public List<String> listArchetypes() {
 		return Collections.unmodifiableList( new ArrayList<String>(Arrays.asList(ARCHETYPE_PATH.toFile().list())) );
+	}
+	
+	private List<ThumbnailData> thumbnailDatas;
+	
+	@Override
+	public List<ThumbnailData> generateThumbnails() {
+		if( thumbnailDatas!=null )
+			return thumbnailDatas;
+		
+		List<ThumbnailData> td = new ArrayList<ThumbnailData>();
+		
+		UUID uuid = UUID.randomUUID();
+		try {
+			long t = System.currentTimeMillis();
+			RenderTexture texture = new RenderTexture();
+			texture.create(100, 100);
+			
+			for( String a : listArchetypes() ) {
+				EntityArchetype at = ARCHETYPE_CACHE.get(a);
+				
+				if( at!=null ) {
+					IGameEntity e = at.create(uuid, this, new Attributes(new Attribute("x", 0), new Attribute("y", 0)));
+					float size=Math.max(e.getWidth(), e.getHeight());
+					texture.setView(new View(e.getPosition(), new Vector2f(size,size)));
+					texture.clear(Color.BLACK);
+					e.update(2000);
+					e.draw(texture);
+					texture.display();
+
+					// store and load texture to fix weird SFML bug (RenderTexture turn blank after a while)
+					Path p = Paths.get("assets", "tmp", a+".bmp");
+					try {
+						texture.getTexture().copyToImage().saveToFile(p);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}					
+					Texture tex = new Texture();
+					tex.loadFromFile(p);
+					Files.deleteIfExists(p);
+					
+					td.add(new ThumbnailData(a, tex, new IntRect(0, 0, 100, 100)));
+					
+					e.onDestroy();
+				}
+			}
+			
+			System.out.println("Time: "+(System.currentTimeMillis()-t));
+			
+		} catch (ExecutionException | TextureCreationException | IOException e) {
+			throw new GameException(e);
+		}
+		
+		return thumbnailDatas=td;
 	}
 	
 	@Override

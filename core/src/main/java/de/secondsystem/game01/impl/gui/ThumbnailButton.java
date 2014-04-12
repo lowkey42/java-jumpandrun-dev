@@ -12,7 +12,7 @@ import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 public class ThumbnailButton extends Element {
 	
-	public static final class ThumbnailData {
+	public static class ThumbnailData {
 		public final ConstTexture texture;
 		public final IntRect clip;
 		public final String name;
@@ -51,7 +51,7 @@ public class ThumbnailButton extends Element {
 		
 		float captSpacing = CAPTION_DISTANCE + textRect.height*2;
 		
-		sprite = new Sprite(thumbnailData.texture, thumbnailData.clip);
+		sprite = new Sprite(thumbnailData.texture/*, thumbnailData.clip*/);
 		sprite.setOrigin(thumbnailData.clip.width/2.f, thumbnailData.clip.height/2.f);
 		if( thumbnailData.clip.width-captSpacing >= thumbnailData.clip.height )
 			sprite.setScale(width / thumbnailData.clip.width, width / thumbnailData.clip.width);

@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
+import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.ISerializable;
@@ -16,6 +17,7 @@ import de.secondsystem.game01.model.IUpdateable;
 public interface IGameEntityManager extends IUpdateable, ISerializable {
 
 	List<String> listArchetypes();
+	List<ThumbnailData> generateThumbnails();
 	
 	@Deprecated
 	IGameEntity createEntity(String type, Map<String, Object> attributes);
