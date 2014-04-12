@@ -116,4 +116,7 @@ public class LayoutElementContainer extends ElementContainer {
 	public final <T extends Enum<T>> DropDownField<T> createDropDown(float width, Class<T> valueEnum, RwValueRef<T> value) {
 		return updateOffset(createDropDown(getXOffset(), getYOffset(), width, valueEnum, value));
 	}
+	public final VScrollPanel createScrollPanel(float width, float height, Layout layout) {
+		return updateOffset(createScrollPanel(getXOffset(), getYOffset(), width, height, layout));
+	}
 }

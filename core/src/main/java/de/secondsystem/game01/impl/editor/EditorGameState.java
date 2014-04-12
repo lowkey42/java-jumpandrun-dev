@@ -80,7 +80,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 	public IGameMap getMap() {
 		if(map==null && mapToLoad!=null) {
 			IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
-			map = mapSerializer.deserialize(ctx, mapToLoad, null, true, true);
+			map = mapSerializer.deserialize(ctx, mapToLoad, null, false, true);
 			mapToLoad = null;
 		}
 		

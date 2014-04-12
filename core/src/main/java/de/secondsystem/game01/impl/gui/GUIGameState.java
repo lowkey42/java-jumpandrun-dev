@@ -61,6 +61,11 @@ public abstract class GUIGameState extends GameState {
 				baseContainer.onTextInput(event.asTextEvent().unicode);
 				break;
 				
+			case MOUSE_WHEEL_MOVED:
+				baseContainer.onMouseOver(ctx.getMousePosition());
+				baseContainer.onScroll(event.asMouseWheelEvent().delta);
+				break;
+				
 			case MOUSE_BUTTON_PRESSED:
 				baseContainer.onFocus(ctx.getMousePosition());
 				baseContainer.onKeyPressed(KeyType.ENTER);

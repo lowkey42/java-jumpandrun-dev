@@ -13,7 +13,7 @@ import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 
 public class ElementContainer extends Element {
 	
-	private final List<Element> children = new ArrayList<>();
+	protected final List<Element> children = new ArrayList<>();
 
 	private Element mouseOver;
 	
@@ -75,6 +75,12 @@ public class ElementContainer extends Element {
 	protected void onMouseOut() {
 		if( mouseOver!=null )
 			mouseOver.onMouseOut();
+	}
+	
+	@Override
+	protected void onScroll(int offset) {
+		if( mouseOver!=null )
+			mouseOver.onScroll(offset);
 	}
 	
 	@Override
@@ -176,6 +182,9 @@ public class ElementContainer extends Element {
 	}
 	public final <T extends Enum<T>> DropDownField<T> createDropDown(float x, float y, float width, Class<T> valueEnum, RwValueRef<T> value) {
 		return new DropDownField<>(x, y, width, valueEnum, value, this);
+	}
+	public final VScrollPanel createScrollPanel(float x, float y, float width, float height, Layout layout) {
+		return new VScrollPanel(x, y, width, height, layout, this);
 	}
 	
 }

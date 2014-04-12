@@ -8,6 +8,7 @@ import de.secondsystem.game01.impl.gui.AttributesDataTable;
 import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
 import de.secondsystem.game01.impl.gui.ElementContainer;
 import de.secondsystem.game01.impl.gui.Panel;
+import de.secondsystem.game01.impl.gui.VScrollPanel;
 import de.secondsystem.game01.model.Attributes;
 
 public class ObjectPanel extends Panel implements AttributesSource, ISelectionChangedListener {
@@ -31,7 +32,8 @@ public class ObjectPanel extends Panel implements AttributesSource, ISelectionCh
 		setFillColor(new Color(0, 0, 0, 200));
 		
 		objectSelection = createPanel(TABLE_WIDTH, TABLE_WIDTH/2);
-		attributeTable = createAttributesDataTable(TABLE_WIDTH, this);
+		attributeTable = createScrollPanel(TABLE_WIDTH, height-TABLE_WIDTH/2, new Layout(LayoutDirection.VERTICAL, 0))
+				.createAttributesDataTable(TABLE_WIDTH-VScrollPanel.WIDTH, this);
 		attributeTable.setVisible(false);
 	}
 	

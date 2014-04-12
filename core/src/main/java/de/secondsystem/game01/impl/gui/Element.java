@@ -30,6 +30,7 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 	
 	public interface Overlay extends IDrawable, IInsideCheck {
 		void onFocus(Vector2f mp);
+		void setOffsetPosition(Vector2f pos);
 	}
 	
 	// shared Attributes
@@ -58,6 +59,8 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 	
 	protected void onMouseOver(Vector2f mp){}
 	protected void onMouseOut(){}
+	
+	protected void onScroll(int offset) {}
 	
 	protected void onTextInput(int character){}
 	protected void onKeyPressed(KeyType type){}

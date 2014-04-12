@@ -150,6 +150,12 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 					break;
 				}
 		}
+
+		@Override
+		public void setOffsetPosition(Vector2f pos) {
+			for( Suggestion s : suggestions )
+				s.setOffsetPosition(pos);
+		}
 		
 	}
 	
@@ -157,6 +163,7 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 		private final Text text;
 		private final RectangleShape box;
 		private final float yPos;
+		private Vector2f offsetPos = new Vector2f(0, 0);
 		public final T value;
 		public Suggestion(float yPos, T value, float width, float height) {
 			this.yPos = yPos;
@@ -171,6 +178,10 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 			box.setOutlineThickness(1);
 		}
 		
+		public void setOffsetPosition(Vector2f pos) {
+			offsetPos = pos;
+		}
+
 		@Override
 		public boolean inside(Vector2f point) {
 			return Tools.isInside(box, point);
@@ -178,8 +189,8 @@ public class DropDownField<T extends Enum<T>> extends Edit {
 
 		@Override
 		public void draw(RenderTarget rt) {
-			box.setPosition(Vector2f.add(new Vector2f(0,yPos), getPosition()));
-			text.setPosition(Vector2f.add(new Vector2f(5,yPos+box.getSize().y/2), getPosition()));
+			box.setPosition(Vector2f.add(new Vector2f(offsetPos.x,offsetPos.y+ yPos), getPosition()));
+			text.setPosition(Vector2f.add(new Vector2f(offsetPos.x+ 5,offsetPos.y+ yPos+box.getSize().y/2), getPosition()));
 			
 			rt.draw(box);
 			rt.draw(text);
