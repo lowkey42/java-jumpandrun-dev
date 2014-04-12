@@ -39,7 +39,6 @@ public final class GUITestState extends GUIGameState {
 	@Override
 	protected void initGui(GameContext ctx, LayoutElementContainer c) {
 		c.createLabel("Input Text").setFor(c.createInputField(200, ""));
-		c.createLabel("Memo Editor").setFor(c.createInputField(200, ""));
 		
 		new DropDownField<>(400, 0, 300, EventType.class, new SimpleRwValueRef<EventType>(null), c);
 		

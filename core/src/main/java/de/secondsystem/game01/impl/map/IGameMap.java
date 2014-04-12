@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.map;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
@@ -75,6 +76,11 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	LightMap getLightMap();
 
 	boolean isEditable();
+	
+	void toogleLightmap();
+	
+	void setAmbientLight(Color color);
+	void setBackgroundColor(Color color);
 	
 	void registerWorldSwitchListener( IWorldSwitchListener listener );
 	void deregisterWorldSwitchListener( IWorldSwitchListener listener );

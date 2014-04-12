@@ -82,6 +82,8 @@ public class GameMap implements IGameMap {
 	
 	final ScriptEnvironment scripts;
 	
+	private boolean renderLightmap = true;
+	
 	public GameMap(GameContext ctx, String mapId, Tileset tileset, IScriptApi scriptApi) {
 		this(ctx, mapId, tileset, scriptApi, true, true);
 	}
@@ -144,6 +146,19 @@ public class GameMap implements IGameMap {
 		return tileset;
 	}
 	
+	@Override
+	public void toogleLightmap() {
+		renderLightmap=!renderLightmap;
+	}
+	@Override
+	public void setAmbientLight(Color color) {
+		gameWorld[activeWorldId.arrayIndex].ambientLight = color;
+	}
+	@Override
+	public void setBackgroundColor(Color color) {
+		gameWorld[activeWorldId.arrayIndex].backgroundColor = color;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#switchWorlds()
 	 */
@@ -198,7 +213,7 @@ public class GameMap implements IGameMap {
 	 */
 	@Override
 	public void draw(RenderTarget rt) {
-		if( lightMap!=null ) {
+		if( lightMap!=null && renderLightmap ) {
 			lightMap.setTarget(rt);
 			lightMap.setView(rt.getView());
 			rt = lightMap;

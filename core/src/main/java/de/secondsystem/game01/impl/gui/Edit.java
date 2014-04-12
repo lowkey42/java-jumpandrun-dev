@@ -16,6 +16,10 @@ import org.jsfml.system.Vector2f;
  */
 public class Edit extends Element implements TextElement {
 
+	public static interface IOnTextEnteredListener {
+		String onTextEntered(String text);
+	}
+	
 	private static final char CURSER_CHAR_1 = '┊';
 	private static final char CURSER_CHAR_2 = '┋';
 	private static final int CURSER_BLINK_DELAY = 500; 
@@ -30,6 +34,8 @@ public class Edit extends Element implements TextElement {
 	protected final Text text;
 	
 	private final RectangleShape box;
+	
+	private IOnTextEnteredListener enteredListener;
 	
 	private int curserPosition = -1;
 	
@@ -55,6 +61,10 @@ public class Edit extends Element implements TextElement {
 		box.setOutlineColor(Color.WHITE);
 		box.setOutlineThickness(BORDER_SIZE);
 	}
+	
+	public void setFillColor(Color color) {
+		box.setFillColor(color);
+	}
 
 	public String getText() {
 		return buffer.toString();
@@ -63,6 +73,9 @@ public class Edit extends Element implements TextElement {
 		buffer.setLength(0);
 		buffer.append(text);
 		updateText(true);
+	}
+	public void setEnteredListener(IOnTextEnteredListener listener) {
+		this.enteredListener = listener;
 	}
 	
 	@Override
@@ -168,6 +181,14 @@ public class Edit extends Element implements TextElement {
 			buffer.insert(curserPosition, Character.toChars(character));
 			curserPosition+=Character.charCount(character);
 			updateText(true);
+			
+		} else if( character=='\n' || character=='\r' ) {
+			if( enteredListener!=null ) {
+				final String cText = getText();
+				String newText = enteredListener.onTextEntered(cText);
+				if( newText!=null && newText!=cText )
+					setText(newText);
+			}
 		}
 	}
 

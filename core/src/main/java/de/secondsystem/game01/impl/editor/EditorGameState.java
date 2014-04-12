@@ -1,5 +1,11 @@
 package de.secondsystem.game01.impl.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
@@ -14,6 +20,8 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.curser.CurserManager;
+import de.secondsystem.game01.impl.gui.Edit;
+import de.secondsystem.game01.impl.gui.Edit.IOnTextEnteredListener;
 import de.secondsystem.game01.impl.gui.GUIGameState;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
@@ -24,6 +32,8 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
 import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
+import de.secondsystem.game01.impl.map.Tileset;
+import de.secondsystem.game01.util.SerializationUtil;
 
 /**
  * 
@@ -36,7 +46,7 @@ import de.secondsystem.game01.impl.map.JsonGameMapSerializer;
  * @author lowkey
  * 
  */
-public final class EditorGameState extends GUIGameState implements IMapProvider {
+public final class EditorGameState extends GUIGameState implements IMapProvider, IOnTextEnteredListener {
 
 	private static final float CAM_MOVE_SPEED = 5.f;
 	private GameContext ctx;
@@ -48,6 +58,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 	private final CurserManager curser = new CurserManager(this);
 	private ObjectPanel objectPanel;
 	private LayerPanel layerPanel;
+	private Edit commandPanel;
 	
 	private float zoom = 1.f;
 	private float cameraX = 0.f;
@@ -107,12 +118,16 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 		layerPanel.addListener(curser);
 		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c, curser));
 		curser.setToBrush();
+		
+		commandPanel = c.createInputField(0, ctx.getViewHeight()-40, ctx.getViewWidth()-objectPanel.getWidth(), ":");
+		commandPanel.setFillColor(new Color(0, 0, 0, 50));
+		commandPanel.setEnteredListener(this);
 	}
 	
 	private final boolean isCurserInGuiArea(GameContext ctx) {
 		final Vector2f mousePos = ctx.getMousePosition();
 		
-		return layerPanel.inside(mousePos) || objectPanel.inside(mousePos);
+		return layerPanel.inside(mousePos) || objectPanel.inside(mousePos) || commandPanel.inside(mousePos);
 	}
 
 	private final Vector2f getWorldMousePosition() {
@@ -283,6 +298,96 @@ public final class EditorGameState extends GUIGameState implements IMapProvider 
 		
 		return true;
 		
+	}
+
+	
+	private static final Pattern COMMAND_ARG_PATTERN = Pattern.compile("\"([^\"]+)\"|([^ ]+)");
+	private static final Pattern COMMAND_PATTERN = Pattern.compile("(?::)?([a-zA-Z]+)((?: +[^ ]+|\"[^\"]+\")*)");
+	
+	@Override
+	public String onTextEntered(String text) {
+		if(text.startsWith(":"))
+			text = text.substring(1);
+		
+		text = text.trim();
+		
+		final Matcher cm = COMMAND_PATTERN.matcher(text);
+		if( !cm.matches() )
+			return "> syntax error";
+		
+		final String command = cm.group(1);
+		
+		final Matcher am = COMMAND_ARG_PATTERN.matcher(cm.group(2));
+		final List<String> args = new ArrayList<>();
+		while( am.find() ) {
+			if( am.group(1)!=null )
+				args.add(am.group(1).trim());
+			else if( am.group(2)!=null )
+				args.add(am.group(2).trim());
+		}
+		
+		try {
+			switch(command) {
+				case "quit":
+				case "q":
+					setNextState(playGameState!=null ? playGameState : new MainMenuState());
+					break;
+					
+				case "save":
+				case "w":
+					curser.setToNull();
+					new JsonGameMapSerializer().serialize(map);
+					curser.setToBrush();
+					break;
+					
+				case "new":
+					IGameMapSerializer mapSerializer = new JsonGameMapSerializer();
+					GameMap nmap = new GameMap(ctx, args.get(0), new Tileset(args.get(1)), null);
+					mapSerializer.serialize(nmap);
+					
+				case "l":
+				case "load":
+					map = new JsonGameMapSerializer().deserialize(ctx, args.isEmpty() ? map.getMapId() : args.get(0), null, false, true);
+					curser.setToBrush();
+					break;
+					
+				case "set":
+					switch(args.get(0)) {
+						case "light":
+							map.setAmbientLight(SerializationUtil.decodeColor(args.get(1)));
+							break;
+							
+						case "bg":
+						case "background":
+							map.setBackgroundColor(SerializationUtil.decodeColor(args.get(1)));
+							break;
+					}
+					break;
+					
+				case "fl":
+				case "fiatLux":
+					map.toogleLightmap();
+					break;
+					
+				case "goto":
+					try {
+						cameraX = Float.valueOf(args.get(0));
+						cameraY = Float.valueOf(args.get(1));
+						
+					} catch(NumberFormatException e) {
+						return "> syntax error: NaN";
+					}
+					break;
+					
+				case "echo":
+					System.out.println(":echo > "+args);
+					break;
+			}
+		} catch( Exception e ) {
+			System.err.println("cmd-error: "+e.getMessage());
+		}
+		
+		return ":";
 	}
 
 }

@@ -114,7 +114,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 	
 	@Override
 	protected Color getRowBackgroundColorBase(AttributeVal data) {
-		return data.modified ? new Color(140, 140, 0) : super.getRowBackgroundColorBase(data);
+		return data.modified ? new Color(140, 140, 0, 150) : super.getRowBackgroundColorBase(data);
 	}
 	
 	private final class KeyColumn extends AbstractColumnDef<AttributeVal> {
@@ -126,12 +126,12 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 		@Override
 		public Element createValueElement(float width, AttributeVal data, LayoutElementContainer row) {
 			if( data.depth>0 )
-				row.createLabel("", data.depth*5, 5);
+				row.createLabel("", data.depth*10, 5);
 			
 			if( data.parent==null || data.parent.type!=ColumnType.SEQ )
-				return row.createInputField(width - data.depth*5, data.new KeyRef());
+				return row.createInputField(width - data.depth*10, data.new KeyRef());
 			else
-				return row.createPanel(width - data.depth*5, 50);
+				return row.createPanel(width - data.depth*10, 50);
 		}
 	}
 

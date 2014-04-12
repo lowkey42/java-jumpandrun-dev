@@ -133,4 +133,12 @@ public final class VScrollPanel extends LayoutElementContainer {
 		}
 	}
 
+	public void setFillColor(Color color) {
+		border.setFillColor(color);
+	}
+	
+	public void setOutlineColor(Color color) {
+		border.setOutlineColor(color);
+	}
+
 }

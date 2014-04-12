@@ -36,13 +36,15 @@ public class ObjectPanel extends Panel implements AttributesSource, ISelectionCh
 	public ObjectPanel(float x, float y, float height, ElementContainer owner, CurserManager curserManager) {
 		super(x, y, WIDTH, height, new Layout(LayoutDirection.VERTICAL, SPACING), owner);
 		setLayoutOffset(SPACING, SPACING);
-		setFillColor(new Color(0, 0, 0, 200));
+		setFillColor(new Color(0, 0, 0, 50));
 		
 		this.curserManager = curserManager;
 		
 		objectSelection = createScrollPanel(TABLE_WIDTH, TABLE_WIDTH/2, new Layout(10, TABLE_WIDTH-100));
-		attributeTable = createScrollPanel(TABLE_WIDTH, height-TABLE_WIDTH/2, new Layout(LayoutDirection.VERTICAL, 0))
-				.createAttributesDataTable(TABLE_WIDTH-VScrollPanel.WIDTH, this);
+		objectSelection.setFillColor(new Color(0, 0, 0, 50));
+		VScrollPanel sp = createScrollPanel(TABLE_WIDTH, height-TABLE_WIDTH/2, new Layout(LayoutDirection.VERTICAL, 0));
+		sp.setFillColor(Color.TRANSPARENT);
+		attributeTable = sp.createAttributesDataTable(TABLE_WIDTH-VScrollPanel.WIDTH, this);
 		attributeTable.setVisible(false);
 		
 		curserManager.addListerner(this);
