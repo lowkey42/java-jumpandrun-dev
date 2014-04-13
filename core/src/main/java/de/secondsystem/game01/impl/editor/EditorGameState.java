@@ -174,6 +174,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 		
 		else if (event.type == Event.Type.KEY_RELEASED
 				&& event.asKeyEvent().key == Key.F12) {
+			curser.setToNull();
 			setNextState(playGameState);
 
 		} else if (event.type == Event.Type.KEY_RELEASED
@@ -267,7 +268,9 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 				break;
 	
 			case TAB: // switch world
+				curser.setToNull();
 				map.switchWorlds();
+				curser.setToBrush();
 				break;
 	
 			case DELETE: // delete selected object
@@ -332,6 +335,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 			switch(command) {
 				case "quit":
 				case "q":
+					curser.setToNull();
 					setNextState(playGameState!=null ? playGameState : new MainMenuState());
 					break;
 					

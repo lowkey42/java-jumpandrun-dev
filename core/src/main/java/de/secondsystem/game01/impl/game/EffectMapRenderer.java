@@ -1,17 +1,21 @@
 package de.secondsystem.game01.impl.game;
 
+import java.io.IOException;
+
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.RenderStates;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.RenderTexture;
+import org.jsfml.graphics.Shader;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.TextureCreationException;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.GameContext;
+import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.IWorldSwitchListener;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
@@ -29,6 +33,8 @@ public final class EffectMapRenderer implements IDrawable, IUpdateable, IWorldSw
 
 	private final RenderTexture fadeBuffer = new RenderTexture();
 	
+	private final Shader bloomShader;
+	
 	private int fadeTimeLeft;
 	
 	private boolean fadeEnabled = true;
@@ -40,9 +46,13 @@ public final class EffectMapRenderer implements IDrawable, IUpdateable, IWorldSw
 		try {
 			fadeBuffer.create(ctx.getViewWidth(), ctx.getViewHeight());
 			effectBuffer.create(ctx.getViewWidth(), ctx.getViewHeight());
+			bloomShader = (Shader) ResourceManager.shader_frag.get("bloom.frag");
+			bloomShader.setParameter("blur_radius", 0.002f);
 			
 		} catch (TextureCreationException e) {
 			throw new GameException("Unable to create buffer: "+e.getMessage(), e);
+		} catch (IOException e) {
+			throw new GameException(e);
 		}
 		
 		map.registerWorldSwitchListener(this);
@@ -68,21 +78,20 @@ public final class EffectMapRenderer implements IDrawable, IUpdateable, IWorldSw
 	public void draw(RenderTarget renderTarget) {
 		final ConstView cView = renderTarget.getView();
 				
-		//effectBuffer.setView(cView);
-		map.draw(renderTarget);
-		//effectBuffer.display();
-		
-		//displayBuffer(effectBuffer, renderTarget, new RenderStates(BlendMode.ALPHA), 255);
-
-		// TODO: add effects (e.g. Bloom)
+		effectBuffer.setView(cView);
+		map.draw(effectBuffer);
+		effectBuffer.display();
+		effectBuffer.setView(cView);
 		
 		if( fadeTimeLeft>0 && fadeEnabled ) {
 			fadeBuffer.setView(cView);
 			map.drawInactiveWorld(fadeBuffer);
 			fadeBuffer.display();
 			
-			displayBuffer(fadeBuffer, renderTarget, new RenderStates(BlendMode.ALPHA), ((float)fadeTimeLeft)/FADE_TIME*200.f);
+			displayBuffer(fadeBuffer, effectBuffer, new RenderStates(BlendMode.ALPHA), ((float)fadeTimeLeft)/FADE_TIME*200.f);
 		}
+		
+		displayBuffer(effectBuffer, renderTarget, new RenderStates(bloomShader), 255);
 
 		renderTarget.setView(cView);
 	}
