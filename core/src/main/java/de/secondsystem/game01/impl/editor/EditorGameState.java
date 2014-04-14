@@ -20,9 +20,11 @@ import org.jsfml.window.event.KeyEvent;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.GameState;
 import de.secondsystem.game01.impl.editor.curser.CurserManager;
+import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.gui.Edit;
 import de.secondsystem.game01.impl.gui.Edit.IOnTextEnteredListener;
 import de.secondsystem.game01.impl.gui.GUIGameState;
+import de.secondsystem.game01.impl.gui.Label;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.Layout;
 import de.secondsystem.game01.impl.gui.LayoutElementContainer.LayoutDirection;
@@ -59,6 +61,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 	private ObjectPanel objectPanel;
 	private LayerPanel layerPanel;
 	private Edit commandPanel;
+	private Label statusLabel;
 	
 	private float zoom = 1.f;
 	private float cameraX = 0.f;
@@ -121,9 +124,12 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c, curser));
 		curser.setToBrush();
 		
-		commandPanel = c.createInputField(0, ctx.getViewHeight()-40, ctx.getViewWidth()-objectPanel.getWidth(), ":");
+		commandPanel = c.createInputField(0, ctx.getViewHeight()-40, ctx.getViewWidth()-objectPanel.getWidth()-400, ":");
 		commandPanel.setFillColor(new Color(0, 0, 0, 50));
 		commandPanel.setEnteredListener(this);
+		
+		statusLabel = c.createPanel(ctx.getViewWidth()-objectPanel.getWidth()-400, ctx.getViewHeight()-40, 400, commandPanel.getHeight())
+				.createLabel("STATUS...ASDASD");
 	}
 	
 	private final boolean isCurserInGuiArea(GameContext ctx) {
@@ -145,12 +151,15 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
+		statusLabel.setText("Pos: "+((int)getWorldMousePosition().x)+"/"+((int)getWorldMousePosition().y)+"  |   Time:"+timeFactor+"  |   Entity: ?/?");
+		
 		getMap().update((long) (frameTime*timeFactor));	///< update everything, but freeze/slow down time 
 		drawMap(ctx.window);
 		
 		if( !isCurserInGuiArea(ctx) ) {
 			processInputKeyboard();
-			curser.get().onMouseMoved(getWorldMousePosition());
+			if( curser.get()!=null )
+				curser.get().onMouseMoved(getWorldMousePosition());
 		}
 		
 		super.onFrame(ctx, frameTime);
@@ -354,6 +363,12 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 				case "l":
 				case "load":
 					map = new JsonGameMapSerializer().deserialize(ctx, args.isEmpty() ? map.getMapId() : args.get(0), null, false, true);
+					curser.setToBrush();
+					break;
+					
+				case "play":
+					curser.setToNull();
+					setNextState(new MainGameState(map.getMapId(), ctx, this));
 					curser.setToBrush();
 					break;
 					

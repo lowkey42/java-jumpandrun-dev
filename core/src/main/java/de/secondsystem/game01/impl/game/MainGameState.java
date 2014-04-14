@@ -44,6 +44,8 @@ public class MainGameState extends GameState {
 
 	private final String mapId;
 	
+	private final GameState parentState;
+	
 	MonologueTextBox monologueTextBox;
 	
 	private MusicWrapper backgroundMusic;
@@ -63,9 +65,10 @@ public class MainGameState extends GameState {
 	private KeyboardController controller;
 	
 	private final UUID PLAYER_UUID = UUID.nameUUIDFromBytes("player".getBytes());
-	
-	public MainGameState( String mapId ) {
+
+	public MainGameState( String mapId, GameState parentState ) {
 		this.mapId = mapId;
+		this.parentState = parentState;
 		try {
 			loadingSprite = new AnimatedSprite(ResourceManager.animation.get("loading.anim"), 100, 100);
 			
@@ -73,8 +76,8 @@ public class MainGameState extends GameState {
 			loadingSprite = null;
 		}
 	}
-	public MainGameState( String mapId, GameContext ctx ) {
-		this(mapId);
+	public MainGameState( String mapId, GameContext ctx, GameState parentState ) {
+		this(mapId, parentState);
 		init(ctx);
 	}
 	
@@ -299,7 +302,7 @@ public class MainGameState extends GameState {
         		setNextState(EditorGameState.createLive(this, map));
         	}
         	if( event.asKeyEvent().key==Key.ESCAPE ) {
-        		setNextState(new MainMenuState(this));
+        		setNextState(parentState!=null ? parentState : new MainMenuState(this));
         	}
         }
         

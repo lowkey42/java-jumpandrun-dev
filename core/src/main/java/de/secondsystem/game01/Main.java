@@ -7,6 +7,7 @@ import de.secondsystem.game01.impl.FuncGameState;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.InitState;
 import de.secondsystem.game01.impl.editor.EditorGameState;
+import de.secondsystem.game01.impl.game.MainGameState;
 import de.secondsystem.game01.impl.intro.MainMenuState;
 import de.secondsystem.game01.impl.map.GameMap;
 import de.secondsystem.game01.impl.map.IGameMapSerializer;
@@ -23,7 +24,7 @@ public final class Main {
 			System.out.println("You just won 100 cookies !");
 		}
 		
-		final String command = args.length>1 ? args[0] : "play";
+		final String command = args.length>1 ? args[0] : "def";
 		
 		final IState initialState;
 		
@@ -46,6 +47,10 @@ public final class Main {
 				break;
 				
 			case "play":
+				initialState = new MainGameState(args[1], null);
+				break;
+				
+			case "def":
 			default:
 				initialState = new MainMenuState();
 		}

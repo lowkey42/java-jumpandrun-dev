@@ -117,6 +117,7 @@ public final class CurserManager implements IOnLayerChangedListener, IDrawable {
 	
 	@Override
 	public void draw(RenderTarget renderTarget) {
-		curser.draw(renderTarget);
+		if( curser!=null )
+			curser.draw(renderTarget);
 	}
 }

@@ -136,7 +136,7 @@ public final class GameEntityManager implements IGameEntityManager {
 
 	@Override
 	public IGameEntity create(String type, Map<String, Object> attr) {
-		return create(UUID.randomUUID(), type, attr);
+		return create(null, type, attr);
 	}
 	
 	@Override
@@ -159,7 +159,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		}
 		
 		if( uuid==null )
-			uuid = UUID.randomUUID();
+			uuid = !"player".equals(type) ? UUID.randomUUID() : UUID.nameUUIDFromBytes("player".getBytes());
 			
 		try {
 			EntityArchetype at = ARCHETYPE_CACHE.get(type);

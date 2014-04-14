@@ -43,7 +43,7 @@ public final class MainMenuState extends GUIGameState {
 	protected void initGui(GameContext ctx, LayoutElementContainer c) {
 		c.createButton("NEW GAME", new IOnClickListener() {
 			@Override public void onClick() {
-				setNextState(new MainGameState("test01"));
+				setNextState(new MainGameState("test01", null));
 			}
 		});
 

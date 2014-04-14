@@ -34,7 +34,7 @@ public class ThreadedMapLoader {
 		
 		@Override
 		public void run() {
-			loaded.set( new MainGameState(mapId, ctx) );
+			loaded.set( new MainGameState(mapId, ctx, null) );
 		}
 	};
 	
