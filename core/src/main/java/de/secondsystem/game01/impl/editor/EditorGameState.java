@@ -151,7 +151,8 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 
 	@Override
 	protected void onFrame(GameContext ctx, long frameTime) {
-		statusLabel.setText("Pos: "+((int)getWorldMousePosition().x)+"/"+((int)getWorldMousePosition().y)+"  |   Time:"+timeFactor+"  |   Entity: ?/?");
+		statusLabel.setText("Pos: "+((int)getWorldMousePosition().x)+"/"+((int)getWorldMousePosition().y)+"  |   Time:"+timeFactor+
+				"  |   Entity: "+(curser.getCurrentBrushIndex()+1)+"/"+(curser.getBrushCount()+1));
 		
 		getMap().update((long) (frameTime*timeFactor));	///< update everything, but freeze/slow down time 
 		drawMap(ctx.window);

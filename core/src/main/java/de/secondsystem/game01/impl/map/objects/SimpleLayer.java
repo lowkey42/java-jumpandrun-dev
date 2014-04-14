@@ -67,6 +67,16 @@ public class SimpleLayer implements ILayer {
 		
 		return null;
 	}
+	@Override
+	public List<ILayerObject> findNodes(Vector2f point) {
+		List<ILayerObject> r = new ArrayList<>();
+		for( ILayerObject o : objects )
+			if( o.inside(point) )
+				r.add(o);
+		
+		return r;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.ILayer#remove(de.secondsystem.game01.impl.map.ILayerObject)
 	 */

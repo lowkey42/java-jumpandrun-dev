@@ -1,5 +1,6 @@
 package de.secondsystem.game01.impl.map.objects;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,6 +55,14 @@ public class EntityLayer implements ILayer {
 	public ILayerObject findNode(Vector2f point) {
 		final IGameEntity entity = manager.findEntity(point);
 		return entity!=null ? new EntityLayerObject(entity) : null;
+	}
+	@Override
+	public List<ILayerObject> findNodes(Vector2f point) {
+		List<ILayerObject> r = new ArrayList<>();
+		for( IGameEntity e : manager.findEntities(point) )
+			r.add(new EntityLayerObject(e));
+		
+		return r;
 	}
 
 	@Override

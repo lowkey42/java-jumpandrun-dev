@@ -33,6 +33,7 @@ public interface IGameEntityManager extends IUpdateable, ISerializable {
 	
 	void destroy(UUID eId);
 	IGameEntity findEntity(Vector2f pos);
+	List<IGameEntity> findEntities(Vector2f point);
 	
 	IGameEntity get(UUID eId);
 	IWeakGameEntityRef getRef(UUID eId);

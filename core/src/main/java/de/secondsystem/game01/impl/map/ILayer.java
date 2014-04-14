@@ -22,5 +22,7 @@ public interface ILayer extends IDrawable, IUpdateable {
 	boolean setVisible(boolean visible);
 
 	List<ILayerObject> listAll();
+
+	List<ILayerObject> findNodes(Vector2f point);
 	
 }

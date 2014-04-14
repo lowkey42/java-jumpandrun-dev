@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl.map;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jsfml.graphics.Color;
@@ -304,6 +305,11 @@ public class GameMap implements IGameMap {
 	public ILayerObject findNode( LayerType layer, Vector2f point ) {
 		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].findNode(point);
 	}
+	@Override
+	public List<ILayerObject> findNodes(LayerType layer, Vector2f point) {
+		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].findNodes(point);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#remove(de.secondsystem.game01.impl.map.LayerType, de.secondsystem.game01.impl.map.LayerObject)
 	 */

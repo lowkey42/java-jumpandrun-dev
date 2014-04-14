@@ -30,6 +30,8 @@ abstract class AbstractCurser implements IEditorCurser {
 		shapeMarker.setOutlineColor(outlineColor);
 	}
 
+	public abstract void cirlce(boolean up);
+	
 	protected abstract ILayerObject getLayerObject();
 	protected float getWidth() {
 		if( width==null )

@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl.map;
 
+import java.util.List;
+
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
@@ -64,6 +66,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	void addNode(LayerType layer, ILayerObject sprite);
 	
 	ILayerObject findNode(LayerType layer, Vector2f point);
+	
+	List<ILayerObject> findNodes(LayerType layer, Vector2f point);
 	
 	void remove(LayerType layer, ILayerObject s);
 	

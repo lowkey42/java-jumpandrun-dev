@@ -28,6 +28,11 @@ class BrushCurser extends AbstractCurser {
 	}
 	
 	@Override
+	public void cirlce(boolean up) {
+		brush.cirlce(up);
+	}
+	
+	@Override
 	public void onDragFinished(Vector2f point) {
 		super.onDragFinished(point);
 		// copy current brush to map
@@ -45,5 +50,15 @@ class BrushCurser extends AbstractCurser {
 	@Override
 	public void onMouseMoved(Vector2f point) {
 		getLayerObject().setPosition(point);
+	}
+
+	@Override
+	public int getCurrentBrushIndex() {
+		return brush.getIndex();
+	}
+
+	@Override
+	public int getBrushCount() {
+		return brush.getMax();
 	}
 }

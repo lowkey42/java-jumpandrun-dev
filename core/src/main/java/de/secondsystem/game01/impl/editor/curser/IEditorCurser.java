@@ -22,5 +22,8 @@ public interface IEditorCurser extends IDrawable, IInsideCheck {
 	void onMouseMoved(Vector2f point);
 	
 	void onDestroy();
+	
+	int getCurrentBrushIndex();
+	int getBrushCount();
 
 }

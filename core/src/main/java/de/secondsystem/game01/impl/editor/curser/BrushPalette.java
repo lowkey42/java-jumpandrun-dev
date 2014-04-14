@@ -35,6 +35,8 @@ final class BrushPalette {
 		List<ThumbnailButton.ThumbnailData> generateThumbnails();
 
 		ILayerObject set(int index);
+		int getIndex();
+		int getMax();
 	}
 	
 	public IBrush getBrush( IGameMap map, LayerType layer ) {
@@ -69,16 +71,18 @@ final class BrushPalette {
 			map.addNode(layer, obj);
 		}
 		
-		protected int circleIndex( int cIndex, boolean up, int minIndex, int maxIndex ) {
+		protected int circleIndex( boolean up ) {
+			int cIndex = getIndex();
+			
 			if( up )
 				cIndex++;
 			else
 				cIndex--;
 			
-			if( cIndex<minIndex )
-				return maxIndex;
-			else if( cIndex>maxIndex )
-				return minIndex;
+			if( cIndex<0 )
+				return getMax();
+			else if( cIndex>getMax() )
+				return 0;
 			else
 				return cIndex;
 		}
@@ -115,8 +119,17 @@ final class BrushPalette {
 		}
 		
 		@Override
+		public int getIndex() {
+			return obj instanceof SpriteLayerObject ? ((SpriteLayerObject)obj).getTile() : map.getTileset().size();
+		}
+		@Override
+		public int getMax() {
+			return map.getTileset().size();
+		}
+		
+		@Override
 		public ILayerObject cirlce(boolean up) {
-			return set( circleIndex(obj instanceof SpriteLayerObject ? ((SpriteLayerObject)obj).getTile() : map.getTileset().size(), up, 0, map.getTileset().size()) );
+			return set( circleIndex(up) );
 		}
 		
 		@Override
@@ -152,8 +165,17 @@ final class BrushPalette {
 		}
 		
 		@Override
+		public int getIndex() {
+			return obj.getType().ordinal();
+		}
+		@Override
+		public int getMax() {
+			return CollisionObject.CollisionType.values().length-1;
+		}
+		
+		@Override
 		public ILayerObject cirlce(boolean up) {
-			return set( circleIndex(obj.getType().ordinal(), up, 0, CollisionObject.CollisionType.values().length-1) );
+			return set( circleIndex(up) );
 		}
 		
 		@Override
@@ -189,8 +211,17 @@ final class BrushPalette {
 		}
 		
 		@Override
+		public int getIndex() {
+			return (int) (obj.getDegree()/DEGREE_STEP_SIZE);
+		}
+		@Override
+		public int getMax() {
+			return DEGREE_STEPS-1;
+		}
+		
+		@Override
 		public ILayerObject cirlce(boolean up) {
-			return set( circleIndex((int)(obj.getDegree()/DEGREE_STEP_SIZE), up, 1, (int)DEGREE_STEPS)-1 );
+			return set( circleIndex(up) );
 		}
 
 		@Override
@@ -231,8 +262,17 @@ final class BrushPalette {
 		}
 		
 		@Override
+		public int getIndex() {
+			return index;
+		}
+		@Override
+		public int getMax() {
+			return map.getEntityManager().listArchetypes().size()-1;
+		}
+		
+		@Override
 		public ILayerObject cirlce(boolean up) {
-			return set( circleIndex(index, up, 0, map.getEntityManager().listArchetypes().size()-1) );
+			return set( circleIndex(up) );
 		}
 		
 		@Override

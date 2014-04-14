@@ -1,5 +1,7 @@
 package de.secondsystem.game01.impl.editor.curser;
 
+import java.util.List;
+
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.system.Vector2f;
@@ -10,7 +12,9 @@ import de.secondsystem.game01.model.Attributes;
 
 class SelectionCurser extends AbstractCurser {
 	
-	private ILayerObject layerObject;
+	private List<ILayerObject> layerObjects;
+	
+	private int index = 0;
 	
 	private final RectangleShape resizeMarkers[] = new RectangleShape[] {	// TODO: migrate mouse-scale code from EditorLayerObject
 			new RectangleShape(),
@@ -19,9 +23,9 @@ class SelectionCurser extends AbstractCurser {
 			new RectangleShape()
 	};
 	
-	public SelectionCurser( IMapProvider mapProvider, ILayerObject layerObject ) {
+	public SelectionCurser( IMapProvider mapProvider, List<ILayerObject> layerObject ) {
 		super(mapProvider, Color.RED);
-		this.layerObject = layerObject;
+		this.layerObjects = layerObject;
 		
 		for(RectangleShape shape : resizeMarkers) {
 			shape.setFillColor(Color.RED);
@@ -31,12 +35,12 @@ class SelectionCurser extends AbstractCurser {
 
 	@Override
 	protected ILayerObject getLayerObject() {
-		return layerObject;
+		return layerObjects.get(index);
 	}
 
 	@Override
 	public void setAttributes(Attributes attributes) {
-		mapProvider.getMap().updateNode(layerObject, attributes);
+		layerObjects.set(index, mapProvider.getMap().updateNode(layerObjects.get(index), attributes));
 	}
 
 	@Override
@@ -44,6 +48,26 @@ class SelectionCurser extends AbstractCurser {
 		if( inside(point) ) {
 			super.onDragged(point);
 		}
+	}
+
+	@Override
+	public void cirlce(boolean up) {
+		index += up ? 1 : -1;
+		
+		if( index>layerObjects.size()-1 )
+			index = 0;
+		else if( index<0 )
+			index = layerObjects.size()-1;
+	}
+
+	@Override
+	public int getCurrentBrushIndex() {
+		return index;
+	}
+
+	@Override
+	public int getBrushCount() {
+		return layerObjects.size()-1;
 	}
 	
 }

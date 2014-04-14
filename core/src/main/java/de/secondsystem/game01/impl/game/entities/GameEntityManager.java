@@ -51,6 +51,8 @@ public final class GameEntityManager implements IGameEntityManager {
 
 	private static final Path ARCHETYPE_PATH = Paths.get("assets", "entities");
 	
+	private final List<String> archetypes = Collections.unmodifiableList( new ArrayList<String>(Arrays.asList(ARCHETYPE_PATH.toFile().list())) );
+	
 	private final boolean overrideOptionalCreation;
 	
 	private final Map<UUID, IGameEntity> entities = new HashMap<>();
@@ -73,7 +75,7 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	@Override
 	public List<String> listArchetypes() {
-		return Collections.unmodifiableList( new ArrayList<String>(Arrays.asList(ARCHETYPE_PATH.toFile().list())) );
+		return archetypes;
 	}
 	
 	private List<ThumbnailData> thumbnailDatas;
@@ -477,6 +479,15 @@ public final class GameEntityManager implements IGameEntityManager {
 		}
 		
 		return null;
+	}
+	@Override
+	public List<IGameEntity> findEntities(Vector2f point) {
+		List<IGameEntity> r = new ArrayList<>();
+		for(IGameEntity entity : entities.values())
+			if( entity.inside(point) )
+				r.add(entity);
+		
+		return r;
 	}
 
 }

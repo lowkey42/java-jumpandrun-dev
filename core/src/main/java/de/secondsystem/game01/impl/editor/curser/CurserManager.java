@@ -73,10 +73,12 @@ public final class CurserManager implements IOnLayerChangedListener, IDrawable {
 	}
 
 	public void setSelectionFromCurser(Vector2f mouse, LayerType layer) {
-		ILayerObject obj = mapProvider.getMap().findNode(layer, mouse);
+		List<ILayerObject> objs = mapProvider.getMap().findNodes(layer, mouse);
 		
-		if( obj!=null ) {
-			setCurser(new SelectionCurser(mapProvider, obj));
+		objs.remove(((AbstractCurser)curser).getLayerObject());
+		
+		if( !objs.isEmpty() ) {
+			setCurser(new SelectionCurser(mapProvider, objs));
 		
 		} else if( curser instanceof AbstractCurser )
 			setToBrush();
@@ -95,10 +97,15 @@ public final class CurserManager implements IOnLayerChangedListener, IDrawable {
 
 
 	public void scrollBrushes(boolean up) {
-		if( curser instanceof BrushCurser ) {
-			((BrushCurser) curser).brush.cirlce(up);
-			callListeners();
-		}
+		((AbstractCurser) curser).cirlce(up);
+		callListeners();
+	}
+	
+	public int getCurrentBrushIndex() {
+		return curser!=null ? curser.getCurrentBrushIndex() : 0;
+	}
+	public int getBrushCount() {
+		return curser!=null ? curser.getBrushCount() : 0;
 	}
 	
 	public void setBrush(int index) {
