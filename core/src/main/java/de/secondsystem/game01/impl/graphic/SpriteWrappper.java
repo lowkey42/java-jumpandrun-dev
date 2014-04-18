@@ -153,4 +153,9 @@ public class SpriteWrappper implements ISpriteWrapper {
 	public void setTextureRect(IntRect rect) {
 		sprite.setTextureRect(rect);
 	}
+	
+	@Override
+	public int getClipState() {
+		return sprite.getTextureRect().hashCode();
+	}
 }

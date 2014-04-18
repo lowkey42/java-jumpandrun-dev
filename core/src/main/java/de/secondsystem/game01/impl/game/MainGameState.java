@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
@@ -21,6 +22,8 @@ import de.secondsystem.game01.impl.game.controller.KeyboardController.IWorldSwit
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
+import de.secondsystem.game01.impl.game.entities.effects.GEGlowEffect;
+import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.AttackEventHandler;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.game.entities.events.IEventHandler;
@@ -107,6 +110,7 @@ public class MainGameState extends GameState {
 
 	private IControllableGameEntity possessedEntity;
 	private IGameEntityController possessedEntityController;
+	private IGameEntityEffect possessionEffect;
 	private Vector2f fixedPlayerPos;
 	private IEventHandler possessedEntityDamagedHandler = new IEventHandler() {
 		@Override public Attributes serialize() {
@@ -119,9 +123,9 @@ public class MainGameState extends GameState {
 		}
 	};
 	
-	private void possess(IControllableGameEntity player, IControllableGameEntity target) {
+	private void possess(IControllableGameEntity player, IControllableGameEntity target, int possessTime) {
 		ignoreDamageEntity = target.uuid();
-		ignoreDamageTimer = Long.MAX_VALUE;
+		ignoreDamageTimer = System.currentTimeMillis() + possessTime;
 		
 		possessedEntity = target;
 
@@ -131,9 +135,13 @@ public class MainGameState extends GameState {
 		player.setWorldMask(0);
 		camera.setController(possessedEntity);
 		possessedEntity.addEventHandler(EventType.DAMAGED, possessedEntityDamagedHandler);
+
+		possessedEntity.addEffect(possessionEffect=new GEGlowEffect(map, possessedEntity.getRepresentation(), 
+				new Color(80, 30, 200, 255), new Color(200, 200, 255, 100), 15, 30, 15/(possessTime/1000.f) ));
 	}
 	private boolean unpossess() {
 		if( possessedEntity!=null ) {
+			ignoreDamageEntity = possessedEntity.uuid();
 			ignoreDamageTimer = System.currentTimeMillis() + 5000;
 			
 			possessedEntity.removeEventHandler(EventType.DAMAGED, possessedEntityDamagedHandler);
@@ -146,6 +154,9 @@ public class MainGameState extends GameState {
 			controller.addGE(player);
 			controller.removeGE(possessedEntity);
 			possessedEntity.setController(possessedEntityController);
+			possessedEntity.removeEffect(possessionEffect);
+			possessedEntity.addEffect(possessionEffect=new GEGlowEffect(map, possessedEntity.getRepresentation(), 
+					new Color(50, 10, 100, 255), new Color(160, 100, 180, 100), 20, 30, 18/5.f), 5000);
 
 			camera.setController(player);
 			possessedEntity = null;
@@ -161,8 +172,8 @@ public class MainGameState extends GameState {
 		@Override
 		protected boolean attack(IGameEntity owner, IGameEntity target,
 				float force) {
-			if( owner.isInWorld(WorldId.MAIN) && target instanceof IControllableGameEntity && ((IControllableGameEntity) target).isPossessable() ) {
-				possess((IControllableGameEntity) owner, (IControllableGameEntity) target);
+			if( owner.isInWorld(WorldId.MAIN) && target instanceof IControllableGameEntity && ((IControllableGameEntity) target).getPossessableTime()>0 ) {
+				possess((IControllableGameEntity) owner, (IControllableGameEntity) target, ((IControllableGameEntity) target).getPossessableTime());
 				return true;
 				
 			} else
@@ -292,6 +303,7 @@ public class MainGameState extends GameState {
 		
 		if( System.currentTimeMillis()>=ignoreDamageTimer ) {
 			ignoreDamageEntity=null;
+			unpossess();
 		}
 	}
 	

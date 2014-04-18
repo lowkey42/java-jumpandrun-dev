@@ -29,7 +29,7 @@ import de.secondsystem.game01.model.IUpdateable;
  */
 class ControllableGameEntity extends GameEntity implements IControllableGameEntity {
 	
-	private boolean possessable;
+	private int possessableTime;
 	
 	private IGameEntityController controller; 
 	
@@ -60,7 +60,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		this.moveAcceleration = attributes.getFloat("moveAcceleration", 10);
 		this.jumpAcceleration = attributes.getFloat("jumpAcceleration", 10);
 		this.vMovementAlwaysAllowed = attributes.getBoolean("verticalMovementAllowed", false);
-		this.possessable = attributes.getBoolean("possessable", false);
+		this.possessableTime = attributes.getInteger("possessableTime", 0);
 		
 		final Attributes controllerAttributes = attributes.getObject("controller");
 		if( controllerAttributes!=null )
@@ -312,8 +312,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 
 	@Override
-	public boolean isPossessable() {
-		return possessable;
+	public int getPossessableTime() {
+		return possessableTime;
 	}
 
 	@Override

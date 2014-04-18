@@ -6,6 +6,7 @@ import com.google.common.base.Function;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IDrawable;
 
 public final class EffectUtils {
 
@@ -22,7 +23,7 @@ public final class EffectUtils {
 		return classname.startsWith(PACKAGE_SHORTCUT) ? PACKAGE_NAME+"."+ classname.substring(1) : classname;
 	}
 	
-	public static IGameEntityEffect createEventHandler(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation) {
+	public static IGameEntityEffect createEffect(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IDrawable representation) {
 		final String factoryName = attributes.getString(EffectUtils.FACTORY);
 		
 		if( factoryName==null )
@@ -32,7 +33,7 @@ public final class EffectUtils {
 			@SuppressWarnings("unchecked")
 			Class<? extends IGameEntityEffectFactory> clazz = (Class<? extends IGameEntityEffectFactory>) EffectUtils.class.getClassLoader().loadClass(denormalizeHandlerFactory(factoryName));
 			
-			return clazz.newInstance().create(map, attributes, worldMask, position, rotation);
+			return clazz.newInstance().create(map, attributes, worldMask, position, rotation, representation);
 			
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Unable to create EventHandler by '"+factoryName+"'.",e);

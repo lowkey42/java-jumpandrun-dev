@@ -2,7 +2,10 @@ package de.secondsystem.game01.impl.game.entities;
 
 import java.io.IOException;
 
+import org.jsfml.graphics.Color;
+
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.game.entities.effects.GEGlowEffect;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -29,6 +32,14 @@ final class GameEntityHelper {
 		DYNAMIC,
 		KINEMATIC,
 		FLYING
+	}
+	
+	public static <T extends IGameEntity> T addStaticEffects(T ge, IGameMap map, Attributes attributes) {
+		Boolean worldSwitchAllowed = attributes.getBoolean("worldSwitchAllowed");
+		if( worldSwitchAllowed!=null && worldSwitchAllowed )
+			ge.addEffect(new GEGlowEffect(map, ge.getRepresentation(), new Color(50, 0, 0, 200), new Color(255, 255, 255, 100), 20, 20, 0));
+		
+		return ge;
 	}
 	
 	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) {

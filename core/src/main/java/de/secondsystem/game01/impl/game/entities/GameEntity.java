@@ -11,13 +11,12 @@ import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.system.Vector2f;
 
-import com.google.common.collect.Collections2;
-
 import de.secondsystem.game01.impl.game.entities.effects.EffectUtils;
-import de.secondsystem.game01.impl.game.entities.effects.GEParticleEffect;
+import de.secondsystem.game01.impl.game.entities.effects.GEGlowEffect;
 import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.EventHandlerCollection;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
+import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
@@ -94,8 +93,10 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
 			
 			for( Attributes attr : effectAttrs )
-				effects.add(EffectUtils.createEventHandler(map, attr, worldMask, position, rotation));
+				effects.add(EffectUtils.createEffect(map, attr, worldMask, position, rotation, representation));
 		}
+		
+		GameEntityHelper.addStaticEffects(this, map, attributes);
 	}
 	
 	@Override
@@ -177,9 +178,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( physicsBody!=null ) {
 			if( newWorldMask!=0 && worldMask!=0 && physicsBody instanceof IDynamicPhysicsBody ) {
 				if( !((IDynamicPhysicsBody)physicsBody).tryWorldSwitch(newWorldMask) ) {
-					addEffect(new GEParticleEffect(map, worldMask, getPosition(), getRotation(), "explosion.png", 50, getWidth(), getHeight(), null,
-							100, 500, -10, 10, -10, 10, -5, 5, 0,0,
-							new Color(200, 255, 255), Color.WHITE, 10, 40, 0, 0, 0), 2000);
+					if( representation instanceof SpriteWrappper )
+						addEffect(new GEGlowEffect(map, representation, new Color(100, 0, 0, 255), new Color(255, 255, 255, 100), 40, 50, 25), 2000);
 					return false;
 				}
 				
@@ -358,12 +358,10 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
 		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
 		
-		// TODO: may/should be modified for editor
 		return new Attributes( editableEntityState!=null ? editableEntityState.getAttributes() : Collections.emptyMap(), 
 				new Attributes(
 						new Attribute("uuid", uuid.toString()),
 						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???"),
-						new AttributeIf(!effects.isEmpty(), "effects", Collections2.transform(effects, EffectUtils.HANDLER_SERIALIZER)),
 						new AttributeIf(orderId!=0, "orderId", orderId),
 						new Attribute("x", position.x),
 						new Attribute("y", position.y),

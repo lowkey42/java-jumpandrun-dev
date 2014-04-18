@@ -6,7 +6,7 @@ public interface IControllableGameEntity extends IControllable, IGameEntity {
 	
 	IGameEntityController getController();
 	
-	boolean isPossessable();
+	int getPossessableTime();
 
 	boolean isLiftingSomething();
 

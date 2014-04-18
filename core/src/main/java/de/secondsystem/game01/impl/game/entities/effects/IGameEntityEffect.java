@@ -5,6 +5,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
+import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
@@ -18,5 +19,5 @@ public interface IGameEntityEffect extends ISerializable, IUpdateable, IInsideCh
 }
 
 interface IGameEntityEffectFactory {
-	IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation);
+	IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IDrawable representation);
 }

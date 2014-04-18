@@ -17,4 +17,10 @@ public interface ISpriteWrapper extends IDrawable, IMoveable, IDimensioned, IIns
 	boolean isFlipped();
 	
 	void setTextureRect(IntRect rect);
+	
+	/**
+	 * returns a different integer for different clipping-values (e.g. other animation-frame)
+	 * @return
+	 */
+	int getClipState();
 }
