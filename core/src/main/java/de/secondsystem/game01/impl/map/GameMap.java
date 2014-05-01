@@ -14,6 +14,7 @@ import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.game.entities.GameEntityManager;
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.graphic.LightMap;
+import de.secondsystem.game01.impl.graphic.LightningManager;
 import de.secondsystem.game01.impl.map.objects.EntityLayer;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.impl.map.objects.LightLayer;
@@ -77,6 +78,8 @@ public class GameMap implements IGameMap {
 	
 	private final IGameEntityManager entityManager;
 	
+	private final LightningManager lightningManager;
+	
 	private final Set<IWorldSwitchListener> worldSwitchListeners = new HashSet<>();
 	
 	private final LightMap lightMap;
@@ -102,6 +105,8 @@ public class GameMap implements IGameMap {
 				new Vector2f(ctx.settings.width, ctx.settings.height), 
 				ctx.getViewWidth(), 
 				ctx.getViewHeight()) : null;
+				
+		lightningManager = new LightningManager((byte) WorldId.values().length);
 		
 		physicalWorld = new Box2dPhysicalWorld();
 		physicalWorld.init(new Vector2f(0, 15.f));
@@ -189,6 +194,9 @@ public class GameMap implements IGameMap {
 			target.setView(calcLayerView(layerType.parallax, baseView));
 			 
 			layer.draw(target);
+			if( layerType==LayerType.OBJECTS )
+				lightningManager.draw(target);
+			
 			target.setView(baseView);
 		}
 	}
@@ -244,6 +252,8 @@ public class GameMap implements IGameMap {
 		
 		if( physicalWorld !=null )
 			physicalWorld.update(frameTimeMs);
+		
+		lightningManager.update(frameTimeMs, activeWorldId.arrayIndex, lightMap.getView());
 	}
 	
 	
@@ -386,6 +396,11 @@ public class GameMap implements IGameMap {
 
 	public String getDefaultBgMusic(WorldId world) {
 		return gameWorld[world.arrayIndex].backgroundMusic;
+	}
+
+	@Override
+	public LightningManager getLightningManager() {
+		return lightningManager;
 	}
 	
 }

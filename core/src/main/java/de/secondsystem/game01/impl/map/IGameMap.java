@@ -8,6 +8,7 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntityManager;
 import de.secondsystem.game01.impl.graphic.LightMap;
+import de.secondsystem.game01.impl.graphic.LightningManager;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld;
 import de.secondsystem.game01.impl.scripting.ScriptEnvironment;
@@ -48,6 +49,8 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	Tileset getTileset();
 	
 	IGameEntityManager getEntityManager();
+	
+	LightningManager getLightningManager();
 	
 	void switchWorlds();
 	

@@ -19,6 +19,6 @@ public interface ISpatialIndex<T extends IMoveable> {
 
 	public abstract class EntryWalker<T extends IMoveable> {
 		public abstract void walk(T entry);
-		public void finished() {}
+		public void finished(int numFound) {}
 	}
 }

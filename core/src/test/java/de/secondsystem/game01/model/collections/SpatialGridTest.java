@@ -48,7 +48,7 @@ public class SpatialGridTest {
 			expected.remove(entry.id);
 		}
 		@Override
-		public void finished() {
+		public void finished(int numFound) {
 			assertTrue("Missing entries: "+expected, expected.isEmpty());
 		}
 	}

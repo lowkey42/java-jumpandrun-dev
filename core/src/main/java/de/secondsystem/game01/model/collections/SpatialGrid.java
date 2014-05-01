@@ -105,15 +105,18 @@ public class SpatialGrid<T extends IMoveable> implements ISpatialIndex<T> {
 	 */
 	@Override
 	public void query(FloatRect area, EntryWalker<T> walker) {
+		int numFound = 0;
 		for(int x=posToIndex(area.left-maxObjectSize); x<=posToIndex(area.left+area.width+maxObjectSize); ++x )
 			for(int y=posToIndex(area.top-maxObjectSize); y<=posToIndex(area.top+area.height+maxObjectSize); ++y ) {
 				Set<T> entries = getRootByIndex(x, y, false);
 				if( entries!=null )
-					for( T e : entries )
+					for( T e : entries ) {
 						walker.walk(e);
+						numFound++;
+					}
 			}
 		
-		walker.finished();
+		walker.finished(numFound);
 	}
 	
 	/* (non-Javadoc)
@@ -121,15 +124,18 @@ public class SpatialGrid<T extends IMoveable> implements ISpatialIndex<T> {
 	 */
 	@Override
 	public void query(Vector2f point, float range, EntryWalker<T> walker) {
-		for(int x=posToIndex(point.x-maxObjectSize); x<=posToIndex(point.x+maxObjectSize); ++x )
-			for(int y=posToIndex(point.y-maxObjectSize); y<=posToIndex(point.y+maxObjectSize); ++y ) {
+		int numFound = 0;
+		for(int x=posToIndex(point.x-maxObjectSize-range); x<=posToIndex(point.x+maxObjectSize+range); ++x )
+			for(int y=posToIndex(point.y-maxObjectSize-range); y<=posToIndex(point.y+maxObjectSize+range); ++y ) {
 				Set<T> entries = getRootByIndex(x, y, false);
 				if( entries!=null )
-					for( T e : entries )
+					for( T e : entries ) {
 						walker.walk(e);
+						numFound++;
+					}
 			}
 		
-		walker.finished();
+		walker.finished(numFound);
 	}
 
 }
