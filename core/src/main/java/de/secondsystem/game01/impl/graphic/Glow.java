@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.graphic;
 
-import java.io.IOException;
-
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstShader;
 import org.jsfml.graphics.RenderStates;
@@ -54,7 +52,7 @@ public class Glow implements IDrawable, IUpdateable {
 			shader = ResourceManager.shader_frag.get("glow.frag");
 			((Shader) shader).setParameter("noiseTexture", ResourceManager.texture.get("noise.jpg"));
 			
-		} catch (TextureCreationException | IOException e) {
+		} catch (TextureCreationException e) {
 			throw new GameException(e);
 		}
 		

@@ -140,8 +140,10 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 		entity.update(frameTimeMs);	
 	}
 	
-
-	public static ILayerObject create(IGameMap map, Attributes attributes) {
-		return new EntityLayerObject(map, attributes.getString("archetype"), attributes);
+	static final class Factory implements ILayerObjectFactory {
+		@Override
+		public ILayerObject create(IGameMap map, Attributes attributes) {
+			return new EntityLayerObject(map, attributes.getString("archetype"), attributes);
+		}
 	}
 }

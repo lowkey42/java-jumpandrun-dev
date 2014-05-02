@@ -79,7 +79,7 @@ public abstract class GameState implements IState {
 			frameTime = 1;
 		}
 		
-		if( frameTime > 16*3 ) {
+		if( frameTime > 16*4 ) {
 			System.out.println("JITTER: "+frameTime+"  of "+(frameTime-(1000./60.)));
 		}
 		

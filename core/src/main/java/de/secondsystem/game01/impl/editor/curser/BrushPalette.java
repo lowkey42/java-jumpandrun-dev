@@ -1,7 +1,7 @@
 package de.secondsystem.game01.impl.editor.curser;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jsfml.graphics.Color;
@@ -19,7 +19,6 @@ import de.secondsystem.game01.impl.map.objects.ParticleEmitterLayerObject;
 import de.secondsystem.game01.impl.map.objects.SpriteLayerObject;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
-import de.secondsystem.game01.model.GameException;
 
 final class BrushPalette {
 
@@ -148,11 +147,7 @@ final class BrushPalette {
 				td.add(new ThumbnailData(map.getTileset().getName(i), map.getTileset().get(i), map.getTileset().getClip(i)));
 			}
 			
-			try {
-				td.add(new ThumbnailData("Particles", ResourceManager.texture_gui.get("icon_particles.png")));
-			} catch (IOException e) {
-				throw new GameException(e);
-			}
+			td.add(new ThumbnailData("Particles", ResourceManager.texture_gui.get("icon_particles.png")));
 			
 			return td;
 		}
@@ -186,18 +181,11 @@ final class BrushPalette {
 
 		@Override
 		public List<ThumbnailData> generateThumbnails() {
-			List<ThumbnailData> td = new ArrayList<>(3);
-			
-			try {
-				td.add(new ThumbnailData("Normal", ResourceManager.texture_gui.get("icon_grav_full_color.png")));
-				td.add(new ThumbnailData("Half", ResourceManager.texture_gui.get("icon_grav_half_color.png")));
-				td.add(new ThumbnailData("Climb", ResourceManager.texture_gui.get("icon_grav_climb_color.png")));
-				
-			} catch (IOException e) {
-				throw new GameException(e);
-			}
-			
-			return td;
+			return Arrays.asList(
+				new ThumbnailData("Normal", ResourceManager.texture_gui.get("icon_grav_full_color.png")),
+				new ThumbnailData("Half", ResourceManager.texture_gui.get("icon_grav_half_color.png")),
+				new ThumbnailData("Climb", ResourceManager.texture_gui.get("icon_grav_climb_color.png"))
+			);
 		}
 	}
 	
@@ -232,22 +220,16 @@ final class BrushPalette {
 		
 		@Override
 		public List<ThumbnailData> generateThumbnails() {
-			List<ThumbnailData> td = new ArrayList<>(DEGREE_STEPS);
-			try {
-				td.add(new ThumbnailData("12%",  ResourceManager.texture_gui.get("icon_light_012.png")));
-				td.add(new ThumbnailData("25%",  ResourceManager.texture_gui.get("icon_light_025.png")));
-				td.add(new ThumbnailData("37%",  ResourceManager.texture_gui.get("icon_light_037.png")));
-				td.add(new ThumbnailData("50%",  ResourceManager.texture_gui.get("icon_light_050.png")));
-				td.add(new ThumbnailData("62%",  ResourceManager.texture_gui.get("icon_light_062.png")));
-				td.add(new ThumbnailData("75%",  ResourceManager.texture_gui.get("icon_light_075.png")));
-				td.add(new ThumbnailData("87%",  ResourceManager.texture_gui.get("icon_light_087.png")));
-				td.add(new ThumbnailData("100%", ResourceManager.texture_gui.get("icon_light_100.png")));
-				
-			} catch (IOException e) {
-				throw new GameException(e);
-			}
-			
-			return td;
+			return Arrays.asList(
+				new ThumbnailData("12%",  ResourceManager.texture_gui.get("icon_light_012.png")),
+				new ThumbnailData("25%",  ResourceManager.texture_gui.get("icon_light_025.png")),
+				new ThumbnailData("37%",  ResourceManager.texture_gui.get("icon_light_037.png")),
+				new ThumbnailData("50%",  ResourceManager.texture_gui.get("icon_light_050.png")),
+				new ThumbnailData("62%",  ResourceManager.texture_gui.get("icon_light_062.png")),
+				new ThumbnailData("75%",  ResourceManager.texture_gui.get("icon_light_075.png")),
+				new ThumbnailData("87%",  ResourceManager.texture_gui.get("icon_light_087.png")),
+				new ThumbnailData("100%", ResourceManager.texture_gui.get("icon_light_100.png"))
+			);
 		}
 	}
 	

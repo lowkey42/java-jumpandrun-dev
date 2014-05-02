@@ -3,8 +3,6 @@ package de.secondsystem.game01.impl.game.entities.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Collections2;
-
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
@@ -41,9 +39,13 @@ public final class BlockEventHandler implements IEventHandler {
 	
 	@Override
 	public Attributes serialize() {
+		List<Attributes> subs = new ArrayList<>(handlers.size());
+		for( IEventHandler h : handlers )
+			subs.add(h.serialize());
+		
 		return new Attributes(
 				new Attribute(EventUtils.FACTORY, EventUtils.normalizeHandlerFactory(BlockEHF.class.getName())), 
-				new AttributeIfNotNull("subs", Collections2.transform(handlers, EventUtils.HANDLER_SERIALIZER))
+				new AttributeIfNotNull("subs", subs)
 		);
 	}
 	

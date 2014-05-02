@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.gui;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.jsfml.graphics.Color;
@@ -13,7 +12,6 @@ import de.secondsystem.game01.impl.gui.AttributeDataCollection.ColumnType;
 import de.secondsystem.game01.impl.gui.AttributeDataCollection.IRedrawable;
 import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.GameException;
 
 /**
  * 
@@ -196,11 +194,7 @@ public final class AttributesDataTable extends DataTable<AttributeVal> implement
 			row.updateOffset(e=new Panel(row.getXOffset(), row.getYOffset(), width, 50, row) {
 				@Override
 				protected Style getStyle() {
-					try {
-						return super.getStyle().setButtonTexture(ResourceManager.animation.get("smallButton.anim"));
-					} catch (IOException e) {
-						throw new GameException(e.getMessage(),e);
-					}
+					return super.getStyle().setButtonTexture(ResourceManager.animation.get("smallButton.anim"));
 				}
 			});
 			

@@ -17,7 +17,7 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 
 public class CollisionObject implements ILayerObject {
 
-	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(CollisionObject.class);
+	public static final LayerObjectType TYPE_UUID = LayerObjectType.COLLISION;
 	
 	public static enum CollisionType {
 		NORMAL	(CollisionHandlerType.SOLID, new Color(255, 10, 10, 100)), 
@@ -179,20 +179,23 @@ public class CollisionObject implements ILayerObject {
 		);
 	}
 	
-	public static CollisionObject create(IGameMap map, Attributes attributes) {
-		try {
-			return new CollisionObject(
-					map,
-					attributes.getInteger("world"),
-					CollisionType.valueOf(attributes.getString("type")), 
-					attributes.getFloat("x"),
-					attributes.getFloat("y"),
-					attributes.getFloat("width"),
-					attributes.getFloat("height"),
-					attributes.getFloat("rotation") );
-		
-		} catch( ClassCastException | NullPointerException e ) {
-			throw new Error( "Invalid attributes: "+attributes, e );
+	static final class Factory implements ILayerObjectFactory {
+		@Override
+		public CollisionObject create(IGameMap map, Attributes attributes) {
+			try {
+				return new CollisionObject(
+						map,
+						attributes.getInteger("world"),
+						CollisionType.valueOf(attributes.getString("type")), 
+						attributes.getFloat("x"),
+						attributes.getFloat("y"),
+						attributes.getFloat("width"),
+						attributes.getFloat("height"),
+						attributes.getFloat("rotation") );
+			
+			} catch( ClassCastException | NullPointerException e ) {
+				throw new Error( "Invalid attributes: "+attributes, e );
+			}
 		}
 	}
 

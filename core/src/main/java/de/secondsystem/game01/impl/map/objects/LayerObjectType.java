@@ -1,41 +1,27 @@
 package de.secondsystem.game01.impl.map.objects;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
+import de.secondsystem.game01.impl.map.ILayerObject.ILayerObjectFactory;
 import de.secondsystem.game01.model.Attributes;
 
 public enum LayerObjectType {
 
-	SPRITE			("sp", SpriteLayerObject.class),
-	COLLISION		("cl", CollisionObject.class),
-	ENTITY			("et", EntityLayerObject.class),
-	LIGHT			("li", LightLayerObject.class),
-	PARTICLE_EMITTER("pe", ParticleEmitterLayerObject.class);
+	SPRITE			("sp", new SpriteLayerObject.Factory()),
+	COLLISION		("cl", new CollisionObject.Factory()),
+	ENTITY			("et", new EntityLayerObject.Factory()),
+	LIGHT			("li", new LightLayerObject.Factory()),
+	PARTICLE_EMITTER("pe", new ParticleEmitterLayerObject.Factory());
 	
-	private static final String CONSTRUCT_METHOD_NAME = "create";
 	
 	/** Shortened id of this type (must be unique) */
 	public final String shortId;
 	
-	/** Reference to the concrete class, implementing this LO-Type */
-	private final Class<? extends ILayerObject> clazz;
+	private final ILayerObjectFactory factory;
 	
-	/** Reference to the create-Method of the implementation */
-	private final Method constructMethod;
-	
-	private LayerObjectType(String shortId, Class<? extends ILayerObject> clazz) {
+	private LayerObjectType(String shortId, ILayerObjectFactory factory) {
 		this.shortId = shortId;
-		this.clazz = clazz;
-		
-		try {
-			constructMethod = clazz.getMethod(CONSTRUCT_METHOD_NAME, IGameMap.class, Attributes.class);
-			
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new Error("CONTRACT_VIOLATION: no static "+CONSTRUCT_METHOD_NAME+"-Method in LayerObjectClass "+clazz, e);
-		}
+		this.factory = factory;
 	}
 	
 	public static LayerObjectType getByShortId(String shortId) {
@@ -46,22 +32,8 @@ public enum LayerObjectType {
 		return null;
 	}
 	
-	public static LayerObjectType getByType(Class<? extends ILayerObject> clazz) {
-		for( LayerObjectType lot : values() )
-			if( lot.clazz.equals(clazz) )
-				return lot;
-		
-		return null;
-	}
-	
 	public ILayerObject create( IGameMap map, Attributes attributes ) {
-		try {
-			return (ILayerObject) constructMethod.invoke(null, map, attributes);
-			
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new Error("CONTRACT_VIOLATION: exception calling static "+CONSTRUCT_METHOD_NAME+"-Method in LayerObjectClass "+clazz, e);
-		}
+		return factory.create(map, attributes);
 	}
 	
 }

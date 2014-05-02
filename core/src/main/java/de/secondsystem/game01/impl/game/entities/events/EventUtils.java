@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.game.entities.events;
 
-import com.google.common.base.Function;
-
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 
@@ -36,15 +34,6 @@ final class EventUtils {
 			throw new RuntimeException("Unable to create EventHandler by '"+factoryName+"'.",e);
 		}
 	}
-	
-
-	
-	public static final Function<IEventHandler, Attributes> HANDLER_SERIALIZER = new Function<IEventHandler, Attributes>() {
-		@Override
-		public Attributes apply(IEventHandler input) {
-			return input.serialize();
-		}
-	};
 
 	
 	private EventUtils() {

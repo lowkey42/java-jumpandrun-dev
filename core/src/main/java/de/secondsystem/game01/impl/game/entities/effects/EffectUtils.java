@@ -2,8 +2,6 @@ package de.secondsystem.game01.impl.game.entities.effects;
 
 import org.jsfml.system.Vector2f;
 
-import com.google.common.base.Function;
-
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDrawable;
@@ -39,15 +37,6 @@ public final class EffectUtils {
 			throw new RuntimeException("Unable to create EventHandler by '"+factoryName+"'.",e);
 		}
 	}
-	
-
-	
-	public static final Function<IGameEntityEffect, Attributes> HANDLER_SERIALIZER = new Function<IGameEntityEffect, Attributes>() {
-		@Override
-		public Attributes apply(IGameEntityEffect input) {
-			return input.serialize();
-		}
-	};
 
 	
 	private EffectUtils() {

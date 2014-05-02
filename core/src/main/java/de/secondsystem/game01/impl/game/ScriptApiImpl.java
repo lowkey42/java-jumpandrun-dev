@@ -17,6 +17,7 @@ import org.json.simple.parser.ParseException;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.scripting.IScriptApi;
+import de.secondsystem.game01.model.GameException;
 
 public class ScriptApiImpl implements IScriptApi {
 	/**
@@ -96,7 +97,7 @@ public class ScriptApiImpl implements IScriptApi {
 			s.play();
 			return s;
 			
-		} catch (IOException e) {
+		} catch (GameException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 			return null;
@@ -113,7 +114,7 @@ public class ScriptApiImpl implements IScriptApi {
 			this.mainGameState.sprites.add(s);
 			return s;
 			
-		} catch (IOException e) {
+		} catch (GameException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 			return null;
@@ -134,7 +135,7 @@ public class ScriptApiImpl implements IScriptApi {
 		try {
 			sprite.setTexture(ResourceManager.texture_gui.get(texture));
 			
-		} catch (IOException e) {
+		} catch (GameException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}

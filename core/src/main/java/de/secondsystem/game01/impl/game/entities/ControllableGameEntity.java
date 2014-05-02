@@ -52,7 +52,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	
 	private boolean vMovementAlwaysAllowed = false;
 	
-	public ControllableGameEntity(UUID uuid, 
+	ControllableGameEntity(UUID uuid, 
 			GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		super(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
@@ -303,10 +303,10 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public Attributes serialize() {
 		Attributes attributes = super.serialize();
 		
+		attributes.put("controllable", true);
+		
 		if( controller instanceof ISerializable )
 			attributes.put("controller", ((ISerializable) controller).serialize());
-		
-		// TODO
 		
 		return attributes;
 	}

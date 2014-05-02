@@ -1,4 +1,4 @@
-{"class":"de.secondsystem.game01.impl.game.entities.ControllableGameEntity", "representationType":"ANIMATION", "representation":"dude.anim", 
+{"controllable":true, "representationType":"ANIMATION", "representation":"dude.anim", 
 "moveAcceleration":0.6, "jumpAcceleration":1, "maxMoveSpeed":1.5, "maxJumpSpeed":8, "maxThrowSpeed":10,
 "width":60, "height":60, "shape":"HUMANOID", "possessableTime":10000, "controller":{"factory":".SAiControllerFactory"}, "onDAMAGED":{"factory":".KillEHF", "spawn":{"type":"ghost"}},
 "onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".DelayEHF", "delay":50, "sub":{"factory":".PPEHF", "out":"DAMAGED"}}} }

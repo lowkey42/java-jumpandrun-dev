@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.graphic;
 
-import java.io.IOException;
 import java.util.Random;
 
 import org.jsfml.graphics.Color;
@@ -12,7 +11,6 @@ import org.jsfml.graphics.Vertex;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.ResourceManager;
-import de.secondsystem.game01.model.GameException;
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
@@ -106,11 +104,8 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 		this.maxColor = maxColor;
 		
 		if( texture!=null && !texture.isEmpty() )
-			try {
-				this.texture = ResourceManager.texture.get(texture);
-			} catch (IOException e) {
-				throw new GameException(e);
-			}
+			this.texture = ResourceManager.texture.get(texture);
+			
 		else
 			this.texture = null;
 		

@@ -58,7 +58,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	private boolean destroyed = false;
 	
-	public GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
+	GameEntity(UUID uuid, GameEntityManager em, IGameMap map,
 			Attributes attributes) {
 		this(uuid, em, attributes.getInteger("worldId", map.getActiveWorldId().id), 
 				GameEntityHelper.createRepresentation(map, attributes), 

@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.game.entities;
 
-import java.io.IOException;
-
 import org.jsfml.graphics.Color;
 
 import de.secondsystem.game01.impl.ResourceManager;
@@ -23,8 +21,7 @@ final class GameEntityHelper {
 	public static enum RepresentationType {
 		ANIMATION, 
 		TEXTURE, 
-		TILE,
-		LIGHT;
+		TILE;
 	}
 	
 	public static enum PhysicsType {
@@ -43,44 +40,39 @@ final class GameEntityHelper {
 	}
 	
 	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) {
-		IDrawable repr = null;
-		try {
-			final String typeStr = attributes.getString("representationType");
-			if( typeStr==null )
-				return null;
+		final String typeStr = attributes.getString("representationType");
+		if( typeStr==null )
+			return null;
+		
+		final RepresentationType type = RepresentationType.valueOf(typeStr);
+		
+		
+		float width = attributes.getFloat("width");
+		float height = attributes.getFloat("height");
+		String filename = attributes.getString("representation");
+		
+		switch( type ) {
+			case ANIMATION: {
+				AnimatedSprite repr = new AnimatedSprite(ResourceManager.animation.get(filename), width, height);
+				repr.setFlip(attributes.getBoolean("flipped", false));
+				return repr; }
 			
-			final RepresentationType type = RepresentationType.valueOf(typeStr);
+			case TEXTURE: {
+				SpriteWrappper repr = new SpriteWrappper(width, height);
+				repr.setTexture(ResourceManager.texture.get(filename));
+				repr.setFlip(attributes.getBoolean("flipped", false));
+				return repr; }
 			
-			
-			float width = attributes.getFloat("width");
-			float height = attributes.getFloat("height");
-			String filename = attributes.getString("representation");
-			
-			switch( type ) {
-			case ANIMATION:
-				repr = new AnimatedSprite(ResourceManager.animation.get(filename), width, height);
-				((AnimatedSprite) repr).setFlip(attributes.getBoolean("flipped", false));
-				break;
-			case TEXTURE:
-				repr = new SpriteWrappper(width, height);
-				((SpriteWrappper) repr).setTexture(ResourceManager.texture.get(filename));
-				((SpriteWrappper) repr).setFlip(attributes.getBoolean("flipped", false));
-				break;
-			case TILE:
-				repr = new SpriteWrappper(width, height);
-				((SpriteWrappper) repr).setTexture(ResourceManager.texture_tiles.get(filename));
-				((SpriteWrappper) repr).setFlip(attributes.getBoolean("flipped", false));
-				break;
+			case TILE: {
+				SpriteWrappper repr = new SpriteWrappper(width, height);
+				repr.setTexture(ResourceManager.texture_tiles.get(filename));
+				repr.setFlip(attributes.getBoolean("flipped", false));
+				return repr; }
 				
 			default:
 				System.out.println("Representation unknown.");
-				break;
-			}
-			
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+				return null;
 		}
-		return repr;
 	}
 	
 	public static IPhysicsBody createPhysicsBody( IGameMap map, boolean jumper, boolean 

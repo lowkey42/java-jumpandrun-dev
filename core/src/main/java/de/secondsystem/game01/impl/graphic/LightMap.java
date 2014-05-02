@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.graphic;
 
-import java.io.IOException;
-
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstShader;
@@ -52,7 +50,7 @@ public class LightMap extends RenderTargetWrapper {
 		try {
 			normalShader = (Shader) ResourceManager.shader.get("normalMapping");
 			
-		} catch (IOException e1) {
+		} catch (GameException e1) {
 			throw new GameException("Unable to load normalShader");
 		}
 		

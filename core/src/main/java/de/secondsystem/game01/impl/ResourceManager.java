@@ -3,7 +3,6 @@ package de.secondsystem.game01.impl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
 
 import org.jsfml.audio.ConstSoundBuffer;
 import org.jsfml.audio.SoundBuffer;
@@ -15,11 +14,9 @@ import org.jsfml.graphics.Shader;
 import org.jsfml.graphics.ShaderSourceException;
 import org.jsfml.graphics.Texture;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import de.secondsystem.game01.impl.graphic.AnimationTexture;
+import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.collections.LruCache;
 
 
 public abstract class ResourceManager<T> {
@@ -33,9 +30,9 @@ public abstract class ResourceManager<T> {
 			try {
 				shader.loadFromFile(path, Shader.Type.FRAGMENT);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			} catch (ShaderSourceException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return shader;
 		}
@@ -50,9 +47,9 @@ public abstract class ResourceManager<T> {
 			try {
 				shader.loadFromFile(Paths.get(path.toString()+".vert"), Paths.get(path.toString()+".frag"));
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			} catch (ShaderSourceException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return shader;
 		}
@@ -67,9 +64,9 @@ public abstract class ResourceManager<T> {
 			try {
 				shader.loadFromFile(path, Shader.Type.VERTEX);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			} catch (ShaderSourceException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return shader;
 		}
@@ -84,7 +81,7 @@ public abstract class ResourceManager<T> {
 			try {
 				texture.loadFromFile(path);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return texture;
 		}
@@ -99,7 +96,7 @@ public abstract class ResourceManager<T> {
 			try {
 				texture.loadFromFile(path);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return texture;
 		}
@@ -114,7 +111,7 @@ public abstract class ResourceManager<T> {
 			try {
 				texture.loadFromFile(path);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return texture;
 		}
@@ -128,7 +125,7 @@ public abstract class ResourceManager<T> {
 			try {
 				return new AnimationTexture(path);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 		}
 	};
@@ -142,7 +139,7 @@ public abstract class ResourceManager<T> {
 			try {
 			    sound.loadFromFile(path);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return sound;
 		}
@@ -158,44 +155,38 @@ public abstract class ResourceManager<T> {
 			try {
 			    font.loadFromFile(path);
 			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(), e);
+				throw new GameException(e.getMessage(), e);
 			}
 			return font;
 		}
 	};
 	
 	
-	private static final int CONCURRENCY_LEVEL = 5;
-	
-	private final LoadingCache<String, T> cache;
+	private final LruCache<String, T> cache;
 	
 	private ResourceManager( int maxSize ) {
-		cache = CacheBuilder.newBuilder().concurrencyLevel(CONCURRENCY_LEVEL).maximumSize(maxSize).build(new MyLoader());
+		cache = new LruCache<>(maxSize, new MyLoader());
 	}
 	
 	protected abstract T load( Path path );
 	
 	protected abstract Path getBasePath();
 
-	public final T getNullable( String name ) throws IOException {
+	public final T getNullable( String name ) {
 		try {
 			return cache.get(name);
-		} catch (Exception e) {
+		} catch (GameException e) {
 			return null;
 		}
 	}
-	public final T get( String name ) throws IOException {
-		try {
-			return cache.get(name);
-		} catch (ExecutionException e) {
-			throw new IOException("error loading '"+name+"': "+e.getMessage(),e);
-		}
+	public final T get( String name ) throws GameException {
+		return cache.get(name);
 	}
 	
-	private final class MyLoader extends CacheLoader<String, T> {
+	private final class MyLoader implements LruCache.Loader<String, T> {
 
 		@Override
-		public T load(String key) throws Exception {
+		public T load(String key) {
 			return ResourceManager.this.load(getBasePath().resolve(key));
 		}
 		

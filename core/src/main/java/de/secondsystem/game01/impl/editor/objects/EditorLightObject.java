@@ -83,7 +83,7 @@ public class EditorLightObject extends EditorLayerObject {
 		Attribute color = new Attribute("color", SerializationUtil.encodeColor(new Color(100, 180, 150)) );
 		Attribute sizeDegree = new Attribute("sizeDegree", 360.f);
 		
-		lightLayerObject = LightLayerObject.create(map, new Attributes(radius, rotation, x, y, world, color, sizeDegree));
+		lightLayerObject = null;// LightLayerObject.create(map, new Attributes(radius, rotation, x, y, world, color, sizeDegree));
 		
 		this.rotation = lightLayerObject.getRotation();
 		

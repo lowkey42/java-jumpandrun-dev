@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Class-Path: . lib/jsfml.jar lib/json_simple-1.1.jar lib/jbox2d-library-2.2.1.2-SNAPSHOT.jar
+Main-Class: de.secondsystem.game01.Main

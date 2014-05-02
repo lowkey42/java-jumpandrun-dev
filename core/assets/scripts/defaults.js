@@ -1,10 +1,3 @@
-importPackage(Packages.de.secondsystem.game01.model);
-importPackage(Packages.de.secondsystem.game01.impl.game.controller);
-importPackage(Packages.de.secondsystem.game01.impl.map.physics);
-importPackage(Packages.de.secondsystem.game01.impl.game.entities); 
-importPackage(Packages.de.secondsystem.game01.impl.timer);
-importPackage(Packages.de.secondsystem.game01.impl.game.entities.events);
-
 function include(fn) {
 	System.load(fn);
 }

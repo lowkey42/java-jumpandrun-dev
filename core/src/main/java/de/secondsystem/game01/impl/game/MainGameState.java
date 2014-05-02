@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.game;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -75,7 +74,7 @@ public class MainGameState extends GameState {
 		try {
 			loadingSprite = new AnimatedSprite(ResourceManager.animation.get("loading.anim"), 100, 100);
 			
-		} catch (IOException e) {
+		} catch (GameException e) {
 			loadingSprite = null;
 		}
 	}
@@ -200,7 +199,7 @@ public class MainGameState extends GameState {
 		try {
 			monologueTextBox = new MonologueTextBox(ResourceManager.font.get("FreeSans.otf"), 30, new Vector2f(ctx.getViewWidth()/2, ctx.getViewHeight()-100));
 			
-		} catch (IOException e) {
+		} catch (GameException e) {
 			throw new GameException("Unable to load font for MonologueTextBox: "+e.getMessage(), e);
 		}
 		
@@ -213,8 +212,8 @@ public class MainGameState extends GameState {
 		mapRenderer = new EffectMapRenderer(ctx, map);
 
 		// lets kick the JIT in his ass
-		for(int i=0; i<5*60; i++) {
-			mapRenderer.update(18);
+		for(int i=0; i<30; i++) {
+			mapRenderer.update(8);
 		}
 		
 		player = (IControllableGameEntity) map.getEntityManager().get(PLAYER_UUID);

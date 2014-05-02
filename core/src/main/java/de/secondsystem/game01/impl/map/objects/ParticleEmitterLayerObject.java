@@ -137,35 +137,38 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 		);
 	}
 	
-	public static ParticleEmitterLayerObject create(IGameMap map, Attributes attributes) {
-		try {
+	static final class Factory implements ILayerObjectFactory {
+		@Override
+		public ParticleEmitterLayerObject create(IGameMap map, Attributes attributes) {
+			try {
+				
+				return new ParticleEmitterLayerObject(
+						attributes.getString("texture"),
+						attributes.getInteger("particles"), 
+						attributes.getInteger("world"),
+						attributes.getFloat("x"),
+						attributes.getFloat("y"),
+						attributes.getFloat("width"),
+						attributes.getFloat("height"),
+						attributes.getFloat("radius"),
+						attributes.getInteger("minTtl"),
+						attributes.getInteger("maxTtl"),
+						attributes.getFloat("minXVelocity", 0),
+						attributes.getFloat("maxXVelocity", 0),
+						attributes.getFloat("minYVelocity", 0),
+						attributes.getFloat("maxYVelocity", 0),
+						attributes.getFloat("minRotationVelocity", 0),
+						attributes.getFloat("maxRotationVelocity", 0),
+						attributes.getFloat("minAngularVelocity", 0),
+						attributes.getFloat("maxAngularVelocity", 0),
+						SerializationUtil.decodeColor(attributes.getString("minColor")),
+						SerializationUtil.decodeColor(attributes.getString("maxColor")),
+						attributes.getFloat("minParticleSize"),
+						attributes.getFloat("maxParticleSize") );
 			
-			return new ParticleEmitterLayerObject(
-					attributes.getString("texture"),
-					attributes.getInteger("particles"), 
-					attributes.getInteger("world"),
-					attributes.getFloat("x"),
-					attributes.getFloat("y"),
-					attributes.getFloat("width"),
-					attributes.getFloat("height"),
-					attributes.getFloat("radius"),
-					attributes.getInteger("minTtl"),
-					attributes.getInteger("maxTtl"),
-					attributes.getFloat("minXVelocity", 0),
-					attributes.getFloat("maxXVelocity", 0),
-					attributes.getFloat("minYVelocity", 0),
-					attributes.getFloat("maxYVelocity", 0),
-					attributes.getFloat("minRotationVelocity", 0),
-					attributes.getFloat("maxRotationVelocity", 0),
-					attributes.getFloat("minAngularVelocity", 0),
-					attributes.getFloat("maxAngularVelocity", 0),
-					SerializationUtil.decodeColor(attributes.getString("minColor")),
-					SerializationUtil.decodeColor(attributes.getString("maxColor")),
-					attributes.getFloat("minParticleSize"),
-					attributes.getFloat("maxParticleSize") );
-		
-		} catch( ClassCastException | NullPointerException e ) {
-			throw new Error( "Invalid attributes: "+attributes, e );
+			} catch( ClassCastException | NullPointerException e ) {
+				throw new Error( "Invalid attributes: "+attributes, e );
+			}
 		}
 	}
 

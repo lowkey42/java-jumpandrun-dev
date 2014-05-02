@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.gui;
 
-import java.io.IOException;
-
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstTexture;
 
@@ -71,7 +69,7 @@ public final class Style {
 					16, // dropdown
 					false);
 			
-		} catch (IOException e) {
+		} catch (GameException e) {
 			throw new GameException("Unable to load files for default gui-style: "+e.getMessage(), e);
 		}
 	}

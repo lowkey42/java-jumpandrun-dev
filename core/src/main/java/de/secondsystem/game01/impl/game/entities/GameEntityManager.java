@@ -3,8 +3,6 @@ package de.secondsystem.game01.impl.game.entities;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import javax.script.ScriptException;
 
@@ -36,16 +33,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.collections.LruCache;
 
 public final class GameEntityManager implements IGameEntityManager {
 
@@ -63,8 +57,7 @@ public final class GameEntityManager implements IGameEntityManager {
 	private final Set<UUID> entitiesToDestroy = new HashSet<>();
 	private final Set<IGameEntity> entitiesToAdd = new HashSet<>();
 	
-	private static final LoadingCache<String, EntityArchetype> ARCHETYPE_CACHE = 
-			CacheBuilder.newBuilder().concurrencyLevel(3).maximumSize(100).build(new ArchetypeLoader());
+	private static final LruCache<String, EntityArchetype> ARCHETYPE_CACHE = new LruCache<>(100, new ArchetypeLoader());
 	
 	final IGameMap map;
 	
@@ -124,7 +117,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			
 			System.out.println("Time: "+(System.currentTimeMillis()-t));
 			
-		} catch (ExecutionException | TextureCreationException | IOException e) {
+		} catch (TextureCreationException | IOException e) {
 			throw new GameException(e);
 		}
 		
@@ -163,20 +156,15 @@ public final class GameEntityManager implements IGameEntityManager {
 		if( uuid==null )
 			uuid = !"player".equals(type) ? UUID.randomUUID() : UUID.nameUUIDFromBytes("player".getBytes());
 			
-		try {
-			EntityArchetype at = ARCHETYPE_CACHE.get(type);
-			
-			if( at==null )
-				throw new EntityCreationException("Unknown archetype '"+type+"' for entity: "+uuid);
-			
-			IGameEntity e = at.create(uuid, this, attr);
+		EntityArchetype at = ARCHETYPE_CACHE.get(type);
 		
-			entitiesToAdd.add(e);
-			return e;
-			
-		} catch (ExecutionException e) {
-			throw new Error(e.getMessage(), e);
-		}
+		if( at==null )
+			throw new EntityCreationException("Unknown archetype '"+type+"' for entity: "+uuid);
+		
+		IGameEntity e = at.create(uuid, this, attr);
+	
+		entitiesToAdd.add(e);
+		return e;
 	}
 	
 	@Override
@@ -268,48 +256,32 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 	private static final class EntityArchetype {
 		public final String archetype;
-		public final Constructor<? extends IGameEntity> constructor;
 		public final Map<String, Object> attributes;
 		
 		public EntityArchetype(String archetype, Map<String, Object> attributes) throws EntityCreationException {
 			this.archetype = archetype;
 			this.attributes = attributes;
-			String className = (String) attributes.get("class");
-			if(className==null)
-				className = GameEntity.class.getCanonicalName();
-			
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends IGameEntity> clazz = (Class<? extends IGameEntity>) getClass().getClassLoader().loadClass(className);
-				constructor = clazz.getConstructor( UUID.class, GameEntityManager.class, IGameMap.class, Attributes.class );
-				
-			} catch (ClassNotFoundException | NoSuchMethodException e) {
-				throw new EntityCreationException("Unable to load GameEntity-Class with required constructor: "+e.getMessage(), e);
-			} catch (SecurityException e) {
-				throw new Error(e.getMessage(), e);
-			}
 		}
 		
 		public IGameEntity create(UUID uuid, GameEntityManager em, Map<String, Object> attr) {
-			try {
-				IGameEntity entity = constructor.newInstance(uuid, em, em.map, new Attributes( attributes, attr) );
-				entity.setEditableState(new EditableEntityStateImpl(this, new Attributes(attr)) );
-				return entity;
-				
-			} catch (InstantiationException | IllegalAccessException
-					| IllegalArgumentException | InvocationTargetException e) {
-				throw new EntityCreationException("Unable to create instance of "+constructor.getDeclaringClass()+": "+e.getMessage(), e);
-			}
+			final Attributes inAttr = new Attributes( attributes, attr);
+			
+			IGameEntity entity = inAttr.getBoolean("controllable",false) ? 
+					new ControllableGameEntity(uuid, em, em.map, inAttr)
+					: new GameEntity(uuid, em, em.map, inAttr);
+					
+			entity.setEditableState(new EditableEntityStateImpl(this, new Attributes(attr)) );
+			return entity;
 		}
 	}
 	
-	private static final class ArchetypeLoader extends CacheLoader<String, EntityArchetype> {
+	private static final class ArchetypeLoader implements LruCache.Loader<String, EntityArchetype> {
 		
 		private JSONParser parser = new JSONParser();
 		
 		@SuppressWarnings("unchecked")
 		@Override
-		public synchronized EntityArchetype load(String key) throws Exception {
+		public synchronized EntityArchetype load(String key) {
 			try ( Reader reader = Files.newBufferedReader(ARCHETYPE_PATH.resolve(key), StandardCharsets.UTF_8) ){
 				JSONObject obj = (JSONObject) parser.parse(reader);
 				
@@ -358,23 +330,18 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	private static final Attributes filterEntityAttributes( Attributes attributes, String archetype ) {
-		try {
-			EntityArchetype at = ARCHETYPE_CACHE.get(archetype);
-			
-			if( at!=null ) {
-				for( Entry<String, Object> e : at.attributes.entrySet() ) {
-					Object o1 = e.getValue();
-					Object o2 = attributes.get(e.getKey());
-					
-					if( compObject(o1, o2) )
-						attributes.remove(e.getKey());
-				}
-			}
-			
-		} catch (ExecutionException e) {
-			throw new Error(e.getMessage(), e);
-		}
+		EntityArchetype at = ARCHETYPE_CACHE.get(archetype);
 		
+		if( at!=null ) {
+			for( Entry<String, Object> e : at.attributes.entrySet() ) {
+				Object o1 = e.getValue();
+				Object o2 = attributes.get(e.getKey());
+				
+				if( compObject(o1, o2) )
+					attributes.remove(e.getKey());
+			}
+		}
+	
 		return attributes;
 	}
 	

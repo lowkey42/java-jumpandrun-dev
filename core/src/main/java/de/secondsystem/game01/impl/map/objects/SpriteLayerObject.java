@@ -20,7 +20,7 @@ import de.secondsystem.game01.model.Attributes.Attribute;
  */
 public class SpriteLayerObject implements ILayerObject {
 
-	public static final LayerObjectType TYPE_UUID = LayerObjectType.getByType(SpriteLayerObject.class);
+	public static final LayerObjectType TYPE_UUID = LayerObjectType.SPRITE;
 	
 	private LayerType layerType;
 	
@@ -141,20 +141,23 @@ public class SpriteLayerObject implements ILayerObject {
 		);
 	}
 	
-	public static SpriteLayerObject create(IGameMap map, Attributes attributes) {
-		try {
-			return new SpriteLayerObject(
-					map.getTileset(),
-					attributes.getInteger("world"),
-					attributes.getInteger("tile"), 
-					attributes.getFloat("x"),
-					attributes.getFloat("y"),
-					attributes.getFloat("rotation"),
-					attributes.getFloat("width"),
-					attributes.getFloat("height") );
-		
-		} catch( ClassCastException | NullPointerException e ) {
-			throw new Error( "Invalid attributes: "+attributes, e );
+	static final class Factory implements ILayerObjectFactory {
+		@Override
+		public SpriteLayerObject create(IGameMap map, Attributes attributes) {
+			try {
+				return new SpriteLayerObject(
+						map.getTileset(),
+						attributes.getInteger("world"),
+						attributes.getInteger("tile"), 
+						attributes.getFloat("x"),
+						attributes.getFloat("y"),
+						attributes.getFloat("rotation"),
+						attributes.getFloat("width"),
+						attributes.getFloat("height") );
+			
+			} catch( ClassCastException | NullPointerException e ) {
+				throw new Error( "Invalid attributes: "+attributes, e );
+			}
 		}
 	}
 }

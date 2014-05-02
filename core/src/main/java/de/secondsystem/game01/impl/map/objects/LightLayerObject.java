@@ -134,21 +134,23 @@ public class LightLayerObject implements ILayerObject {
 				new Attribute("sizeDegree", light.getDegree())
 		);
 	}
-
-	public static LightLayerObject create(IGameMap map, Attributes attributes) {
-		try {
-			return new LightLayerObject(
-					map.getLightMap(),
-					attributes.getInteger("world"),
-					attributes.getFloat("x"),
-					attributes.getFloat("y"),
-					attributes.getFloat("rotation"),
-					attributes.getFloat("radius"),
-					attributes.getFloat("sizeDegree"),
-					SerializationUtil.decodeColor(attributes.getString("color")) );
-		
-		} catch( ClassCastException | NullPointerException e ) {
-			throw new Error( "Invalid attributes: "+attributes, e );
+	static final class Factory implements ILayerObjectFactory {
+		@Override
+		public LightLayerObject create(IGameMap map, Attributes attributes) {
+			try {
+				return new LightLayerObject(
+						map.getLightMap(),
+						attributes.getInteger("world"),
+						attributes.getFloat("x"),
+						attributes.getFloat("y"),
+						attributes.getFloat("rotation"),
+						attributes.getFloat("radius"),
+						attributes.getFloat("sizeDegree"),
+						SerializationUtil.decodeColor(attributes.getString("color")) );
+			
+			} catch( ClassCastException | NullPointerException e ) {
+				throw new Error( "Invalid attributes: "+attributes, e );
+			}
 		}
 	}
 }

@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.game;
 
-import java.io.IOException;
-
 import org.jsfml.graphics.BlendMode;
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.ConstView;
@@ -51,8 +49,6 @@ public final class EffectMapRenderer implements IDrawable, IUpdateable, IWorldSw
 			
 		} catch (TextureCreationException e) {
 			throw new GameException("Unable to create buffer: "+e.getMessage(), e);
-		} catch (IOException e) {
-			throw new GameException(e);
 		}
 		
 		map.registerWorldSwitchListener(this);
