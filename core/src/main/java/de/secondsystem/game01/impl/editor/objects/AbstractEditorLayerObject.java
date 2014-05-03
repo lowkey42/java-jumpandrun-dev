@@ -109,7 +109,7 @@ public abstract class AbstractEditorLayerObject implements IEditorLayerObject {
 	
 	@Override
 	public void draw(RenderTarget rt) {
-		layerObject.draw(rt);
+	//	layerObject.draw(rt);
 	}
 	
 	@Override

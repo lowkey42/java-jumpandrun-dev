@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.Texture;
 
 import de.secondsystem.game01.impl.ResourceManager;
+import de.secondsystem.game01.impl.graphic.SpriteTexture;
 
 public class Tileset {
 
@@ -42,12 +42,8 @@ public class Tileset {
 		return tiles.size();
 	}
 	
-	public ConstTexture get(int index) {
-		return tiles.get( index % tiles.size() ).texture;
-	}
-	
-	public ConstTexture getNormals(int index) {
-		return tiles.get( index % tiles.size() ).normals;
+	public SpriteTexture get(int index) {
+		return tiles.get( index % tiles.size() );
 	}
 	
 	public IntRect getClip(int index) {
@@ -84,16 +80,7 @@ public class Tileset {
 		} else
 			clip = null;
 		
-		return new Tile(fn, ResourceManager.texture_tiles.get(fn.trim()), ResourceManager.texture_tiles.getNullable(toNormalTextureName(fn.trim())), clip );
-	}
-	
-	private static String toNormalTextureName(String name) {
-		String[] parts = name.split("\\.");
-		StringBuilder str = new StringBuilder();
-		for( int i=0; i<parts.length-1; ++i )
-			str.append(i>0 ? "." : "").append(parts[i]);
-		
-		return str.toString()+"_n."+parts[parts.length-1]; 
+		return new Tile(ResourceManager.texture_tiles.get(fn.trim()), fn, clip );
 	}
 	
 	/**
@@ -107,15 +94,13 @@ public class Tileset {
 	  return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(encoded)).toString();
 	}
 	
-	private static final class Tile {
+	private static final class Tile extends SpriteTexture {
 		public final String name;
-		public final ConstTexture texture;
-		public final ConstTexture normals;
 		public final IntRect clip;
-		public Tile(String name, ConstTexture texture, ConstTexture normals, IntRect clip) {
+		
+		public Tile(SpriteTexture tex, String name, IntRect clip) {
+			super(tex.texture, tex.normals, tex.altTexture, tex.altNormals);
 			this.name = name;
-			this.texture = texture;
-			this.normals = normals;
 			this.clip = clip;
 			
 			if( clip==null && (name.contains("tileable") || name.contains("_ta_")) ) {

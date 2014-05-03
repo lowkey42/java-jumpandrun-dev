@@ -57,7 +57,7 @@ public class LightLayerObject implements ILayerObject {
 	}
 
 	@Override
-	public void draw(RenderTarget renderTarget) {
+	public void draw(RenderTarget renderTarget, WorldId worldId) {
 	}
 
 	@Override

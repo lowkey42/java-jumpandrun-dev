@@ -7,8 +7,9 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.graphic.Light;
 import de.secondsystem.game01.impl.graphic.LightMap;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.util.SerializationUtil;
 
@@ -39,7 +40,7 @@ public class GELightEffect implements IGameEntityEffect {
 	}
 	
 	@Override
-	public void draw(RenderTarget rt, Vector2f position, float rotation, int worldMask) {
+	public void draw(RenderTarget rt, WorldId worldId, Vector2f position, float rotation, int worldMask) {
 		light.setPosition(Vector2f.add(position, offset));
 		light.setRotation(rotation+offsetRotation);
 		if( this.worldMask!=worldMask )
@@ -73,7 +74,7 @@ public class GELightEffect implements IGameEntityEffect {
 class LightFactory implements IGameEntityEffectFactory {
 
 	@Override
-	public IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IDrawable representation) {
+	public IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IWorldDrawable representation) {
 		return new GELightEffect(map, worldMask, position, rotation, 
 				SerializationUtil.decodeColor(attributes.getString("color")),
 				attributes.getFloat("radius"),

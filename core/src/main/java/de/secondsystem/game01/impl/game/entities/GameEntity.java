@@ -19,6 +19,7 @@ import de.secondsystem.game01.impl.game.entities.events.EventType;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
@@ -26,7 +27,6 @@ import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.Attributes.AttributeIf;
 import de.secondsystem.game01.model.IDimensioned;
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IScalable;
@@ -44,7 +44,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	protected IPhysicsBody physicsBody;
 	
-	protected IDrawable representation;
+	protected IWorldDrawable representation;
 	
 	protected final IGameMap map;
 	
@@ -65,7 +65,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 				GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes );
 	}
 	
-	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IDrawable representation, 
+	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IWorldDrawable representation, 
 			IPhysicsBody physicsBody, IGameMap map, Attributes attributes) {
 		super( map, attributes );
 		
@@ -123,7 +123,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	}
 
 	@Override
-	public void draw(RenderTarget renderTarget) {
+	public void draw(RenderTarget renderTarget, WorldId worldId) {
 		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
 		
 		if( physicsBody!=null && representation instanceof IMoveable ) {
@@ -132,10 +132,10 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		}
 		
 		if( representation!=null )
-			representation.draw(renderTarget);
+			representation.draw(renderTarget, worldId);
 		
 		for( IGameEntityEffect effect : effects )
-			effect.draw(renderTarget, getPosition(), rotation, worldMask);
+			effect.draw(renderTarget, worldId, getPosition(), rotation, worldMask);
 	}
 
 	@Override
@@ -231,7 +231,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	}
 
 	@Override
-	public IDrawable getRepresentation() {
+	public IWorldDrawable getRepresentation() {
 		return representation;
 	}
 

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jsfml.audio.ConstSoundBuffer;
-import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.IntRect;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -68,7 +67,7 @@ public final class AnimationTexture {
 	 *
 	 */
 	public static final class AnimationData {
-		public final ConstTexture texture;
+		public final SpriteTexture texture;
 		public final ConstSoundBuffer sound;
 		public final int frameWidth;
 		public final int frameHeight;

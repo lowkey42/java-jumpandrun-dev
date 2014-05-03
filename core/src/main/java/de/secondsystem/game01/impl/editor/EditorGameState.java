@@ -123,6 +123,7 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 		layerPanel.addListener(curser);
 		objectPanel = c.updateOffset(new ObjectPanel(c.getXOffset(), c.getYOffset(), c.getHeight(), c, curser));
 		curser.setToBrush();
+		objectPanel.setActiveWorld(map.getActiveWorldId());
 		
 		commandPanel = c.createInputField(0, ctx.getViewHeight()-40, ctx.getViewWidth()-objectPanel.getWidth()-400, ":");
 		commandPanel.setFillColor(new Color(0, 0, 0, 50));
@@ -275,12 +276,14 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 				map = new JsonGameMapSerializer().deserialize(ctx, map.getMapId(), null, false, 
 						true);
 				curser.setToBrush();
+				objectPanel.setActiveWorld(map.getActiveWorldId());
 				break;
 	
 			case TAB: // switch world
 				curser.setToNull();
 				map.switchWorlds();
 				curser.setToBrush();
+				objectPanel.setActiveWorld(map.getActiveWorldId());
 				break;
 	
 			case DELETE: // delete selected object

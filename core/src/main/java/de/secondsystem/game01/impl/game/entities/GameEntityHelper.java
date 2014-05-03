@@ -7,6 +7,7 @@ import de.secondsystem.game01.impl.game.entities.effects.GEGlowEffect;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.DynamicPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.HumanoidPhysicsBodyFactory;
@@ -14,7 +15,6 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.PhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.StaticPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.PhysicsBodyShape;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IDrawable;
 
 final class GameEntityHelper {
 	
@@ -39,7 +39,7 @@ final class GameEntityHelper {
 		return ge;
 	}
 	
-	public static IDrawable createRepresentation( IGameMap map, Attributes attributes ) {
+	public static IWorldDrawable createRepresentation( IGameMap map, Attributes attributes ) {
 		final String typeStr = attributes.getString("representationType");
 		if( typeStr==null )
 			return null;

@@ -6,8 +6,9 @@ import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.graphic.ParticleEmitter;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IWorldDrawable;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.Attributes.AttributeIf;
 import de.secondsystem.game01.util.SerializationUtil;
@@ -38,7 +39,7 @@ public class GEParticleEffect implements IGameEntityEffect {
 	}
 	
 	@Override
-	public void draw(RenderTarget rt, Vector2f position, float rotation, int worldMask) {
+	public void draw(RenderTarget rt, WorldId worldId, Vector2f position, float rotation, int worldMask) {
 		pe.setPosition(Vector2f.add(position, offset));
 		pe.setRotation(rotation+offsetRotation);
 		pe.draw(rt);
@@ -93,7 +94,7 @@ public class GEParticleEffect implements IGameEntityEffect {
 class ParticleFactory implements IGameEntityEffectFactory {
 
 	@Override
-	public IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IDrawable representation) {
+	public IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IWorldDrawable representation) {
 		return new GEParticleEffect(map, worldMask, position, rotation, 
 				attributes.getString("texture"),
 				attributes.getInteger("particles"), 

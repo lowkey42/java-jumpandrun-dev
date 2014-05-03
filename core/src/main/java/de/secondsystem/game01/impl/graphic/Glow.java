@@ -50,7 +50,7 @@ public class Glow implements IDrawable, IUpdateable {
 		try {
 			buffer.create((int) (base.getWidth()+Math.max(size,waveSize)*2), (int) (base.getHeight()+Math.max(size,waveSize)*2));
 			shader = ResourceManager.shader_frag.get("glow.frag");
-			((Shader) shader).setParameter("noiseTexture", ResourceManager.texture.get("noise.jpg"));
+			((Shader) shader).setParameter("noiseTexture", ResourceManager.texture.get("noise.jpg").texture);
 			
 		} catch (TextureCreationException e) {
 			throw new GameException(e);

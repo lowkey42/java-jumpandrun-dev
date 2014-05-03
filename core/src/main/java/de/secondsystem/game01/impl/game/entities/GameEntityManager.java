@@ -71,12 +71,13 @@ public final class GameEntityManager implements IGameEntityManager {
 		return archetypes;
 	}
 	
-	private List<ThumbnailData> thumbnailDatas;
+	@SuppressWarnings("unchecked")
+	private List<ThumbnailData> thumbnailDatas[] = new ArrayList[WorldId.values().length];;
 	
 	@Override
-	public List<ThumbnailData> generateThumbnails() {
-		if( thumbnailDatas!=null )
-			return thumbnailDatas;
+	public List<ThumbnailData> generateThumbnails(WorldId currentWorld) {
+		if( thumbnailDatas[currentWorld.ordinal()]!=null )
+			return thumbnailDatas[currentWorld.ordinal()];
 		
 		List<ThumbnailData> td = new ArrayList<ThumbnailData>();
 		
@@ -95,7 +96,7 @@ public final class GameEntityManager implements IGameEntityManager {
 					texture.setView(new View(e.getPosition(), new Vector2f(size,size)));
 					texture.clear(Color.BLACK);
 					e.update(2000);
-					e.draw(texture);
+					e.draw(texture, currentWorld);
 					texture.display();
 
 					// store and load texture to fix weird SFML bug (RenderTexture turn blank after a while)
@@ -121,7 +122,7 @@ public final class GameEntityManager implements IGameEntityManager {
 			throw new GameException(e);
 		}
 		
-		return thumbnailDatas=td;
+		return thumbnailDatas[currentWorld.ordinal()]=td;
 	}
 	
 	@Override
@@ -245,7 +246,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		for( Byte orderId : orderedEntitiesKeys )
 			for( IGameEntity entity : orderedEntities[orderId+128] )
 				if( entity.isInWorld(worldId) )
-					entity.draw(rt);
+					entity.draw(rt, worldId);
 	}
 
 	@Override
@@ -448,10 +449,10 @@ public final class GameEntityManager implements IGameEntityManager {
 		return null;
 	}
 	@Override
-	public List<IGameEntity> findEntities(Vector2f point) {
+	public List<IGameEntity> findEntities(WorldId worldId, Vector2f point) {
 		List<IGameEntity> r = new ArrayList<>();
 		for(IGameEntity entity : entities.values())
-			if( entity.inside(point) )
+			if( entity.isInWorld(worldId) && entity.inside(point) )
 				r.add(entity);
 		
 		return r;

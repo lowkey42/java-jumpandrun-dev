@@ -99,7 +99,7 @@ public class CollisionObject implements ILayerObject {
 	}
 	
 	@Override
-	public void draw(RenderTarget rt) {
+	public void draw(RenderTarget rt, WorldId worldId) {
 		rt.draw(shape);
 	}
 

@@ -109,7 +109,7 @@ public class ScriptApiImpl implements IScriptApi {
 	@Override
 	public Sprite createSprite(String texture, float x, float y) {
 		try {
-			Sprite s = new Sprite(ResourceManager.texture_gui.get(texture));
+			Sprite s = new Sprite(ResourceManager.texture_gui.get(texture).texture);
 			s.setPosition(x, y);
 			this.mainGameState.sprites.add(s);
 			return s;
@@ -133,7 +133,7 @@ public class ScriptApiImpl implements IScriptApi {
 	@Override
 	public void updateSpriteTex(Sprite sprite, String texture) {
 		try {
-			sprite.setTexture(ResourceManager.texture_gui.get(texture));
+			sprite.setTexture(ResourceManager.texture_gui.get(texture).texture);
 			
 		} catch (GameException e) {
 			System.err.println(e.getMessage());

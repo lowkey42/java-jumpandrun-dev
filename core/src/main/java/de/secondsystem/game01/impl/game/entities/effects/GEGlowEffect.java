@@ -7,15 +7,16 @@ import org.jsfml.system.Vector2f;
 import de.secondsystem.game01.impl.graphic.Glow;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.model.Attributes;
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.util.SerializationUtil;
 
 public class GEGlowEffect implements IGameEntityEffect {
 
 	private final Glow glow;
 	
-	public GEGlowEffect(IGameMap map, IDrawable representation, Color color, Color outerColor, float size, float waveSize, float sizeDecayPerSec) {
+	public GEGlowEffect(IGameMap map, IWorldDrawable representation, Color color, Color outerColor, float size, float waveSize, float sizeDecayPerSec) {
 		this.glow = new Glow((SpriteWrappper) representation, color, outerColor, size, waveSize, sizeDecayPerSec);
 	}
 
@@ -24,7 +25,7 @@ public class GEGlowEffect implements IGameEntityEffect {
 	}
 	
 	@Override
-	public void draw(RenderTarget rt, Vector2f position, float rotation, int worldMask) {
+	public void draw(RenderTarget rt, WorldId worldId, Vector2f position, float rotation, int worldMask) {
 		glow.draw(rt);
 	}
 	
@@ -48,7 +49,7 @@ public class GEGlowEffect implements IGameEntityEffect {
 class GlowFactory implements IGameEntityEffectFactory {
 
 	@Override
-	public IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IDrawable representation) {
+	public IGameEntityEffect create(IGameMap map, Attributes attributes, int worldMask, Vector2f position, float rotation, IWorldDrawable representation) {
 		return new GEGlowEffect(map, representation,
 				SerializationUtil.decodeColor(attributes.getString("color")),
 				SerializationUtil.decodeColor(attributes.getString("outerColor")),

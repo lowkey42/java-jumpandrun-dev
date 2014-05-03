@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jsfml.graphics.Color;
 
-import de.secondsystem.game01.impl.editor.curser.CurserManager.ISelectionChangedListener;
 import de.secondsystem.game01.impl.editor.curser.CurserManager;
+import de.secondsystem.game01.impl.editor.curser.CurserManager.ISelectionChangedListener;
 import de.secondsystem.game01.impl.editor.curser.IEditorCurser;
 import de.secondsystem.game01.impl.gui.AttributesDataTable;
 import de.secondsystem.game01.impl.gui.AttributesDataTable.AttributesSource;
@@ -13,8 +13,9 @@ import de.secondsystem.game01.impl.gui.ElementContainer;
 import de.secondsystem.game01.impl.gui.Panel;
 import de.secondsystem.game01.impl.gui.ThumbnailButton;
 import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
-import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
 import de.secondsystem.game01.impl.gui.VScrollPanel;
+import de.secondsystem.game01.impl.gui.listeners.IOnClickListener;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.Attributes;
 
 public class ObjectPanel extends Panel implements AttributesSource, ISelectionChangedListener {
@@ -24,6 +25,8 @@ public class ObjectPanel extends Panel implements AttributesSource, ISelectionCh
 	private static final int SPACING = 5;
 
 	public static final int WIDTH = TABLE_WIDTH+SPACING*2;
+	
+	private WorldId currentWorld;
 	
 	private CurserManager curserManager;
 	
@@ -53,7 +56,7 @@ public class ObjectPanel extends Panel implements AttributesSource, ISelectionCh
 	private void generateThumbnails() {
 		objectSelection.clear();
 		
-		List<ThumbnailButton.ThumbnailData> td = curserManager.generateBrushThumbnail();
+		List<ThumbnailButton.ThumbnailData> td = curserManager.generateBrushThumbnail(currentWorld);
 		for( int i=0; i<td.size(); ++i  ) {
 			ThumbnailData t = td.get(i);
 			final int index = i;
@@ -87,5 +90,12 @@ public class ObjectPanel extends Panel implements AttributesSource, ISelectionCh
 	public void applyAttributes(Attributes newAttributes) {
 		if( curser!=null )
 			curser.setAttributes(newAttributes);
+	}
+
+	public void setActiveWorld(WorldId newWorldId) {
+		if( currentWorld!=newWorldId ) {
+			currentWorld = newWorldId;
+			generateThumbnails();
+		}
 	}
 }

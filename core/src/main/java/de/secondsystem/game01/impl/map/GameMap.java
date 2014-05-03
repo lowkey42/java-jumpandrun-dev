@@ -188,7 +188,7 @@ public class GameMap implements IGameMap {
 		if( layer.isVisible() ) {
 			target.setView(calcLayerView(layerType.parallax, baseView));
 			 
-			layer.draw(target);
+			layer.draw(target, worldId);
 			target.setView(baseView);
 		}
 	}

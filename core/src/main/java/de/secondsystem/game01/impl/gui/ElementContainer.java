@@ -37,6 +37,13 @@ public class ElementContainer extends Element {
 	}
 	
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		for( Element c : children )
+			c.onDestroy();
+	}
+	
+	@Override
 	protected Style getStyle() {
 		return style!=null ? style : super.getStyle();
 	}

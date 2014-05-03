@@ -13,6 +13,7 @@ import de.secondsystem.game01.impl.gui.ThumbnailButton;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.IMapProvider;
 import de.secondsystem.game01.impl.map.LayerType;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.model.IDrawable;
 
 public final class CurserManager implements IOnLayerChangedListener, IDrawable {
@@ -115,9 +116,9 @@ public final class CurserManager implements IOnLayerChangedListener, IDrawable {
 		}
 	}
 	
-	public List<ThumbnailButton.ThumbnailData> generateBrushThumbnail() {
+	public List<ThumbnailButton.ThumbnailData> generateBrushThumbnail(WorldId currentWorld) {
 		if( curser instanceof BrushCurser )
-			return ((BrushCurser) curser).brush.generateThumbnails();
+			return ((BrushCurser) curser).brush.generateThumbnails(currentWorld);
 		
 		return Collections.emptyList();
 	}

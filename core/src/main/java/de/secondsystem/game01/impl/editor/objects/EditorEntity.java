@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RenderTarget;
-import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 
 import de.secondsystem.game01.impl.game.entities.IGameEntity;

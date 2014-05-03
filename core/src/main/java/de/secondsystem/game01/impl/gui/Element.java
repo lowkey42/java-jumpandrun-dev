@@ -54,6 +54,8 @@ public abstract class Element implements IDrawable, IDimensioned, IScalable, IMo
 			overlays = new HashSet<>();
 	}
 	
+	public void onDestroy(){}
+	
 	protected void onFocus(Vector2f mp){}
 	protected void onUnFocus(){}
 	

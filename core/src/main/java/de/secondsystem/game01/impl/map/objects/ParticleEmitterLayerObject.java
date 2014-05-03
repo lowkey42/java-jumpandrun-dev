@@ -45,7 +45,7 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 	}
 	
 	@Override
-	public void draw(RenderTarget renderTarget) {
+	public void draw(RenderTarget renderTarget, WorldId worldId) {
 		emitter.draw(renderTarget);
 	}
 

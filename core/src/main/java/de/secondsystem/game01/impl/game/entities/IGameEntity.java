@@ -7,10 +7,10 @@ import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.IEventHandlerCollection;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDimensioned;
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IScalable;
@@ -22,7 +22,7 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, IMoveable, 
+public interface IGameEntity extends IUpdateable, IWorldDrawable, ICameraController, IMoveable, 
 									IInsideCheck, IDimensioned, ISerializable, IEventHandlerCollection, IScalable {
 
 	UUID uuid();
@@ -38,7 +38,7 @@ public interface IGameEntity extends IUpdateable, IDrawable, ICameraController, 
 	void setDead( boolean dead );
 	boolean isDead();
 
-	IDrawable getRepresentation();
+	IWorldDrawable getRepresentation();
 	IPhysicsBody getPhysicsBody();
 	void setPhysicsBody(IPhysicsBody physicsBody);
 	void setPhysicsBodyFromAttributes(Attributes attributes);

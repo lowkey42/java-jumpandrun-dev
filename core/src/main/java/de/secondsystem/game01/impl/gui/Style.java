@@ -63,7 +63,7 @@ public final class Style {
 					ResourceManager.font.get("FreeSans.otf"), 20, // label
 					ResourceManager.font.get("FreeSans.otf"), 20, // text
 					ResourceManager.font.get("FreeSans.otf"), 26, ResourceManager.animation.get("coolButton.anim"), // button 
-					ResourceManager.texture_gui.get("VolumeButton.png"), // slider
+					ResourceManager.texture_gui.get("VolumeButton.png").texture, // slider
 					ResourceManager.animation.get("coolCheckBox.anim"), // checkBox
 					ResourceManager.animation.get("coolRadioBox.anim"), // radioBox
 					16, // dropdown

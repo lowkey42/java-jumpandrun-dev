@@ -75,8 +75,8 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	}
 	
 	@Override
-	public void draw(RenderTarget renderTarget) {
-		super.draw(renderTarget);
+	public void draw(RenderTarget renderTarget, WorldId worldId) {
+		super.draw(renderTarget, worldId);
 		if( controller instanceof IDrawable )
 			((IDrawable) controller).draw(renderTarget);
 	}

@@ -29,10 +29,10 @@ public class SimpleLayer implements ILayer {
 	 * @see de.secondsystem.game01.impl.map.ILayer#draw(org.jsfml.graphics.RenderTarget)
 	 */
 	@Override
-	public void draw(RenderTarget rt) {
+	public void draw(RenderTarget rt, WorldId worldId) {
 		if( show )
 			for( ILayerObject s : objects )
-				s.draw(rt);
+				s.draw(rt, worldId);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.ILayer#addNode(de.secondsystem.game01.impl.map.ILayerObject)

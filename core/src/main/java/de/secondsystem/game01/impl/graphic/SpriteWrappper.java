@@ -1,10 +1,12 @@
 package de.secondsystem.game01.impl.graphic;
 
-import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.IntRect;
 import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
+
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 
 public class SpriteWrappper implements ISpriteWrapper {
 	protected final Sprite sprite;
@@ -12,20 +14,14 @@ public class SpriteWrappper implements ISpriteWrapper {
 	protected float height;
 	protected boolean visible = true;
 	private boolean flipped;
-	
-	protected ConstTexture normalMap;
+	private SpriteTexture texture;
 
-	public SpriteWrappper(ConstTexture tex, ConstTexture normalMap, IntRect clip) {
-		this(tex, clip);
-		this.normalMap = normalMap;
+	public SpriteWrappper(SpriteTexture texture) {
+		this(texture, new IntRect(Vector2i.ZERO,texture.texture.getSize()));
 	}
-	public SpriteWrappper(ConstTexture tex) {
-		this(tex.getSize().x, tex.getSize().y);
-		setTexture(tex);
-	}
-	public SpriteWrappper(ConstTexture tex, IntRect clip) {
-		this(tex.getSize().x, tex.getSize().y);
-		setTexture(tex, clip);
+	public SpriteWrappper(SpriteTexture texture, IntRect clip) {
+		this(texture.texture.getSize().x, texture.texture.getSize().y);
+		setTexture(texture, clip);
 	}
 	public SpriteWrappper(float width, float height) {
 		sprite = new Sprite();	
@@ -34,27 +30,42 @@ public class SpriteWrappper implements ISpriteWrapper {
 		this.height = height;
 	}
 
-	public void setTexture(ConstTexture tex, ConstTexture normalMap, IntRect clip) {
-		setTexture(tex, clip);
-		this.normalMap = normalMap;
+	public void setTexture(SpriteTexture texture) {
+		setTexture(texture, null);
 	}
-	public void setTexture(ConstTexture tex) {
-		setTexture(tex, null);
-	}
-	public void setTexture(ConstTexture tex, IntRect clip) {
-		sprite.setTexture(tex, true);
-		if( clip!=null ) {
-			sprite.setTextureRect(clip);
+	public void setTexture(SpriteTexture texture, IntRect clip) {
+		if( this.texture!=texture ) {
+			this.texture = texture;
+			sprite.setTexture(texture.texture, true);
 		}
+		
+		sprite.setTextureRect(clip!=null ? clip : new IntRect(Vector2i.ZERO,texture.texture.getSize()));
 
 		updateScale();
 	}
-	
+
 	@Override
 	public void draw(RenderTarget renderTarget) {
+		draw(renderTarget, WorldId.MAIN);
+	}
+			
+	@Override
+	public void draw(RenderTarget renderTarget, WorldId worldId) {
 		if( visible ) {
+			switch( worldId ) {
+				case MAIN:
+					if( sprite.getTexture()!=texture.texture )
+						sprite.setTexture(texture.texture, false);
+					break;
+					
+				case OTHER:
+					if( sprite.getTexture()!=texture.altTexture )
+						sprite.setTexture(texture.altTexture, false);
+					break;
+			}
+			
 			if( renderTarget instanceof LightMap ) {
-				((LightMap)renderTarget).draw(sprite, normalMap);
+				((LightMap)renderTarget).draw(sprite, worldId==WorldId.MAIN ? texture.normals : texture.altNormals);
 			} else {
 				renderTarget.draw(sprite);
 			}
@@ -114,8 +125,8 @@ public class SpriteWrappper implements ISpriteWrapper {
 			sprite.setOrigin(width/2, height/2);
 			
 		} else {
-			sprite.setOrigin(sprite.getTexture().getSize().x/2, sprite.getTexture().getSize().y/2);
-			sprite.setScale(width/sprite.getTexture().getSize().x * (isFlipped()?-1:1), height/sprite.getTexture().getSize().y);
+			sprite.setOrigin(sprite.getTextureRect().width/2, sprite.getTextureRect().height/2);
+			sprite.setScale(width/sprite.getTextureRect().width * (isFlipped()?-1:1), height/sprite.getTextureRect().height);
 		}
 	}
 

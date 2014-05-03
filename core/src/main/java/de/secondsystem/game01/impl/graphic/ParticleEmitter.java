@@ -103,10 +103,11 @@ public class ParticleEmitter implements IDrawable, IMoveable, IDimensioned, IUpd
 		this.minColor = minColor;
 		this.maxColor = maxColor;
 		
-		if( texture!=null && !texture.isEmpty() )
-			this.texture = ResourceManager.texture.get(texture);
+		if( texture!=null && !texture.isEmpty() ) {
+			SpriteTexture t = ResourceManager.texture.get(texture);
+			this.texture = t!=null ? t.texture : null;
 			
-		else
+		} else
 			this.texture = null;
 		
 		for(int i=0; i<particles; ++i)

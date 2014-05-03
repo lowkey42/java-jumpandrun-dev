@@ -25,12 +25,12 @@ public class EntityLayer implements ILayer {
 	
 	public EntityLayer(LayerType type, IGameEntityManager entityManager, WorldId worldId) {
 		this.manager = entityManager;
-		this.worldId = worldId;
 		this.show = type.visible;
+		this.worldId = worldId;
 	}
 
 	@Override
-	public void draw(RenderTarget rt) {
+	public void draw(RenderTarget rt, WorldId worldId) {
 		manager.draw(worldId, rt);
 	}
 
@@ -59,7 +59,7 @@ public class EntityLayer implements ILayer {
 	@Override
 	public List<ILayerObject> findNodes(Vector2f point) {
 		List<ILayerObject> r = new ArrayList<>();
-		for( IGameEntity e : manager.findEntities(point) )
+		for( IGameEntity e : manager.findEntities(worldId, point) )
 			r.add(new EntityLayerObject(e));
 		
 		return r;

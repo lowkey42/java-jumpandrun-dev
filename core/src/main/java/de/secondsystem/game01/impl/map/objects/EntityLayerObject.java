@@ -65,8 +65,8 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	}
 	
 	@Override
-	public void draw(RenderTarget renderTarget) {
-		entity.draw(renderTarget);
+	public void draw(RenderTarget renderTarget, WorldId worldId) {
+		entity.draw(renderTarget, worldId);
 	}
 
 	@Override

@@ -4,10 +4,9 @@ import java.util.List;
 
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
 
-public interface ILayer extends IDrawable, IUpdateable {
+public interface ILayer extends IWorldDrawable, IUpdateable {
 
 	void addNode(ILayerObject obj);
 

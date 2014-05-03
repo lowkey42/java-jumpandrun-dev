@@ -12,6 +12,7 @@ import de.secondsystem.game01.impl.gui.ThumbnailButton.ThumbnailData;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
+import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.objects.CollisionObject;
 import de.secondsystem.game01.impl.map.objects.EntityLayerObject;
 import de.secondsystem.game01.impl.map.objects.LightLayerObject;
@@ -31,7 +32,7 @@ final class BrushPalette {
 		
 		ILayerObject getObject();
 		
-		List<ThumbnailButton.ThumbnailData> generateThumbnails();
+		List<ThumbnailButton.ThumbnailData> generateThumbnails(WorldId currentWorld);
 
 		ILayerObject set(int index);
 		int getIndex();
@@ -141,13 +142,15 @@ final class BrushPalette {
 		}
 
 		@Override
-		public List<ThumbnailData> generateThumbnails() {
+		public List<ThumbnailData> generateThumbnails(WorldId currentWorld) {
 			List<ThumbnailData> td = new ArrayList<>(map.getTileset().size()+1);
 			for(int i=0; i<map.getTileset().size(); ++i ) {
-				td.add(new ThumbnailData(map.getTileset().getName(i), map.getTileset().get(i), map.getTileset().getClip(i)));
+				td.add(new ThumbnailData(map.getTileset().getName(i), 
+						currentWorld==WorldId.MAIN ? map.getTileset().get(i).texture : map.getTileset().get(i).altTexture, 
+						map.getTileset().getClip(i)));
 			}
 			
-			td.add(new ThumbnailData("Particles", ResourceManager.texture_gui.get("icon_particles.png")));
+			td.add(new ThumbnailData("Particles", ResourceManager.texture_gui.get("icon_particles.png").texture));
 			
 			return td;
 		}
@@ -180,11 +183,11 @@ final class BrushPalette {
 		}
 
 		@Override
-		public List<ThumbnailData> generateThumbnails() {
+		public List<ThumbnailData> generateThumbnails(WorldId currentWorld) {
 			return Arrays.asList(
-				new ThumbnailData("Normal", ResourceManager.texture_gui.get("icon_grav_full_color.png")),
-				new ThumbnailData("Half", ResourceManager.texture_gui.get("icon_grav_half_color.png")),
-				new ThumbnailData("Climb", ResourceManager.texture_gui.get("icon_grav_climb_color.png"))
+				new ThumbnailData("Normal", ResourceManager.texture_gui.get("icon_grav_full_color.png").texture),
+				new ThumbnailData("Half", ResourceManager.texture_gui.get("icon_grav_half_color.png").texture),
+				new ThumbnailData("Climb", ResourceManager.texture_gui.get("icon_grav_climb_color.png").texture)
 			);
 		}
 	}
@@ -219,16 +222,16 @@ final class BrushPalette {
 		}
 		
 		@Override
-		public List<ThumbnailData> generateThumbnails() {
+		public List<ThumbnailData> generateThumbnails(WorldId currentWorld) {
 			return Arrays.asList(
-				new ThumbnailData("12%",  ResourceManager.texture_gui.get("icon_light_012.png")),
-				new ThumbnailData("25%",  ResourceManager.texture_gui.get("icon_light_025.png")),
-				new ThumbnailData("37%",  ResourceManager.texture_gui.get("icon_light_037.png")),
-				new ThumbnailData("50%",  ResourceManager.texture_gui.get("icon_light_050.png")),
-				new ThumbnailData("62%",  ResourceManager.texture_gui.get("icon_light_062.png")),
-				new ThumbnailData("75%",  ResourceManager.texture_gui.get("icon_light_075.png")),
-				new ThumbnailData("87%",  ResourceManager.texture_gui.get("icon_light_087.png")),
-				new ThumbnailData("100%", ResourceManager.texture_gui.get("icon_light_100.png"))
+				new ThumbnailData("12%",  ResourceManager.texture_gui.get("icon_light_012.png").texture),
+				new ThumbnailData("25%",  ResourceManager.texture_gui.get("icon_light_025.png").texture),
+				new ThumbnailData("37%",  ResourceManager.texture_gui.get("icon_light_037.png").texture),
+				new ThumbnailData("50%",  ResourceManager.texture_gui.get("icon_light_050.png").texture),
+				new ThumbnailData("62%",  ResourceManager.texture_gui.get("icon_light_062.png").texture),
+				new ThumbnailData("75%",  ResourceManager.texture_gui.get("icon_light_075.png").texture),
+				new ThumbnailData("87%",  ResourceManager.texture_gui.get("icon_light_087.png").texture),
+				new ThumbnailData("100%", ResourceManager.texture_gui.get("icon_light_100.png").texture)
 			);
 		}
 	}
@@ -269,8 +272,8 @@ final class BrushPalette {
 		}
 
 		@Override
-		public List<ThumbnailData> generateThumbnails() {
-			return map.getEntityManager().generateThumbnails();
+		public List<ThumbnailData> generateThumbnails(WorldId currentWorld) {
+			return map.getEntityManager().generateThumbnails(currentWorld);
 		}
 	}
 	

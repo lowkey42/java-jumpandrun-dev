@@ -17,7 +17,7 @@ import de.secondsystem.game01.model.IUpdateable;
 public interface IGameEntityManager extends IUpdateable, ISerializable {
 
 	List<String> listArchetypes();
-	List<ThumbnailData> generateThumbnails();
+	List<ThumbnailData> generateThumbnails(WorldId currentWorld);
 	
 	@Deprecated
 	IGameEntity createEntity(String type, Map<String, Object> attributes);
@@ -33,7 +33,7 @@ public interface IGameEntityManager extends IUpdateable, ISerializable {
 	
 	void destroy(UUID eId);
 	IGameEntity findEntity(Vector2f pos);
-	List<IGameEntity> findEntities(Vector2f point);
+	List<IGameEntity> findEntities(WorldId worldId, Vector2f point);
 	
 	IGameEntity get(UUID eId);
 	IWeakGameEntityRef getRef(UUID eId);

@@ -1,6 +1,7 @@
 package de.secondsystem.game01.impl;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -8,13 +9,13 @@ import org.jsfml.audio.ConstSoundBuffer;
 import org.jsfml.audio.SoundBuffer;
 import org.jsfml.graphics.ConstFont;
 import org.jsfml.graphics.ConstShader;
-import org.jsfml.graphics.ConstTexture;
 import org.jsfml.graphics.Font;
 import org.jsfml.graphics.Shader;
 import org.jsfml.graphics.ShaderSourceException;
 import org.jsfml.graphics.Texture;
 
 import de.secondsystem.game01.impl.graphic.AnimationTexture;
+import de.secondsystem.game01.impl.graphic.SpriteTexture;
 import de.secondsystem.game01.model.GameException;
 import de.secondsystem.game01.model.collections.LruCache;
 
@@ -72,48 +73,21 @@ public abstract class ResourceManager<T> {
 		}
 	};
 
-	public static final ResourceManager<ConstTexture> texture_gui = new ResourceManager<ConstTexture>(100) {
+	public static final ResourceManager<SpriteTexture> texture_gui = new TextureResourceManager(100) {
 		@Override protected Path getBasePath() {
 			return Paths.get("assets", "gui");
 		}
-		@Override protected ConstTexture load(Path path) {
-			Texture texture = new Texture();
-			try {
-				texture.loadFromFile(path);
-			} catch (IOException e) {
-				throw new GameException(e.getMessage(), e);
-			}
-			return texture;
-		}
 	};
 
-	public static final ResourceManager<ConstTexture> texture_tiles = new ResourceManager<ConstTexture>(100) {
+	public static final ResourceManager<SpriteTexture> texture_tiles = new TextureResourceManager(100) {
 		@Override protected Path getBasePath() {
 			return Paths.get("assets", "tiles");
 		}
-		@Override protected ConstTexture load(Path path) {
-			Texture texture = new Texture();
-			try {
-				texture.loadFromFile(path);
-			} catch (IOException e) {
-				throw new GameException(e.getMessage(), e);
-			}
-			return texture;
-		}
 	};
 
-	public static final ResourceManager<ConstTexture> texture = new ResourceManager<ConstTexture>(100) {
+	public static final ResourceManager<SpriteTexture> texture = new TextureResourceManager(100) {
 		@Override protected Path getBasePath() {
 			return Paths.get("assets", "textures");
-		}
-		@Override protected ConstTexture load(Path path) {
-			Texture texture = new Texture();
-			try {
-				texture.loadFromFile(path);
-			} catch (IOException e) {
-				throw new GameException(e.getMessage(), e);
-			}
-			return texture;
 		}
 	};
 	
@@ -161,6 +135,61 @@ public abstract class ResourceManager<T> {
 		}
 	};
 	
+	private static abstract class TextureResourceManager extends ResourceManager<SpriteTexture> {
+		private TextureResourceManager( int maxSize ) {
+			super(maxSize);
+		}
+		@Override protected SpriteTexture load(Path path) {
+			
+			try {
+				Texture normals = null;
+				Texture altTexture = null;
+				Texture altNormals = null;
+				
+				Texture texture = new Texture();
+				texture.loadFromFile(path);
+
+				Path normalsPath = addSuffix(path, "_n");
+				if( Files.isRegularFile(normalsPath) ) {
+					try {
+						normals = new Texture();
+						normals.loadFromFile(normalsPath);
+					} catch (IOException e) {
+						System.err.println("Unable to load normal-texture from: "+normalsPath);
+						normals = null;
+					}
+				}
+
+				Path altTexturePath = addSuffix(path, "_o");
+				if( Files.isRegularFile(altTexturePath) ) {
+					try {
+						altTexture = new Texture();
+						altTexture.loadFromFile(altTexturePath);
+					} catch (IOException e) {
+						System.err.println("Unable to load alt-texture from: "+altTexturePath);
+						altTexture = null;
+					}
+				}
+
+				Path altNormalsPath = addSuffix(path, "_on");
+				if( Files.isRegularFile(altNormalsPath) ) {
+					try {
+						altNormals = new Texture();
+						altNormals.loadFromFile(altNormalsPath);
+					} catch (IOException e) {
+						System.err.println("Unable to load normal-texture from: "+altNormalsPath);
+						altNormals = null;
+					}
+				}
+				
+				return new SpriteTexture(texture, normals, altTexture, altNormals);
+				
+			} catch (IOException e) {
+				throw new GameException(e.getMessage(), e);
+			}
+		}
+	}
+	
 	
 	private final LruCache<String, T> cache;
 	
@@ -181,6 +210,15 @@ public abstract class ResourceManager<T> {
 	}
 	public final T get( String name ) throws GameException {
 		return cache.get(name);
+	}
+	
+	private static Path addSuffix(Path path, String suffix) {
+		String[] parts = path.getFileName().toString().split("\\.");
+		StringBuilder str = new StringBuilder();
+		for( int i=0; i<parts.length-1; ++i )
+			str.append(i>0 ? "." : "").append(parts[i]);
+		
+		return path.subpath(0, path.getNameCount()-1).resolve(str.toString()+suffix+"."+parts[parts.length-1]); 
 	}
 	
 	private final class MyLoader implements LruCache.Loader<String, T> {
