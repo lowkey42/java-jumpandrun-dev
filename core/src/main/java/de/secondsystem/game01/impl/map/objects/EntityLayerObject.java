@@ -118,6 +118,36 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 		else
 			entity.setWorldMask(entity.getWorldMask()&~worldId.id);
 	}
+
+	@Override
+	public void flipHoriz() {
+		entity.flipHoriz();
+	}
+
+	@Override
+	public void setFlipHoriz(boolean flip) {
+		entity.setFlipHoriz(flip);
+	}
+
+	@Override
+	public boolean isFlippedHoriz() {
+		return entity.isFlippedHoriz();
+	}
+
+	@Override
+	public void flipVert() {
+		entity.flipVert();
+	}
+
+	@Override
+	public void setFlipVert(boolean flip) {
+		entity.setFlipVert(flip);
+	}
+
+	@Override
+	public boolean isFlippedVert() {
+		return entity.isFlippedVert();
+	}
 	
 	@Override
 	public Attributes serialize() {

@@ -1,14 +1,10 @@
 package de.secondsystem.game01.impl.game.entities;
 
+import de.secondsystem.game01.model.HDirection;
+import de.secondsystem.game01.model.VDirection;
+
 
 public interface IControllable {
-	
-	public static enum HDirection {
-		LEFT, RIGHT;
-	}
-	public static enum VDirection {
-		UP, DOWN, FORWARD;
-	}
 	
 	void moveHorizontally(HDirection direction, float factor);
 	void moveVertically(VDirection direction, float factor);

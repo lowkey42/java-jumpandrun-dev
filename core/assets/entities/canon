@@ -1,4 +1,4 @@
-{"representationType":"TEXTURE", "representation":"cannon2.png", "width":216, "height":160, "shape":"BOX", "liftable":"true", "density":1.0, "flipped":true,
+{"representationType":"TEXTURE", "representation":"cannon2.png", "width":216, "height":160, "shape":"BOX", "liftable":"true", "density":1.0,
 "onUPDATE":{"factory":".RepeatEHF", "intervalMs":5000, "sub":{
-	"factory":".SpawnEHF", "type":"canonball", "relX":-140, "relY":0, "attributes":{"initialRelXSpeed":-4, "initialRelYSpeed":0} }
+	"factory":".SpawnEHF", "type":"canonball", "relX":1, "relY":0, "attributes":{"initialRelXSpeed":4, "initialRelYSpeed":0} }
 } }

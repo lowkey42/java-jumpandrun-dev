@@ -103,6 +103,42 @@ public class ParticleEmitterLayerObject implements ILayerObject, IUpdateable {
 	}
 
 	@Override
+	public void flipHoriz() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setFlipHoriz(boolean flip) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isFlippedHoriz() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void flipVert() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setFlipVert(boolean flip) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isFlippedVert() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public LayerObjectType typeUuid() {
 		return LayerObjectType.PARTICLE_EMITTER;
 	}

@@ -16,10 +16,9 @@ import de.secondsystem.game01.impl.game.entities.effects.GEGlowEffect;
 import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.EventHandlerCollection;
 import de.secondsystem.game01.impl.game.entities.events.EventType;
-import de.secondsystem.game01.impl.graphic.SpriteWrappper;
+import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
-import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.impl.map.physics.IDynamicPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.PhysicsContactListener;
@@ -28,8 +27,6 @@ import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.Attributes.AttributeIf;
 import de.secondsystem.game01.model.IDimensioned;
 import de.secondsystem.game01.model.IInsideCheck;
-import de.secondsystem.game01.model.IMoveable;
-import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.IUpdateable;
 
 class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsContactListener {
@@ -46,7 +43,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	protected IPhysicsBody physicsBody;
 	
-	protected IWorldDrawable representation;
+	protected ISpriteWrapper representation;
 	
 	protected final IGameMap map;
 	
@@ -67,9 +64,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 				GameEntityHelper.createPhysicsBody(map, true, true, true, attributes), map, attributes );
 	}
 	
-	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, IWorldDrawable representation, 
+	protected GameEntity(UUID uuid, GameEntityManager em, int worldMask, ISpriteWrapper representation, 
 			IPhysicsBody physicsBody, IGameMap map, Attributes attributes) {
 		super( map, attributes );
+		
+		assert( physicsBody!=null || representation!=null );
 		
 		this.uuid = uuid;
 		this.group = attributes.getString("group", "").intern();
@@ -80,20 +79,28 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		this.map = map;
 		this.orderId = (byte) attributes.getInteger("orderId", 0);
 		
+		final boolean flippedHoriz = attributes.getBoolean("flipHoriz", false);
+		final boolean flippedVert = attributes.getBoolean("flipVert", false);
+		
 		if( physicsBody!=null ) {
 			physicsBody.setOwner(this);
 			physicsBody.setContactListener(this);
 		}
 		
-		if( physicsBody!=null && representation instanceof IMoveable ) {
-			((IMoveable) representation).setPosition( physicsBody.getPosition() );
-			((IMoveable) representation).setRotation( physicsBody.getRotation() );
+		if( representation!=null ) {
+			representation.setFlipHoriz(flippedHoriz);
+			representation.setFlipVert(flippedVert);
+			
+			if( physicsBody!=null ) {
+				representation.setPosition( physicsBody.getPosition() );
+				representation.setRotation( physicsBody.getRotation() );
+			}
 		}
 		
 		List<Attributes> effectAttrs = attributes.getObjectList("effects");
 		if( effectAttrs!=null ) {
-			Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
-			float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
+			Vector2f position = physicsBody!=null ? physicsBody.getPosition() : representation.getPosition();
+			float rotation = physicsBody!=null ? physicsBody.getRotation() : representation.getRotation();
 			
 			for( Attributes attr : effectAttrs )
 				effects.add(EffectUtils.createEffect(map, attr, worldMask, position, rotation, representation));
@@ -117,6 +124,33 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	}
 	
 	@Override
+	public boolean isFlippedHoriz() {
+		return representation!=null ? representation.isFlippedHoriz() : false;
+	}
+	@Override
+	public boolean isFlippedVert() {
+		return representation!=null ? representation.isFlippedVert() : false;
+	}
+	@Override
+	public void setFlipHoriz(boolean flipped) {
+		if( representation!=null )
+			representation.setFlipHoriz(flipped);
+	}
+	@Override
+	public void setFlipVert(boolean flipped) {
+		if( representation!=null )
+			representation.setFlipVert(flipped);
+	}
+	@Override
+	public void flipHoriz() {
+		setFlipHoriz(!isFlippedHoriz());
+	}
+	@Override
+	public void flipVert() {
+		setFlipVert(!isFlippedVert());
+	}
+	
+	@Override
 	public void update(long frameTimeMs) {
 		if( representation instanceof IUpdateable )
 			((IUpdateable) representation).update(frameTimeMs);
@@ -132,11 +166,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public void draw(RenderTarget renderTarget, WorldId worldId) {
-		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
+		float rotation = getRotation();
 		
-		if( physicsBody!=null && representation instanceof IMoveable ) {
-			((IMoveable) representation).setPosition( physicsBody.getPosition() );
-			((IMoveable) representation).setRotation( physicsBody.getRotation() );
+		if( physicsBody!=null && representation!=null ) {
+			representation.setPosition( physicsBody.getPosition() );
+			representation.setRotation( physicsBody.getRotation() );
 		}
 		
 		if( representation!=null )
@@ -148,7 +182,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public Vector2f getPosition() {
-		return physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
+		return physicsBody!=null ? physicsBody.getPosition() : representation.getPosition();
 	}
 
 	@Override
@@ -186,8 +220,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( physicsBody!=null ) {
 			if( newWorldMask!=0 && worldMask!=0 && physicsBody instanceof IDynamicPhysicsBody ) {
 				if( !((IDynamicPhysicsBody)physicsBody).tryWorldSwitch(newWorldMask) ) {
-					if( representation instanceof SpriteWrappper )
-						addEffect(new GEGlowEffect(map, representation, new Color(100, 0, 0, 255), new Color(255, 255, 255, 100), 40, 50, 25), 2000);
+					addEffect(new GEGlowEffect(map, representation, new Color(100, 0, 0, 255), new Color(255, 255, 255, 100), 40, 50, 25), 2000);
 					return false;
 				}
 				
@@ -216,8 +249,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			if( physicsBody instanceof IDynamicPhysicsBody )
 				((IDynamicPhysicsBody)physicsBody).resetVelocity(true, true, false);
 		}
-		if( representation instanceof IMoveable ) {
-			((IMoveable) representation).setPosition(pos);
+		if( representation!=null ) {
+			representation.setPosition(pos);
 		}
 	}
 
@@ -228,18 +261,18 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 			if( physicsBody instanceof IDynamicPhysicsBody )
 				((IDynamicPhysicsBody)physicsBody).resetVelocity(false, false, true);
 		}
-		if( representation instanceof IMoveable ) {
-			((IMoveable) representation).setRotation(degree);
+		if( representation!=null ) {
+			representation.setRotation(degree);
 		}
 	}
 
 	@Override
 	public float getRotation() {
-		return physicsBody!=null ? physicsBody.getRotation() : 0;
+		return physicsBody!=null ? physicsBody.getRotation() : representation.getRotation();
 	}
 
 	@Override
-	public IWorldDrawable getRepresentation() {
+	public ISpriteWrapper getRepresentation() {
 		return representation;
 	}
 
@@ -291,8 +324,9 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public boolean inside(Vector2f point) {
-		if( representation instanceof IInsideCheck )
+		if( representation!=null )
 			return ((IInsideCheck)representation).inside(point);
+		
 		else
 			for(IGameEntityEffect e : effects)
 				if( e.inside(point) )
@@ -303,7 +337,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public float getHeight() {
-		if( representation instanceof IDimensioned )
+		if( representation!=null )
 			return ((IDimensioned) representation).getHeight();
 			
 		return 1;
@@ -311,7 +345,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	@Override
 	public float getWidth() {
-		if( representation instanceof IDimensioned )
+		if( representation!=null )
 			return ((IDimensioned) representation).getWidth();
 			
 		return 1;
@@ -363,29 +397,30 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	
 	@Override
 	public Attributes serialize() {
-		Vector2f position = physicsBody!=null ? physicsBody.getPosition() : (representation instanceof IMoveable ? ((IMoveable) representation).getPosition() : null);
-		float rotation = physicsBody!=null ? physicsBody.getRotation() : (representation instanceof IMoveable ? ((IMoveable) representation).getRotation() : null);
-		
-		return new Attributes( editableEntityState!=null ? editableEntityState.getAttributes() : Collections.emptyMap(), 
+		assert( editableEntityState!=null );
+		return new Attributes( editableEntityState.getAttributes(),
 				new Attributes(
 						new Attribute("uuid", uuid.toString()),
-						new Attribute("archetype", editableEntityState!=null ? editableEntityState.getArchetype() : "???"),
+						new Attribute("archetype", editableEntityState.getArchetype()),
 						new AttributeIf(orderId!=0, "orderId", orderId),
-						new Attribute("x", position.x),
-						new Attribute("y", position.y),
-						new Attribute("rotation", rotation),
+						new Attribute("x", getPosition().x),
+						new Attribute("y", getPosition().y),
+						new Attribute("flipHoriz", isFlippedHoriz()),
+						new Attribute("flipVert", isFlippedVert()),
+						new Attribute("rotation", getRotation()),
+						new Attribute("width", getWidth()),
+						new Attribute("height", getHeight()),
 						new Attribute("worldId", worldMask)
 		) );
 	}
 
 	@Override
 	public void setDimensions(float width, float height) {
-		if( representation instanceof IScalable )
-			((IScalable) representation).setDimensions(width, height);
+		if( representation!=null )
+			representation.setDimensions(width, height);
 		else
-			if( representation != null )
-				System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
-									+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
+			System.out.println("Entity" + "(" + toString() + ")" + " can not be scaled." 
+								+ " Representation " + representation.getClass().getSimpleName() + " not scalable.");
 		
 	}
 

@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.game.controller;
 
-import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
 import de.secondsystem.game01.impl.map.IGameMap;
@@ -9,6 +8,7 @@ import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.HDirection;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
 

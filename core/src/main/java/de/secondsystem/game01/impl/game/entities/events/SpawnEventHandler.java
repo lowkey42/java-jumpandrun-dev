@@ -22,20 +22,20 @@ public class SpawnEventHandler implements IEventHandler {
 		
 		this.type = attributes.getString("type");
 		this.attributes = attributes.getObject("attributes");
-		this.relativeX = attributes.getFloat("relX");
-		this.relativeY = attributes.getFloat("relY");
+		this.relativeX = attributes.getFloat("relX", 0);
+		this.relativeY = attributes.getFloat("relY", 0);
 	}
 	
 	@Override
 	public Object handle(Object... args) {
 		final IGameEntity self = (IGameEntity) args[0];
 		
-		float sr = (float) Math.sin(Math.toRadians(self.getRotation()));
-		float cr = (float) Math.cos(Math.toRadians(self.getRotation()));
+		float sr = (float) Math.sin(Math.toRadians(self.getRotation() - (self.isFlippedHoriz()?180:0) ));
+		float cr = (float) Math.cos(Math.toRadians(self.getRotation() - (self.isFlippedHoriz()?180:0) ));
 		
-		final float rx = (relativeX!=null ? relativeX : 0) * cr - (relativeY!=null ? relativeY : 0) * sr;
-		final float ry = (relativeX!=null ? relativeX : 0) * sr - (relativeY!=null ? relativeY : 0) * cr;
-
+		final float rx = relativeX*self.getWidth() * cr - relativeY*self.getHeight() * sr;
+		final float ry = relativeX*self.getWidth() * sr - relativeY*self.getHeight() * cr;
+		
 		// delay creation (after physics-update)
 		timerManager.createTimer(0, false, new Runnable() {
 			@Override
@@ -43,6 +43,8 @@ public class SpawnEventHandler implements IEventHandler {
 				self.manager().create(type, new Attributes(attributes, new Attributes(
 						new AttributeIf(relativeX!=null, "x", rx+self.getPosition().x),
 						new AttributeIf(relativeY!=null, "y", ry+self.getPosition().y),
+						new AttributeIf(self.isFlippedHoriz(), "flipHoriz", true),
+						new AttributeIf(self.isFlippedVert(), "flipVert", true),
 						new Attribute("rotation", self.getRotation()),
 						new Attribute("worldId", self.getWorldMask())
 				)) );

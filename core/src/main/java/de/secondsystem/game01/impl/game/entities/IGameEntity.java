@@ -5,12 +5,14 @@ import java.util.UUID;
 
 import de.secondsystem.game01.impl.game.entities.effects.IGameEntityEffect;
 import de.secondsystem.game01.impl.game.entities.events.IEventHandlerCollection;
+import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.map.ICameraController;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDimensioned;
+import de.secondsystem.game01.model.IFlipable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IScalable;
@@ -22,7 +24,7 @@ import de.secondsystem.game01.model.IUpdateable;
  * @author lowkey
  *
  */
-public interface IGameEntity extends IUpdateable, IWorldDrawable, ICameraController, IMoveable, 
+public interface IGameEntity extends IUpdateable, IWorldDrawable, ICameraController, IMoveable, IFlipable,
 									IInsideCheck, IDimensioned, ISerializable, IEventHandlerCollection, IScalable {
 
 	UUID uuid();
@@ -39,7 +41,7 @@ public interface IGameEntity extends IUpdateable, IWorldDrawable, ICameraControl
 	void setDead( boolean dead );
 	boolean isDead();
 
-	IWorldDrawable getRepresentation();
+	ISpriteWrapper getRepresentation();
 	IPhysicsBody getPhysicsBody();
 	void setPhysicsBody(IPhysicsBody physicsBody);
 	void setPhysicsBodyFromAttributes(Attributes attributes);
@@ -54,4 +56,5 @@ public interface IGameEntity extends IUpdateable, IWorldDrawable, ICameraControl
 	
 	void onDestroy();
 	boolean isDestroyed();
+	
 }

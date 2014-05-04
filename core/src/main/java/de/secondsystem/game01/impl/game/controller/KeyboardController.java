@@ -7,8 +7,8 @@ import org.jsfml.window.Keyboard.Key;
 import org.jsfml.window.event.Event;
 
 import de.secondsystem.game01.impl.game.entities.AbstractGameEntityController;
-import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
-import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
+import de.secondsystem.game01.model.HDirection;
+import de.secondsystem.game01.model.VDirection;
 import de.secondsystem.game01.model.Settings.KeyMapping;
 
 public final class KeyboardController extends AbstractGameEntityController {

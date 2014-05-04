@@ -212,12 +212,12 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 
 	@Override
 	public void onBeginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
-		if( contactListener!=null )
+		if( contactListener!=null && other.type!=CollisionHandlerType.CLIMBABLE )
 			contactListener.beginContact(other);
 	}
 	@Override
 	public void onEndContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
-		if( contactListener!=null )
+		if( contactListener!=null && other.type!=CollisionHandlerType.CLIMBABLE )
 			contactListener.endContact(other);
 	}
 	public boolean isContactFiltered(Contact contact, Box2dPhysicsBody other, Fixture ownFixture, Fixture otherFixture) {

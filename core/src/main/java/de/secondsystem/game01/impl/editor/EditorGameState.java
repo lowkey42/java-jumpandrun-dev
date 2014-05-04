@@ -310,6 +310,13 @@ public final class EditorGameState extends GUIGameState implements IMapProvider,
 					zoom /= 2;
 				break;
 	
+			case F:
+				if( event.shift )
+					curser.get().flipVert();
+				else
+					curser.get().flipHoriz();
+				break;
+				
 			default:
 				return layerPanel.handleKeyCommands(event);
 		}

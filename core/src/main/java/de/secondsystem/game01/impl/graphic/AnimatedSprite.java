@@ -31,11 +31,6 @@ public class AnimatedSprite extends SpriteWrappper implements IAnimated, IUpdate
 		playingSound.setVolume(100);
 		play(animationTexture.getDefaultType(), 1, true);
 	}
-	
-	@Override
-	protected void updateScale() {
-		sprite.setScale(width/currentAnimationData.frameWidth * (isFlipped()?-1:1), height/currentAnimationData.frameHeight);
-	}
 
 
 	@Override

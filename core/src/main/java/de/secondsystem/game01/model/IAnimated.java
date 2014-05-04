@@ -9,10 +9,6 @@ public interface IAnimated extends IPlayable {
 	 * @param repeated the animation is looped
 	 */
 	void play( AnimationType animation, float speedFactor, boolean repeated);
-
-	void flip();
-	void setFlip(boolean flip);
-	boolean isFlipped();
 	
 	AnimationType getCurrentAnimationType();
 	

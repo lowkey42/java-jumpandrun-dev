@@ -12,6 +12,7 @@ import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.Tileset;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.Attributes.AttributeIf;
 
 /**
  * TODO: tinting
@@ -31,15 +32,18 @@ public class SpriteLayerObject implements ILayerObject {
 	private int worldMask;
 	
 	public SpriteLayerObject(Tileset tileset, int worldId, int tileId, float x, float y, float rotation) {
-		this(tileset, worldId, tileId, x, y, rotation, 0, 0);
+		this(tileset, worldId, tileId, x, y, false, false, rotation, 0, 0);
 	}
-	public SpriteLayerObject(Tileset tileset, int worldId, int tileId, float x, float y, float rotation, float width, float height) {
+	public SpriteLayerObject(Tileset tileset, int worldId, int tileId, float x, float y, boolean flipHoriz, boolean flipVert, 
+			float rotation, float width, float height) {
 		this.tileId = tileId;
 		this.worldMask = worldId;
 		sprite = new SpriteWrappper(tileset.get(tileId), tileset.getClip(tileId));
 		sprite.setPosition(new Vector2f(x, y));
 		sprite.setRotation(rotation);
 		sprite.setDimensions(width>0?width:sprite.getWidth(), height>0?height:sprite.getHeight());
+		sprite.setFlipHoriz(flipHoriz);
+		sprite.setFlipVert(flipVert);
 	}
 	
 	@Override
@@ -110,6 +114,36 @@ public class SpriteLayerObject implements ILayerObject {
 	}
 
 	@Override
+	public void flipHoriz() {
+		sprite.flipHoriz();
+	}
+
+	@Override
+	public void setFlipHoriz(boolean flip) {
+		sprite.setFlipHoriz(flip);
+	}
+
+	@Override
+	public boolean isFlippedHoriz() {
+		return sprite.isFlippedHoriz();
+	}
+
+	@Override
+	public void flipVert() {
+		sprite.flipVert();
+	}
+
+	@Override
+	public void setFlipVert(boolean flip) {
+		sprite.setFlipVert(flip);
+	}
+
+	@Override
+	public boolean isFlippedVert() {
+		return sprite.isFlippedVert();
+	}
+
+	@Override
 	public boolean isInWorld(WorldId worldId) {
 		return (worldMask & worldId.id)!=0;
 	}
@@ -135,6 +169,8 @@ public class SpriteLayerObject implements ILayerObject {
 				new Attribute("tile", tileId),
 				new Attribute("x", getPosition().x),
 				new Attribute("y", getPosition().y),
+				new AttributeIf(isFlippedHoriz(), "flipHoriz", true),
+				new AttributeIf(isFlippedVert(), "flipVert", true),
 				new Attribute("rotation", getRotation()),
 				new Attribute("width", getWidth()),
 				new Attribute("height", getHeight())
@@ -151,9 +187,11 @@ public class SpriteLayerObject implements ILayerObject {
 						attributes.getInteger("tile"), 
 						attributes.getFloat("x"),
 						attributes.getFloat("y"),
-						attributes.getFloat("rotation"),
-						attributes.getFloat("width"),
-						attributes.getFloat("height") );
+						attributes.getBoolean("flipHoriz", false),
+						attributes.getBoolean("flipVert", false),
+						attributes.getFloat("rotation", 0),
+						attributes.getFloat("width", 0),
+						attributes.getFloat("height", 0) );
 			
 			} catch( ClassCastException | NullPointerException e ) {
 				throw new Error( "Invalid attributes: "+attributes, e );

@@ -61,16 +61,17 @@ public class KillEventHandler implements IEventHandler {
 		final IGameEntity owner = (IGameEntity) args[0];
 		final IGameEntity killer = (IGameEntity) args[1];
 		
-		switch( owner.getWorldId() ) {
-			case MAIN:
-				inMainWorld(owner, killer);
-				break;
-				
-			case OTHER:
-				inOtherWorld(owner, killer);
-				break;
-		}
-		
+		if( owner!=null && killer!=null )
+			switch( owner.getWorldId() ) {
+				case MAIN:
+					inMainWorld(owner, killer);
+					break;
+					
+				case OTHER:
+					inOtherWorld(owner, killer);
+					break;
+			}
+			
 		return null;
 	}
 

@@ -1592,6 +1592,7 @@
 			},
 			{
 				"archetype":"canon",
+				"flipHoriz":true,
 				"rotation":0.0,
 				"uuid":"e06dcafa-bf7b-4712-a7b7-0cd233256ec6",
 				"worldId":1,
@@ -1619,6 +1620,7 @@
 			},
 			{
 				"archetype":"canon",
+				"flipHoriz":true,
 				"rotation":0.0,
 				"uuid":"98619842-9de3-413e-9dba-7630c3a76a06",
 				"worldId":1,
@@ -1715,6 +1717,7 @@
 			},
 			{
 				"archetype":"canon",
+				"flipHoriz":true,
 				"rotation":0.0,
 				"uuid":"54d2d6b8-3983-4aa8-8068-45d2a273eb69",
 				"worldId":1,

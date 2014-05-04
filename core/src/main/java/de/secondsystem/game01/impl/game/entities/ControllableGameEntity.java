@@ -16,9 +16,11 @@ import de.secondsystem.game01.impl.map.physics.IHumanoidPhysicsBody.BodyFilter;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.HDirection;
 import de.secondsystem.game01.model.IAnimated;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.ISerializable;
+import de.secondsystem.game01.model.VDirection;
 import de.secondsystem.game01.model.IAnimated.AnimationType;
 import de.secondsystem.game01.model.IUpdateable;
 
@@ -165,7 +167,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		{
 			IAnimated anim = ((IAnimated) representation);
 
-			anim.setFlip(hDirection==HDirection.LEFT);
+			setFlipHoriz(hDirection==HDirection.LEFT);
 			
 			if( xMove!=0 )
 				anim.play(AnimationType.MOVE, 0.3f, true);
@@ -289,8 +291,10 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 		for( IPhysicsBody body : bodies ) {
 			Object result = notify(EventType.ATTACK, this, body.getOwner(), Math.min(1, force*2));
 			if( result instanceof Boolean && ((Boolean) result).booleanValue() )
-				break;
+				return;
 		}
+		
+		notify(EventType.DIST_ATTACK, this, Math.min(1, force*2));
 	}
 	
 	private static final BodyFilter BODY_GO_FILTER = new BodyFilter() {
@@ -315,7 +319,7 @@ class ControllableGameEntity extends GameEntity implements IControllableGameEnti
 	public int getPossessableTime() {
 		return possessableTime;
 	}
-
+	
 	@Override
 	public boolean isLiftingSomething() {
 		if( !(physicsBody instanceof IHumanoidPhysicsBody) )

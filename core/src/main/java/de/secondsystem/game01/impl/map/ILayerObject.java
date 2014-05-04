@@ -4,12 +4,13 @@ import de.secondsystem.game01.impl.map.IGameMap.WorldId;
 import de.secondsystem.game01.impl.map.objects.LayerObjectType;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.IDimensioned;
+import de.secondsystem.game01.model.IFlipable;
 import de.secondsystem.game01.model.IInsideCheck;
 import de.secondsystem.game01.model.IMoveable;
 import de.secondsystem.game01.model.IScalable;
 import de.secondsystem.game01.model.ISerializable;
 
-public interface ILayerObject extends IWorldDrawable, IInsideCheck, IMoveable, IDimensioned, ISerializable, IScalable {
+public interface ILayerObject extends IWorldDrawable, IInsideCheck, IMoveable, IDimensioned, ISerializable, IScalable, IFlipable {
 
 	boolean isInWorld(WorldId worldId);
 	void setWorld(WorldId worldId, boolean exists);

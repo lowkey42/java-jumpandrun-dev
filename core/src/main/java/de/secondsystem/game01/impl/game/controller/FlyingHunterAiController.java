@@ -8,8 +8,6 @@ import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Vertex;
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
-import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
@@ -20,9 +18,11 @@ import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
 import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.HDirection;
 import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.model.VDirection;
 import de.secondsystem.game01.util.Tools;
 
 public class FlyingHunterAiController implements IUpdateable, IGameEntityController,

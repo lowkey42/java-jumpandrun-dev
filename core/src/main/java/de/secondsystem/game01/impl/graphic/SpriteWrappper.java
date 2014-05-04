@@ -13,7 +13,7 @@ public class SpriteWrappper implements ISpriteWrapper {
 	protected float width;
 	protected float height;
 	protected boolean visible = true;
-	private boolean flipped;
+	private boolean flippedH, flippedV;
 	private SpriteTexture texture;
 
 	public SpriteWrappper(SpriteTexture texture) {
@@ -126,27 +126,44 @@ public class SpriteWrappper implements ISpriteWrapper {
 			
 		} else {
 			sprite.setOrigin(sprite.getTextureRect().width/2, sprite.getTextureRect().height/2);
-			sprite.setScale(width/sprite.getTextureRect().width * (isFlipped()?-1:1), height/sprite.getTextureRect().height);
+			sprite.setScale(width/sprite.getTextureRect().width * (isFlippedHoriz()?-1:1), 
+					height/sprite.getTextureRect().height * (isFlippedVert()?-1:1) );
 		}
 	}
 
 	@Override
-	public void flip() {
-		flipped = !flipped;
+	public void flipHoriz() {
+		flippedH = !flippedH;
+		updateScale();
+	}
+	@Override
+	public boolean isFlippedHoriz() {
+		return flippedH;
+	}
+	@Override
+	public void setFlipHoriz(boolean flip) {
+		if( this.flippedH == flip )
+			return;
+		
+		this.flippedH = flip;
 		updateScale();
 	}
 
 	@Override
-	public boolean isFlipped() {
-		return flipped;
+	public void flipVert() {
+		flippedV = !flippedV;
+		updateScale();
 	}
-	
 	@Override
-	public void setFlip(boolean flip) {
-		if( this.flipped == flip )
+	public boolean isFlippedVert() {
+		return flippedV;
+	}
+	@Override
+	public void setFlipVert(boolean flip) {
+		if( this.flippedV == flip )
 			return;
 		
-		this.flipped = flip;
+		this.flippedV = flip;
 		updateScale();
 	}
 	

@@ -139,6 +139,42 @@ public class CollisionObject implements ILayerObject {
 	}
 
 	@Override
+	public void flipHoriz() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setFlipHoriz(boolean flip) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isFlippedHoriz() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void flipVert() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setFlipVert(boolean flip) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isFlippedVert() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public void setDimensions(float width, float height) {
 		shape.setSize(new Vector2f(Math.max(width, 1), Math.max(height, 1)));
 		shape.setOrigin(shape.getSize().x/2, shape.getSize().y/2);

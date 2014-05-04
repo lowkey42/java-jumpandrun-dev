@@ -11,6 +11,8 @@ public interface IEditorCurser extends IDrawable, IInsideCheck {
 	void zoom(float factorOffset);
 	void rotate(float degrees);
 	void resize(float widthDiff, float heightDiff);
+	void flipHoriz();
+	void flipVert();
 
 	Attributes getAttributes();
 	void setAttributes(Attributes attributes);

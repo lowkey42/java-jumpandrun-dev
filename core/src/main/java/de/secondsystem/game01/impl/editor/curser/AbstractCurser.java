@@ -63,6 +63,14 @@ abstract class AbstractCurser implements IEditorCurser {
 		height= Math.max(MIN_SIZE, getHeight()+heightDiff);
 		getLayerObject().setDimensions(width*zoom, height*zoom);
 	}
+	@Override
+	public void flipHoriz() {
+		getLayerObject().flipHoriz();
+	}
+	@Override
+	public void flipVert() {
+		getLayerObject().flipVert();
+	}
 
 	@Override
 	public Attributes getAttributes() {

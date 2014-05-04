@@ -5,9 +5,9 @@ import org.jsfml.graphics.Color;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.game.entities.effects.GEGlowEffect;
 import de.secondsystem.game01.impl.graphic.AnimatedSprite;
+import de.secondsystem.game01.impl.graphic.ISpriteWrapper;
 import de.secondsystem.game01.impl.graphic.SpriteWrappper;
 import de.secondsystem.game01.impl.map.IGameMap;
-import de.secondsystem.game01.impl.map.IWorldDrawable;
 import de.secondsystem.game01.impl.map.physics.IPhysicsBody;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.DynamicPhysicsBodyFactory;
 import de.secondsystem.game01.impl.map.physics.IPhysicsWorld.HumanoidPhysicsBodyFactory;
@@ -39,7 +39,7 @@ final class GameEntityHelper {
 		return ge;
 	}
 	
-	public static IWorldDrawable createRepresentation( IGameMap map, Attributes attributes ) {
+	public static ISpriteWrapper createRepresentation( IGameMap map, Attributes attributes ) {
 		final String typeStr = attributes.getString("representationType");
 		if( typeStr==null )
 			return null;
@@ -54,19 +54,16 @@ final class GameEntityHelper {
 		switch( type ) {
 			case ANIMATION: {
 				AnimatedSprite repr = new AnimatedSprite(ResourceManager.animation.get(filename), width, height);
-				repr.setFlip(attributes.getBoolean("flipped", false));
 				return repr; }
 			
 			case TEXTURE: {
 				SpriteWrappper repr = new SpriteWrappper(width, height);
 				repr.setTexture(ResourceManager.texture.get(filename));
-				repr.setFlip(attributes.getBoolean("flipped", false));
 				return repr; }
 			
 			case TILE: {
 				SpriteWrappper repr = new SpriteWrappper(width, height);
 				repr.setTexture(ResourceManager.texture_tiles.get(filename));
-				repr.setFlip(attributes.getBoolean("flipped", false));
 				return repr; }
 				
 			default:
@@ -173,11 +170,14 @@ final class GameEntityHelper {
 				Float maxJumpSpeed = attributes.getFloat("maxJumpSpeed");
 				if( maxJumpSpeed!=null )
 					((DynamicPhysicsBodyFactory)bodyFactory).maxYSpeed(maxJumpSpeed);
-	
+
+				
 				Float initialRelXSpeed = attributes.getFloat("initialRelXSpeed");
 				Float initialRelYSpeed = attributes.getFloat("initialRelYSpeed");
 				if( initialRelXSpeed!=null && initialRelYSpeed!=null )
-					((DynamicPhysicsBodyFactory)bodyFactory).initialRelativeSpeed(initialRelXSpeed, initialRelYSpeed);
+					((DynamicPhysicsBodyFactory)bodyFactory).initialRelativeSpeed(
+							initialRelXSpeed * (attributes.getBoolean("flipHoriz", false)?-1:1), 
+							initialRelYSpeed * (attributes.getBoolean("flipVert", false)?-1:1));
 
 				Boolean jumpAllowed = attributes.getBoolean("jumpAllowed");
 				if( jumpAllowed!=null )

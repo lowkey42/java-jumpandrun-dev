@@ -1,4 +1,6 @@
 {"controllable":true, "representationType":"ANIMATION", "representation":"dude.anim", 
 "moveAcceleration":0.6, "jumpAcceleration":1, "maxMoveSpeed":1.5, "maxJumpSpeed":8, "maxThrowSpeed":10,
 "width":60, "height":60, "shape":"HUMANOID", "possessableTime":10000, "controller":{"factory":".SAiControllerFactory"}, "onDAMAGED":{"factory":".KillEHF", "spawn":{"type":"ghost"}},
-"onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".DelayEHF", "delay":50, "sub":{"factory":".PPEHF", "out":"DAMAGED"}}} }
+"onTOUCHED":{"factory":".CondEHF", "if":"IS_PLAYER", "arg":1, "then":{"factory":".DelayEHF", "delay":50, "sub":{"factory":".PPEHF", "out":"DAMAGED"}}},
+"onDIST_ATTACK":{"factory":".SpawnEHF", "type":"canonball", "relX":1, "relY":0, "attributes":{"initialRelXSpeed":4, "initialRelYSpeed":0} }
+ }

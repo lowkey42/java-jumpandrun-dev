@@ -5,16 +5,16 @@ import java.util.List;
 
 import org.jsfml.system.Vector2f;
 
-import de.secondsystem.game01.impl.game.entities.IControllable.HDirection;
-import de.secondsystem.game01.impl.game.entities.IControllable.VDirection;
 import de.secondsystem.game01.impl.game.entities.IControllableGameEntity;
 import de.secondsystem.game01.impl.game.entities.IGameEntityController;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
 import de.secondsystem.game01.model.Attributes.Attribute;
+import de.secondsystem.game01.model.HDirection;
 import de.secondsystem.game01.model.IPlayable;
 import de.secondsystem.game01.model.ISerializable;
 import de.secondsystem.game01.model.IUpdateable;
+import de.secondsystem.game01.model.VDirection;
 import de.secondsystem.game01.util.Tools;
 
 public class PatrollingController implements IUpdateable, IGameEntityController, ISerializable, IPlayable {

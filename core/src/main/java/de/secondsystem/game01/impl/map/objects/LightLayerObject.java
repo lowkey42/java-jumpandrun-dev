@@ -117,6 +117,32 @@ public class LightLayerObject implements ILayerObject {
 	}
 
 	@Override
+	public void flipHoriz() {
+	}
+
+	@Override
+	public void setFlipHoriz(boolean flip) {
+	}
+
+	@Override
+	public boolean isFlippedHoriz() {
+		return false;
+	}
+
+	@Override
+	public void flipVert() {
+	}
+
+	@Override
+	public void setFlipVert(boolean flip) {
+	}
+
+	@Override
+	public boolean isFlippedVert() {
+		return false;
+	}
+
+	@Override
 	public LayerObjectType typeUuid() {
 		return LayerObjectType.LIGHT;
 	}

@@ -81,5 +81,7 @@ public enum EventType {
 	 *  ARGS: IGameEntity: owner
 	 *  RETURN: unused
 	 */
-	JUMPED;
+	JUMPED,
+	
+	DIST_ATTACK;
 }

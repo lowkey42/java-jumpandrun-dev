@@ -3,6 +3,9 @@ package de.secondsystem.game01.impl.game.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.secondsystem.game01.model.HDirection;
+import de.secondsystem.game01.model.VDirection;
+
 public abstract class AbstractGameEntityController implements IGameEntityController {
 
 	protected final Set<IControllableGameEntity> ges = new HashSet<>(); 

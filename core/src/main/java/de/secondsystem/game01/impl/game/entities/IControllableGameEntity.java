@@ -11,4 +11,5 @@ public interface IControllableGameEntity extends IControllable, IGameEntity {
 	boolean isLiftingSomething();
 
 	boolean isUsePossible();
+	
 }
