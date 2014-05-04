@@ -56,14 +56,6 @@ public class EntityLayerObject implements ILayerObject, IUpdateable {
 	public void setLayerType(LayerType layerType) {
 	}
 	
-	@Deprecated
-	public void remove(IGameMap map) {
-	}
-	
-	@Deprecated
-	public void updateAttributes() {
-	}
-	
 	@Override
 	public void draw(RenderTarget renderTarget, WorldId worldId) {
 		entity.draw(renderTarget, worldId);

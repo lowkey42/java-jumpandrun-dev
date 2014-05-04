@@ -52,11 +52,6 @@ public class EntityLayer implements ILayer {
 	}
 
 	@Override
-	public ILayerObject findNode(Vector2f point) {
-		final IGameEntity entity = manager.findEntity(point);
-		return entity!=null ? new EntityLayerObject(entity) : null;
-	}
-	@Override
 	public List<ILayerObject> findNodes(Vector2f point) {
 		List<ILayerObject> r = new ArrayList<>();
 		for( IGameEntity e : manager.findEntities(worldId, point) )

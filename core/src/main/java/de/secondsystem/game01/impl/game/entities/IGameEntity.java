@@ -28,6 +28,7 @@ public interface IGameEntity extends IUpdateable, IWorldDrawable, ICameraControl
 	UUID uuid();
 	IGameEntityManager manager();
 	byte orderId();
+	String group();
 	
 	int getWorldMask();
 	boolean isInWorld(WorldId worldId);

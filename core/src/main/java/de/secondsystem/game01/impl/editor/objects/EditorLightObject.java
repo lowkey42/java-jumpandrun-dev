@@ -8,8 +8,6 @@ import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.ILayerObject;
 import de.secondsystem.game01.impl.map.LayerType;
 import de.secondsystem.game01.impl.map.objects.LightLayerObject;
-import de.secondsystem.game01.model.Attributes.Attribute;
-import de.secondsystem.game01.util.SerializationUtil;
 
 public class EditorLightObject extends EditorLayerObject {
 	private LightLayerObject lightLayerObject;
@@ -74,13 +72,13 @@ public class EditorLightObject extends EditorLayerObject {
 		this.map = map;	
 		
 		// temporary
-		Attribute radius = new Attribute("radius", 40.f);
-		Attribute rotation = new Attribute("rotation", 0.f);
-		Attribute x = new Attribute("x", 0.f);
-		Attribute y = new Attribute("y", 0.f);
-		Attribute world = new Attribute("world", map.getActiveWorldId().id);
-		Attribute color = new Attribute("color", SerializationUtil.encodeColor(new Color(100, 180, 150)) );
-		Attribute sizeDegree = new Attribute("sizeDegree", 360.f);
+//		Attribute radius = new Attribute("radius", 40.f);
+//		Attribute rotation = new Attribute("rotation", 0.f);
+//		Attribute x = new Attribute("x", 0.f);
+//		Attribute y = new Attribute("y", 0.f);
+//		Attribute world = new Attribute("world", map.getActiveWorldId().id);
+//		Attribute color = new Attribute("color", SerializationUtil.encodeColor(new Color(100, 180, 150)) );
+//		Attribute sizeDegree = new Attribute("sizeDegree", 360.f);
 		
 		lightLayerObject = null;// LightLayerObject.create(map, new Attributes(radius, rotation, x, y, world, color, sizeDegree));
 		

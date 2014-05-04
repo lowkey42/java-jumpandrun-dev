@@ -1,6 +1,5 @@
 package de.secondsystem.game01.impl.game.entities;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +52,7 @@ public final class GameEntityManager implements IGameEntityManager {
 	@SuppressWarnings("unchecked")
 	private final List<IGameEntity>[] orderedEntities = new ArrayList[256];
 	private final List<Byte> orderedEntitiesKeys = new ArrayList<>(5);
+	private final Map<String, Set<IGameEntity>> entityGroups = new HashMap<>(4);
 	
 	private final Set<UUID> entitiesToDestroy = new HashSet<>();
 	private final Set<IGameEntity> entitiesToAdd = new HashSet<>();
@@ -136,11 +136,6 @@ public final class GameEntityManager implements IGameEntityManager {
 	}
 	
 	@Override
-	public IGameEntity createEntity(String type, Map<String, Object> attributes) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public IGameEntity create(UUID uuid, String type, Map<String, Object> attr) {
 		if( overrideOptionalCreation ) {
 			final Object createCondition = attr.get("createIf");
@@ -155,7 +150,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		}
 		
 		if( uuid==null )
-			uuid = !"player".equals(type) ? UUID.randomUUID() : UUID.nameUUIDFromBytes("player".getBytes());
+			uuid = UUID.randomUUID();
 			
 		EntityArchetype at = ARCHETYPE_CACHE.get(type);
 		
@@ -166,17 +161,6 @@ public final class GameEntityManager implements IGameEntityManager {
 	
 		entitiesToAdd.add(e);
 		return e;
-	}
-	
-	@Override
-	public void addEntity(IGameEntity entity) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public void destroyEntity(UUID eId) {
-		throw new UnsupportedOperationException();
-		// editor requirement
 	}
 	
 	@Override
@@ -198,6 +182,14 @@ public final class GameEntityManager implements IGameEntityManager {
 				}
 				
 				sg.add(e);
+				
+				if( e.group()!=null && !e.group().isEmpty() ) {
+					Set<IGameEntity> ges = entityGroups.get(e.group());
+					if( ges==null )
+						entityGroups.put(e.group(), ges=new HashSet<>());
+					
+					ges.add(e);
+				}
 			}
 		}
 		entitiesToAdd.clear();
@@ -210,6 +202,12 @@ public final class GameEntityManager implements IGameEntityManager {
 				List<IGameEntity> sg = orderedEntities[entity.orderId()+128];
 				if( sg!=null ) {
 					sg.remove(entity);
+				}
+
+				if( entity.group()!=null && !entity.group().isEmpty() ) {
+					Set<IGameEntity> ges = entityGroups.get(entity.group());
+					if( ges!=null )
+						ges.remove(entity);
 				}
 			}
 		}
@@ -415,39 +413,7 @@ public final class GameEntityManager implements IGameEntityManager {
 		
 		destroyAndAddEntites();
 	}
-
-	@Override
-	public ArrayList<String> getArchetypes() {
-		ArrayList<String> list = new ArrayList<>();
-		final File entityFolder = ARCHETYPE_PATH.toFile();
-		
-	    for (final File fileEntry : entityFolder.listFiles())
-	    	if (fileEntry.isDirectory()) 
-	           list.addAll(listFilesForFolder(fileEntry));
-	        else 
-	           list.add(fileEntry.getName()); 
-	        
-		return list;
-	}
 	
-	private ArrayList<String> listFilesForFolder(final File folder) {
-		ArrayList<String> list = new ArrayList<>();
-		
-	    for (final File fileEntry : folder.listFiles()) 
-	    	list.add(fileEntry.getName());
-	    
-	    return list;
-	}
-
-	@Override
-	public IGameEntity findEntity(Vector2f pos) {
-		for(IGameEntity entity : entities.values()) {
-			if( entity.inside(pos) )
-				return entity;
-		}
-		
-		return null;
-	}
 	@Override
 	public List<IGameEntity> findEntities(WorldId worldId, Vector2f point) {
 		List<IGameEntity> r = new ArrayList<>();
@@ -458,4 +424,12 @@ public final class GameEntityManager implements IGameEntityManager {
 		return r;
 	}
 
+	@Override
+	public Set<IGameEntity> listByGroup(String group) {
+		Set<IGameEntity> r = entityGroups.get(group);
+		if( r==null )
+			entityGroups.put(group, r=new HashSet<>());
+		return Collections.unmodifiableSet(r);
+	}
+	
 }

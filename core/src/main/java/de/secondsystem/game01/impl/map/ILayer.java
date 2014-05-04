@@ -12,8 +12,6 @@ public interface ILayer extends IWorldDrawable, IUpdateable {
 
 	void replaceNode(ILayerObject obj, ILayerObject nObj);
 
-	ILayerObject findNode(Vector2f point);
-
 	void remove(ILayerObject s);
 
 	boolean isVisible();

@@ -36,6 +36,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 
 	private final UUID uuid;
 	
+	private final String group;
+	
 	protected final GameEntityManager em;
 	
 	protected final byte orderId;
@@ -70,6 +72,7 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		super( map, attributes );
 		
 		this.uuid = uuid;
+		this.group = attributes.getString("group", "").intern();
 		this.em = em;
 		this.worldMask = worldMask;
 		this.representation = representation;
@@ -108,6 +111,11 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		return em;
 	}
 
+	@Override
+	public String group() {
+		return group;
+	}
+	
 	@Override
 	public void update(long frameTimeMs) {
 		if( representation instanceof IUpdateable )

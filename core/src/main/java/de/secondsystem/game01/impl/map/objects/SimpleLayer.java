@@ -56,17 +56,6 @@ public class SimpleLayer implements ILayer {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.map.ILayer#findNode(org.jsfml.system.Vector2f)
-	 */
-	@Override
-	public ILayerObject findNode( Vector2f point ) {
-		for( ILayerObject o : objects )
-			if( o.inside(point) )
-				return o;
-		
-		return null;
-	}
 	@Override
 	public List<ILayerObject> findNodes(Vector2f point) {
 		List<ILayerObject> r = new ArrayList<>();

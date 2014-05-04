@@ -41,10 +41,6 @@ public interface IGameMap extends IDrawable, IUpdateable {
 	
 	String getMapId();
 
-	void setMapId(String mapId);
-
-	void setTileset(Tileset tileset);
-
 	Tileset getTileset();
 	
 	IGameEntityManager getEntityManager();
@@ -65,15 +61,11 @@ public interface IGameMap extends IDrawable, IUpdateable {
 
 	void addNode(LayerType layer, ILayerObject sprite);
 	
-	ILayerObject findNode(LayerType layer, Vector2f point);
-	
 	List<ILayerObject> findNodes(LayerType layer, Vector2f point);
 	
 	void remove(LayerType layer, ILayerObject s);
 	
 	boolean flipShowLayer(LayerType layer);
-
-	boolean[] getShownLayer();
 	
 	boolean isLayerShown(LayerType layer);
 	void setShowLayer(LayerType layer, boolean show);

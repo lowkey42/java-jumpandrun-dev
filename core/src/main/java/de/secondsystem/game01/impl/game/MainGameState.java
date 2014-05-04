@@ -65,8 +65,6 @@ public class MainGameState extends GameState {
 	private IControllableGameEntity player;
 	
 	private KeyboardController controller;
-	
-	private final UUID PLAYER_UUID = UUID.nameUUIDFromBytes("player".getBytes());
 
 	public MainGameState( String mapId, GameState parentState ) {
 		this.mapId = mapId;
@@ -216,9 +214,11 @@ public class MainGameState extends GameState {
 			mapRenderer.update(8);
 		}
 		
-		player = (IControllableGameEntity) map.getEntityManager().get(PLAYER_UUID);
-		if( player == null )
-			player = (IControllableGameEntity) map.getEntityManager().create(PLAYER_UUID, "player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
+		Set<IGameEntity> playerEntities = map.getEntityManager().listByGroup("player");
+		
+		player = !playerEntities.isEmpty() ? 
+				(IControllableGameEntity) playerEntities.iterator().next() :
+				map.getEntityManager().createControllable("player", new Attributes(new Attribute("x",300), new Attribute("y",100)) );
 
 		player.addEventHandler(EventType.DAMAGED, new PlayerDeathEventHandler(map) );
 		player.addEventHandler(EventType.ATTACK, new PlayerAttackEventHandler());
@@ -227,7 +227,11 @@ public class MainGameState extends GameState {
 
 		controller = new KeyboardController(ctx.settings.keyMapping, new IWorldSwitchInterceptor() {
 			@Override public boolean doWorldSwitch() {
-				return !unpossess();
+				if( unpossess() )
+					return false;
+				
+				mapRenderer.onWorldSwitch(map.getActiveWorldId());
+				return true;
 			}
 		});
 		controller.addGE(player);

@@ -126,20 +126,6 @@ public class GameMap implements IGameMap {
 		return mapId;
 	}
 	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.map.IGameMap#setMapId(java.lang.String)
-	 */
-	@Override
-	public void setMapId(String mapId) {
-		this.mapId = mapId;
-	}
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.map.IGameMap#setTileset(de.secondsystem.game01.impl.map.Tileset)
-	 */
-	@Override
-	public void setTileset(Tileset tileset) {
-		this.tileset = tileset;
-	}
-	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.map.IGameMap#getTileset()
 	 */
 	@Override
@@ -298,13 +284,6 @@ public class GameMap implements IGameMap {
 	public void addNode( LayerType layer, ILayerObject sprite ) {
 		addNode(activeWorldId, layer, sprite);
 	}
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.map.IGameMap#findNode(de.secondsystem.game01.impl.map.LayerType, org.jsfml.system.Vector2f)
-	 */
-	@Override
-	public ILayerObject findNode( LayerType layer, Vector2f point ) {
-		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].findNode(point);
-	}
 	@Override
 	public List<ILayerObject> findNodes(LayerType layer, Vector2f point) {
 		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].findNodes(point);
@@ -324,17 +303,6 @@ public class GameMap implements IGameMap {
 	@Override
 	public boolean flipShowLayer( LayerType layer ) {
 		return gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].setVisible( !gameWorld[activeWorldId.arrayIndex].graphicLayer[layer.layerIndex].isVisible() );
-	}
-	/* (non-Javadoc)
-	 * @see de.secondsystem.game01.impl.map.IGameMap#getShownLayer()
-	 */
-	@Override
-	public boolean[] getShownLayer() {
-		boolean[] s = new boolean[LayerType.LAYER_COUNT];
-		for( int i=0; i<LayerType.LAYER_COUNT; ++i )
-			s[i] = gameWorld[activeWorldId.arrayIndex].graphicLayer[i].isVisible();
-		
-		return s;
 	}
 	
 	@Override

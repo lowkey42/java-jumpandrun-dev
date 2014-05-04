@@ -1,7 +1,5 @@
 package de.secondsystem.game01.impl.game.entities.events;
 
-import java.util.UUID;
-
 import de.secondsystem.game01.impl.game.entities.IGameEntity;
 import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.model.Attributes;
@@ -16,7 +14,7 @@ public class FilterEventHandler implements IEventHandler {
 		IS_NOT_NULL
 	}
 	
-	private static final UUID PLAYER_UUID = UUID.nameUUIDFromBytes("player".getBytes());
+	private static final String PLAYER_GROUP = "player";
 	
 	private final Condition condition;
 	
@@ -44,7 +42,7 @@ public class FilterEventHandler implements IEventHandler {
 				break;
 
 			case IS_PLAYER:
-				if( !(arg instanceof IGameEntity) || !PLAYER_UUID.equals(((IGameEntity) arg).uuid()) )
+				if( !(arg instanceof IGameEntity) || !PLAYER_GROUP.equals(((IGameEntity) arg).group()) )
 					return null;
 				break;
 

@@ -22,7 +22,7 @@ public class EditorEntity extends EditorLayerObject {
 	public EditorEntity(IGameMap map) {
 		mouseState = true;
 		
-		archetypes = map.getEntityManager().getArchetypes();
+		archetypes = null;//map.getEntityManager().getArchetypes();
 		currentArchetype = archetypes.get(currentArchetypeIndex);
 		this.map = map;
 	}
@@ -86,7 +86,7 @@ public class EditorEntity extends EditorLayerObject {
 	@Override
 	public void deselect() {
 		if( mouseState ) {
-			((EntityLayerObject) layerObject).remove(map);
+		//	((EntityLayerObject) layerObject).remove(map);
 		}
 		else
 			if( layerObject != null ) {
@@ -96,7 +96,7 @@ public class EditorEntity extends EditorLayerObject {
 	
 	private void recreate() {				
 		if( layerObject instanceof EntityLayerObject ) {
-			((EntityLayerObject) layerObject).remove(map);
+		//	((EntityLayerObject) layerObject).remove(map);
 			IGameEntity entity = ((EntityLayerObject) layerObject).getEntity();
 			addToMap(entity.getEditableState().getArchetype(), entity.uuid());
 		}
@@ -117,7 +117,7 @@ public class EditorEntity extends EditorLayerObject {
 	
 	@Override
 	public Attributes getAttributes() {
-		((EntityLayerObject) layerObject).updateAttributes();
+	//	((EntityLayerObject) layerObject).updateAttributes();
 		return ((EntityLayerObject) layerObject).attributes;
 	}
 }
