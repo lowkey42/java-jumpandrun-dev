@@ -63,7 +63,7 @@ public final class PingPongEventHandler implements IEventHandler {
 	@Override
 	public Object handle(Object... args) {
 		List<Object> newArgs = new ArrayList<>(Arrays.asList(args));
-		Object target = targetEntity==null ? args[1] : targetEntity.get();
+		Object target = targetEntity==null ? (args[1] instanceof IGameEntity ? args[1]: args[0]) : targetEntity.get();
 
 		if( targetEntity==null ) {
 			target = args[1];

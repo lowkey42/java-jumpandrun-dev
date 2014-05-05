@@ -59,9 +59,9 @@ public class KillEventHandler implements IEventHandler {
 		lastHit = System.currentTimeMillis() + 1000;
 		
 		final IGameEntity owner = (IGameEntity) args[0];
-		final IGameEntity killer = (IGameEntity) args[1];
+		final IGameEntity killer = args[1] instanceof IGameEntity ? (IGameEntity) args[1] : null;
 		
-		if( owner!=null && killer!=null )
+		if( owner!=null )
 			switch( owner.getWorldId() ) {
 				case MAIN:
 					inMainWorld(owner, killer);

@@ -89,7 +89,7 @@ public class MainGameState extends GameState {
 
 		@Override
 		public Object handle(Object... args) {
-			if( ((IGameEntity)args[1]).uuid().equals(ignoreDamageEntity) )
+			if( args[1] instanceof IGameEntity && ((IGameEntity)args[1]).uuid().equals(ignoreDamageEntity) )
 				return null;
 			
 			return super.handle(args);

@@ -92,7 +92,14 @@ class Box2dContactListener implements ContactListener {
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse arg1) {
-		// not used currently
+        Box2dPhysicsBody bodyA = (Box2dPhysicsBody) contact.m_fixtureA.getBody().getUserData();
+        Box2dPhysicsBody bodyB = (Box2dPhysicsBody) contact.m_fixtureB.getBody().getUserData();
+        
+		if( arg1.normalImpulses[0]>=1.0 )
+			bodyA.onPressed(arg1.normalImpulses[0]);
+
+		if( arg1.normalImpulses.length>1 && arg1.normalImpulses[1]>=1.0 )
+			bodyB.onPressed(arg1.normalImpulses[1]);
 	}
 
 	@Override

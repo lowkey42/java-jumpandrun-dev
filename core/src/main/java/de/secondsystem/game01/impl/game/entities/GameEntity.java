@@ -196,6 +196,14 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 	}
 	
 	@Override
+	public void pressed(float pressure) {
+		notify(EventType.HIT, this, pressure);
+		if( pressure>=2.0f ) {
+			notify(EventType.DAMAGED, this, pressure);
+		}
+	}
+	
+	@Override
 	public int getWorldMask() {
 		return worldMask;
 	}
@@ -220,7 +228,8 @@ class GameEntity extends EventHandlerCollection implements IGameEntity, PhysicsC
 		if( physicsBody!=null ) {
 			if( newWorldMask!=0 && worldMask!=0 && physicsBody instanceof IDynamicPhysicsBody ) {
 				if( !((IDynamicPhysicsBody)physicsBody).tryWorldSwitch(newWorldMask) ) {
-					addEffect(new GEGlowEffect(map, representation, new Color(100, 0, 0, 255), new Color(255, 255, 255, 100), 40, 50, 25), 2000);
+					if( representation!=null )
+						addEffect(new GEGlowEffect(map, representation, new Color(100, 0, 0, 255), new Color(255, 255, 255, 100), 40, 50, 25), 2000);
 					return false;
 				}
 				

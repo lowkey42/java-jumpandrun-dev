@@ -83,5 +83,6 @@ public enum EventType {
 	 */
 	JUMPED,
 	
-	DIST_ATTACK;
+	DIST_ATTACK,
+	HIT;
 }

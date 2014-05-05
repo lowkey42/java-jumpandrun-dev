@@ -210,6 +210,10 @@ class Box2dPhysicsBody implements IPhysicsBody, FixtureContactListener {
 		return (float) (a < 0 ? 360 + a : a);
 	}
 
+	public void onPressed(float pressure) {
+		if( contactListener!=null )
+			contactListener.pressed(pressure);
+	}
 	@Override
 	public void onBeginContact(Contact contact, Box2dPhysicsBody other, Fixture fixture) {
 		if( contactListener!=null && other.type!=CollisionHandlerType.CLIMBABLE )

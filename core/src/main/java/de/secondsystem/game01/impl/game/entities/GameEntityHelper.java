@@ -33,7 +33,7 @@ final class GameEntityHelper {
 	
 	public static <T extends IGameEntity> T addStaticEffects(T ge, IGameMap map, Attributes attributes) {
 		Boolean worldSwitchAllowed = attributes.getBoolean("worldSwitchAllowed");
-		if( worldSwitchAllowed!=null && worldSwitchAllowed )
+		if( worldSwitchAllowed!=null && worldSwitchAllowed && ge.getRepresentation()!=null )
 			ge.addEffect(new GEGlowEffect(map, ge.getRepresentation(), new Color(50, 0, 0, 200), new Color(255, 255, 255, 100), 20, 20, 0));
 		
 		return ge;
