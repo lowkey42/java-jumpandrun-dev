@@ -6,10 +6,14 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.jsfml.audio.Sound;
 import org.jsfml.graphics.Color;
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.Sprite;
+import org.jsfml.system.Vector2f;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,9 +21,12 @@ import org.json.simple.parser.ParseException;
 import de.secondsystem.game01.impl.GameContext;
 import de.secondsystem.game01.impl.ResourceManager;
 import de.secondsystem.game01.impl.scripting.IScriptApi;
+import de.secondsystem.game01.impl.sound.MonologueTextBox;
 import de.secondsystem.game01.model.GameException;
+import de.secondsystem.game01.model.IDrawable;
+import de.secondsystem.game01.model.IUpdateable;
 
-public class ScriptApiImpl implements IScriptApi {
+public class ScriptApiImpl implements IScriptApi, IDrawable, IUpdateable {
 	/**
 	 * 
 	 */
@@ -27,6 +34,10 @@ public class ScriptApiImpl implements IScriptApi {
 	private final GameContext ctx;
 	private JSONObject storedValues;
 	private final JSONParser parser = new JSONParser();
+
+	private ThreadedMapLoader activeMapLoader;
+	private final Set<Sprite> sprites = new HashSet<>();
+	private final MonologueTextBox monologueTextBox;
 	
 	public ScriptApiImpl(MainGameState mainGameState, GameContext ctx) {
 		this.mainGameState = mainGameState;
@@ -37,6 +48,13 @@ public class ScriptApiImpl implements IScriptApi {
 		} catch (IOException | ParseException e) {
 			storedValues = new JSONObject();
 		}
+
+		try {
+			monologueTextBox = new MonologueTextBox(ResourceManager.font.get("FreeSans.otf"), 30, new Vector2f(ctx.getViewWidth()/2, ctx.getViewHeight()-100));
+			
+		} catch (GameException e) {
+			throw new GameException("Unable to load font for MonologueTextBox: "+e.getMessage(), e);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -45,8 +63,8 @@ public class ScriptApiImpl implements IScriptApi {
 	@Override
 	public void loadMap(String mapId) {
 		System.out.println("load:" +mapId);
-		if( this.mainGameState.activeMapLoader==null )
-			this.mainGameState.activeMapLoader = new ThreadedMapLoader(mapId, ctx);
+		if( activeMapLoader==null )
+			activeMapLoader = new ThreadedMapLoader(mapId, ctx);
 	}
 	
 	/* (non-Javadoc)
@@ -54,7 +72,7 @@ public class ScriptApiImpl implements IScriptApi {
 	 */
 	@Override
 	public void playMonologue(String name) {
-		this.mainGameState.monologueTextBox.play(name);
+		monologueTextBox.play(name);
 	}
 	
 	/* (non-Javadoc)
@@ -111,7 +129,7 @@ public class ScriptApiImpl implements IScriptApi {
 		try {
 			Sprite s = new Sprite(ResourceManager.texture_gui.get(texture).texture);
 			s.setPosition(x, y);
-			this.mainGameState.sprites.add(s);
+			this.sprites.add(s);
 			return s;
 			
 		} catch (GameException e) {
@@ -125,7 +143,7 @@ public class ScriptApiImpl implements IScriptApi {
 	 */
 	@Override
 	public void deleteSprite(Sprite sprite) {
-		this.mainGameState.sprites.remove(sprite);
+		this.sprites.remove(sprite);
 	}
 	/* (non-Javadoc)
 	 * @see de.secondsystem.game01.impl.game.IScriptApi#updateSpriteTex(org.jsfml.graphics.Sprite, java.lang.String)
@@ -146,5 +164,30 @@ public class ScriptApiImpl implements IScriptApi {
 	@Override
 	public void updateSpriteColor(Sprite sprite, int r, int g, int b, int a) {
 		sprite.setColor(new Color(r, g, b, a));
+	}
+
+	@Override
+	public void update(long frameTime) {
+		if( activeMapLoader!=null ) {
+			activeMapLoader.update(frameTime);
+		}
+		
+		monologueTextBox.update(frameTime);
+	}
+
+	@Override
+	public void draw(RenderTarget renderTarget) {
+		for( Sprite s : sprites )
+			ctx.window.draw(s);
+		
+
+		if( activeMapLoader!=null ) {
+			activeMapLoader.draw(renderTarget);
+			
+			if( activeMapLoader.isFinished() )
+				mainGameState.requestStateSwitch(activeMapLoader.getLoadedMap());
+		}
+		
+		monologueTextBox.draw(renderTarget);
 	}
 }

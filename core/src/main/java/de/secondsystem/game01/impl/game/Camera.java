@@ -1,11 +1,14 @@
 package de.secondsystem.game01.impl.game;
 
 import org.jsfml.graphics.ConstView;
+import org.jsfml.graphics.RenderTarget;
 import org.jsfml.graphics.View;
 import org.jsfml.system.Vector2f;
 
 import de.secondsystem.game01.impl.map.ICameraController;
+import de.secondsystem.game01.impl.map.IGameMap;
 import de.secondsystem.game01.impl.map.IGameMap.WorldId;
+import de.secondsystem.game01.model.IDrawable;
 import de.secondsystem.game01.model.IUpdateable;
 
 public class Camera implements IUpdateable {
@@ -26,7 +29,10 @@ public class Camera implements IUpdateable {
 	private Vector2f recenterTarget;
 	
 	private float timeAcc = 0;
-	
+
+	public Camera() {
+		this(Vector2f.ZERO);
+	}
 	public Camera(Vector2f center) {
 		this.x = center.x;
 		this.y = center.y;
@@ -93,11 +99,21 @@ public class Camera implements IUpdateable {
 		return valStart+(valTarget-valStart)*timeDiff;
 	}
 	
-	public ConstView createView( ConstView base ) {
+	protected ConstView createView( ConstView base ) {
 		return new View(new Vector2f(x, y), base.getSize());
 	}
 	
-	public WorldId getWorldId() {
+	public void drawInView(RenderTarget target, IGameMap map, IDrawable drawable) {
+		final ConstView cView = target.getView();
+		target.setView(createView(cView));
+		map.setActiveWorldId(getWorldId());
+		
+		drawable.draw(target);
+		
+		target.setView(cView);
+	}
+	
+	protected WorldId getWorldId() {
 		return worldId;
 	}
 	
